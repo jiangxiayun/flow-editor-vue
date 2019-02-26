@@ -198,11 +198,39 @@ input{
   width: 80px;
   height: 40px;
   position: absolute;
-  top: 0;
-  left: 0;
   z-index: 999;
 
-  .lt{
-
+  .out{
+    position: relative;
+    height: 100%;
   }
+  span{
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: #fff;
+    border: 1px #38a1ff dashed;
+    position: absolute;
+  }
+  .lt{
+    top: -3px;
+    left: -3px;
+    cursor: nw-resize;
+  }
+  .rt{
+    top: -3px;
+    right: -3px;
+    cursor: ne-resize;
+  }
+  .lb{
+    bottom: -3px;
+    left: -3px;
+    cursor: ne-resize;
+  }
+  .rb{
+    bottom: -3px;
+    right: -3px;
+    cursor: nw-resize;
+   }
+
 }

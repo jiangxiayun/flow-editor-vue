@@ -1,56 +1,52 @@
 <template>
-  <div>
-    <div data-status="node-selected" class="panel">
+  <div class="detailpanel">
+    <div data-status="node-selected" class="pannel">
       <div class="panel-title">节点</div>
       <div class="block-container">
-        {labelInput}
-        <div class="p">
-          尺寸：
-          <InputNumber
-              size="small"
-              value={width} class="input width-input"
-              onChange={ value => {
-            const newSize = value + '*' + height;
-            selectedModel.size = newSize;
-            this.setState({
-            selectedModel
-            });
-            this.updateGraph('size', newSize);
-            } }/>
-            <InputNumber
-                size="small"
-                value={height} class="input height-input"
-                onChange={ value => {
-              const newSize = width + '*' + value;
-              selectedModel.size = newSize;
-              this.setState({
-              selectedModel
-              });
-              this.updateGraph('size', newSize);
-              } }/>
-        </div>
+        <nodeEdit :selectedModel="item" @updateGraph="updateGraph"></nodeEdit>
+
         {colorInput}
       </div>
     </div>
-    <div data-status="edge-selected" class="panel" id="edge_detailpanel">
+    <div data-status="edge-selected" class="pannel" id="edge_detailpanel">
       <div class="panel-title">边</div>
       <div class="block-container">
-        {labelInput}
+        <div class="p">
+          名称：
+          <nodeEdit :flow="flow"></nodeEdit>
+          <!--<el-input v-model="input" placeholder="请输入内容"></el-input>-->
+          <!--<Input-->
+              <!--size="small"-->
+              <!--className="input name-input"-->
+              <!--value = {inputingLabel ? inputingLabel : selectedModel.label}-->
+              <!--onChange = { ev => {-->
+            <!--this.setState({-->
+            <!--inputingLabel: ev.target.value-->
+            <!--});-->
+            <!--}}-->
+            <!--onBlur = { ev => {-->
+            <!--this.updateGraph('label', ev.target.value);-->
+            <!--this.setState({-->
+            <!--inputingLabel: null-->
+            <!--});-->
+            <!--}}-->
+            <!--/>-->
+        </div>
       </div>
     </div>
-    <div data-status="group-selected" class="panel" id="group_detailpanel">
+    <div data-status="group-selected" class="pannel" id="group_detailpanel">
       <div class="panel-title">组</div>
       <div class="block-container">
         {labelInput}
       </div>
     </div>
-    <div data-status="canvas-selected" class="panel" id="canvas_detailpanel">
+    <div data-status="canvas-selected" class="pannel" id="canvas_detailpanel">
       <div class="panel-title">画布</div>
       <div class="block-container">
-        <Checkbox onChange={ this.toggleGrid.bind(this) } >网格对齐</Checkbox>
+        <el-checkbox v-model="checked" @change="toggleGrid">网格对齐</el-checkbox>
       </div>
     </div>
-    <div data-status="multi-selected" class="panel" id="multi_detailpanel">
+    <div data-status="multi-selected" class="pannel" id="multi_detailpanel">
       <div class="panel-title">多选</div>
       <div class="block-container">
         {colorInput}
@@ -60,10 +56,40 @@
 </template>
 
 <script>
+import nodeEdit from '@/components/editInfo/node'
+
 export default {
   name: 'Detailpanel',
+  data () {
+    return {
+      checked: false
+    }
+  },
+  components: { nodeEdit },
   props: {
-    msg: String
+    editor: Object,
+    flow: Object,
+    item: Object,
+  },
+  methods: {
+    toggleGrid(ev) {
+      if (ev) {
+        this.flow.showGrid();
+      } else {
+        this.flow.hideGrid();
+      }
+    },
+    updateGraph({key, value}) {
+      // 执行命令
+      this.editor.executeCommand(() => {
+        const selectedItems = this.flow.getSelected(); // 获取选中图项集
+        selectedItems.forEach(item => {
+          const updateModel = {};
+          updateModel[key] = value;
+          this.flow.update(item, updateModel); // 更新项
+        });
+      });
+    }
   }
 }
 </script>

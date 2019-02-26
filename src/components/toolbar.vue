@@ -1,60 +1,45 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-unit-mocha" target="_blank" rel="noopener">unit-mocha</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-e2e-cypress" target="_blank" rel="noopener">e2e-cypress</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="toolbar">
+    <link rel="stylesheet" type="text/css" href="//at.alicdn.com/t/font_598462_3xve1872wizzolxr.css" />
+    <i data-command="undo" class="command iconfont icon-undo" title="撤销"></i>
+    <i data-command="redo" class="command iconfont icon-redo" title="重做"></i>
+    <span class="separator"></span>
+    <i data-command="copy" class="command iconfont icon-copy-o" title="复制"></i>
+    <i data-command="paste" class="command iconfont icon-paster-o" title="粘贴"></i>
+    <i data-command="delete" class="command iconfont icon-delete-o" title="删除"></i>
+    <span class="separator"></span>
+    <i data-command="zoomIn" class="command iconfont icon-zoom-in-o" title="放大"></i>
+    <i data-command="zoomOut" class="command iconfont icon-zoom-out-o" title="缩小"></i>
+    <i data-command="autoZoom" class="command iconfont icon-fit" title="适应画布"></i>
+    <i data-command="resetZoom" class="command iconfont icon-actual-size-o" title="实际尺寸"></i>
+    <span class="separator"></span>
+    <i data-command="toBack" class="command iconfont icon-to-back" title="层级后置"></i>
+    <i data-command="toFront" class="command iconfont icon-to-front" title="层级前置"></i>
+    <span class="separator"></span>
+    <i data-command="multiSelect" class="command iconfont icon-select" title="多选"></i>
+    <i data-command="addGroup" class="command iconfont icon-group" title="成组"></i>
+    <i data-command="unGroup" class="command iconfont icon-ungroup" title="解组"></i>
+    <i data-command="save" class="command" title="save">save</i>
+    <i data-command="clear" class="command" title="清空画布">clear</i>
   </div>
 </template>
 
 <script>
+
 export default {
-  name: 'HelloWorld',
+  name: 'ToolBar',
   props: {
-    msg: String
+    flow: Object
+  },
+  methods: {
+    // save () {
+    //   const data = this.flow.save()
+    //   console.log('save', data)
+    // }
   }
 }
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+
 </style>

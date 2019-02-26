@@ -1,70 +1,74 @@
 <template>
-  <div class="detailpanel">
-    <div data-status="node-selected" class="panel">
-      <div class="panel-title">节点</div>
-      <div class="block-container">
-        {labelInput}
-        <div class="p">
-          尺寸：
-          <InputNumber
-              size="small"
-              value={width} class="input width-input"
-              onChange={ value => {
-            const newSize = value + '*' + height;
-            selectedModel.size = newSize;
-            this.setState({
-            selectedModel
-            });
-            this.updateGraph('size', newSize);
-            } }/>
-            <InputNumber
-                size="small"
-                value={height} class="input height-input"
-                onChange={ value => {
-              const newSize = width + '*' + value;
-              selectedModel.size = newSize;
-              this.setState({
-              selectedModel
-              });
-              this.updateGraph('size', newSize);
-              } }/>
-        </div>
-        {colorInput}
-      </div>
+  <div class="contextmenu">
+  <div data-status="node-selected" class="menu">
+    <div data-command="copy" class="command">
+      <span>复制</span>
+      <span>copy</span>
     </div>
-    <div data-status="edge-selected" class="panel" id="edge_detailpanel">
-      <div class="panel-title">边</div>
-      <div class="block-container">
-        {labelInput}
-      </div>
+    <div data-command="delete" class="command">
+      <span>删除</span>
+      <span>delete</span>
     </div>
-    <div data-status="group-selected" class="panel" id="group_detailpanel">
-      <div class="panel-title">组</div>
-      <div class="block-container">
-        {labelInput}
-      </div>
+  </div>
+  <div data-status="edge-selected" class="menu">
+    <div data-command="delete" class="command">
+      <span>删除</span>
+      <span>delete</span>
     </div>
-    <div data-status="canvas-selected" class="panel" id="canvas_detailpanel">
-      <div class="panel-title">画布</div>
-      <div class="block-container">
-        <Checkbox onChange={ this.toggleGrid.bind(this) } >网格对齐</Checkbox>
-      </div>
+  </div>
+  <div data-status="group-selected" class="menu">
+    <div data-command="copy" class="command">
+      <span>复制</span>
+      <span>copy</span>
     </div>
-    <div data-status="multi-selected" class="panel" id="multi_detailpanel">
-      <div class="panel-title">多选</div>
-      <div class="block-container">
-        {colorInput}
-      </div>
+    <div data-command="delete" class="command">
+      <span>删除</span>
+      <span>delete</span>
     </div>
+    <div data-command="unGroup" class="command">
+      <span>解组</span>
+      <span>unGroup</span>
+    </div>
+  </div>
+  <div data-status="canvas-selected" class="menu">
+    <div data-command="undo" class="command">
+      <span>撤销</span>
+      <span>undo</span>
+    </div>
+    <div data-command="redo" class="command">
+      <span>重做</span>
+      <span>redo</span>
+    </div>
+    <div data-command="pasteHere" class="command">
+      <span>粘贴</span>
+      <span>pasteHere</span>
+    </div>
+  </div>
+  <div data-status="multi-selected" class="menu">
+    <div data-command="copy" class="command">
+      <span>复制</span>
+      <span>copy</span>
+    </div>
+    <div data-command="paste" class="command">
+      <span>粘贴</span>
+      <span>paste</span>
+    </div>
+    <div data-command="addGroup" class="command">
+      <span>归组</span>
+      <span>addGroup</span>
+    </div>
+    <div data-command="delete" class="command">
+      <span>删除</span>
+      <span>delete</span>
+    </div>
+  </div>
   </div>
 </template>
 
 <script>
+
 export default {
-  name: 'Detailpanel',
-  props: {
-    msg: String
-  }
+  name: 'contextMenu'
 }
 </script>
 
