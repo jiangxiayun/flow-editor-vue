@@ -2394,11 +2394,13 @@ ORYX = Object.extend(ORYX, {
 	},
 	
 	_loadPlugins: function(plugins) {
-	
+		console.log('plugins', plugins)
+
 	    ORYX.availablePlugins.length = 0;
-	
-		// get plugins.xml content
-		var resultXml = jQuery.parseXML(plugins); //jquery parser
+
+    var resultXml = plugins
+    // get plugins.xml content
+		// var resultXml = jQuery.parseXML(plugins); //jquery parser
 
 		// TODO: Describe how properties are handled.
 		// Get the globale Properties
@@ -6559,7 +6561,7 @@ ORYX.Core.StencilSet.Property = Clazz.extend({
         if (!jsonProp.dateFormat) {
             jsonProp.dateFormat = ORYX.I18N.PropertyWindow.dateFormat || "m/d/y";
         }
-        
+
         if (!jsonProp.fill) {
             jsonProp.fill = false;
         }
@@ -8984,6 +8986,7 @@ ORYX.Core.StencilSet._rulesByEditorInstance = new Hash();
  */
 ORYX.Core.StencilSet.stencilSets = function(editorId) {
 	var stencilSetNSs = ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId);
+
 	var stencilSets = new Hash();
 	if(stencilSetNSs) {
 		stencilSetNSs.each(function(stencilSetNS) {
@@ -11662,8 +11665,7 @@ ORYX.Editor = {
             if (stencilType.search(/^http/) === -1) {
                 stencilType = this.getStencilSets().values()[0].namespace() + stencilType;
             }
-        }
-        else {
+        } else {
             // Get any root stencil type
             stencilType = this.getStencilSets().values()[0].findRootStencilName();
         }
@@ -12176,7 +12178,7 @@ ORYX.Editor = {
 		return this.selection || [];
 	},
 
-	getStencilSets: function() { 
+	getStencilSets: function() {
 		return ORYX.Core.StencilSet.stencilSets(this.id); 
 	},
 	
