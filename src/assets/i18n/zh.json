@@ -669,7 +669,7 @@
   },
 
   "TOUR": {
-    "WELCOME-TITLE": "欢迎, {{userName}}",
+    "WELCOME-TITLE": "欢迎, {userName}",
     "WELCOME-CONTENT": "这是一个短暂的flowable编辑器. 接下来的几个步骤将指导您通过应用程序的不同部分来启动。按ESC键随时停止。" ,
     "PALETTE-TITLE": "调色板",
     "PALETTE-CONTENT": "在这里可以找到创建业务流程的所有可用构成。它们是按逻辑组排列的。只需点击它就可以打开一组:",
@@ -682,7 +682,7 @@
     "TOOLBAR-TITLE": "工具栏",
     "TOOLBAR-CONTENT": "可以在这里找到所有的动作：保存或验证模型, 复制和粘贴一个流程的部分, 等等. 在按钮上悬停以此获得对动作的描述信息.",
     "END-TITLE": "终点",
-    "END-CONTENT": "就是这样！现在可以开始建模过程。如果你有任何问题，可以问他们。 <a href=\"http://forum.flowable.org/\" target=\"_blank\">Flowable论坛</a> "
+    "END-CONTENT": "就是这样！现在可以开始建模过程。如果你有任何问题，请联系开发者。"
   },
 
   "FEATURE-TOUR" : {

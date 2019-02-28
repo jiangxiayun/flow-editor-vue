@@ -25,7 +25,6 @@ FLOWABLE.TOOLBAR = {
     },
 
     validate: function (services) {
-
       _internalCreateModal({
         backdrop: true,
         keyboard: true,
@@ -146,12 +145,10 @@ FLOWABLE.TOOLBAR = {
 
     cut: function (services) {
       FLOWABLE.TOOLBAR.ACTIONS._getOryxEditPlugin(services).editCut();
-      for (var i = 0; i < services.$scope.items.length; i++) {
-        var item = services.$scope.items[i];
+      for (let i = 0; i < services.$scope.items.length; i++) {
+        let item = services.$scope.items[i];
         if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste') {
-          services.$scope.safeApply(function () {
-            item.enabled = true;
-          });
+          item.enabled = true;
         }
       }
     },
@@ -175,13 +172,11 @@ FLOWABLE.TOOLBAR = {
     },
 
     addBendPoint: function (services) {
-
       // Show the tutorial the first time
-      FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, services.$translate, services.$q, true);
+      FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, true);
 
-      var dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services);
-
-      var enableAdd = !dockerPlugin.enabledAdd();
+      const dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services);
+      let enableAdd = !dockerPlugin.enabledAdd();
       dockerPlugin.setEnableAdd(enableAdd);
       if (enableAdd) {
         dockerPlugin.setEnableRemove(false);
@@ -193,13 +188,12 @@ FLOWABLE.TOOLBAR = {
     },
 
     removeBendPoint: function (services) {
-
       // Show the tutorial the first time
-      FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, services.$translate, services.$q, true);
+      FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, true);
 
-      var dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services);
+      const dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services);
 
-      var enableRemove = !dockerPlugin.enabledRemove();
+      let enableRemove = !dockerPlugin.enabledRemove();
       dockerPlugin.setEnableRemove(enableRemove);
       if (enableRemove) {
         dockerPlugin.setEnableAdd(false);
@@ -240,10 +234,10 @@ FLOWABLE.TOOLBAR = {
       FLOWABLE.TOOLBAR.ACTIONS._getOryxViewPlugin(services).zoomFitToModel();
     },
 
+    // 对齐
     alignVertical: function (services) {
       FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_CENTER]);
     },
-
     alignHorizontal: function (services) {
       FLOWABLE.TOOLBAR.ACTIONS._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_MIDDLE]);
     },
@@ -253,7 +247,7 @@ FLOWABLE.TOOLBAR = {
     },
 
     help: function (services) {
-      FLOWABLE_EDITOR_TOUR.gettingStarted(services.$scope, services.$translate, services.$q);
+      FLOWABLE_EDITOR_TOUR.gettingStarted(services.$scope);
     },
 
     /**

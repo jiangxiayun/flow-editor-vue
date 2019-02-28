@@ -670,7 +670,7 @@
   },
 
   "TOUR": {
-    "WELCOME-TITLE": "Welcome, {{userName}}",
+    "WELCOME-TITLE": "Welcome, {userName}",
     "WELCOME-CONTENT": "This a short tour of the Flowable editor. The next few steps will guide you through the different sections of the application to get you started. Press the ESC key to stop at any time." ,
     "PALETTE-TITLE": "The Palette",
     "PALETTE-CONTENT": "All the available constructs to create a business process can be found here. They are arranged in logical groups. To open a group simply click on it:",
@@ -683,7 +683,7 @@
     "TOOLBAR-TITLE": "The Toolbar",
     "TOOLBAR-CONTENT": "All the actions can be found here: saving or validating a model, copy and pasting parts of a process, and so on. Hover over the buttons to get a description for an action.",
     "END-TITLE": "The End",
-    "END-CONTENT": "That's it! You can now start modeling your processes. If you have any questions, feel free to ask them on the <a href=\"http://forum.flowable.org/\" target=\"_blank\">Flowable Forum</a> "
+    "END-CONTENT": "That's it! You can now start modeling your processes. If you have any questions, please contact the developer"
   },
 
   "FEATURE-TOUR" : {

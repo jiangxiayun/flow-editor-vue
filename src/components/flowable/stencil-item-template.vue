@@ -3,7 +3,7 @@
     <span @click="expandedToggle">
         <i class="glyphicon"
            :class="{'glyphicon-chevron-right': !group.expanded, 'glyphicon-chevron-down': group.expanded}"></i>
-       {{$t(group.name)}}
+       {{group.name}}
     </span>
 
     <!-- Child groups -->
@@ -27,7 +27,7 @@
         <img v-if="!item.customIcon" width="16px;" height="16px;"
              :src="`/flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`" />
         <img v-if="item.customIcon" :src="getImageUrl(item.icon)" width="16px;" height="16px;"/>
-        {{$t(item.name)}}
+        {{item.name}}
       </li>
     </ul>
 
