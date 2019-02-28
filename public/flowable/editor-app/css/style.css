@@ -122,7 +122,7 @@
     color: #323437;
 }
 
-.stencil-group > li > span {
+.stencil-group > li  span.item-parent-name {
     margin-left: 5px;
     padding-top: 5px;
     padding-bottom: 5px;
@@ -130,7 +130,7 @@
     cursor: pointer;
 }
 
-.stencil-group > li > span > i {
+.stencil-group > li span.item-parent-name > i {
     font-size: 12px;
     line-height: 17px;
 }
@@ -148,10 +148,11 @@
     color: #000000;
 }
 
-.stencil-group.collapsed > li > ul {
+.stencil-group.collapsed > li  ul {
     max-height: 0px;
     padding-top: 0;
     padding-bottom: 0;
+    overflow: hidden;
 }
 
 .stencil-group-non-root > li {
@@ -431,6 +432,7 @@ li.x-menu-list-item.x-menu-item-active a {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
 
 .editor-icon-save:before {
     content: 'a';

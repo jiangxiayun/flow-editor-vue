@@ -1,6 +1,6 @@
 <template>
   <!--画布区域-->
-  <div id="canvasHelpWrapper" class="col-xs-9">
+  <div id="canvasHelpWrapper" class="col-xs-12">
     <!--ng-model="droppedElement"-->
     <div class="canvas-wrapper" id="canvasSection"
 
@@ -10,17 +10,23 @@
       <div class="canvas-message" id="model-modified-date"></div>
       <div class="Oryx_button"
            id="delete-button"
-           :title="'BUTTON.ACTION.DELETE.TOOLTIP' | translate"
+           :title="$t('BUTTON.ACTION.DELETE.TOOLTIP')"
            @click="deleteShape()"
            style="display:none">
         <img src="editor-app/images/delete.png"/>
       </div>
       <div class="Oryx_button"
            id="morph-button"
-           title="{{'BUTTON.ACTION.MORPH.TOOLTIP' | translate}}"
+           :title="$t('BUTTON.ACTION.MORPH.TOOLTIP')"
            @click="morphShape()"
            style="display:none">
         <img src="editor-app/images/wrench.png"/>
+      </div>
+      <div class="Oryx_button"
+           id="edit-button"
+           style="display:none"
+           @click="editShape()">
+        <img src="editor-app/images/pencil.png"/>
       </div>
       <div class="Oryx_button"
            v-for="item in quickMenuItems"
@@ -34,7 +40,7 @@
            data-jqyoui-options="{revert: 'invalid', helper: 'clone', opacity : 0.5}"
            style="display:none">
         <!--ng-model="draggedElement"-->
-        <img :src="`editor-app/stencilsets/bpmn2.0/icons/${item.icon}`"/>
+        <img :src="`editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
       </div>
     </div>
   </div>
@@ -42,7 +48,18 @@
 
 <script>
   export default {
-    name: "canvasWrapper"
+    name: "canvasWrapper",
+    data () {
+      return {
+        quickMenuItems: []
+      }
+    },
+    props: {
+
+    },
+    methods: {
+
+    }
   }
 </script>
 

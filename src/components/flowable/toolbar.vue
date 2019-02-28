@@ -1,31 +1,30 @@
 <template>
   <div class="subheader editor-toolbar" id="editor-header">
     <div class="btn-group">
-      <div class="btn-toolbar pull-left" ng-controller="ToolbarController" ng-cloak>
-        <button v-for="item in items"
+      <div class="btn-toolbar pull-left" ng-controller="ToolbarController">
+        <button v-for="(item, index) in items"
                 :key="item.id"
                 :id="item.id"
-                :title="item.title | translate"
                 class="btn btn-inverse"
                 :class="{'separator': item.type == 'separator'}"
                 :disabled="item.type == 'separator' || item.enabled == false"
-                @click="toolbarButtonClicked($index)">
+                @click="toolbarButtonClicked(index)">
           <i v-if="item.type == 'button'"
              :class="item.cssClass"
-             class="toolbar-button" data-toggle="tooltip" :title="item.title | translate"></i>
+             class="toolbar-button" data-toggle="tooltip" :title="$t(item.title)"></i>
           <div v-if="item.type == 'separator'" :class="item.cssClass"></div>
         </button>
       </div>
     </div>
-    <div class="btn-group pull-right" v-show="!secondaryItems.length">
-      <div class="btn-toolbar pull-right" ng-controller="ToolbarController">
-        <button :title="item.title | translate"
-                v-for="item in secondaryItems"
+    <div class="btn-group pull-right" v-show="secondaryItems.length > 0">
+      <div class="btn-toolbar pull-right">
+        <button v-for="(item, index) in secondaryItems"
                 :key="item.id"
                 :id="item.id"
+                :title="item.title | translate"
                 class="btn btn-inverse" :class="{'separator': item.type == 'separator'}"
                 :disabled="item.type == 'separator'"
-                @click="toolbarSecondaryButtonClicked($index)">
+                @click="toolbarSecondaryButtonClicked(index)">
           <i v-if="item.type == 'button'"  :class="item.cssClass" class="toolbar-button"
              data-toggle="tooltip" :title="item.title | translate"></i>
           <div v-if="item.type == 'separator'" :class="item.cssClass"></div>
@@ -53,7 +52,6 @@
       editorManager: {}
     },
     mounted () {
-      console.log(1, this.modelData)
       var toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items;
       for (var i = 0; i < toolbarItems.length; i++) {
         if (this.mockData.model.modelType === 'form') {
@@ -78,98 +76,49 @@
         }
 
       },this);
-
-      // Catch all command that are executed and store them on the respective stacks
-      this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_EXECUTE_COMMANDS, ( evt ) => {
-
-        // If the event has commands
-        if( !evt.commands ){ return; }
-
-        this.undoStack.push( evt.commands );
-        this.redoStack = [];
-
-        for(var i = 0; i < this.items.length; i++)
-        {
-          var item = this.items[i];
-          if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo')
-          {
-            item.enabled = true;
-          }
-          else if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo')
-          {
-            item.enabled = false;
-          }
-        }
-
-        // Update
-        editorManager.getCanvas().update();
-        editorManager.updateSelection();
-
-      });
-      // Handle enable/disable toolbar buttons
-      this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, ( evt ) => {
-        var elements = evt.elements;
-
-        for(var i = 0; i < this.items.length; i++)  {
-          var item = this.items[i];
-          if (item.enabledAction && item.enabledAction === 'element') {
-            var minLength = 1;
-            if (item.minSelectionCount) {
-              minLength = item.minSelectionCount;
-            }
-
-            if (elements.length >= minLength && !item.enabled) {
-              this.safeApply(function () {
-                item.enabled = true;
-              });
-            } else if (elements.length == 0 && item.enabled) {
-              this.safeApply(function () {
-                item.enabled = false;
-              });
-            }
-          }
-        }
-      });
     },
     methods: {
       executeFunctionByName (functionName, context /*, args */) {
         var args = Array.prototype.slice.call(arguments).splice(2);
         var namespaces = functionName.split(".");
         var func = namespaces.pop();
-        for(var i = 0; i < namespaces.length; i++) {
+        for(let i = 0; i < namespaces.length; i++) {
           context = context[namespaces[i]];
         }
+        console.log('func', func)
         return context[func].apply(this, args);
       },
       toolbarButtonClicked (buttonIndex) {
         // Default behaviour
-        var buttonClicked = this.items[buttonIndex];
-        var services = {
-          'this' : this,
-          // '$rootScope' : $rootScope,
+        let buttonClicked = this.items[buttonIndex];
+        let services = {
+          '$scope' : this,
+          '$rootScope' : this.$parent,
           // '$http' : $http,
           // '$modal' : $modal,
           // '$q' : $q,
-          // '$translate' : $translate
+          // '$translate' : $translate,
+          'editorManager' : this.editorManager
         };
         this.executeFunctionByName(buttonClicked.action, window, services);
 
         // Other events
-        var event = {
+        let event = {
           type : FLOWABLE.eventBus.EVENT_TYPE_TOOLBAR_BUTTON_CLICKED,
           toolbarItem : buttonClicked
         };
         FLOWABLE.eventBus.dispatch(event.type, event);
       },
       toolbarSecondaryButtonClicked (buttonIndex) {
-        var buttonClicked = this.secondaryItems[buttonIndex];
-        var services = {
-          // 'this' : this,
+        let buttonClicked = this.secondaryItems[buttonIndex];
+        let services = {
+          '$scope' : this,
           // '$http' : $http,
           // '$modal' : $modal,
           // '$q' : $q,
           // '$translate' : $translate,
-          // '$location': $location
+          // '$location': $location,
+          'editorManager' : this.editorManager
         };
         this.executeFunctionByName(buttonClicked.action, window, services);
       },
@@ -204,6 +153,49 @@
         //   FLOWABLE.TOOLBAR.ACTIONS.deleteItem(services);
         //   return false;
         // });
+      }
+    },
+    watch: {
+      editorManager () {
+        // 捕获所有执行的命令并将它们存储在各自的堆栈上
+        this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_EXECUTE_COMMANDS, ( evt ) => {
+          // If the event has commands
+          if ( !evt.commands ) return
+
+          this.undoStack.push( evt.commands );
+          this.redoStack = [];
+
+          for(let i = 0; i < this.items.length; i++) {
+            let item = this.items[i];
+            if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo') {
+              item.enabled = true
+            } else if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo') {
+              item.enabled = false
+            }
+          }
+
+          // Update
+          this.editorManager.getCanvas().update();
+          this.editorManager.updateSelection();
+        });
+        // 控制 toolbar buttons 是否可用
+        this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, ( evt ) => {
+          var elements = evt.elements;
+          for(let i = 0; i < this.items.length; i++)  {
+            let item = this.items[i];
+            if (item.enabledAction && item.enabledAction === 'element') {
+              let minLength = 1;
+              if (item.minSelectionCount) {
+                minLength = item.minSelectionCount;
+              }
+              if (elements.length >= minLength && !item.enabled) {
+                item.enabled = true
+              } else if (elements.length == 0 && item.enabled) {
+                item.enabled = false
+              }
+            }
+          }
+        });
       }
     }
   }

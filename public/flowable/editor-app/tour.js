@@ -12,7 +12,6 @@
  */
 
 var FLOWABLE_EDITOR_TOUR = {
-
     /*
      * General 'getting started' tutorial for the Editor.
      */

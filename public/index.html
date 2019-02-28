@@ -6,6 +6,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
 
+    <link rel="Stylesheet" href="flowable/libs/ui-grid_3.0.0/ui-grid.css" type="text/css"/>
+    <link rel="stylesheet" href="flowable/libs/bootstrap_3.1.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="flowable/libs/bootstrap-tour_0.9.1/bootstrap-tour.min.css"/>
+
     <link rel="Stylesheet" media="screen" href="flowable/editor-app/editor/css/editor.css" type="text/css"/>
     <link rel="stylesheet" href="flowable/editor-app/css/style.css" type="text/css"/>
 
@@ -15,7 +19,7 @@
     <title>flow-editor</title>
 
     <script src="flowable/libs/jquery_1.11.0/jquery.min.js"></script>
-    <!--<script src="flowable/libs/jquery-ui-1.10.3.custom.min.js"></script>-->
+    <script src="flowable/libs/jquery-ui-1.10.3.custom.min.js"></script>
 
     <!--<script src="flowable/libs/angular_1.3.13/angular.min.js"></script>-->
     <!--<script src="flowable/libs/angular-animate_1.3.13/angular-animate.min.js"></script>-->
@@ -58,9 +62,18 @@
     <!-- build:js scripts/scripts.js -->
     <script src="flowable/editor-app/editor/i18n/translation_en_us.js" type="text/javascript"></script>
     <script src="flowable/editor-app/editor/i18n/translation_signavio_en_us.js" type="text/javascript"></script>
-    <script src="flowable/editor-app/editor/oryx.debug.js" type="text/javascript"></script>
 
-    <!--<script src="flowable/scripts/app.js"></script>-->
+    <script src="flowable/oryx/CONFIG.js" type="text/javascript"></script>
+    <script src="flowable/oryx/oryx.debug.js" type="text/javascript"></script>
+    <script src="flowable/oryx/Core_StencilSet.js" type="text/javascript"></script>
+    <script src="flowable/oryx/Core_SVG.js" type="text/javascript"></script>
+    <script src="flowable/oryx/Core_Math.js" type="text/javascript"></script>
+    <script src="flowable/oryx/Core.js" type="text/javascript"></script>
+    <script src="flowable/oryx/Editor.js" type="text/javascript"></script>
+    <script src="flowable/oryx/Core_Controls.js" type="text/javascript"></script>
+    <script src="flowable/oryx/Plugins.js" type="text/javascript"></script>
+
+    <!--xx<script src="flowable/scripts/app.js"></script>-->
     <script src="flowable/scripts/configuration/url-config.js"></script>
     <!--<script src="flowable/scripts/editor-directives.js"></script>-->
     <!--<script src="flowable/scripts/controllers/processes.js"></script>-->
@@ -104,8 +117,8 @@
     <!--<script src="flowable/editor-app/header-controller.js" type="text/javascript"></script>-->
     <!--<script src="flowable/editor-app/select-shape-controller.js" type="text/javascript"></script>-->
     <!--<script src="flowable/editor-app/define-data-controller.js" type="text/javascript"></script>-->
-    <!--<script src="flowable/editor-app/process-navigator-controller.js" type="text/javascript"></script>-->
-    <!--<script src="flowable/editor-app/editormanager.js" type="text/javascript"></script>-->
+    <!--xx<script src="flowable/editor-app/process-navigator-controller.js" type="text/javascript"></script>-->
+    <!--xx<script src="flowable/editor-app/editormanager.js" type="text/javascript"></script>-->
 
     <script src="flowable/editor-app/tour.js" type="text/javascript"></script>
     <script src="flowable/editor-app/editor-utils.js" type="text/javascript"></script>

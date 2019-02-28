@@ -1,25 +1,25 @@
 <template>
   <!--表单信息区域-->
-  <div id="propertiesHelpWrapper" class="col-xs-9">
+  <div id="propertiesHelpWrapper" class="col-xs-12">
     <div class="propertySection" id="propertySection"
          :class="{collapsed: propertyWindowState.collapsed}">
       <div class="selected-item-section">
         <div class="clearfix">
-          <div class="pull-right" v-if="selectedItem.auditData.createDate">
-            <strong>{{'ELEMENT.DATE_CREATED' | translate}}: </strong> {{selectedItem.auditData.createDate}}
-          </div>
-          <div class="pull-right" v-if="selectedItem.auditData.author">
-            <strong>{{'ELEMENT.AUTHOR' | translate}}: </strong> {{selectedItem.auditData.author}}
-          </div>
+          <!--<div class="pull-right" v-if="selectedItem.auditData.createDate">-->
+            <!--<strong>{{'ELEMENT.DATE_CREATED' | translate}}: </strong> {{selectedItem.auditData.createDate}}-->
+          <!--</div>-->
+          <!--<div class="pull-right" v-if="selectedItem.auditData.author">-->
+            <!--<strong>{{'ELEMENT.AUTHOR' | translate}}: </strong> {{selectedItem.auditData.author}}-->
+          <!--</div>-->
           <div class="selected-item-title">
             <a @click="propertyWindowState.toggle()">
               <i class="glyphicon"
                  :class="{'glyphicon-chevron-right': propertyWindowState.collapsed,
-  'glyphicon-chevron-down': !propertyWindowState.collapsed}"></i>
-              <span v-show="selectedItem.title != undefined &&
-  selectedItem.title != null && selectedItem.title.length > 0">{{selectedItem.title}}</span>
+                 'glyphicon-chevron-down': !propertyWindowState.collapsed}"></i>
+              <span v-show="selectedItem.title != undefined && selectedItem.title != null &&
+              selectedItem.title.length > 0">{{selectedItem.title}}</span>
               <span v-show="!selectedItem || selectedItem.title == undefined ||
-  selectedItem.title == null || selectedItem.title.length == 0">{{modelData.name}}</span>
+              selectedItem.title == null || selectedItem.title.length == 0">{{modelData.name}}</span>
             </a>
           </div>
         </div>
@@ -49,7 +49,24 @@
 
 <script>
   export default {
-    name: "propertySection"
+    name: "propertySection",
+    data () {
+      return {
+        propertyWindowState: {'collapsed': false},
+        selectedItem: {'title': '', 'properties': []}
+      }
+    },
+    mounted () {
+
+    },
+    methods: {
+      propertyWindowStateToggle () {
+        this.propertyWindowState.collapsed = !this.propertyWindowState.collapsed;
+        setTimeout(function () {
+          $window.dispatchEvent(new Event("resize"));
+        }, 100);
+      }
+    }
   }
 </script>
 

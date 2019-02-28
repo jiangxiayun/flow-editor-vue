@@ -7,6 +7,15 @@ module.exports = {
       'jquery' : '$',
       'ORYX':'ORYX'
     }
+  },
+
+  pluginOptions: {
+    i18n: {
+      locale: 'zh',
+      fallbackLocale: 'en',
+      localeDir: 'assets/i18n',
+      enableInSFC: false
+    }
   }
 }
 

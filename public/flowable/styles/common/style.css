@@ -180,7 +180,7 @@ label {
     font-size: 14px;
 }
 
-[ng\:cloak], [ng-cloak], .ng-cloak { display: none; }
+/*[ng\:cloak], [ng-cloak], .ng-cloak { display: none; }*/
 
 .nothing-to-see {
     padding: 5px 0 20px 0;
