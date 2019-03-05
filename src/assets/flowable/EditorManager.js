@@ -11,48 +11,140 @@ export default class EditorManager {
       'CollapsedSubProcess': 'subprocess.png',
       'EventSubProcess': 'event.subprocess.png'
     }
-    this.current = this.modelId
+    this.current = this.modelId // 当前流程id
     this.loading = true
 
-    // 设置vuex modelData
+    // 设置 this.modelData
     this.setModelData(config.modelData)
-    this.setStencilData(config.stencilData);
+    // 设置 this.stencilData
+    this.setStencilData(config.stencilData)
+
+    const baseUrl = "http://b3mn.org/stencilset/";
+    const stencilSet = new ORYX.Core.StencilSet.StencilSet(baseUrl, config.stencilData);
+    ORYX.Core.StencilSet.loadStencilSet(baseUrl, stencilSet, '6609363a-3be5-11e9-afe0-82ad27eff10d');
+    jQuery.ajax({
+      type: "GET",
+      url: 'flowable/editor-app/plugins.xml',
+      success: function(data, textStatus, jqXHR){
+        ORYX._loadPlugins(data)
+      }
+    });
+
+    this.bootEditor()
   }
 
-  getModelId () {
-    return this.modelId
+  getModelId () { return this.modelId }
+  setModelId (modelId) { this.modelId = modelId }
+
+  getModel () {
+    this.syncCanvasTracker()
+
+    var modelMetaData = this.getBaseModelData()
+
+    var stencilId = undefined
+    var stencilSetNamespace = undefined
+    var stencilSetUrl = undefined
+    if (modelMetaData.model.stencilset.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+      stencilId = 'CMMNDiagram'
+      stencilSetNamespace = 'http://b3mn.org/stencilset/cmmn1.1#'
+      stencilSetUrl = '../editor/stencilsets/cmmn1.1/cmmn1.1.json'
+    } else {
+      stencilId = 'BPMNDiagram'
+      stencilSetNamespace = 'http://b3mn.org/stencilset/bpmn2.0#'
+      stencilSetUrl = '../editor/stencilsets/bpmn2.0/bpmn2.0.json'
+    }
+
+    //this is an object.
+    var editorConfig = this.editor.getJSON()
+    var model = {
+      modelId: this.modelId,
+      bounds: editorConfig.bounds,
+      properties: editorConfig.properties,
+      childShapes: JSON.parse(this.canvasTracker.get(this.modelId)),
+      stencil: {
+        id: stencilId
+      },
+      stencilset: {
+        namespace: stencilSetNamespace,
+        url: stencilSetUrl
+      }
+    }
+
+    this._mergeCanvasToChild(model)
+
+    return model
   }
 
-  setModelId (modelId) {
-    this.modelId = modelId
+  setModelData (response) {
+    this.modelData = response
+    // _this.UPDATE_modelData(response)
   }
+  getBaseModelData () { return this.modelData }
 
-  getCurrentModelId () {
-    return this.current
-  }
+  getCurrentModelId () { return this.current }
+
+  getStencilData () { return this.stencilData }
   setStencilData (stencilData) {
     //we don't want a references!
     this.stencilData = jQuery.extend(true, {}, stencilData)
   }
 
-  getStencilData () {
-    return this.stencilData
-  }
-
-  getSelection () {
-    return this.editor.selection
-  }
+  getSelection () { return this.editor.selection }
+  setSelection (selection) { this.editor.setSelection(selection) }
+  updateSelection () { this.editor.updateSelection() }
 
   getSubSelection () {
     return this.editor._subSelection
   }
 
-  handleEvents (events) {
-    this.editor.handleEvents(events)
+  bootEditor () {
+    //TODO: populate the canvas with correct json sections.
+    //resetting the state
+    this.canvasTracker = new Hash()
+    var config = jQuery.extend(true, {}, this.modelData) //avoid a reference to the original object.
+    if (!config.model.childShapes) {
+      config.model.childShapes = []
+    }
+
+    //this will remove any childshapes of a collapseable
+    this.findAndRegisterCanvas(config.model.childShapes)
+
+    // subprocess.
+
+    //this will be overwritten almost
+    this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes))
+
+    // instantly.
+    this.editor = new ORYX.Editor(config)
+    this.current = this.editor.id
+    this.loading = false
+
+
+    FLOWABLE.eventBus.editor = this.editor
+    FLOWABLE.eventBus.dispatch('ORYX-EDITOR-LOADED', {})
+    FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_EDITOR_BOOTED, {})
+
+    const eventMappings = [
+      { oryxType: ORYX.CONFIG.EVENT_SELECTION_CHANGED, flowableType: FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGE },
+      { oryxType: ORYX.CONFIG.EVENT_DBLCLICK, flowableType: FLOWABLE.eventBus.EVENT_TYPE_DOUBLE_CLICK },
+      { oryxType: ORYX.CONFIG.EVENT_MOUSEOUT, flowableType: FLOWABLE.eventBus.EVENT_TYPE_MOUSE_OUT },
+      { oryxType: ORYX.CONFIG.EVENT_MOUSEOVER, flowableType: FLOWABLE.eventBus.EVENT_TYPE_MOUSE_OVER },
+      { oryxType: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED, flowableType: FLOWABLE.eventBus.EVENT_TYPE_EDITOR_READY },
+      {
+        oryxType: ORYX.CONFIG.EVENT_PROPERTY_CHANGED,
+        flowableType: FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED
+      }
+    ]
+
+    eventMappings.forEach((eventMapping) => {
+      this.registerOnEvent(eventMapping.oryxType, function (event) {
+        FLOWABLE.eventBus.dispatch(eventMapping.flowableType, event)
+      })
+    })
   }
 
-  setSelection (selection) {
-    this.editor.setSelection(selection)
+  handleEvents (events) {
+    this.editor.handleEvents(events)
   }
 
   registerOnEvent (event, callback) {
@@ -63,30 +155,32 @@ export default class EditorManager {
     return this.editor.getCanvas().getChildShapeByResourceId(resourceId)
   }
 
-  getJSON () {
-    return this.editor.getJSON()
-  }
-
-  getStencilSets () {
-    return this.editor.getStencilSets()
-  }
-
+  getJSON () { return this.editor.getJSON() }
+  getStencilSets () { return this.editor.getStencilSets() }
+  getCanvas () { return this.editor.getCanvas() }
+  getRules () { return this.editor.getRules() }
   getEditor () {
-    return this.editor //TODO: find out if we can avoid exposing the editor object to angular.
+    //TODO: find out if we can avoid exposing the editor object to angular.
+    return this.editor
+  }
+
+  getTree () {
+    //build a tree of all subprocesses and there children.
+    var result = new Hash()
+    var parent = this.getModel()
+    result.set('name', parent.properties['name'] || 'No name provided')
+    result.set('id', this.modelId)
+    result.set('type', 'root')
+    result.set('current', this.current === this.modelId)
+    var childShapes = parent.childShapes
+    var children = this._buildTreeChildren(childShapes)
+    result.set('children', children)
+    return result.toObject()
   }
 
   executeCommands (commands) {
     this.editor.executeCommands(commands)
   }
-
-  getCanvas () {
-    return this.editor.getCanvas()
-  }
-
-  getRules () {
-    return this.editor.getRules()
-  }
-
   eventCoordinates (coordinates) {
     return this.editor.eventCoordinates(coordinates)
   }
@@ -95,16 +189,6 @@ export default class EditorManager {
     return this.editor.eventCoordinatesXY(x, y)
   }
 
-  updateSelection () {
-    this.editor.updateSelection()
-  }
-
-  /**
-   * @returns the modeldata as received from the server. This does not represent the current editor data.
-   */
-  getBaseModelData () {
-    return _this.modelData
-  }
 
   edit (resourceId) {
     //Save the current canvas in the canvastracker if it is the root process.
@@ -135,19 +219,6 @@ export default class EditorManager {
     FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_UNDO_REDO_RESET, {})
   }
 
-  getTree () {
-    //build a tree of all subprocesses and there children.
-    var result = new Hash()
-    var parent = this.getModel()
-    result.set('name', parent.properties['name'] || 'No name provided')
-    result.set('id', this.modelId)
-    result.set('type', 'root')
-    result.set('current', this.current === this.modelId)
-    var childShapes = parent.childShapes
-    var children = this._buildTreeChildren(childShapes)
-    result.set('children', children)
-    return result.toObject()
-  }
 
   _buildTreeChildren (childShapes) {
     var children = []
@@ -194,91 +265,6 @@ export default class EditorManager {
     this.canvasTracker.set(this.current, JSON.stringify(jsonShapes))
   }
 
-  getModel () {
-    this.syncCanvasTracker()
-
-    var modelMetaData = this.getBaseModelData()
-
-    var stencilId = undefined
-    var stencilSetNamespace = undefined
-    var stencilSetUrl = undefined
-    if (modelMetaData.model.stencilset.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
-      stencilId = 'CMMNDiagram'
-      stencilSetNamespace = 'http://b3mn.org/stencilset/cmmn1.1#'
-      stencilSetUrl = '../editor/stencilsets/cmmn1.1/cmmn1.1.json'
-    } else {
-      stencilId = 'BPMNDiagram'
-      stencilSetNamespace = 'http://b3mn.org/stencilset/bpmn2.0#'
-      stencilSetUrl = '../editor/stencilsets/bpmn2.0/bpmn2.0.json'
-    }
-
-    //this is an object.
-    var editorConfig = this.editor.getJSON()
-    var model = {
-      modelId: this.modelId,
-      bounds: editorConfig.bounds,
-      properties: editorConfig.properties,
-      childShapes: JSON.parse(this.canvasTracker.get(this.modelId)),
-      stencil: {
-        id: stencilId
-      },
-      stencilset: {
-        namespace: stencilSetNamespace,
-        url: stencilSetUrl
-      }
-    }
-
-    this._mergeCanvasToChild(model)
-
-    return model
-  }
-
-  setModelData (response) {
-    _this.UPDATE_modelData(response)
-  }
-
-  bootEditor () {
-    //TODO: populate the canvas with correct json sections.
-    //resetting the state
-    this.canvasTracker = new Hash()
-    var config = jQuery.extend(true, {}, _this.modelData) //avoid a reference to the original object.
-    console.log('config', config)
-    if (!config.model.childShapes) {
-      config.model.childShapes = []
-    }
-
-    this.findAndRegisterCanvas(config.model.childShapes) //this will remove any childshapes of a collapseable
-                                                          // subprocess.
-    this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes)) //this will be overwritten almost
-                                                                                      // instantly.
-    this.editor = new ORYX.Editor(config)
-    this.current = this.editor.id
-    this.loading = false
-
-
-    FLOWABLE.eventBus.editor = this.editor
-    FLOWABLE.eventBus.dispatch('ORYX-EDITOR-LOADED', {})
-    FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_EDITOR_BOOTED, {})
-
-    var eventMappings = [
-      { oryxType: ORYX.CONFIG.EVENT_SELECTION_CHANGED, flowableType: FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGE },
-      { oryxType: ORYX.CONFIG.EVENT_DBLCLICK, flowableType: FLOWABLE.eventBus.EVENT_TYPE_DOUBLE_CLICK },
-      { oryxType: ORYX.CONFIG.EVENT_MOUSEOUT, flowableType: FLOWABLE.eventBus.EVENT_TYPE_MOUSE_OUT },
-      { oryxType: ORYX.CONFIG.EVENT_MOUSEOVER, flowableType: FLOWABLE.eventBus.EVENT_TYPE_MOUSE_OVER },
-      { oryxType: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED, flowableType: FLOWABLE.eventBus.EVENT_TYPE_EDITOR_READY },
-      {
-        oryxType: ORYX.CONFIG.EVENT_PROPERTY_CHANGED,
-        flowableType: FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED
-      }
-    ]
-
-    eventMappings.forEach((eventMapping) => {
-      _this.editorManager.registerOnEvent(eventMapping.oryxType, function (event) {
-        FLOWABLE.eventBus.dispatch(eventMapping.flowableType, event)
-      })
-    })
-  }
-
   findAndRegisterCanvas (childShapes) {
     for (var i = 0; i < childShapes.length; i++) {
       var childShape = childShapes[i]
@@ -317,7 +303,6 @@ export default class EditorManager {
       }
     }
   }
-
 
   dispatchOryxEvent (event) {
     FLOWABLE.eventBus.dispatchOryxEvent(event)

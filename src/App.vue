@@ -6,8 +6,9 @@
       <div class="full">
         <div class="row row-no-gutter">
           <paletteWrapper :editorManager="editorManager"></paletteWrapper>
-          <div id="contentCanvasWrapper">
-            <div id="paletteSectionOpen" class="hidden">
+          <div id="contentCanvasWrapper" :class="{collapsedCanvasWrapper: !paletteWrapperOpen}">
+            <div id="paletteSectionOpen" :class="{hidden: paletteWrapperOpen}"
+                 @click="UPDATE_paletteWrapperOpen(true)">
               <i class="glyphicon glyphicon-chevron-right"></i>
             </div>
             <canvasWrapper :editorManager="editorManager"></canvasWrapper>
@@ -20,6 +21,7 @@
 </template>
 
 <script>
+  import { mapState, mapMutations } from 'vuex'
   import toolbar from '@/components/flowable/toolbar'
   import paletteWrapper from '@/components/flowable/paletteHelpWrapper'
   import canvasWrapper from '@/components/flowable/canvasWrapper'
@@ -46,45 +48,18 @@
     created () {
 
     },
+    computed: {
+      ...mapState('Flowable', ['paletteWrapperOpen'])
+    },
     mounted () {
-      this.editorManager =  this.createEditorManager()
-      // this.editorManager =  new EditorManager({
-      //
-      // })
-      this.editorManager.setModelData(this.mockData)
-
-      var baseUrl = "http://b3mn.org/stencilset/";
-      this.editorManager.setStencilData(AA);
-      var stencilSet = new ORYX.Core.StencilSet.StencilSet(baseUrl, AA);
-      ORYX.Core.StencilSet.loadStencilSet(baseUrl, stencilSet, '80646b68-3967-11e9-bbaa-82ad27eff10d');
-      jQuery.ajax({
-        type: "GET",
-        url: 'flowable/editor-app/plugins.xml',
-        success: function(data, textStatus, jqXHR){
-          ORYX._loadPlugins(data)
-        }
-      });
-      console.log('editorManager', this.editorManager)
-      this.editorManager.bootEditor();
-
-
-      this.paletteHelpWrapper = jQuery('#paletteHelpWrapper');
-      this.paletteSectionFooter = jQuery('#paletteSectionFooter');
-      this.paletteSectionOpen = jQuery('#paletteSectionOpen');
-      this.contentCanvasWrapper = jQuery('#contentCanvasWrapper');
-      this.paletteSectionFooter.on('click', () => {
-        this.paletteHelpWrapper.addClass('close');
-        this.contentCanvasWrapper.addClass('collapsedCanvasWrapper');
-        this.paletteSectionOpen.removeClass('hidden');
-      });
-      this.paletteSectionOpen.on('click', () => {
-        this.paletteHelpWrapper.removeClass('close');
-        this.contentCanvasWrapper.removeClass('collapsedCanvasWrapper');
-        this.paletteSectionOpen.addClass('hidden');
-      });
+      this.editorManager =  new EditorManager({
+        modelData: this.mockData,
+        stencilData: AA,
+      })
       this.resizeFun()
     },
     methods: {
+      ...mapMutations('Flowable', ['UPDATE_paletteWrapperOpen']),
       resizeFun() {
         jQuery(window).resize(() => {
           // Calculate the offset based on the bottom of the module header
@@ -265,5 +240,5 @@
   }
 </script>
 <style lang="scss">
-  /*@import "./flow.scss";*/
+
 </style>

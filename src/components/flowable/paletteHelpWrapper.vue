@@ -1,6 +1,6 @@
 <template>
   <!--组件元素-->
-  <div id="paletteHelpWrapper" class="col-xs-3">
+  <div id="paletteHelpWrapper" class="col-xs-3" :class="{close: !paletteWrapperOpen}">
     <div class="stencils" id="paletteSection">
       <div v-if="stencilItemGroups.length > 1">
         <div v-for="(group, index) in stencilItemGroups" :key="group.name">
@@ -65,7 +65,7 @@
         </div>
       </div>
     </div>
-    <div id="paletteSectionFooter">
+    <div id="paletteSectionFooter" @click="updatePaletteWrapperOpen">
       <i class="glyphicon glyphicon-chevron-left"></i>
     </div>
   </div>
@@ -93,10 +93,10 @@
 
     },
     computed: {
-      ...mapState('Flowable', ['stencilItemGroups'])
+      ...mapState('Flowable', ['paletteWrapperOpen', 'stencilItemGroups'])
     },
     methods: {
-      ...mapMutations('Flowable', ['UPDATE_stencilItemGroups', 'UPDATE_quickMenuItems']),
+      ...mapMutations('Flowable', ['UPDATE_stencilItemGroups', 'UPDATE_quickMenuItems', 'UPDATE_paletteWrapperOpen']),
       init () {
         var data = this.editorManager.getStencilData();
 
@@ -517,6 +517,9 @@
         FLOWABLE.eventBus.addListener("EDITORMANAGER-EDIT-ACTION", () => {
           this.renderProcessHierarchy();
         });
+      },
+      updatePaletteWrapperOpen () {
+        this.UPDATE_paletteWrapperOpen(false)
       },
       showSubProcess (child) {
         var flowableShapes = this.editorManager.getChildShapeByResourceId(child.resourceId);
