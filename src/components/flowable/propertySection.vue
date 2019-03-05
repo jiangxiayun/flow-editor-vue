@@ -12,7 +12,7 @@
             <!--<strong>{{'ELEMENT.AUTHOR' | translate}}: </strong> {{selectedItem.auditData.author}}-->
           <!--</div>-->
           <div class="selected-item-title">
-            <a @click="propertyWindowState.toggle()">
+            <a @click="propertyWindowStateToggle">
               <i class="glyphicon"
                  :class="{'glyphicon-chevron-right': propertyWindowState.collapsed,
                  'glyphicon-chevron-down': !propertyWindowState.collapsed}"></i>
@@ -63,7 +63,7 @@
       propertyWindowStateToggle () {
         this.propertyWindowState.collapsed = !this.propertyWindowState.collapsed;
         setTimeout(function () {
-          $window.dispatchEvent(new Event("resize"));
+          window.dispatchEvent(new Event("resize"));
         }, 100);
       }
     }

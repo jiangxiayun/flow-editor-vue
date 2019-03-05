@@ -60,7 +60,7 @@ ORYX.Editor = {
     // CREATES the canvas
     this._createCanvas(model.stencil ? model.stencil.id : null, model.properties);
 
-    // GENERATES the whole EXT.VIEWPORT
+    // 生成整个 EXT.VIEWPORT
     this._generateGUI();
 
     // Initializing of a callback to check loading ends
@@ -122,7 +122,6 @@ ORYX.Editor = {
     var layoutHeight = ORYX.CONFIG.WINDOW_HEIGHT;
     var canvasParent = this.getCanvas().rootNode.parentNode;
 
-    console.log('canvasSection', canvasParent)
     jQuery("#canvasSection").append(canvasParent);
     if (canvasParent.parentNode) {
       // Set the editor to the center, and refresh the size

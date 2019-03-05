@@ -1,8 +1,8 @@
+import { mapState, mapMutations } from 'vuex'
 
 const commonMix = {
   data () {
     return {
-      modelData: {},
       mockData: {
         description: '1',
         key: '1',
@@ -39,11 +39,12 @@ const commonMix = {
       }
     }
   },
-  created () {
-
-
+  computed: {
+    ...mapState('Flowable', ['stencilItemGroups', 'modelData'])
   },
+  created () {},
   methods: {
+    ...mapMutations('Flowable', ['UPDATE_modelData']),
     createEditorManager () {
       let _this = this
       var editorManager = Class.create({
@@ -124,7 +125,7 @@ const commonMix = {
          * @returns the modeldata as received from the server. This does not represent the current editor data.
          */
         getBaseModelData: function () {
-          return this.modelData;
+          return _this.modelData;
         },
         edit: function (resourceId) {
           //Save the current canvas in the canvastracker if it is the root process.
@@ -249,13 +250,14 @@ const commonMix = {
           return model;
         },
         setModelData: function(response){
-          this.modelData = response;
+          _this.UPDATE_modelData(response)
         },
         bootEditor: function () {
           //TODO: populate the canvas with correct json sections.
           //resetting the state
           this.canvasTracker = new Hash();
-          var config = jQuery.extend(true, {}, this.modelData); //avoid a reference to the original object.
+          var config = jQuery.extend(true, {}, _this.modelData); //avoid a reference to the original object.
+          console.log('config', config)
           if(!config.model.childShapes){
             config.model.childShapes = [];
           }
@@ -504,49 +506,48 @@ const commonMix = {
       });
     },
     deleteShape () {
-      FLOWABLE.TOOLBAR.ACTIONS.deleteItem({'this': this, 'editorManager': this.editorManager});
+      FLOWABLE.TOOLBAR.ACTIONS.deleteItem({'$scope': this, 'editorManager': this.editorManager});
     },
     quickAddItem (newItemId) {
-      this.safeApply(() => {
-        var shapes = this.editorManager.getSelection();
-        if (shapes && shapes.length == 1) {
-          this.currentSelectedShape = shapes.first();
+      console.log('Oryx_button:', newItemId)
+      var shapes = this.editorManager.getSelection();
+      if (shapes && shapes.length == 1) {
+        this.currentSelectedShape = shapes.first();propertyWindowState
 
-          var containedStencil = undefined;
-          var stencilSets = this.editorManager.getStencilSets().values();
-          for (var i = 0; i < stencilSets.length; i++) {
-            var stencilSet = stencilSets[i];
-            var nodes = stencilSet.nodes();
-            for (var j = 0; j < nodes.length; j++) {
-              if (nodes[j].idWithoutNs() === newItemId) {
-                containedStencil = nodes[j];
-                break;
-              }
+        var containedStencil = undefined;
+        var stencilSets = this.editorManager.getStencilSets().values();
+        for (var i = 0; i < stencilSets.length; i++) {
+          var stencilSet = stencilSets[i];
+          var nodes = stencilSet.nodes();
+          for (var j = 0; j < nodes.length; j++) {
+            if (nodes[j].idWithoutNs() === newItemId) {
+              containedStencil = nodes[j];
+              break;
             }
           }
-
-          if (!containedStencil) return;
-
-          var option = {type: this.currentSelectedShape.getStencil().namespace() + newItemId, namespace: this.currentSelectedShape.getStencil().namespace()};
-          option['connectedShape'] = this.currentSelectedShape;
-          option['parent'] = this.currentSelectedShape.parent;
-          option['containedStencil'] = containedStencil;
-
-          var args = { sourceShape: this.currentSelectedShape, targetStencil: containedStencil };
-          var targetStencil = this.editorManager.getRules().connectMorph(args);
-
-          // Check if there can be a target shape
-          if (!targetStencil) {
-            return;
-          }
-
-          option['connectingType'] = targetStencil.id();
-
-          var command = new FLOWABLE.CreateCommand(option, undefined, undefined, this.editorManager.getEditor());
-
-          this.editorManager.executeCommands([command]);
         }
-      });
+
+        if (!containedStencil) return;
+
+        var option = {type: this.currentSelectedShape.getStencil().namespace() + newItemId, namespace: this.currentSelectedShape.getStencil().namespace()};
+        option['connectedShape'] = this.currentSelectedShape;
+        option['parent'] = this.currentSelectedShape.parent;
+        option['containedStencil'] = containedStencil;
+
+        var args = { sourceShape: this.currentSelectedShape, targetStencil: containedStencil };
+        var targetStencil = this.editorManager.getRules().connectMorph(args);
+
+        // Check if there can be a target shape
+        if (!targetStencil) {
+          return;
+        }
+
+        option['connectingType'] = targetStencil.id();
+
+        var command = new FLOWABLE.CreateCommand(option, undefined, undefined, this.editorManager.getEditor());
+
+        this.editorManager.executeCommands([command]);
+      }
     },
     editShape (){
       this.editorManager.edit(this.selectedShape.resourceId);
@@ -690,591 +691,6 @@ const commonMix = {
         }
       }
       return undefined;
-    },
-
-    /*
-     * DRAG AND DROP FUNCTIONALITY
-     */
-
-    dropCallback (event, ui) {
-      this.editorManager.handleEvents({
-        type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-        highlightId: "shapeRepo.attached"
-      });
-      this.editorManager.handleEvents({
-        type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-        highlightId: "shapeRepo.added"
-      });
-
-      this.editorManager.handleEvents({
-        type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-        highlightId: "shapeMenu"
-      });
-
-      FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
-
-      if (this.dragCanContain) {
-        var item = this.getStencilItemById(ui.draggable[0].id);
-
-        var pos = {x: event.pageX, y: event.pageY};
-
-        var additionalIEZoom = 1;
-        if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-          var ua = navigator.userAgent;
-          if (ua.indexOf('MSIE') >= 0) {
-            //IE 10 and below
-            var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100);
-            if (zoom !== 100) {
-              additionalIEZoom = zoom / 100;
-            }
-          }
-        }
-
-        var screenCTM = this.editorManager.getCanvas().node.getScreenCTM();
-
-        // Correcting the UpperLeft-Offset
-        pos.x -= (screenCTM.e / additionalIEZoom);
-        pos.y -= (screenCTM.f / additionalIEZoom);
-        // Correcting the Zoom-Factor
-        pos.x /= screenCTM.a;
-        pos.y /= screenCTM.d;
-
-        // Correcting the ScrollOffset
-        pos.x -= document.documentElement.scrollLeft;
-        pos.y -= document.documentElement.scrollTop;
-
-        var parentAbs = this.dragCurrentParent.absoluteXY();
-        pos.x -= parentAbs.x;
-        pos.y -= parentAbs.y;
-
-        var containedStencil = undefined;
-        var stencilSets = this.editorManager.getStencilSets().values();
-        for (var i = 0; i < stencilSets.length; i++) {
-          var stencilSet = stencilSets[i];
-          var nodes = stencilSet.nodes();
-          for (var j = 0; j < nodes.length; j++) {
-            if (nodes[j].idWithoutNs() === ui.draggable[0].id) {
-              containedStencil = nodes[j];
-              break;
-            }
-          }
-
-          if (!containedStencil) {
-            var edges = stencilSet.edges();
-            for (var j = 0; j < edges.length; j++) {
-              if (edges[j].idWithoutNs() === ui.draggable[0].id) {
-                containedStencil = edges[j];
-                break;
-              }
-            }
-          }
-        }
-
-        if (!containedStencil) return;
-
-        if (this.quickMenu) {
-          var shapes = this.editorManager.getSelection();
-          if (shapes && shapes.length == 1) {
-            var currentSelectedShape = shapes.first();
-
-            var option = {};
-            option.type = currentSelectedShape.getStencil().namespace() + ui.draggable[0].id;
-            option.namespace = currentSelectedShape.getStencil().namespace();
-            option.connectedShape = currentSelectedShape;
-            option.parent = this.dragCurrentParent;
-            option.containedStencil = containedStencil;
-
-            // If the ctrl key is not pressed,
-            // snapp the new shape to the center
-            // if it is near to the center of the other shape
-            if (!event.ctrlKey) {
-              // Get the center of the shape
-              var cShape = currentSelectedShape.bounds.center();
-              // Snapp +-20 Pixel horizontal to the center
-              if (20 > Math.abs(cShape.x - pos.x)) {
-                pos.x = cShape.x;
-              }
-              // Snapp +-20 Pixel vertical to the center
-              if (20 > Math.abs(cShape.y - pos.y)) {
-                pos.y = cShape.y;
-              }
-            }
-
-            option.position = pos;
-
-            if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' &&
-              containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation') {
-
-              var args = { sourceShape: currentSelectedShape, targetStencil: containedStencil };
-              var targetStencil = this.editorManager.getRules().connectMorph(args);
-              if (!targetStencil) { // Check if there can be a target shape
-                return;
-              }
-              option.connectingType = targetStencil.id();
-            }
-
-            var command = new FLOWABLE.CreateCommand(option, this.dropTargetElement, pos, this.editorManager.getEditor());
-
-            this.editorManager.executeCommands([command]);
-          }
-
-        } else {
-          var canAttach = false;
-          if (containedStencil.idWithoutNs() === 'BoundaryErrorEvent' || containedStencil.idWithoutNs() === 'BoundaryTimerEvent' ||
-            containedStencil.idWithoutNs() === 'BoundarySignalEvent' || containedStencil.idWithoutNs() === 'BoundaryMessageEvent' ||
-            containedStencil.idWithoutNs() === 'BoundaryCancelEvent' || containedStencil.idWithoutNs() === 'BoundaryCompensationEvent') {
-
-            // Modify position, otherwise boundary event will get position related to left corner of the canvas instead of the container
-            pos = this.editorManager.eventCoordinates( event );
-            canAttach = true;
-          }
-
-          var option = {};
-          option['type'] = this.modelData.model.stencilset.namespace + item.id;
-          option['namespace'] = this.modelData.model.stencilset.namespace;
-          option['position'] = pos;
-          option['parent'] = this.dragCurrentParent;
-
-          var commandClass = ORYX.Core.Command.extend({
-            construct: function(option, dockedShape, canAttach, position, facade){
-              this.option = option;
-              this.docker = null;
-              this.dockedShape = dockedShape;
-              this.dockedShapeParent = dockedShape.parent || facade.getCanvas();
-              this.position = position;
-              this.facade = facade;
-              this.selection = this.facade.getSelection();
-              this.shape = null;
-              this.parent = null;
-              this.canAttach = canAttach;
-            },
-            execute: function(){
-              if (!this.shape) {
-                this.shape = this.facade.createShape(option);
-                this.parent = this.shape.parent;
-              } else if (this.parent) {
-                this.parent.add(this.shape);
-              }
-
-              if (this.canAttach && this.shape.dockers && this.shape.dockers.length) {
-                this.docker = this.shape.dockers[0];
-
-                this.dockedShapeParent.add(this.docker.parent);
-
-                // Set the Docker to the new Shape
-                this.docker.setDockedShape(undefined);
-                this.docker.bounds.centerMoveTo(this.position);
-                if (this.dockedShape !== this.facade.getCanvas()) {
-                  this.docker.setDockedShape(this.dockedShape);
-                }
-                this.facade.setSelection( [this.docker.parent] );
-              }
-
-              this.facade.getCanvas().update();
-              this.facade.updateSelection();
-
-            },
-            rollback: function(){
-              if (this.shape) {
-                this.facade.setSelection(this.selection.without(this.shape));
-                this.facade.deleteShape(this.shape);
-              }
-              if (this.canAttach && this.docker) {
-                this.docker.setDockedShape(undefined);
-              }
-              this.facade.getCanvas().update();
-              this.facade.updateSelection();
-
-            }
-          });
-
-          // Update canvas
-          var command = new commandClass(option, this.dragCurrentParent, canAttach, pos, this.editorManager.getEditor());
-          this.editorManager.executeCommands([command]);
-
-          // Fire event to all who want to know about this
-          var dropEvent = {
-            type: FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED,
-            droppedItem: item,
-            position: pos
-          };
-          FLOWABLE.eventBus.dispatch(dropEvent.type, dropEvent);
-        }
-      }
-
-      this.dragCurrentParent = undefined;
-      this.dragCurrentParentId = undefined;
-      this.dragCurrentParentStencil = undefined;
-      this.dragCanContain = undefined;
-      this.quickMenu = undefined;
-      this.dropTargetElement = undefined;
-    },
-
-
-    overCallback  (event, ui) {
-      this.dragModeOver = true;
-    },
-
-    outCallback  (event, ui) {
-      this.dragModeOver = false;
-    },
-
-    startDragCallback  (event, ui) {
-      this.dragModeOver = false;
-      this.quickMenu = false;
-      if (!ui.helper.hasClass('stencil-item-dragged')) {
-        ui.helper.addClass('stencil-item-dragged');
-      }
-    },
-
-    startDragCallbackQuickMenu  (event, ui) {
-      this.dragModeOver = false;
-      this.quickMenu = true;
-    },
-
-    dragCallback (event, ui) {
-      if (this.dragModeOver != false) {
-        var coord = editorManager.eventCoordinatesXY(event.pageX, event.pageY);
-
-        var additionalIEZoom = 1;
-        if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-          var ua = navigator.userAgent;
-          if (ua.indexOf('MSIE') >= 0) {
-            //IE 10 and below
-            var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100);
-            if (zoom !== 100) {
-              additionalIEZoom = zoom / 100
-            }
-          }
-        }
-
-        if (additionalIEZoom !== 1) {
-          coord.x = coord.x / additionalIEZoom;
-          coord.y = coord.y / additionalIEZoom;
-        }
-
-        var aShapes = this.editorManager.getCanvas().getAbstractShapesAtPosition(coord);
-
-        if (aShapes.length <= 0) {
-          if (event.helper) {
-            this.dragCanContain = false;
-            return false;
-          }
-        }
-
-        if (aShapes[0] instanceof ORYX.Core.Canvas) {
-          this.editorManager.getCanvas().setHightlightStateBasedOnX(coord.x);
-        }
-
-        if (aShapes.length == 1 && aShapes[0] instanceof ORYX.Core.Canvas) {
-          var item = this.getStencilItemById(event.target.id);
-          var parentCandidate = aShapes[0];
-
-          if (item.id === 'Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
-            item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
-            item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
-            item.id === 'EntryCriterion') {
-
-            this.dragCanContain = false;
-
-            // Show Highlight
-            this.editorManager.handleEvents({
-              type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
-              highlightId: 'shapeRepo.added',
-              elements: [parentCandidate],
-              style: ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
-              color: ORYX.CONFIG.SELECTION_INVALID_COLOR
-            });
-
-          } else {
-            this.dragCanContain = true;
-            this.dragCurrentParent = parentCandidate;
-            this.dragCurrentParentId = parentCandidate.id;
-
-            this.editorManager.handleEvents({
-              type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-              highlightId: "shapeRepo.added"
-            });
-          }
-
-          this.editorManager.handleEvents({
-            type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-            highlightId: "shapeRepo.attached"
-          });
-
-          return false;
-
-        } else  {
-          var item = this.getStencilItemById(event.target.id);
-
-          var parentCandidate = aShapes.reverse().find(function (candidate) {
-            return (candidate instanceof ORYX.Core.Canvas
-              || candidate instanceof ORYX.Core.Node
-              || candidate instanceof ORYX.Core.Edge);
-          });
-
-          if (!parentCandidate) {
-            this.dragCanContain = false;
-            return false;
-          }
-
-          if (item.type === "node") {
-
-            // check if the draggable is a boundary event and the parent an Activity
-            var _canContain = false;
-            var parentStencilId = parentCandidate.getStencil().id();
-
-            if (this.dragCurrentParentId && this.dragCurrentParentId === parentCandidate.id) {
-              return false;
-            }
-
-            var parentItem = this.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
-            if (parentItem.roles.indexOf('Activity') > -1) {
-              if (item.roles.indexOf('IntermediateEventOnActivityBoundary') > -1
-                || item.roles.indexOf('EntryCriterionOnItemBoundary') > -1
-                || item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
-                _canContain = true;
-              }
-
-            } else if(parentItem.roles.indexOf('StageActivity') > -1) {
-              if (item.roles.indexOf('EntryCriterionOnItemBoundary') > -1
-                || item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
-                _canContain = true;
-              }
-
-            } else if(parentItem.roles.indexOf('StageModelActivity') > -1) {
-              if (item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
-                _canContain = true;
-              }
-
-            } else if (parentCandidate.getStencil().idWithoutNs() === 'Pool') {
-              if (item.id === 'Lane') {
-                _canContain = true;
-              }
-            }
-
-            if (_canContain) {
-              this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
-                highlightId: "shapeRepo.attached",
-                elements: [parentCandidate],
-                style: ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
-                color: ORYX.CONFIG.SELECTION_VALID_COLOR
-              });
-
-              this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-                highlightId: "shapeRepo.added"
-              });
-
-            } else {
-              for (var i = 0; i < this.containmentRules.length; i++) {
-                var rule = this.containmentRules[i];
-                if (rule.role === parentItem.id) {
-                  for (var j = 0; j < rule.contains.length; j++) {
-                    if (item.roles.indexOf(rule.contains[j]) > -1) {
-                      _canContain = true;
-                      break;
-                    }
-                  }
-
-                  if (_canContain) {
-                    break;
-                  }
-                }
-              }
-
-              // Show Highlight
-              this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
-                highlightId: 'shapeRepo.added',
-                elements: [parentCandidate],
-                color: _canContain ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
-              });
-
-              this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-                highlightId: "shapeRepo.attached"
-              });
-            }
-
-            this.dragCurrentParent = parentCandidate;
-            this.dragCurrentParentId = parentCandidate.id;
-            this.dragCurrentParentStencil = parentStencilId;
-            this.dragCanContain = _canContain;
-
-          } else  {
-            var canvasCandidate = this.editorManager.getCanvas();
-            var canConnect = false;
-
-            var targetStencil = this.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
-            if (targetStencil) {
-              var associationConnect = false;
-              if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
-                associationConnect = true;
-              } else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
-                associationConnect = true;
-              }
-
-              if (targetStencil.canConnectTo || associationConnect) {
-                canConnect = true;
-              }
-            }
-
-            //Edge
-            this.dragCurrentParent = canvasCandidate;
-            this.dragCurrentParentId = canvasCandidate.id;
-            this.dragCurrentParentStencil = canvasCandidate.getStencil().id();
-            this.dragCanContain = canConnect;
-
-            // Show Highlight
-            this.editorManager.handleEvents({
-              type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
-              highlightId: 'shapeRepo.added',
-              elements: [canvasCandidate],
-              color: ORYX.CONFIG.SELECTION_VALID_COLOR
-            });
-
-            this.editorManager.handleEvents({
-              type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-              highlightId: "shapeRepo.attached"
-            });
-          }
-        }
-      }
-    },
-
-    dragCallbackQuickMenu (event, ui) {
-      if (this.dragModeOver != false) {
-        var coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY);
-
-        var additionalIEZoom = 1;
-        if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-          var ua = navigator.userAgent;
-          if (ua.indexOf('MSIE') >= 0) {
-            //IE 10 and below
-            var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100);
-            if (zoom !== 100) {
-              additionalIEZoom = zoom / 100
-            }
-          }
-        }
-
-        if (additionalIEZoom !== 1) {
-          coord.x = coord.x / additionalIEZoom;
-          coord.y = coord.y / additionalIEZoom;
-        }
-
-        var aShapes = this.editorManager.getCanvas().getAbstractShapesAtPosition(coord);
-
-        if (aShapes.length <= 0) {
-          if (event.helper) {
-            this.dragCanContain = false;
-            return false;
-          }
-        }
-
-        if (aShapes[0] instanceof ORYX.Core.Canvas) {
-          this.editorManager.getCanvas().setHightlightStateBasedOnX(coord.x);
-        }
-
-        var stencil = undefined;
-        var stencilSets = this.editorManager.getStencilSets().values();
-        for (var i = 0; i < stencilSets.length; i++) {
-          var stencilSet = stencilSets[i];
-          var nodes = stencilSet.nodes();
-          for (var j = 0; j < nodes.length; j++) {
-            if (nodes[j].idWithoutNs() === event.target.id) {
-              stencil = nodes[j];
-              break;
-            }
-          }
-
-          if (!stencil) {
-            var edges = stencilSet.edges();
-            for (var j = 0; j < edges.length; j++) {
-              if (edges[j].idWithoutNs() === event.target.id) {
-                stencil = edges[j];
-                break;
-              }
-            }
-          }
-        }
-
-        var candidate = aShapes.last();
-
-        var isValid = false;
-        if (stencil.type() === "node")  {
-          //check containment rules
-          var canContain = this.editorManager.getRules().canContain({containingShape:candidate, containedStencil:stencil});
-
-          var parentCandidate = aShapes.reverse().find(function (candidate) {
-            return (candidate instanceof ORYX.Core.Canvas
-              || candidate instanceof ORYX.Core.Node
-              || candidate instanceof ORYX.Core.Edge);
-          });
-
-          if (!parentCandidate) {
-            this.dragCanContain = false;
-            return false;
-          }
-
-          this.dragCurrentParent = parentCandidate;
-          this.dragCurrentParentId = parentCandidate.id;
-          this.dragCurrentParentStencil = parentCandidate.getStencil().id();
-          this.dragCanContain = canContain;
-          this.dropTargetElement = parentCandidate;
-          isValid = canContain;
-
-        } else { //Edge
-
-          var shapes = this.editorManager.getSelection();
-          if (shapes && shapes.length == 1) {
-            var currentSelectedShape = shapes.first();
-            var curCan = candidate;
-            var canConnect = false;
-
-            var targetStencil = this.getStencilItemById(curCan.getStencil().idWithoutNs());
-            if (targetStencil) {
-              var associationConnect = false;
-              if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
-                associationConnect = true;
-              } else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
-                associationConnect = true;
-              }
-
-              if (targetStencil.canConnectTo || associationConnect) {
-                while (!canConnect && curCan && !(curCan instanceof ORYX.Core.Canvas)) {
-                  candidate = curCan;
-                  //check connection rules
-                  canConnect = this.editorManager.getRules().canConnect({
-                    sourceShape: currentSelectedShape,
-                    edgeStencil: stencil,
-                    targetShape: curCan
-                  });
-                  curCan = curCan.parent;
-                }
-              }
-            }
-            var parentCandidate = this.editorManager.getCanvas();
-
-            isValid = canConnect;
-            this.dragCurrentParent = parentCandidate;
-            this.dragCurrentParentId = parentCandidate.id;
-            this.dragCurrentParentStencil = parentCandidate.getStencil().id();
-            this.dragCanContain = canConnect;
-            this.dropTargetElement = candidate;
-          }
-
-        }
-
-        this.editorManager.handleEvents({
-          type:   ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
-          highlightId:'shapeMenu',
-          elements: [candidate],
-          color: isValid ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
-        });
-      }
     },
   }
 }

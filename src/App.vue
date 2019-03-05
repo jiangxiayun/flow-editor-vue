@@ -10,7 +10,7 @@
             <div id="paletteSectionOpen" class="hidden">
               <i class="glyphicon glyphicon-chevron-right"></i>
             </div>
-            <canvasWrapper></canvasWrapper>
+            <canvasWrapper :editorManager="editorManager"></canvasWrapper>
             <propertySection></propertySection>
           </div>
         </div>
@@ -25,6 +25,7 @@
   import canvasWrapper from '@/components/flowable/canvasWrapper'
   import propertySection from '@/components/flowable/propertySection'
   import { AA } from './editorAA.js'
+  import EditorManager from '@/assets/flowable/EditorManager'
 
   export default {
     name: 'Editor',
@@ -47,6 +48,9 @@
     },
     mounted () {
       this.editorManager =  this.createEditorManager()
+      // this.editorManager =  new EditorManager({
+      //
+      // })
       this.editorManager.setModelData(this.mockData)
 
       var baseUrl = "http://b3mn.org/stencilset/";

@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router'
 import store from './store'
 import './plugins/element.js'
+import './directives.js'
 import commonMix from './mixin'
 import i18n from './i18n'
 

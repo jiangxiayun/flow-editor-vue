@@ -72,6 +72,7 @@
 </template>
 
 <script>
+  import { mapState, mapMutations } from 'vuex'
   import stencilItemTemplate from '@/components/flowable/stencil-item-template'
   import processTreeList from '@/components/flowable/process-tree-list'
   import rootStencilItemTemplate from '@/components/flowable/root-stencil-item-template'
@@ -80,7 +81,6 @@
     name: "paletteHelpWrapper",
     data () {
       return {
-        stencilItemGroups: [],
         treeview: {},
         isEditorReady: false
       }
@@ -92,7 +92,11 @@
     mounted () {
 
     },
+    computed: {
+      ...mapState('Flowable', ['stencilItemGroups'])
+    },
     methods: {
+      ...mapMutations('Flowable', ['UPDATE_stencilItemGroups', 'UPDATE_quickMenuItems']),
       init () {
         var data = this.editorManager.getStencilData();
 
@@ -116,6 +120,8 @@
           morphRoles.push(roleItem);
         }
 
+        let stencilItemGroups_ary = []
+
         // Check all received items
         for (let stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) {
           // Check if the root group is the 'diagram' group. If so, this item should not be shown.
@@ -134,9 +140,9 @@
             // Check if this group already exists. If not, we create a new one
             if (currentGroupName !== null && currentGroupName !== undefined && currentGroupName.length > 0) {
 
-              currentGroup = this.findGroup(currentGroupName, this.stencilItemGroups); // Find group in root groups array
+              currentGroup = this.findGroup(currentGroupName, stencilItemGroups_ary); // Find group in root groups array
               if (currentGroup === null) {
-                currentGroup = this.addGroup(currentGroupName, this.stencilItemGroups);
+                currentGroup = this.addGroup(currentGroupName, stencilItemGroups_ary);
               }
 
               // Add all child groups (if any)
@@ -211,6 +217,7 @@
             }
           }
 
+
           if (currentGroup) {
             // Add the stencil item to the correct group
             currentGroup.items.push(stencilItem);
@@ -220,18 +227,21 @@
           } else {
             // It's a root stencil element
             if (!removed) {
-              this.stencilItemGroups.push(stencilItem);
+              stencilItemGroups_ary.push(stencilItem);
             }
           }
+
         }
 
-        for (let i = 0; i < this.stencilItemGroups.length; i++)  {
-          if (this.stencilItemGroups[i].paletteItems && this.stencilItemGroups[i].paletteItems.length == 0) {
-            this.stencilItemGroups[i].visible = false;
+        for (let i = 0; i < stencilItemGroups_ary.length; i++)  {
+          if (stencilItemGroups_ary[i].paletteItems && stencilItemGroups_ary[i].paletteItems.length == 0) {
+            stencilItemGroups_ary[i].visible = false;
           }
         }
 
-        // this.stencilItemGroups = stencilItemGroups;
+        console.log('stencilItemGroups_ary', stencilItemGroups_ary)
+        this.UPDATE_stencilItemGroups(stencilItemGroups_ary)
+        console.log('stencilItemGroups', this.stencilItemGroups)
 
         var containmentRules = [];
         for (let i = 0; i < data.rules.containmentRules.length; i++) {
@@ -247,7 +257,7 @@
           }
         }
 
-        this.quickMenuItems = availableQuickMenuItems;
+        this.UPDATE_quickMenuItems(availableQuickMenuItems)
         this.morphRoles = morphRoles;
         /*
                     * Listen to selection change events: show properties
@@ -322,8 +332,7 @@
                   selectedShape.properties.set(key, true);
                 }
 
-                if (FLOWABLE.UI_CONFIG.showRemovedProperties == false && property.isHidden())
-                {
+                if (FLOWABLE.UI_CONFIG.showRemovedProperties == false && property.isHidden()) {
                   continue;
                 }
 
@@ -385,7 +394,6 @@
         });
 
         this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
-
           FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
           var shapes = event.elements;
 
