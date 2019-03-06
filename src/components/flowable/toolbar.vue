@@ -1,7 +1,7 @@
 <template>
   <div class="subheader editor-toolbar" id="editor-header">
     <div class="btn-group">
-      <div class="btn-toolbar pull-left" ng-controller="ToolbarController">
+      <div class="btn-toolbar pull-left">
         <button v-for="(item, index) in items"
                 :key="item.id"
                 :id="item.id"
@@ -16,6 +16,7 @@
         </button>
       </div>
     </div>
+
     <div class="btn-group pull-right" v-show="secondaryItems.length > 0">
       <div class="btn-toolbar pull-right">
         <button v-for="(item, index) in secondaryItems"
@@ -41,8 +42,6 @@
     name: "toolbar",
     data() {
       return {
-        items: [],
-        secondaryItems: FLOWABLE.TOOLBAR_CONFIG.secondaryItems,
         undoStack: [],
         redoStack: []
       }
@@ -51,31 +50,16 @@
       editor: {},
       editorManager: {}
     },
-    mounted () {
-      var toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items;
-      for (var i = 0; i < toolbarItems.length; i++) {
-        if (this.mockData.model.modelType === 'form') {
-          if (!toolbarItems[i].disableInForm) {
-            this.items.push(toolbarItems[i]);
-          }
-        } else {
-          this.items.push(toolbarItems[i]);
-        }
+    computed: {
+      items () {
+        return this.editorManager ? this.editorManager.getToolbarItems() : []
+      },
+      secondaryItems () {
+        return this.editorManager ? this.editorManager.getSecondaryItems() : []
       }
+    },
+    mounted () {
 
-      FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_UNDO_REDO_RESET,function(){
-        this.undoStack = [];
-        this.redoStack = [];
-        if (this.items) {
-          for(var i = 0; i < this.items.length; i++) {
-            var item = this.items[i];
-            if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo' || item.action === "FLOWABLE.TOOLBAR.ACTIONS.redo"){
-              item.enabled = false;
-            }
-          }
-        }
-
-      },this);
     },
     methods: {
       executeFunctionByName (functionName, context /*, args */) {
@@ -157,45 +141,7 @@
     },
     watch: {
       editorManager () {
-        // 捕获所有执行的命令并将它们存储在各自的堆栈上
-        this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_EXECUTE_COMMANDS, ( evt ) => {
-          // If the event has commands
-          if ( !evt.commands ) return
 
-          this.undoStack.push( evt.commands );
-          this.redoStack = [];
-
-          for(let i = 0; i < this.items.length; i++) {
-            let item = this.items[i];
-            if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo') {
-              item.enabled = true
-            } else if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo') {
-              item.enabled = false
-            }
-          }
-
-          // Update
-          this.editorManager.getCanvas().update();
-          this.editorManager.updateSelection();
-        });
-        // 控制 toolbar buttons 是否可用
-        this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, ( evt ) => {
-          var elements = evt.elements;
-          for(let i = 0; i < this.items.length; i++)  {
-            let item = this.items[i];
-            if (item.enabledAction && item.enabledAction === 'element') {
-              let minLength = 1;
-              if (item.minSelectionCount) {
-                minLength = item.minSelectionCount;
-              }
-              if (elements.length >= minLength && !item.enabled) {
-                item.enabled = true
-              } else if (elements.length == 0 && item.enabled) {
-                item.enabled = false
-              }
-            }
-          }
-        });
       }
     }
   }

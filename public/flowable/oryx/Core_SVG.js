@@ -25,14 +25,12 @@ ORYX.Core.SVG.EditPathHandler = Clazz.extend({
 
   construct: function () {
     arguments.callee.$.construct.apply(this, arguments);
-
     this.x = 0;
     this.y = 0;
     this.oldX = 0;
     this.oldY = 0;
     this.deltaWidth = 1;
     this.deltaHeight = 1;
-
     this.d = "";
   },
 

@@ -34,14 +34,14 @@
     data () {
       return {
         editorManager: null,
-        formItems: null,
+        // formItems: null,
         editor: null,
-        restRootUrl: FLOWABLE.CONFIG.contextRoot,
-        config: FLOWABLE.CONFIG,
-        getModelThumbnailUrl: FLOWABLE.APP_URL.getModelThumbnailUrl,
-        getImageUrl: FLOWABLE.APP_URL.getImageUrl,
+        // restRootUrl: FLOWABLE.CONFIG.contextRoot,
+        // config: FLOWABLE.CONFIG,
+        // getModelThumbnailUrl: FLOWABLE.APP_URL.getModelThumbnailUrl,
+        // getImageUrl: FLOWABLE.APP_URL.getImageUrl,
         editorHistory: [],
-        forceSelectionRefresh: false
+        // forceSelectionRefresh: false
       }
     },
     components: { toolbar, paletteWrapper, canvasWrapper, propertySection },
@@ -53,9 +53,12 @@
     },
     mounted () {
       this.editorManager =  new EditorManager({
+        type: 'flow',
         modelData: this.mockData,
         stencilData: AA,
       })
+
+
       this.resizeFun()
     },
     methods: {
@@ -170,69 +173,6 @@
             $this.data('scrollTimeout', setTimeout(callback,50,self));
           });
         };
-
-        FLOWABLE.eventBus.addListener('ORYX-EDITOR-LOADED',() => {
-          this.editorFactory.resolve();
-          this.editorInitialized = true;
-          this.modelData = this.editorManager.getBaseModelData();
-
-        }, this);
-
-        FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_EDITOR_READY, () => {
-          var url = window.location.href;
-          var regex = new RegExp("[?&]subProcessId(=([^&#]*)|&|#|$)");
-          var results = regex.exec(url);
-          if (results && results[2]) {
-            this.editorManager.edit(decodeURIComponent(results[2].replace(/\+/g, " ")));
-          }
-        });
-        FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, function (event) {
-          jQuery('.Oryx_button').each(function(i, obj) {
-            obj.style.display = "none";
-          });
-        });
-
-        /*
-         * Listen to property updates and act upon them
-         */
-        FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, function (event) {
-          if (event.property && event.property.key) {
-            // If the name property is been updated, we also need to change the title of the currently selected item
-            if (event.property.key === 'oryx-name' && $scope.selectedItem !== undefined && $scope.selectedItem !== null) {
-              $scope.selectedItem.title = event.newValue;
-            }
-
-            // Update "no value" flag
-            event.property.noValue = (event.property.value === undefined
-              || event.property.value === null
-              || event.property.value.length == 0);
-          }
-        });
-
-        FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_SHOW_VALIDATION_POPUP, function (event) {
-          // Method to open validation dialog
-          var showValidationDialog = function() {
-            this.currentValidationId = event.validationId;
-            this.isOnProcessLevel = event.onProcessLevel;
-
-            _internalCreateModal({template: 'editor-app/popups/validation-errors.html?version=' + Date.now()},  $modal, this);
-          };
-
-          showValidationDialog();
-        });
-
-        FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS, function (event) {
-          var modelMetaData = editorManager.getBaseModelData();
-          this.editorHistory.push({
-            id: modelMetaData.modelId,
-            name: modelMetaData.name,
-            type: 'bpmnmodel'
-          });
-
-          $window.location.href = "../editor/#/editor/" + event.processId;
-        });
-
-
 
         this.stencilInitialized = true;
       }

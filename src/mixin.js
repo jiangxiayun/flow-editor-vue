@@ -523,7 +523,7 @@ const commonMix = {
       console.log('Oryx_button:', newItemId)
       var shapes = this.editorManager.getSelection();
       if (shapes && shapes.length == 1) {
-        this.currentSelectedShape = shapes.first();propertyWindowState
+        this.currentSelectedShape = shapes.first();
 
         var containedStencil = undefined;
         var stencilSets = this.editorManager.getStencilSets().values();
