@@ -1,5 +1,5 @@
-import { FLOWABLE, FLOWABLE_eventBus_initAddListener } from './FLOWABLE_eventBus'
-
+import { FLOWABLE, FLOWABLE_eventBus_initAddListener } from './FLOWABLE_Config'
+import { findGroup, addGroup } from '@/assets/Util'
 
 /**流程图编辑器 类
  * @params modelData: 流程图实例数据
@@ -17,11 +17,11 @@ export default class EditorManager {
     this.current = this.modelId // 当前流程id
     this.loading = true
 
-
     // 设置 this.modelData
     this.setModelData(config.modelData)
     // 设置 this.stencilData
     this.setStencilData(config.stencilData)
+    this.setShowStencilData()
 
     this.setToolbarItems()
 
@@ -36,9 +36,19 @@ export default class EditorManager {
       }
     })
 
+    // 拖拽功能辅助变量
+    this.dragCurrentParent = undefined
+    this.dragCurrentParentId = undefined
+    this.dragCurrentParentStencil = undefined
+    this.dropTargetElement = undefined
+
+    // 元素选择辅助变量
+    this.selectedItem = {}
+
     this.bootEditor()
   }
 
+  getSelectedItem () { return this.selectedItem }
   getToolbarItems () { return this.toolbarItems }
   setToolbarItems () {
     let items = []
@@ -115,6 +125,174 @@ export default class EditorManager {
     //we don't want a references!
     this.stencilData = jQuery.extend(true, {}, stencilData)
   }
+  getShowStencilData () {
+    return this.showStencilData
+  }
+  setShowStencilData () {
+    let quickMenuDefinition = undefined;
+    let ignoreForPaletteDefinition = undefined;
+    const data = this.stencilData
+    if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+      quickMenuDefinition = ['HumanTask', 'Association'];
+      ignoreForPaletteDefinition = ['CasePlanModel'];
+    } else {
+      quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway',
+        'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
+        'SequenceFlow', 'Association'];
+      ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask'];
+    }
+
+    let quickMenuItems = [];
+    let morphRoles = [];
+    for (let i = 0; i < data.rules.morphingRules.length; i++) {
+      var role = data.rules.morphingRules[i].role;
+      var roleItem = {'role': role, 'morphOptions': []};
+      morphRoles.push(roleItem);
+    }
+
+    let stencilItemGroups_ary = []
+
+    // Check all received items
+    for (let stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) {
+      // Check if the root group is the 'diagram' group. If so, this item should not be shown.
+      var currentGroupName = data.stencils[stencilIndex].groups[0];
+      if (currentGroupName === 'Diagram' || currentGroupName === 'Form') {
+        continue;  // go to next item
+      }
+
+      var removed = false;
+      if (data.stencils[stencilIndex].removed) {
+        removed = true;
+      }
+
+      var currentGroup = undefined;
+      if (!removed) {
+        // Check if this group already exists. If not, we create a new one
+        if (currentGroupName !== null && currentGroupName !== undefined && currentGroupName.length > 0) {
+
+          currentGroup = findGroup(currentGroupName, stencilItemGroups_ary); // Find group in root groups array
+          if (currentGroup === null) {
+            currentGroup = addGroup(currentGroupName, stencilItemGroups_ary);
+          }
+
+          // Add all child groups (if any)
+          for (var groupIndex = 1; groupIndex < data.stencils[stencilIndex].groups.length; groupIndex++) {
+            var childGroupName = data.stencils[stencilIndex].groups[groupIndex];
+            var childGroup = findGroup(childGroupName, currentGroup.groups);
+            if (childGroup === null) {
+              childGroup = addGroup(childGroupName, currentGroup.groups);
+            }
+
+            // The current group variable holds the parent of the next group (if any),
+            // and is basically the last element in the array of groups defined in the stencil item
+            currentGroup = childGroup;
+          }
+        }
+      }
+
+      // Construct the stencil item
+      var stencilItem = {
+        'id': data.stencils[stencilIndex].id,
+        'name': data.stencils[stencilIndex].title,
+        'description': data.stencils[stencilIndex].description,
+        'icon': data.stencils[stencilIndex].icon,
+        'type': data.stencils[stencilIndex].type,
+        'roles': data.stencils[stencilIndex].roles,
+        'removed': removed,
+        'customIcon': false,
+        'canConnect': false,
+        'canConnectTo': false,
+        'canConnectAssociation': false
+      };
+
+      if (data.stencils[stencilIndex].customIconId && data.stencils[stencilIndex].customIconId > 0) {
+        stencilItem.customIcon = true;
+        stencilItem.icon = data.stencils[stencilIndex].customIconId;
+      }
+
+      if (!removed) {
+        if (quickMenuDefinition.indexOf(stencilItem.id) >= 0) {
+          quickMenuItems[quickMenuDefinition.indexOf(stencilItem.id)] = stencilItem;
+        }
+      }
+
+      if (stencilItem.id === 'TextAnnotation' || stencilItem.id === 'BoundaryCompensationEvent') {
+        stencilItem.canConnectAssociation = true;
+      }
+
+      for (let i = 0; i < data.stencils[stencilIndex].roles.length; i++) {
+        var stencilRole = data.stencils[stencilIndex].roles[i];
+        if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+          if (stencilRole === 'association_start') {
+            stencilItem.canConnect = true;
+          } else if (stencilRole === 'association_end') {
+            stencilItem.canConnectTo = true;
+          }
+        } else {
+          if (stencilRole === 'sequence_start') {
+            stencilItem.canConnect = true;
+          } else if (stencilRole === 'sequence_end') {
+            stencilItem.canConnectTo = true;
+          }
+        }
+
+        for (let j = 0; j < morphRoles.length; j++) {
+          if (stencilRole === morphRoles[j].role) {
+            if (!removed) {
+              morphRoles[j].morphOptions.push(stencilItem);
+            }
+            stencilItem.morphRole = morphRoles[j].role;
+            break;
+          }
+        }
+      }
+
+
+      if (currentGroup) {
+        // Add the stencil item to the correct group
+        currentGroup.items.push(stencilItem);
+        if (ignoreForPaletteDefinition.indexOf(stencilItem.id) < 0) {
+          currentGroup.paletteItems.push(stencilItem);
+        }
+      } else {
+        // It's a root stencil element
+        if (!removed) {
+          stencilItemGroups_ary.push(stencilItem);
+        }
+      }
+
+    }
+
+    for (let i = 0; i < stencilItemGroups_ary.length; i++)  {
+      if (stencilItemGroups_ary[i].paletteItems && stencilItemGroups_ary[i].paletteItems.length == 0) {
+        stencilItemGroups_ary[i].visible = false;
+      }
+    }
+
+    console.log('stencilItemGroups_ary', stencilItemGroups_ary)
+    this.showStencilData = stencilItemGroups_ary
+    // this.UPDATE_stencilItemGroups(stencilItemGroups_ary)
+    console.log('stencilItemGroups', this.stencilItemGroups)
+
+    let containmentRules = [];
+    for (let i = 0; i < data.rules.containmentRules.length; i++) {
+      let rule = data.rules.containmentRules[i];
+      containmentRules.push(rule);
+    }
+    this.containmentRules = containmentRules;
+
+    // remove quick menu items which are not available anymore due to custom pallette
+    let availableQuickMenuItems = [];
+    for (let i = 0; i < quickMenuItems.length; i++) {
+      if (quickMenuItems[i]) {
+        availableQuickMenuItems[availableQuickMenuItems.length] = quickMenuItems[i];
+      }
+    }
+
+    // this.UPDATE_quickMenuItems(availableQuickMenuItems)
+    this.quickMenuItems = availableQuickMenuItems
+    this.morphRoles = morphRoles;
+  }
 
   getSelection () { return this.editor.selection }
 
@@ -175,6 +353,103 @@ export default class EditorManager {
         FLOWABLE.eventBus.dispatch(eventMapping.flowableType, event)
       })
     })
+
+
+    // if an element is added te properties will catch this event.
+    FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.filterEvent.bind(this));
+    FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED, this.filterEvent.bind(this));
+    FLOWABLE.eventBus.addListener("EDITORMANAGER-EDIT-ACTION", function() {
+      this.renderProcessHierarchy();
+    });
+
+    FLOWABLE_eventBus_initAddListener()
+    this.initRegisterOnEvent()
+  }
+
+  renderProcessHierarchy(){
+    //only start calculating when the editor has done all his constructor work.
+    if(!this.isEditorReady){
+      return false;
+    }
+
+    if (!this.isLoading()){
+      //the current implementation of has a lot of eventlisteners. when calling getTree() it could manipulate
+      //the canvastracker while the canvas is stille loading stuff.
+      //TODO: check if its possible to trigger the re-rendering by a single event instead of registering on 10 events...
+      this.treeview = this.getTree();
+    }
+
+  }
+
+  filterEvent (event) {
+    // this event is fired when the user changes a property by the property editor.
+    if(event.type === "event-type-property-value-changed"){
+      if(event.property.key === "oryx-overrideid" || event.property.key === "oryx-name"){
+        this.renderProcessHierarchy()
+      }
+      //this event is fired when the stencil / shape's text is changed / updated.
+    }else if(event.type === "propertyChanged"){
+      if(event.name === "oryx-overrideid" || event.name === "oryx-name"){
+
+        this.renderProcessHierarchy();
+      }
+    }else if(event.type === ORYX.CONFIG.ACTION_DELETE_COMPLETED){
+      this.renderProcessHierarchy();
+      //for some reason the new tree does not trigger an ui update.
+      //$scope.$apply();
+    }else if(event.type === "event-type-item-dropped"){
+      this.renderProcessHierarchy();
+    }
+  }
+
+
+  /**
+   * Helper method to find a stencil item.
+   */
+  getStencilItemById (stencilItemId) {
+    for (let i = 0; i < this.showStencilData.length; i++) {
+      var element = this.showStencilData[i];
+
+      // Real group
+      if (element.items !== null && element.items !== undefined) {
+        var item = this.findStencilItemInGroup(stencilItemId, element);
+        if (item) {
+          return item;
+        }
+      } else { // Root stencil item
+        if (element.id === stencilItemId) {
+          return element;
+        }
+      }
+    }
+    return undefined;
+  }
+  /**
+   * Helper method that searches a group for an item with the given id.
+   * If not found, will return undefined.
+   */
+  findStencilItemInGroup  (stencilItemId, group) {
+    var item;
+
+    // Check all items directly in this group
+    for (var j = 0; j < group.items.length; j++) {
+      item = group.items[j];
+      if (item.id === stencilItemId) {
+        return item;
+      }
+    }
+
+    // Check the child groups
+    if (group.groups && group.groups.length > 0) {
+      for (var k = 0; k < group.groups.length; k++) {
+        item = this.findStencilItemInGroup(stencilItemId, group.groups[k]);
+        if (item) {
+          return item;
+        }
+      }
+    }
+
+    return undefined;
   }
 
   initRegisterOnEvent () {
@@ -315,7 +590,7 @@ export default class EditorManager {
 
         var selectedShape = shapes.first()
 
-        var a = this.editorManager.getCanvas().node.getScreenCTM()
+        var a = this.getCanvas().node.getScreenCTM()
 
         var absoluteXY = selectedShape.absoluteXY()
 
@@ -442,29 +717,6 @@ export default class EditorManager {
           }
         }
       }
-    })
-
-
-    // 捕获所有执行的命令并将它们存储在各自的堆栈上
-    this.registerOnEvent(ORYX.CONFIG.EVENT_EXECUTE_COMMANDS, (evt) => {
-      // If the event has commands
-      if (!evt.commands) return
-
-      this.undoStack.push(evt.commands)
-      this.redoStack = []
-
-      for (let i = 0; i < this.items.length; i++) {
-        let item = this.items[i]
-        if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo') {
-          item.enabled = true
-        } else if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo') {
-          item.enabled = false
-        }
-      }
-
-      // Update
-      this.editorManager.getCanvas().update()
-      this.editorManager.updateSelection()
     })
 
   }

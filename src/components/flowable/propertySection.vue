@@ -5,12 +5,12 @@
          :class="{collapsed: propertyWindowState.collapsed}">
       <div class="selected-item-section">
         <div class="clearfix">
-          <!--<div class="pull-right" v-if="selectedItem.auditData.createDate">-->
-            <!--<strong>{{'ELEMENT.DATE_CREATED' | translate}}: </strong> {{selectedItem.auditData.createDate}}-->
-          <!--</div>-->
-          <!--<div class="pull-right" v-if="selectedItem.auditData.author">-->
-            <!--<strong>{{'ELEMENT.AUTHOR' | translate}}: </strong> {{selectedItem.auditData.author}}-->
-          <!--</div>-->
+          <div class="pull-right" v-if="selectedItem.auditData && selectedItem.auditData.createDate">
+            <strong>{{$t('ELEMENT.DATE_CREATED')}}: </strong> {{selectedItem.auditData.createDate}}
+          </div>
+          <div class="pull-right" v-if="selectedItem.auditData && selectedItem.auditData.author">
+            <strong>{{$t('ELEMENT.AUTHOR')}}: </strong> {{selectedItem.auditData.author}}
+          </div>
           <div class="selected-item-title">
             <a @click="propertyWindowStateToggle">
               <i class="glyphicon"
@@ -30,15 +30,15 @@
                  @click="propertyClicked(index)">
               <span class="title" v-if="!property.hidden">{{ property.title }}&nbsp;:</span>
               <span class="title-removed" v-if="property.hidden">
-  <i>{{ property.title }}&nbsp;({{'PROPERTY.REMOVED' | translate}})&nbsp;:</i>
-  </span>
-              <span class="value"></span>
-              <!--<ng-include-->
-              <!--src="getPropertyTemplateUrl($index)" v-if="!property.hasReadWriteMode"></ng-include>-->
-              <!--<ng-include src="getPropertyReadModeTemplateUrl($index)"-->
-              <!--v-if="property.hasReadWriteMode && property.mode == 'read'"></ng-include>-->
-              <!--<ng-include src="getPropertyWriteModeTemplateUrl($index)"-->
-              <!--v-if="property.hasReadWriteMode && property.mode == 'write'"></ng-include>-->
+                <i>{{ property.title }}&nbsp;({{'PROPERTY.REMOVED' | translate}})&nbsp;:</i>
+              </span>
+              <span class="value">
+                {{property.templateUrl}}
+                <Property-template :properties="property.templateUrl"></Property-template>
+                <!--<Property-template v-if="!property.hasReadWriteMode" :properties="property.templateUrl"></Property-template>-->
+                <!--<Property-template v-if="property.hasReadWriteMode && property.mode == 'read'"></Property-template>-->
+                <!--<Property-template v-if="property.hasReadWriteMode && property.mode == 'write'"></Property-template>-->
+              </span>
             </div>
           </div>
         </div>
@@ -48,16 +48,33 @@
 </template>
 
 <script>
+  import PropertyTemplate from '@/components/propertyForm/Property-template'
+
   export default {
     name: "propertySection",
     data () {
       return {
-        propertyWindowState: {'collapsed': false},
-        selectedItem: {'title': '', 'properties': []}
+        propertyWindowState: {'collapsed': false}
       }
     },
+    props: {
+      editorManager: {}
+    },
+    components: {PropertyTemplate},
     mounted () {
 
+    },
+    computed: {
+      modelData () {
+        return this.editorManager ? this.editorManager.getBaseModelData() : {}
+      },
+      selectedItem () {
+        return this.editorManager ? this.editorManager.getSelectedItem() : {
+          title: '',
+          properties: [],
+          auditData: {}
+        }
+      }
     },
     methods: {
       propertyWindowStateToggle () {

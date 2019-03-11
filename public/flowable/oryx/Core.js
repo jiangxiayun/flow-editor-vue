@@ -1531,7 +1531,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
    * @param {UIObject} uiObject
    */
   add: function (uiObject, index, silent) {
-    //if uiObject is child of another UIObject, remove it.
+    // if uiObject is child of another UIObject, remove it.
     if (uiObject instanceof ORYX.Core.UIObject) {
       if (!(this.children.member(uiObject))) {
         //if uiObject is child of another parent, remove it from that parent.

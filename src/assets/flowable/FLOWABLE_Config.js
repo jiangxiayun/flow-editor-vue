@@ -33,7 +33,7 @@ export const FLOWABLE = {
     EVENT_TYPE_SELECTION_CHANGE: 'event-type-selection-change',
 
     /** Event fired when a toolbar button has been clicked. */
-    EVENT_TYPE_TOOLBAR_BUTTON_CLICKED: 'event-type-toolbar-button-clicked',
+    EVENT_TYPE_TOOLBAR_BUTTON_CLICKEDEVENT_TYPE_TOOLBAR_BUTTON_CLICKED: 'event-type-toolbar-button-clicked',
 
     /** Event fired when a stencil item is dropped on the canvas. */
     EVENT_TYPE_ITEM_DROPPED: 'event-type-item-dropped',
@@ -95,7 +95,7 @@ export const FLOWABLE = {
       if (typeof this.listeners[type] != 'undefined') {
         var numOfCallbacks = this.listeners[type].length
         var newArray = []
-        for (var i = 0; i < numOfCallbacks; i++) {
+        for (let i = 0; i < numOfCallbacks; i++) {
           var listener = this.listeners[type][i]
           if (listener.scope === scope && listener.callback === callback) {
             // Do nothing, this is the listener and doesn't need to survive
@@ -113,7 +113,7 @@ export const FLOWABLE = {
         if (callback === undefined && scope === undefined) {
           return numOfCallbacks > 0
         }
-        for (var i = 0; i < numOfCallbacks; i++) {
+        for (let i = 0; i < numOfCallbacks; i++) {
           var listener = this.listeners[type][i]
           if (listener.scope == scope && listener.callback == callback) {
             return true
@@ -128,9 +128,9 @@ export const FLOWABLE = {
      */
     dispatch: function (type, event) {
       if (typeof this.listeners[type] != 'undefined') {
-        var numOfCallbacks = this.listeners[type].length
-        for (var i = 0; i < numOfCallbacks; i++) {
-          var listener = this.listeners[type][i]
+        const numOfCallbacks = this.listeners[type].length
+        for (let i = 0; i < numOfCallbacks; i++) {
+          let listener = this.listeners[type][i]
           if (listener && listener.callback) {
             listener.callback.apply(listener.scope, [event])
           }
@@ -643,7 +643,6 @@ export const FLOWABLE = {
       undo: function (services) {
         // Get the last commands
         var lastCommands = services.$scope.undoStack.pop();
-        console.log('lastCommands', lastCommands)
 
         if (lastCommands) {
           // Add the commands to the redo stack
@@ -671,7 +670,7 @@ export const FLOWABLE = {
         }
 
         let toggleUndo = false;
-        if (services.$scope.undoStack.length == 0) {
+        if (services.$scope.undoStack.length === 0) {
           toggleUndo = true;
         }
 
@@ -692,7 +691,6 @@ export const FLOWABLE = {
         }
       },
       redo: function (services) {
-
         // Get the last commands from the redo stack
         var lastCommands = services.$scope.redoStack.pop();
 
@@ -900,11 +898,9 @@ export function FLOWABLE_eventBus_initAddListener (editorManager) {
     })
   })
   FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_UNDO_REDO_RESET,function(){
-    this.undoStack = [];
-    this.redoStack = [];
     if (this.items) {
-      for(var i = 0; i < this.items.length; i++) {
-        var item = this.items[i];
+      for(let i = 0; i < this.items.length; i++) {
+        let item = this.items[i];
         if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo' || item.action === "FLOWABLE.TOOLBAR.ACTIONS.redo"){
           item.enabled = false;
         }
@@ -912,14 +908,6 @@ export function FLOWABLE_eventBus_initAddListener (editorManager) {
     }
 
   },this);
-
-
-  //if an element is added te properties will catch this event.
-  FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.filterEvent);
-  FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED, this.filterEvent);
-  FLOWABLE.eventBus.addListener("EDITORMANAGER-EDIT-ACTION", () => {
-    this.renderProcessHierarchy();
-  });
 
 
   /*

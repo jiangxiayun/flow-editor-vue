@@ -36,7 +36,7 @@
 </template>
 
 <script>
-// import { ACTIVITI, KISBPM } from '@/assets/flowable/_config.js'
+import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
 
   export default {
     name: "toolbar",
@@ -59,17 +59,17 @@
       }
     },
     mounted () {
-
+      this.MousetrapBind()
     },
     methods: {
       executeFunctionByName (functionName, context /*, args */) {
         var args = Array.prototype.slice.call(arguments).splice(2);
         var namespaces = functionName.split(".");
         var func = namespaces.pop();
-        for(let i = 0; i < namespaces.length; i++) {
+        for(let i = 1; i < namespaces.length; i++) {
           context = context[namespaces[i]];
         }
-        console.log('func', func)
+
         return context[func].apply(this, args);
       },
       toolbarButtonClicked (buttonIndex) {
@@ -84,7 +84,7 @@
           // '$translate' : $translate,
           'editorManager' : this.editorManager
         };
-        this.executeFunctionByName(buttonClicked.action, window, services);
+        this.executeFunctionByName(buttonClicked.action, FLOWABLE, services);
 
         // Other events
         let event = {
@@ -104,44 +104,69 @@
           // '$location': $location,
           'editorManager' : this.editorManager
         };
-        this.executeFunctionByName(buttonClicked.action, window, services);
+        this.executeFunctionByName(buttonClicked.action, FLOWABLE, services);
       },
       MousetrapBind () {
         /* Key bindings */
-        // Mousetrap.bind('mod+z', function(e) {
-        //   var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
-        //   FLOWABLE.TOOLBAR.ACTIONS.undo(services);
-        //   return false;
-        // });
-        //
-        // Mousetrap.bind('mod+y', function(e) {
-        //   var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
-        //   FLOWABLE.TOOLBAR.ACTIONS.redo(services);
-        //   return false;
-        // });
-        //
-        // Mousetrap.bind('mod+c', function(e) {
-        //   var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
-        //   FLOWABLE.TOOLBAR.ACTIONS.copy(services);
-        //   return false;
-        // });
-        //
-        // Mousetrap.bind('mod+v', function(e) {
-        //   var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
-        //   FLOWABLE.TOOLBAR.ACTIONS.paste(services);
-        //   return false;
-        // });
-        //
-        // Mousetrap.bind(['del'], function(e) {
-        //   var services = { '$scope' : $scope, '$rootScope' : $rootScope, '$http' : $http, '$modal' : $modal, '$q' : $q, '$translate' : $translate, 'editorManager' : editorManager};
-        //   FLOWABLE.TOOLBAR.ACTIONS.deleteItem(services);
-        //   return false;
-        // });
+        Mousetrap.bind('mod+z', () => {
+          const services = { '$scope' : this, 'editorManager' : this.editorManager}
+          FLOWABLE.TOOLBAR.ACTIONS.undo(services)
+          return false;
+        });
+
+        Mousetrap.bind('mod+y', () => {
+          const services = { '$scope' : this, 'editorManager' : this.editorManager}
+          FLOWABLE.TOOLBAR.ACTIONS.redo(services);
+          return false;
+        });
+
+        Mousetrap.bind('mod+c', () => {
+          const services = { '$scope' : this, 'editorManager' : this.editorManager}
+          FLOWABLE.TOOLBAR.ACTIONS.copy(services);
+          return false;
+        });
+
+        Mousetrap.bind('mod+v', () => {
+          const services = { '$scope' : this, 'editorManager' : this.editorManager}
+          FLOWABLE.TOOLBAR.ACTIONS.paste(services);
+          return false;
+        });
+
+        Mousetrap.bind(['del'], () => {
+          const services = { '$scope' : this, 'editorManager' : this.editorManager}
+          FLOWABLE.TOOLBAR.ACTIONS.deleteItem(services);
+          return false;
+        });
+      },
+      registerOnEvent () {
+        // 捕获所有执行的命令并将它们存储在各自的堆栈上
+        this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_EXECUTE_COMMANDS, (evt) => {
+          // If the event has commands
+          if (!evt.commands) return
+
+          this.undoStack.push(evt.commands)
+          this.redoStack = []
+
+          for (let i = 0; i < this.items.length; i++) {
+            let item = this.items[i]
+            if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo') {
+              item.enabled = true
+            } else if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo') {
+              item.enabled = false
+            }
+          }
+
+          // Update
+          this.editorManager.getCanvas().update()
+          this.editorManager.updateSelection()
+        })
       }
     },
     watch: {
-      editorManager () {
-
+      editorManager (nv, ov) {
+        if (!ov) {
+          this.registerOnEvent()
+        }
       }
     }
   }

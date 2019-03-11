@@ -446,7 +446,6 @@ ORYX.Editor = {
    * @param <Oryx.Core.Command>[] Array of commands
    */
   executeCommands: function (commands) {
-
     if (!this.commandStack) {
       this.commandStack = [];
     }
@@ -1005,19 +1004,20 @@ ORYX.Editor = {
    *		template: a template shape that the newly created inherits properties from.
    *		}
    */
+  // 创建图形元素
   createShape: function (option) {
+    var newShapeObject;
 
     if (option && option.serialize && option.serialize instanceof Array) {
-
       var type = option.serialize.find(function (obj) {
         return (obj.prefix + "-" + obj.name) == "oryx-type"
       });
       var stencil = ORYX.Core.StencilSet.stencil(type.value);
 
       if (stencil.type() == 'node') {
-        var newShapeObject = new ORYX.Core.Node({'eventHandlerCallback': this.handleEvents.bind(this)}, stencil, this._getPluginFacade());
+        newShapeObject = new ORYX.Core.Node({'eventHandlerCallback': this.handleEvents.bind(this)}, stencil, this._getPluginFacade());
       } else {
-        var newShapeObject = new ORYX.Core.Edge({'eventHandlerCallback': this.handleEvents.bind(this)}, stencil, this._getPluginFacade());
+        newShapeObject = new ORYX.Core.Edge({'eventHandlerCallback': this.handleEvents.bind(this)}, stencil, this._getPluginFacade());
       }
 
       this.getCanvas().add(newShapeObject);
@@ -1032,11 +1032,8 @@ ORYX.Editor = {
     }
 
     var canvas = this.getCanvas();
-    var newShapeObject;
-
     // Get the shape type
     var shapetype = option.type;
-
     // Get the stencil set
     var sset = ORYX.Core.StencilSet.stencilSet(option.namespace);
     // Create an New Shape, dependents on an Edge or a Node
@@ -1048,7 +1045,6 @@ ORYX.Editor = {
 
     // when there is a template, inherit the properties.
     if (option.template) {
-
       newShapeObject._jsonStencil.properties = option.template._jsonStencil.properties;
       newShapeObject.postProcessProperties();
     }
@@ -1151,16 +1147,15 @@ ORYX.Editor = {
   },
 
   deleteShape: function (shape) {
-
     if (!shape || !shape.parent) {
       return
     }
 
-    //remove shape from parent
+    // remove shape from parent
     // this also removes it from DOM
     shape.parent.remove(shape);
 
-    //delete references to outgoing edges
+    // delete references to outgoing edges
     shape.getOutgoingShapes().each(function (os) {
       var docker = os.getDockers().first();
       if (docker && docker.getDockedShape() == shape) {
@@ -1168,7 +1163,7 @@ ORYX.Editor = {
       }
     });
 
-    //delete references to incoming edges
+    // delete references to incoming edges
     shape.getIncomingShapes().each(function (is) {
       var docker = is.getDockers().last();
       if (docker && docker.getDockedShape() == shape) {
@@ -1176,7 +1171,7 @@ ORYX.Editor = {
       }
     });
 
-    //delete references of the shape's dockers
+    // delete references of the shape's dockers
     shape.getDockers().each(function (docker) {
       docker.setDockedShape(undefined);
     });

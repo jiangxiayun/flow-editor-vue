@@ -19,8 +19,11 @@ const ngDragDropService = {
     function extract(callbackName) {
       var atStartBracket = callbackName.indexOf('(') !== -1 ? callbackName.indexOf('(') : callbackName.length,
         atEndBracket = callbackName.lastIndexOf(')') !== -1 ? callbackName.lastIndexOf(')') : callbackName.length,
-        args = callbackName.substring(atStartBracket + 1, atEndBracket), // matching function arguments inside brackets
-        constructor = callbackName.match(/^[^.]+.\s*/)[0].slice(0, -1); // matching a string upto a dot to check ctrl as syntax
+        // matching function arguments inside brackets
+        args = callbackName.substring(atStartBracket + 1, atEndBracket),
+        // matching a string upto a dot to check ctrl as syntax
+        constructor = callbackName.match(/^[^.]+.\s*/)[0].slice(0, -1);
+
       constructor = scope.context[constructor] && typeof scope.context[constructor].constructor === 'function' ? constructor : null;
 
       let a = args && args.split(',') || []
@@ -235,21 +238,23 @@ var dragSettings, jqyouiOptions, zIndex;
 // 注册一个全局自定义指令 `v-draggable`
 Vue.directive('draggable', function (el, binding, vnode) {
   if (el.dataset.drag) {
-      dragSettings = {
-        onStart: binding.value.onStart,
-        onDrag: binding.value.onDrag
-      }
-      jqyouiOptions ={
-        revert: binding.value.revert,
-        helper: binding.value.helper,
-        opacity : binding.value.opacity
-      }
+    jqyouiOptions ={
+      revert: binding.value.revert,
+      helper: binding.value.helper,
+      opacity : binding.value.opacity
+    }
+
     let element = jQuery(el)
       element
         .draggable({disabled: false})
         .draggable(jqyouiOptions)
         .draggable({
           start: function(event, ui) {
+            dragSettings = {
+              onStart: binding.value.onStart,
+              onDrag: binding.value.onDrag
+            }
+
             ngDragDropService.draggableScope = vnode;
             zIndex = element.css('z-index')
             let q = jqyouiOptions.helper ? ui.helper : element

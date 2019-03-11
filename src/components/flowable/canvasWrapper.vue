@@ -21,7 +21,21 @@
            :title="$t('BUTTON.ACTION.MORPH.TOOLTIP')"
            @click="morphShape()"
            style="display:none">
+
+        <el-dropdown trigger="click" @command="handleCommand">
+      <span class="el-dropdown-link">
         <img src="flowable/editor-app/images/wrench.png"/>
+        <!--下拉菜单<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
+      </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item v-for="item in morphShapes" :key="item.id" :command="item">
+              <img width="16px;" height="16px;"
+                   :src="`/flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
+              {{item.name}}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+
       </div>
       <!--编辑-->
       <div class="Oryx_button"
@@ -40,7 +54,9 @@
            @click="quickAddItem(item.id)"
            data-model="draggedElement"
            data-drag="true"
-           style="display:none">
+           v-draggable="{onStart:'startDragCallbackQuickMenu', onDrag:'dragCallbackQuickMenu',
+           revert: 'invalid', helper: 'clone', opacity : 0.5}"
+           style="display:none;position: absolute;">
         <img :src="`flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
       </div>
     </div>
@@ -49,264 +65,514 @@
 
 <script>
   import { mapState, mapMutations } from 'vuex'
+  import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
+  import { getAdditionalIEZoom } from '@/assets/Util'
 
   export default {
-    name: "canvasWrapper",
+    name: 'canvasWrapper',
     data () {
-      return {}
+      return {
+        morphShapes: [],
+        currentSelectedMorph: null,
+        newShape: null
+      }
     },
     props: {
-      editorManager: {},
+      editorManager: {}
     },
-    mounted () {
-      console.log(999999)
-    },
+    mounted () {},
     computed: {
-      ...mapState('Flowable', ['dragCanContain', 'dragCurrentParent', 'quickMenu', 'dropTargetElement', 'modelData', 'quickMenuItems'])
+      ...mapState('Flowable', ['dragCanContain', 'quickMenu']),
+      modelData () {
+        return this.editorManager ? this.editorManager.getBaseModelData() : []
+      },
+      quickMenuItems () {
+        return this.editorManager ? this.editorManager.quickMenuItems : []
+      }
     },
     methods: {
       ...mapMutations('Flowable', [
         'UPDATE_dragModeOver', 'UPDATE_dragCanContain',
-        'UPDATE_dragCurrentParent', 'UPDATE_dragCurrentParentId',
-        'UPDATE_dragCurrentParentStencil', 'UPDATE_quickMenu', 'UPDATE_dropTargetElement']),
-      dropCallback (event, ui) {
-        this.editorManager.handleEvents({
-          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-          highlightId: "shapeRepo.attached"
-        });
-        this.editorManager.handleEvents({
-          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-          highlightId: "shapeRepo.added"
-        });
-        this.editorManager.handleEvents({
-          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
-          highlightId: "shapeMenu"
-        });
+        'UPDATE_quickMenu']),
+      deleteShape () {
+        FLOWABLE.TOOLBAR.ACTIONS.deleteItem({ 'this': this, 'editorManager': this.editorManager })
+      },
+      morphShape () {
+        var shapes = this.editorManager.getSelection()
+        if (shapes && shapes.length == 1) {
+          this.currentSelectedShape = shapes.first()
+          let currentSelectedShapeId = this.currentSelectedShape.getStencil().idWithoutNs()
+          var stencilItem = this.editorManager.getStencilItemById(currentSelectedShapeId)
 
-        FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
-
-        console.log('dragCanContain', this.dragCanContain)
-        if (this.dragCanContain) {
-          var item = this.getStencilItemById(ui.draggable[0].id);
-
-          var pos = {x: event.pageX, y: event.pageY};
-
-          var additionalIEZoom = 1;
-          if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-            var ua = navigator.userAgent;
-            if (ua.indexOf('MSIE') >= 0) {
-              //IE 10 and below
-              var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100);
-              if (zoom !== 100) {
-                additionalIEZoom = zoom / 100;
+          var morphShapes = []
+          const morphRoles = this.editorManager.morphRoles
+          // && morphRoles[i].id !== currentSelectedShapeId
+          for (let i = 0; i < morphRoles.length; i++) {
+            if (morphRoles[i].role === stencilItem.morphRole) {
+              let ary = morphRoles[i].morphOptions.slice()
+              for (let y = 0; y < ary.length; y++) {
+                if (ary[y].id != currentSelectedShapeId) {
+                  morphShapes.push(ary[y])
+                }
               }
             }
           }
+          this.morphShapes = morphShapes
+        }
+      },
+      // 切换元素类型
+      handleCommand (item) {
+        const MorphTo = ORYX.Core.Command.extend({
+          construct: function (shape, stencil, facade) {
+            this.shape = shape
+            this.stencil = stencil
+            this.facade = facade
+          },
+          execute: function () {
+            var shape = this.shape
+            var stencil = this.stencil
+            var resourceId = shape.resourceId
 
-          var screenCTM = this.editorManager.getCanvas().node.getScreenCTM();
+            // Serialize all attributes
+            var serialized = shape.serialize()
+            stencil.properties().each((function (prop) {
+              if (prop.readonly()) {
+                serialized = serialized.reject(function (serProp) {
+                  return serProp.name == prop.id()
+                })
+              }
+            }).bind(this))
+
+            // Get shape if already created, otherwise create a new shape
+            if (this.newShape) {
+              this.facade.getCanvas().add(this.newShape)
+            } else {
+              this.newShape = this.facade.createShape({
+                type: stencil.id(),
+                namespace: stencil.namespace(),
+                resourceId: resourceId
+              })
+            }
+
+            // calculate new bounds using old shape's upperLeft and new shape's width/height
+            var boundsObj = serialized.find(function (serProp) {
+              return (serProp.prefix === 'oryx' && serProp.name === 'bounds')
+            })
+
+            var changedBounds = null
+
+            if (!this.facade.getRules().preserveBounds(shape.getStencil())) {
+              var bounds = boundsObj.value.split(',')
+              if (parseInt(bounds[0], 10) > parseInt(bounds[2], 10)) { // if lowerRight comes first, swap array items
+                var tmp = bounds[0]
+                bounds[0] = bounds[2]
+                bounds[2] = tmp
+                tmp = bounds[1]
+                bounds[1] = bounds[3]
+                bounds[3] = tmp
+              }
+              bounds[2] = parseInt(bounds[0], 10) + this.newShape.bounds.width()
+              bounds[3] = parseInt(bounds[1], 10) + this.newShape.bounds.height()
+              boundsObj.value = bounds.join(',')
+            } else {
+              var height = shape.bounds.height()
+              var width = shape.bounds.width()
+
+              // consider the minimum and maximum size of
+              // the new shape
+
+              if (this.newShape.minimumSize) {
+                if (shape.bounds.height() < this.newShape.minimumSize.height) {
+                  height = this.newShape.minimumSize.height
+                }
+
+                if (shape.bounds.width() < this.newShape.minimumSize.width) {
+                  width = this.newShape.minimumSize.width
+                }
+              }
+
+              if (this.newShape.maximumSize) {
+                if (shape.bounds.height() > this.newShape.maximumSize.height) {
+                  height = this.newShape.maximumSize.height
+                }
+
+                if (shape.bounds.width() > this.newShape.maximumSize.width) {
+                  width = this.newShape.maximumSize.width
+                }
+              }
+
+              changedBounds = {
+                a: {
+                  x: shape.bounds.a.x,
+                  y: shape.bounds.a.y
+                },
+                b: {
+                  x: shape.bounds.a.x + width,
+                  y: shape.bounds.a.y + height
+                }
+              }
+            }
+
+            var oPos = shape.bounds.center()
+            if (changedBounds !== null) {
+              this.newShape.bounds.set(changedBounds)
+            }
+
+            // Set all related dockers
+            this.setRelatedDockers(shape, this.newShape)
+
+            // store DOM position of old shape
+            var parentNode = shape.node.parentNode
+            var nextSibling = shape.node.nextSibling
+
+            // Delete the old shape
+            this.facade.deleteShape(shape)
+
+            // Deserialize the new shape - Set all attributes
+            this.newShape.deserialize(serialized)
+            /*
+             * Change color to default if unchanged
+             * 23.04.2010
+             */
+            if (shape.getStencil().property('oryx-bgcolor')
+              && shape.properties['oryx-bgcolor']
+              && shape.getStencil().property('oryx-bgcolor').value().toUpperCase() == shape.properties['oryx-bgcolor'].toUpperCase()) {
+              if (this.newShape.getStencil().property('oryx-bgcolor')) {
+                this.newShape.setProperty('oryx-bgcolor', this.newShape.getStencil().property('oryx-bgcolor').value())
+              }
+            }
+
+            if (changedBounds !== null) {
+              this.newShape.bounds.set(changedBounds)
+            }
+
+            if (this.newShape.getStencil().type() === 'edge' || (this.newShape.dockers.length == 0 || !this.newShape.dockers[0].getDockedShape())) {
+              this.newShape.bounds.centerMoveTo(oPos)
+            }
+
+            if (this.newShape.getStencil().type() === 'node' && (this.newShape.dockers.length == 0 || !this.newShape.dockers[0].getDockedShape())) {
+              this.setRelatedDockers(this.newShape, this.newShape)
+            }
+
+            // place at the DOM position of the old shape
+            if (nextSibling) parentNode.insertBefore(this.newShape.node, nextSibling)
+            else parentNode.appendChild(this.newShape.node)
+
+            // Set selection
+            this.facade.setSelection([this.newShape])
+            this.facade.getCanvas().update()
+            this.facade.updateSelection()
+          },
+          rollback: function () {
+            if (!this.shape || !this.newShape || !this.newShape.parent) {
+              return
+            }
+            // Append shape to the parent
+            this.newShape.parent.add(this.shape)
+            // Set dockers
+            this.setRelatedDockers(this.newShape, this.shape)
+            // Delete new shape
+            this.facade.deleteShape(this.newShape)
+            // Set selection
+            this.facade.setSelection([this.shape])
+            // Update
+            this.facade.getCanvas().update()
+            this.facade.updateSelection()
+          },
+          /**
+           * Set all incoming and outgoing edges from the shape to the new shape
+           * @param {Shape} shape
+           * @param {Shape} newShape
+           */
+          setRelatedDockers: function (shape, newShape) {
+            if (shape.getStencil().type() === 'node') {
+
+              (shape.incoming || []).concat(shape.outgoing || [])
+                .each(function (i) {
+                  i.dockers.each(function (docker) {
+                    if (docker.getDockedShape() == shape) {
+                      var rPoint = Object.clone(docker.referencePoint)
+                      // Move reference point per percent
+
+                      var rPointNew = {
+                        x: rPoint.x * newShape.bounds.width() / shape.bounds.width(),
+                        y: rPoint.y * newShape.bounds.height() / shape.bounds.height()
+                      }
+
+                      docker.setDockedShape(newShape)
+                      // Set reference point and center to new position
+                      docker.setReferencePoint(rPointNew)
+                      if (i instanceof ORYX.Core.Edge) {
+                        docker.bounds.centerMoveTo(rPointNew)
+                      } else {
+                        var absXY = shape.absoluteXY()
+                        docker.bounds.centerMoveTo({ x: rPointNew.x + absXY.x, y: rPointNew.y + absXY.y })
+                        //docker.bounds.moveBy({x:rPointNew.x-rPoint.x, y:rPointNew.y-rPoint.y});
+                      }
+                    }
+                  })
+                })
+
+              // for attached events
+              if (shape.dockers.length > 0 && shape.dockers.first().getDockedShape()) {
+                newShape.dockers.first().setDockedShape(shape.dockers.first().getDockedShape())
+                newShape.dockers.first().setReferencePoint(Object.clone(shape.dockers.first().referencePoint))
+              }
+
+            } else { // is edge
+              newShape.dockers.first().setDockedShape(shape.dockers.first().getDockedShape())
+              newShape.dockers.first().setReferencePoint(shape.dockers.first().referencePoint)
+              newShape.dockers.last().setDockedShape(shape.dockers.last().getDockedShape())
+              newShape.dockers.last().setReferencePoint(shape.dockers.last().referencePoint)
+            }
+          }
+        })
+
+        let stencil = undefined
+        const stencilSets = this.editorManager.getStencilSets().values()
+
+        const stencilId = item.genericTaskId || item.id
+
+        for (let i = 0; i < stencilSets.length; i++) {
+          let stencilSet = stencilSets[i]
+          let nodes = stencilSet.nodes()
+          for (let j = 0; j < nodes.length; j++) {
+            if (nodes[j].idWithoutNs() === stencilId) {
+              stencil = nodes[j]
+              break
+            }
+          }
+        }
+
+        if (!stencil) return
+
+        // Create and execute command (for undo/redo)
+        const command = new MorphTo(this.currentSelectedShape, stencil, this.editorManager.getEditor())
+        this.editorManager.executeCommands([command])
+      },
+      dropCallback (event, ui) {
+        this.editorManager.handleEvents({
+          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+          highlightId: 'shapeRepo.attached'
+        })
+        this.editorManager.handleEvents({
+          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+          highlightId: 'shapeRepo.added'
+        })
+        this.editorManager.handleEvents({
+          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+          highlightId: 'shapeMenu'
+        })
+
+        FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS)
+
+        console.log('dragCanContain', this.dragCanContain)
+        if (this.dragCanContain) {
+          let item = this.editorManager.getStencilItemById(ui.draggable[0].id)
+          let pos = { x: event.pageX, y: event.pageY }
+
+          let additionalIEZoom = getAdditionalIEZoom()
+          let screenCTM = this.editorManager.getCanvas().node.getScreenCTM()
 
           // Correcting the UpperLeft-Offset
-          pos.x -= (screenCTM.e / additionalIEZoom);
-          pos.y -= (screenCTM.f / additionalIEZoom);
+          pos.x -= (screenCTM.e / additionalIEZoom)
+          pos.y -= (screenCTM.f / additionalIEZoom)
           // Correcting the Zoom-Factor
-          pos.x /= screenCTM.a;
-          pos.y /= screenCTM.d;
-
+          pos.x /= screenCTM.a
+          pos.y /= screenCTM.d
           // Correcting the ScrollOffset
-          pos.x -= document.documentElement.scrollLeft;
-          pos.y -= document.documentElement.scrollTop;
+          pos.x -= document.documentElement.scrollLeft
+          pos.y -= document.documentElement.scrollTop
 
-          var parentAbs = this.dragCurrentParent.absoluteXY();
-          pos.x -= parentAbs.x;
-          pos.y -= parentAbs.y;
+          let parentAbs = this.editorManager.dragCurrentParent.absoluteXY()
+          pos.x -= parentAbs.x
+          pos.y -= parentAbs.y
 
-          var containedStencil = undefined;
-          var stencilSets = this.editorManager.getStencilSets().values();
-          for (var i = 0; i < stencilSets.length; i++) {
-            var stencilSet = stencilSets[i];
-            var nodes = stencilSet.nodes();
-            for (var j = 0; j < nodes.length; j++) {
+          let containedStencil = undefined
+          let stencilSets = this.editorManager.getStencilSets().values()
+          for (let i = 0; i < stencilSets.length; i++) {
+            let stencilSet = stencilSets[i]
+            let nodes = stencilSet.nodes()
+            for (let j = 0; j < nodes.length; j++) {
               if (nodes[j].idWithoutNs() === ui.draggable[0].id) {
-                containedStencil = nodes[j];
-                break;
+                containedStencil = nodes[j]
+                break
               }
             }
 
             if (!containedStencil) {
-              var edges = stencilSet.edges();
-              for (var j = 0; j < edges.length; j++) {
+              let edges = stencilSet.edges()
+              for (let j = 0; j < edges.length; j++) {
                 if (edges[j].idWithoutNs() === ui.draggable[0].id) {
-                  containedStencil = edges[j];
-                  break;
+                  containedStencil = edges[j]
+                  break
                 }
               }
             }
           }
 
-          if (!containedStencil) return;
+          if (!containedStencil) return
 
           if (this.quickMenu) {
-            var shapes = this.editorManager.getSelection();
+            // 当拖拽的是快捷元素
+            let shapes = this.editorManager.getSelection()
             if (shapes && shapes.length == 1) {
-              var currentSelectedShape = shapes.first();
-
-              var option = {};
-              option.type = currentSelectedShape.getStencil().namespace() + ui.draggable[0].id;
-              option.namespace = currentSelectedShape.getStencil().namespace();
-              option.connectedShape = currentSelectedShape;
-              option.parent = this.dragCurrentParent;
-              option.containedStencil = containedStencil;
+              let currentSelectedShape = shapes.first()
+              let option = {}
+              option.type = currentSelectedShape.getStencil().namespace() + ui.draggable[0].id
+              option.namespace = currentSelectedShape.getStencil().namespace()
+              option.connectedShape = currentSelectedShape
+              option.parent = this.editorManager.dragCurrentParent
+              option.containedStencil = containedStencil
 
               // If the ctrl key is not pressed,
               // snapp the new shape to the center
               // if it is near to the center of the other shape
               if (!event.ctrlKey) {
                 // Get the center of the shape
-                var cShape = currentSelectedShape.bounds.center();
+                let cShape = currentSelectedShape.bounds.center()
                 // Snapp +-20 Pixel horizontal to the center
                 if (20 > Math.abs(cShape.x - pos.x)) {
-                  pos.x = cShape.x;
+                  pos.x = cShape.x
                 }
                 // Snapp +-20 Pixel vertical to the center
                 if (20 > Math.abs(cShape.y - pos.y)) {
-                  pos.y = cShape.y;
+                  pos.y = cShape.y
                 }
               }
 
-              option.position = pos;
+              option.position = pos
 
               if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' &&
                 containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation') {
 
-                var args = { sourceShape: currentSelectedShape, targetStencil: containedStencil };
-                var targetStencil = this.editorManager.getRules().connectMorph(args);
+                let args = { sourceShape: currentSelectedShape, targetStencil: containedStencil }
+                let targetStencil = this.editorManager.getRules().connectMorph(args)
                 if (!targetStencil) { // Check if there can be a target shape
-                  return;
+                  return
                 }
-                option.connectingType = targetStencil.id();
+                option.connectingType = targetStencil.id()
               }
 
-              var command = new FLOWABLE.CreateCommand(option, this.dropTargetElement, pos, this.editorManager.getEditor());
+              let command = new FLOWABLE.CreateCommand(option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
 
-              this.editorManager.executeCommands([command]);
+              this.editorManager.executeCommands([command])
             }
 
           } else {
-            var canAttach = false;
+            let canAttach = false
             if (containedStencil.idWithoutNs() === 'BoundaryErrorEvent' || containedStencil.idWithoutNs() === 'BoundaryTimerEvent' ||
               containedStencil.idWithoutNs() === 'BoundarySignalEvent' || containedStencil.idWithoutNs() === 'BoundaryMessageEvent' ||
               containedStencil.idWithoutNs() === 'BoundaryCancelEvent' || containedStencil.idWithoutNs() === 'BoundaryCompensationEvent') {
 
               // Modify position, otherwise boundary event will get position related to left corner of the canvas instead of the container
-              pos = this.editorManager.eventCoordinates( event );
-              canAttach = true;
+              pos = this.editorManager.eventCoordinates(event)
+              canAttach = true
             }
 
-            var option = {};
-            option['type'] = this.modelData.model.stencilset.namespace + item.id;
-            option['namespace'] = this.modelData.model.stencilset.namespace;
-            option['position'] = pos;
-            option['parent'] = this.dragCurrentParent;
+            let option = {}
+            option['type'] = this.modelData.model.stencilset.namespace + item.id
+            option['namespace'] = this.modelData.model.stencilset.namespace
+            option['position'] = pos
+            option['parent'] = this.editorManager.dragCurrentParent
 
-            var commandClass = ORYX.Core.Command.extend({
-              construct: function(option, dockedShape, canAttach, position, facade){
-                this.option = option;
-                this.docker = null;
-                this.dockedShape = dockedShape;
-                this.dockedShapeParent = dockedShape.parent || facade.getCanvas();
-                this.position = position;
-                this.facade = facade;
-                this.selection = this.facade.getSelection();
-                this.shape = null;
-                this.parent = null;
-                this.canAttach = canAttach;
+            let commandClass = ORYX.Core.Command.extend({
+              construct: function (option, dockedShape, canAttach, position, facade) {
+                this.option = option
+                this.docker = null
+                this.dockedShape = dockedShape
+                this.dockedShapeParent = dockedShape.parent || facade.getCanvas()
+                this.position = position
+                this.facade = facade
+                this.selection = this.facade.getSelection()
+                this.shape = null
+                this.parent = null
+                this.canAttach = canAttach
               },
-              execute: function(){
+              execute: function () {
                 if (!this.shape) {
-                  this.shape = this.facade.createShape(option);
-                  this.parent = this.shape.parent;
+                  this.shape = this.facade.createShape(option)
+                  this.parent = this.shape.parent
                 } else if (this.parent) {
-                  this.parent.add(this.shape);
+                  this.parent.add(this.shape)
                 }
 
                 if (this.canAttach && this.shape.dockers && this.shape.dockers.length) {
-                  this.docker = this.shape.dockers[0];
+                  this.docker = this.shape.dockers[0]
 
-                  this.dockedShapeParent.add(this.docker.parent);
+                  this.dockedShapeParent.add(this.docker.parent)
 
                   // Set the Docker to the new Shape
-                  this.docker.setDockedShape(undefined);
-                  this.docker.bounds.centerMoveTo(this.position);
+                  this.docker.setDockedShape(undefined)
+                  this.docker.bounds.centerMoveTo(this.position)
                   if (this.dockedShape !== this.facade.getCanvas()) {
-                    this.docker.setDockedShape(this.dockedShape);
+                    this.docker.setDockedShape(this.dockedShape)
                   }
-                  this.facade.setSelection( [this.docker.parent] );
+                  this.facade.setSelection([this.docker.parent])
                 }
 
-                this.facade.getCanvas().update();
-                this.facade.updateSelection();
+                this.facade.getCanvas().update()
+                this.facade.updateSelection()
 
               },
-              rollback: function(){
+              rollback: function () {
                 if (this.shape) {
-                  this.facade.setSelection(this.selection.without(this.shape));
-                  this.facade.deleteShape(this.shape);
+                  this.facade.setSelection(this.selection.without(this.shape))
+                  this.facade.deleteShape(this.shape)
                 }
                 if (this.canAttach && this.docker) {
-                  this.docker.setDockedShape(undefined);
+                  this.docker.setDockedShape(undefined)
                 }
-                this.facade.getCanvas().update();
-                this.facade.updateSelection();
+                this.facade.getCanvas().update()
+                this.facade.updateSelection()
 
               }
-            });
+            })
+
 
             // Update canvas
-            var command = new commandClass(option, this.dragCurrentParent, canAttach, pos, this.editorManager.getEditor());
-            this.editorManager.executeCommands([command]);
+            let command = new commandClass(option, this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())
+
+            this.editorManager.executeCommands([command])
 
             // Fire event to all who want to know about this
-            var dropEvent = {
+            let dropEvent = {
               type: FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED,
               droppedItem: item,
               position: pos
-            };
-            FLOWABLE.eventBus.dispatch(dropEvent.type, dropEvent);
+            }
+            FLOWABLE.eventBus.dispatch(dropEvent.type, dropEvent)
           }
         }
-
-        this.UPDATE_dragCurrentParent(undefined)
-        this.UPDATE_dragCurrentParentId(undefined)
-        this.UPDATE_dragCurrentParentStencil(undefined)
+        this.editorManager.dragCurrentParent = undefined
+        this.editorManager.dragCurrentParentId = undefined
+        this.editorManager.dragCurrentParentStencil = undefined
         this.UPDATE_dragCanContain(undefined)
         this.UPDATE_quickMenu(undefined)
-        this.UPDATE_dropTargetElement(undefined)
+        this.editorManager.dropTargetElement = undefined
       },
-
-      overCallback  (event, ui) {
+      overCallback (event, ui) {
         this.UPDATE_dragModeOver(true)
       },
-
-      outCallback  (event, ui) {
+      outCallback (event, ui) {
         this.UPDATE_dragModeOver(false)
         console.log('out==============')
       },
-      startDragCallbackQuickMenu  (event, ui) {
-        console.log('startDragCallbackQuickMenu==============')
+      startDragCallbackQuickMenu (event, ui) {
         this.UPDATE_dragModeOver(false)
         this.UPDATE_quickMenu(true)
       },
       dragCallbackQuickMenu (event, ui) {
         console.log('dragCallbackQuickMenu==============')
         if (this.$store.state.dragModeOver != false) {
-          var coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY);
+          var coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY)
 
-          var additionalIEZoom = 1;
+          var additionalIEZoom = 1
           if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-            var ua = navigator.userAgent;
+            var ua = navigator.userAgent
             if (ua.indexOf('MSIE') >= 0) {
               //IE 10 and below
-              var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100);
+              var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
               if (zoom !== 100) {
                 additionalIEZoom = zoom / 100
               }
@@ -314,119 +580,122 @@
           }
 
           if (additionalIEZoom !== 1) {
-            coord.x = coord.x / additionalIEZoom;
-            coord.y = coord.y / additionalIEZoom;
+            coord.x = coord.x / additionalIEZoom
+            coord.y = coord.y / additionalIEZoom
           }
 
-          var aShapes = this.editorManager.getCanvas().getAbstractShapesAtPosition(coord);
+          var aShapes = this.editorManager.getCanvas().getAbstractShapesAtPosition(coord)
 
           if (aShapes.length <= 0) {
             if (event.helper) {
               this.UPDATE_dragCanContain(false)
-              return false;
+              return false
             }
           }
 
           if (aShapes[0] instanceof ORYX.Core.Canvas) {
-            this.editorManager.getCanvas().setHightlightStateBasedOnX(coord.x);
+            this.editorManager.getCanvas().setHightlightStateBasedOnX(coord.x)
           }
 
-          var stencil = undefined;
-          var stencilSets = this.editorManager.getStencilSets().values();
+          var stencil = undefined
+          var stencilSets = this.editorManager.getStencilSets().values()
           for (var i = 0; i < stencilSets.length; i++) {
-            var stencilSet = stencilSets[i];
-            var nodes = stencilSet.nodes();
+            var stencilSet = stencilSets[i]
+            var nodes = stencilSet.nodes()
             for (var j = 0; j < nodes.length; j++) {
               if (nodes[j].idWithoutNs() === event.target.id) {
-                stencil = nodes[j];
-                break;
+                stencil = nodes[j]
+                break
               }
             }
 
             if (!stencil) {
-              var edges = stencilSet.edges();
+              var edges = stencilSet.edges()
               for (var j = 0; j < edges.length; j++) {
                 if (edges[j].idWithoutNs() === event.target.id) {
-                  stencil = edges[j];
-                  break;
+                  stencil = edges[j]
+                  break
                 }
               }
             }
           }
 
-          var candidate = aShapes.last();
+          var candidate = aShapes.last()
 
-          var isValid = false;
-          if (stencil.type() === "node")  {
+          var isValid = false
+          if (stencil.type() === 'node') {
             //check containment rules
-            var canContain = this.editorManager.getRules().canContain({containingShape:candidate, containedStencil:stencil});
+            var canContain = this.editorManager.getRules().canContain({
+              containingShape: candidate,
+              containedStencil: stencil
+            })
 
             var parentCandidate = aShapes.reverse().find(function (candidate) {
               return (candidate instanceof ORYX.Core.Canvas
                 || candidate instanceof ORYX.Core.Node
-                || candidate instanceof ORYX.Core.Edge);
-            });
+                || candidate instanceof ORYX.Core.Edge)
+            })
 
             if (!parentCandidate) {
               this.UPDATE_dragCanContain(false)
-              return false;
+              return false
             }
 
-            this.UPDATE_dragCurrentParent(parentCandidate)
-            this.UPDATE_dragCurrentParentId(parentCandidate.id)
-            this.UPDATE_dragCurrentParentStencil(parentCandidate.getStencil().id())
+            this.editorManager.dragCurrentParent = parentCandidate
+            this.editorManager.dragCurrentParentId = parentCandidate.id
+            this.editorManager.dragCurrentParentStencil = parentCandidate.getStencil().id()
             this.UPDATE_dragCanContain(canContain)
-            this.UPDATE_dropTargetElement(parentCandidate)
-            isValid = canContain;
+            this.editorManager.dropTargetElement = parentCandidate
+            isValid = canContain
 
           } else { //Edge
 
-            var shapes = this.editorManager.getSelection();
+            var shapes = this.editorManager.getSelection()
             if (shapes && shapes.length == 1) {
-              var currentSelectedShape = shapes.first();
-              var curCan = candidate;
-              var canConnect = false;
+              var currentSelectedShape = shapes.first()
+              var curCan = candidate
+              var canConnect = false
 
-              var targetStencil = this.getStencilItemById(curCan.getStencil().idWithoutNs());
+              var targetStencil = this.editorManager.getStencilItemById(curCan.getStencil().idWithoutNs())
               if (targetStencil) {
-                var associationConnect = false;
+                var associationConnect = false
                 if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
-                  associationConnect = true;
+                  associationConnect = true
                 } else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
-                  associationConnect = true;
+                  associationConnect = true
                 }
 
                 if (targetStencil.canConnectTo || associationConnect) {
                   while (!canConnect && curCan && !(curCan instanceof ORYX.Core.Canvas)) {
-                    candidate = curCan;
+                    candidate = curCan
                     //check connection rules
                     canConnect = this.editorManager.getRules().canConnect({
                       sourceShape: currentSelectedShape,
                       edgeStencil: stencil,
                       targetShape: curCan
-                    });
-                    curCan = curCan.parent;
+                    })
+                    curCan = curCan.parent
                   }
                 }
               }
-              var parentCandidate = this.editorManager.getCanvas();
+              var parentCandidate = this.editorManager.getCanvas()
 
-              isValid = canConnect;
-              this.UPDATE_dragCurrentParent(parentCandidate)
-              this.UPDATE_dragCurrentParentId(parentCandidate.id)
-              this.UPDATE_dragCurrentParentStencil(parentCandidate.getStencil().id())
+              isValid = canConnect
+              this.editorManager.dragCurrentParent = parentCandidate
+              this.editorManager.dragCurrentParentId = parentCandidate.id
+              this.editorManager.dragCurrentParentStencil = parentCandidate.getStencil().id()
               this.UPDATE_dragCanContain(canConnect)
-              this.UPDATE_dropTargetElement(candidate)
+              this.editorManager.dropTargetElement = candidate
             }
 
           }
 
           this.editorManager.handleEvents({
-            type:   ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
-            highlightId:'shapeMenu',
+            type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
+            highlightId: 'shapeMenu',
             elements: [candidate],
             color: isValid ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
-          });
+          })
         }
       }
     }
