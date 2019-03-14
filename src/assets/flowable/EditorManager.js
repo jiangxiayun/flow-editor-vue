@@ -49,6 +49,8 @@ export default class EditorManager {
   }
 
   getSelectedItem () { return this.selectedItem }
+  getSelectedShape () { return this.selectedShape }
+
   getToolbarItems () { return this.toolbarItems }
   setToolbarItems () {
     let items = []

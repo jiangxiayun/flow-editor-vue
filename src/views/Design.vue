@@ -6,7 +6,6 @@
   import flowDesign from '@/components/flowable/flow-design'
   import { AA } from '../editorAA.js'
   import { mockData } from '../mockData.js'
-  import APIS from '@/service'
 
   export default {
     name: 'Editor',
@@ -26,21 +25,7 @@
 
     },
     methods: {
-      getList () {
-        APIS.productList({
-          __page: this.pageInfo.page,
-          __pagesize: this.pageInfo.pagesize,
-          ...this.searchForm,
-          ...this.sortForm
-        }).then(res => {
-          this.tableData = res.data
-          this.itemCount = res.__pagecount
-          this.loading = false
-        }).catch((err) => {
-          console.log(err)
-          this.loading = false
-        })
-      }
+
     }
   }
 </script>

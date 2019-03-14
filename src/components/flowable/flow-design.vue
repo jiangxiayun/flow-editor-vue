@@ -1,19 +1,17 @@
 <template>
-  <div id="main" class="wrapper full clearfix" style="height:800px">
-    <div>
-      <!--头部操作按钮-->
-      <toolbar :editor="editor" :editorManager="editorManager"></toolbar>
-      <div class="full">
-        <div class="row row-no-gutter">
-          <paletteWrapper :editorManager="editorManager"></paletteWrapper>
-          <div id="contentCanvasWrapper" :class="{collapsedCanvasWrapper: !paletteWrapperOpen}">
-            <div id="paletteSectionOpen" :class="{hidden: paletteWrapperOpen}"
-                 @click="UPDATE_paletteWrapperOpen(true)">
-              <i class="glyphicon glyphicon-chevron-right"></i>
-            </div>
-            <canvasWrapper :editorManager="editorManager"></canvasWrapper>
-            <propertySection :editorManager="editorManager"></propertySection>
+  <div id="main" class="wrapper full clearfix">
+    <!--头部操作按钮-->
+    <toolbar :editor="editor" :editorManager="editorManager"></toolbar>
+    <div class="full" style="height: calc(100% - 60px);">
+      <div class="row row-no-gutter full-height">
+        <paletteWrapper :editorManager="editorManager"></paletteWrapper>
+        <div id="contentCanvasWrapper" :class="{collapsedCanvasWrapper: !paletteWrapperOpen}">
+          <div id="paletteSectionOpen" :class="{hidden: paletteWrapperOpen}"
+               @click="UPDATE_paletteWrapperOpen(true)">
+            <i class="glyphicon glyphicon-chevron-right"></i>
           </div>
+          <canvasWrapper :editorManager="editorManager"></canvasWrapper>
+          <propertySection :editorManager="editorManager"></propertySection>
         </div>
       </div>
     </div>
@@ -96,9 +94,6 @@
 
           var totalAvailable = jQuery(window).height() - offset.top - mainHeader.height() - 21;
           canvas.height(totalAvailable - propSectionHeight);
-          var footerHeight = jQuery('#paletteSectionFooter').height();
-          var treeViewHeight = jQuery('#process-treeview-wrapper').height();
-          jQuery('#paletteSection').height(totalAvailable - treeViewHeight - footerHeight);
 
           // Update positions of the resize-markers, according to the canvas
 

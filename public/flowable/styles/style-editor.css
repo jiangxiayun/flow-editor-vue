@@ -10,6 +10,11 @@
   - Dark highlight: #606b7d
 
  */
+
+.el-dialog{
+	z-index: 6666;
+	cursor: default;
+}
 .container-fluid {
 	max-width: 1400px;
 	min-width: 1000px;

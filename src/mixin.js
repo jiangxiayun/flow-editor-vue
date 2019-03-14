@@ -151,12 +151,7 @@ const commonMix = {
     editShape (){
       this.editorManager.edit(this.selectedShape.resourceId);
     },
-    /* Click handler for clicking a property */
-    propertyClicked (index) {
-      if (!this.selectedItem.properties[index].hidden) {
-        this.selectedItem.properties[index].mode = "write";
-      }
-    },
+
 
     /* Helper method to retrieve the template url for a property */
     getPropertyTemplateUrl (index) {
@@ -169,78 +164,6 @@ const commonMix = {
       return this.selectedItem.properties[index].writeModeTemplateUrl;
     },
 
-    /* Method available to all sub controllers (for property controllers) to update the internal Oryx model */
-    updatePropertyInModel (property, shapeId) {
-
-      var shape = this.selectedShape;
-      // Some updates may happen when selected shape is already changed, so when an additional
-      // shapeId is supplied, we need to make sure the correct shape is updated (current or previous)
-      if (shapeId) {
-        if (shape.id != shapeId && this.previousSelectedShape && this.previousSelectedShape.id == shapeId) {
-          shape = this.previousSelectedShape;
-        } else {
-          shape = null;
-        }
-      }
-
-      if (!shape) {
-        // When no shape is selected, or no shape is found for the alternative
-        // shape ID, do nothing
-        return;
-      }
-      var key = property.key;
-      var newValue = property.value;
-      var oldValue = shape.properties.get(key);
-
-      let _this = this
-      if (newValue != oldValue) {
-        var commandClass = ORYX.Core.Command.extend({
-          construct: function () {
-            this.key = key;
-            this.oldValue = oldValue;
-            this.newValue = newValue;
-            this.shape = shape;
-            this.facade = _this.editorManager.getEditor();
-          },
-          execute: function () {
-            this.shape.setProperty(this.key, this.newValue);
-            this.facade.getCanvas().update();
-            this.facade.updateSelection();
-          },
-          rollback: function () {
-            this.shape.setProperty(this.key, this.oldValue);
-            this.facade.getCanvas().update();
-            this.facade.updateSelection();
-          }
-        });
-        // Instantiate the class
-        var command = new commandClass();
-
-        // Execute the command
-        this.editorManager.executeCommands([command]);
-        this.editorManager.handleEvents({
-          type: ORYX.CONFIG.EVENT_PROPWINDOW_PROP_CHANGED,
-          elements: [shape],
-          key: key
-        });
-
-        // Switch the property back to read mode, now the update is done
-        property.mode = 'read';
-
-        // Fire event to all who is interested
-        // Fire event to all who want to know about this
-        var event = {
-          type: FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED,
-          property: property,
-          oldValue: oldValue,
-          newValue: newValue
-        };
-        FLOWABLE.eventBus.dispatch(event.type, event);
-      } else {
-        // Switch the property back to read mode, no update was needed
-        property.mode = 'read';
-      }
-    },
 
 
   }

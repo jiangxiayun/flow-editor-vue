@@ -7,7 +7,11 @@ import {
   DropdownItem,
   Input,
   Checkbox,
-  InputNumber
+  InputNumber,
+  Dialog,
+  Table,
+  TableColumn,
+  Message
 } from 'element-ui'
 
 Vue.use(Button)
@@ -18,3 +22,9 @@ Vue.use(DropdownItem)
 Vue.use(Input)
 Vue.use(Checkbox)
 Vue.use(InputNumber)
+Vue.use(Dialog)
+Vue.use(Table)
+Vue.use(TableColumn)
+Vue.use(Message)
+
+Vue.prototype.$message = Message

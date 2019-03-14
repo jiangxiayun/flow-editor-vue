@@ -910,22 +910,7 @@ export function FLOWABLE_eventBus_initAddListener (editorManager) {
   },this);
 
 
-  /*
-   * Listen to property updates and act upon them
-   */
-  FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, function (event) {
-    if (event.property && event.property.key) {
-      // If the name property is been updated, we also need to change the title of the currently selected item
-      if (event.property.key === 'oryx-name' && $scope.selectedItem !== undefined && $scope.selectedItem !== null) {
-        $scope.selectedItem.title = event.newValue
-      }
 
-      // Update "no value" flag
-      event.property.noValue = (event.property.value === undefined
-        || event.property.value === null
-        || event.property.value.length == 0)
-    }
-  })
 
   FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_SHOW_VALIDATION_POPUP, function (event) {
     // Method to open validation dialog

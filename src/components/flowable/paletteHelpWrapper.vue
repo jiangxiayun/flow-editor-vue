@@ -1,6 +1,6 @@
 <template>
   <!--组件元素-->
-  <div id="paletteHelpWrapper" class="col-xs-3" :class="{close: !paletteWrapperOpen}">
+  <div id="paletteHelpWrapper" class="col-xs-3 full-height" :class="{close: !paletteWrapperOpen}">
     <div class="stencils" id="paletteSection">
       <div v-if="stencilItemGroups.length > 1">
         <div v-for="(group, index) in stencilItemGroups" :key="group.name">
@@ -121,5 +121,7 @@
 </script>
 
 <style scoped>
-
+#paletteSection {
+  height: calc(100% - 200px - 50px);
+}
 </style>

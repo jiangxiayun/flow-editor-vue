@@ -42,6 +42,10 @@
     padding: 4px 8px;
 }
 
+html, body{
+    height: 100%;
+}
+
 body,
 body pre {
     font-family: 'Titillium Web', sans-serif;
@@ -994,9 +998,14 @@ a.dropdown-toggle {
     margin: 0 auto;
 }
 
+.full-height{
+    height: 100%;
+}
+
 .wrapper.full {
     padding: 40px 0px 0px 0px;
     overflow: hidden;
+    height: 100%;
     max-width: 100%;
     min-width: 100%;
 }

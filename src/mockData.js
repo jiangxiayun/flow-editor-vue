@@ -3,7 +3,7 @@ export const mockData = {
   "name": "请假模型",
   "key": "leave-model",
   "description": "请假模型",
-  "lastUpdated": "2019-03-04T02:15:00.384+0000",
+  "lastUpdated": "2019-03-14T02:10:40.372+0000",
   "lastUpdatedBy": "admin",
   "model": {
     "modelId": "6609363a-3be5-11e9-afe0-82ad27eff10d",
@@ -26,14 +26,90 @@ export const mockData = {
       "process_namespace": "http://www.flowable.org/processdef",
       "process_historylevel": "",
       "isexecutable": true,
-      "dataproperties": "",
-      "executionlisteners": "",
-      "eventlisteners": "",
-      "signaldefinitions": "",
-      "messagedefinitions": "",
+      "dataproperties": "{\"items\":[{\"dataproperty_id\":\"555\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"datetime\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009J\"},{\"dataproperty_id\":\"new_data_object_2\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009L\"},{\"dataproperty_id\":\"new_data_object_3\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009N\"},{\"dataproperty_id\":\"new_data_object_4\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009P\"},{\"dataproperty_id\":\"new_data_object_5\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009R\"},{\"dataproperty_id\":\"new_data_object_6\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009T\"},{\"dataproperty_id\":\"new_data_object_7\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009V\"},{\"dataproperty_id\":\"new_data_object_8\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009X\"},{\"dataproperty_id\":\"new_data_object_9\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-009Z\"},{\"dataproperty_id\":\"new_data_object_10\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00A1\"},{\"dataproperty_id\":\"new_data_object_11\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00A3\"},{\"dataproperty_id\":\"new_data_object_1\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00A5\"},{\"dataproperty_id\":\"new_data_object_2\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00A7\"},{\"dataproperty_id\":\"new_data_object_3\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00A9\"},{\"dataproperty_id\":\"new_data_object_4\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00AB\"},{\"dataproperty_id\":\"new_data_object_5\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00AD\"},{\"dataproperty_id\":\"new_data_object_6\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00AF\"},{\"dataproperty_id\":\"new_data_object_7\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00AH\"},{\"dataproperty_id\":\"new_data_object_8\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00AJ\"},{\"dataproperty_id\":\"new_data_object_9\",\"dataproperty_name\":\"\",\"dataproperty_type\":\"string\",\"readable\":true,\"writable\":true,\"$$hashKey\":\"uiGrid-00AL\"}]}",
+      "executionlisteners": "{\"executionListeners\":[{\"event\":\"start\",\"implementation\":\"22\",\"className\":\"22\",\"expression\":\"22\",\"delegateExpression\":\"22\",\"$$hashKey\":\"uiGrid-000H\",\"fields\":[{\"name\":\"fieldName\",\"implementation\":\"3\",\"stringValue\":\"3\",\"expression\":\"3\",\"string\":\"3\",\"$$hashKey\":\"uiGrid-000N\"},{\"name\":\"fieldName4\",\"implementation\":\"4\",\"stringValue\":\"4\",\"expression\":\"4\",\"string\":\"4\",\"$$hashKey\":\"uiGrid-000T\"}]},{\"event\":\"end\",\"implementation\":\"\",\"className\":\"\",\"expression\":\"\",\"delegateExpression\":\"\",\"$$hashKey\":\"uiGrid-000Z\",\"fields\":[{\"name\":\"fieldName44\",\"implementation\":\"\",\"stringValue\":\"\",\"expression\":\"\",\"string\":\"\",\"$$hashKey\":\"uiGrid-0015\"}]}]}",
+      "eventlisteners": {
+        "eventListeners": [
+          {
+            "event": "ACTIVITY_COMPENSATE, ACTIVITY_COMPLETED",
+            "implementation": "33",
+            "className": "33",
+            "delegateExpression": "33",
+            "retrowEvent": false,
+            "$$hashKey": "uiGrid-001R",
+            "fields": [
+
+            ],
+            "events": [
+              {
+                "event": "ACTIVITY_COMPENSATE",
+                "$$hashKey": "object:509"
+              },
+              {
+                "event": "ACTIVITY_COMPLETED",
+                "$$hashKey": "object:513"
+              }
+            ],
+            "rethrowEvent": false,
+            "rethrowType": "message",
+            "messagename": "33333",
+            "entityType": "33"
+          },
+          {
+            "event": "ACTIVITY_STARTED, ENGINE_CLOSED, HISTORIC_ACTIVITY_INSTANCE_CREATED",
+            "implementation": "8",
+            "className": "8",
+            "delegateExpression": "8",
+            "retrowEvent": false,
+            "$$hashKey": "uiGrid-001X",
+            "fields": [
+
+            ],
+            "events": [
+              {
+                "event": "ACTIVITY_STARTED",
+                "$$hashKey": "object:524"
+              },
+              {
+                "event": "ENGINE_CLOSED",
+                "$$hashKey": "object:526"
+              },
+              {
+                "event": "HISTORIC_ACTIVITY_INSTANCE_CREATED",
+                "$$hashKey": "object:531"
+              }
+            ],
+            "entityType": "8",
+            "rethrowEvent": false,
+            "rethrowType": "globalSignal",
+            "signalname": "666"
+          }
+        ]
+      },
+      "signaldefinitions": [
+        {
+          "id": "5",
+          "name": "5",
+          "scope": "global",
+          "$$hashKey": "uiGrid-000B"
+        },
+        {
+          "id": "4",
+          "name": "4",
+          "scope": "processInstance",
+          "$$hashKey": "uiGrid-000J"
+        }
+      ],
+      "messagedefinitions": [
+        {
+          "id": "55",
+          "name": "55",
+          "$$hashKey": "uiGrid-000Z"
+        }
+      ],
       "process_potentialstarteruser": "",
       "process_potentialstartergroup": "",
-      "iseagerexecutionfetch": "false"
+      "iseagerexecutionfetch": true
     },
     "childShapes": [
       {
@@ -277,30 +353,47 @@ export const mockData = {
         }
       },
       {
-        "resourceId": "sid-6716D349-84DB-4CE5-90E9-B9FABE573BE7",
+        "resourceId": "sid-6B994820-999F-470C-8774-903CEC5A4980",
         "properties": {
           "overrideid": "",
-          "name": "结束",
+          "name": "决策",
           "documentation": "",
-          "executionlisteners": ""
+          "asynchronousdefinition": "false",
+          "exclusivedefinition": "false",
+          "executionlisteners": "",
+          "multiinstance_type": "None",
+          "multiinstance_cardinality": "",
+          "multiinstance_collection": "",
+          "multiinstance_variable": "",
+          "multiinstance_condition": "",
+          "isforcompensation": "false",
+          "decisiontaskdecisiontablereference": {
+            "id": "cb9667fb-4241-11e9-afe0-82ad27eff10d",
+            "name": "dmndemo",
+            "key": "dmndemokey"
+          },
+          "decisiontaskthrowerroronnohits": "false",
+          "decisiontaskfallbacktodefaulttenant": "false"
         },
         "stencil": {
-          "id": "EndNoneEvent"
+          "id": "DecisionTask"
         },
         "childShapes": [
 
         ],
         "outgoing": [
-
+          {
+            "resourceId": "sid-F304E9FB-DA24-43A9-A62B-C12F4565BC1F"
+          }
         ],
         "bounds": {
           "lowerRight": {
-            "x": 518,
-            "y": 192
+            "x": 625,
+            "y": 218
           },
           "upperLeft": {
-            "x": 490,
-            "y": 164
+            "x": 525,
+            "y": 138
           }
         },
         "dockers": [
@@ -325,17 +418,89 @@ export const mockData = {
 
         ],
         "outgoing": [
+
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 524,
+            "y": 178
+          },
+          "upperLeft": {
+            "x": 445.3828125,
+            "y": 178
+          }
+        },
+        "dockers": [
           {
-            "resourceId": "sid-6716D349-84DB-4CE5-90E9-B9FABE573BE7"
+            "x": 50,
+            "y": 40
+          },
+          {
+            "x": 524,
+            "y": 178
+          }
+        ]
+      },
+      {
+        "resourceId": "sid-4D07711C-5A69-4825-8FA1-B0866540D733",
+        "properties": {
+          "overrideid": "",
+          "name": "",
+          "documentation": "",
+          "executionlisteners": ""
+        },
+        "stencil": {
+          "id": "EndNoneEvent"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 698,
+            "y": 192
+          },
+          "upperLeft": {
+            "x": 670,
+            "y": 164
+          }
+        },
+        "dockers": [
+
+        ]
+      },
+      {
+        "resourceId": "sid-F304E9FB-DA24-43A9-A62B-C12F4565BC1F",
+        "properties": {
+          "overrideid": "",
+          "name": "",
+          "documentation": "",
+          "conditionsequenceflow": "",
+          "executionlisteners": "",
+          "defaultflow": "false",
+          "skipexpression": ""
+        },
+        "stencil": {
+          "id": "SequenceFlow"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-4D07711C-5A69-4825-8FA1-B0866540D733"
           }
         ],
         "bounds": {
           "lowerRight": {
-            "x": 489.375,
+            "x": 669.375,
             "y": 178
           },
           "upperLeft": {
-            "x": 445.390625,
+            "x": 625.390625,
             "y": 178
           }
         },
@@ -350,7 +515,7 @@ export const mockData = {
           }
         ],
         "target": {
-          "resourceId": "sid-6716D349-84DB-4CE5-90E9-B9FABE573BE7"
+          "resourceId": "sid-4D07711C-5A69-4825-8FA1-B0866540D733"
         }
       }
     ],

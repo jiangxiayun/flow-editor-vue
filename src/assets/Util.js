@@ -51,3 +51,24 @@ export function _internalCreateModal (modalConfig, $modal, $scope) {
     return $modal(modalConfig);
   }
 }
+
+export function extendDeep(parent, child) {
+
+  let proxy = null
+
+  proxy = JSON.stringify(parent); // 把parent对象转换成字符串
+  proxy = JSON.parse(proxy) // 把字符串转换成对象，这是parent的一个副本
+
+  child = child || {};
+
+  for(let i in proxy) {
+    // 判断对象是否包含特定的自身（非继承）属性
+    if(proxy.hasOwnProperty(i)) {
+      child[i] = proxy[i];
+    }
+  }
+
+  proxy = null; // 因为proxy是中间对象，可以将它回收掉
+
+  return child;
+}

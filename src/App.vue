@@ -1,24 +1,21 @@
 <template>
-  <flowDesign :config="config"></flowDesign>
+  <div class="full-height">
+    <div class="navbar navbar-fixed-top navbar-inverse" role="navigation" id="main-header">
+      <router-link to="/list">流程图列表</router-link>
+    </div>
+
+    <router-view></router-view>
+  </div>
+
 </template>
 
 <script>
-  import flowDesign from '@/components/flowable/flow-design'
-  import { AA } from './editorAA.js'
-  import { mockData } from './mockData.js'
 
   export default {
-    name: 'Editor',
+    name: 'App',
     data () {
-      return {
-        config: {
-          type: 'flow',
-          modelData: mockData,
-          stencilData: AA,
-        }
-      }
+      return {}
     },
-    components: { flowDesign },
     created () {},
     computed: {},
     mounted () {
