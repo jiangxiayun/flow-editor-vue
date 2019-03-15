@@ -26,6 +26,8 @@
   import propertySection from '@/components/flowable/propertySection'
   import EditorManager from '@/assets/flowable/EditorManager'
 
+  import APIS from '@/service'
+
   export default {
     name: 'Editor',
     data () {
@@ -54,14 +56,28 @@
       ...mapState('Flowable', ['paletteWrapperOpen'])
     },
     mounted () {
-      this.editorManager =  new EditorManager({
-        ...this.config
-      })
+      this.getJson()
+      // this.editorManager =  new EditorManager({
+      //   ...this.config,
+      // })
+
       // this.UPDATE_modelData(this.config.modelData)
       this.resizeFun()
     },
     methods: {
       ...mapMutations('Flowable', ['UPDATE_paletteWrapperOpen', 'UPDATE_modelData']),
+      getJson () {
+        let id = this.$route.params.id
+        APIS.editorJson(id, {}).then(res => {
+          // this.modelData = res
+          this.editorManager =  new EditorManager({
+            ...this.config,
+            modelData: res
+          })
+        }).catch((err) => {
+          console.log('Something went wrong: ' + err)
+        })
+      },
       resizeFun() {
         jQuery(window).resize(() => {
           // Calculate the offset based on the bottom of the module header

@@ -27,7 +27,7 @@ export default class EditorManager {
 
     const baseUrl = 'http://b3mn.org/stencilset/'
     const stencilSet = new ORYX.Core.StencilSet.StencilSet(baseUrl, config.stencilData)
-    ORYX.Core.StencilSet.loadStencilSet(baseUrl, stencilSet, '6609363a-3be5-11e9-afe0-82ad27eff10d')
+    ORYX.Core.StencilSet.loadStencilSet(baseUrl, stencilSet, config.modelData.modelId)
     jQuery.ajax({
       type: 'GET',
       url: 'flowable/editor-app/plugins.xml',

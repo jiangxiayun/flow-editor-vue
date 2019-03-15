@@ -10,18 +10,26 @@ import i18n from './i18n'
 
 Vue.config.productionTip = false
 
-Vue.filter('translate', function (value) {
-  if (!value) return ''
-  return value
-})
 Vue.filter('limitLength', function (value, len) {
   if (!value) return ''
   if (value.length <= len) return value
   return value.slice(0, len)
 })
 
-Vue.mixin(commonMix)
+Vue.filter('dateformat', function (date, format) {
+  if (date) {
+    // if (format) {
+    //   return moment(date).format(format)
+    // } else {
+    //   return moment(date).calendar()
+    // }
+    return date
+  }
+  return ''
+})
 
+
+Vue.mixin(commonMix)
 
 
 new Vue({

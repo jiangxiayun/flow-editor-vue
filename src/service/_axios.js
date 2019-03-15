@@ -3,7 +3,7 @@ import { checkCode, HttpCode } from './_checkCode'
 import store from '../store'
 
 const appServer = axios.create({
-  baseURL: process.env.APPL_BASE_URL,
+  baseURL: process.env.VUE_APP_API_PREFIX,
   timeout: 35000
 })
 // appServer.defaults.headers.post['Content-Type'] = 'application/json'
@@ -18,9 +18,6 @@ appServer.interceptors.request.use(
     if (configNew.fileUp) {
       return configNew
     }
-    // let token = sessionStorage.getItem(configConst.tokenName)
-    configNew.data.profile = { __token: store.state.Global.userToken }
-    // console.log('configNew::', configNew)
     return configNew
   },
   err => {
@@ -35,7 +32,7 @@ appServer.interceptors.response.use(
     if (res.config.file) {
       return { ...res }
     }
-    if (res.data.__statusCode === 'S') {
+    if (res.status === 200) {
       return res.data
     }
     checkCode(res)

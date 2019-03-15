@@ -82,7 +82,16 @@
     data () {
       return {
         treeview: {},
-        isEditorReady: false
+        isEditorReady: false,
+        diyStencilItem: [
+          {
+            groups: [],
+            items: [],
+            name: '自定义节点',
+            paletteItems: [],
+            visible: true,
+          }
+        ]
       }
     },
     components: {stencilItemTemplate, processTreeList, rootStencilItemTemplate},
@@ -97,6 +106,7 @@
       stencilItemGroups () {
         if (!this.editorManager) return []
         const data = this.editorManager.getShowStencilData();
+        console.log('stencilItemGroups', data)
         return data
       },
     },

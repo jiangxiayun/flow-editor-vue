@@ -22,12 +22,12 @@
         <button v-for="(item, index) in secondaryItems"
                 :key="item.id"
                 :id="item.id"
-                :title="item.title | translate"
+                :title="$t(item.title)"
                 class="btn btn-inverse" :class="{'separator': item.type == 'separator'}"
                 :disabled="item.type == 'separator'"
                 @click="toolbarSecondaryButtonClicked(index)">
           <i v-if="item.type == 'button'"  :class="item.cssClass" class="toolbar-button"
-             data-toggle="tooltip" :title="item.title | translate"></i>
+             data-toggle="tooltip" :title="$t(item.title)"></i>
           <div v-if="item.type == 'separator'" :class="item.cssClass"></div>
         </button>
       </div>

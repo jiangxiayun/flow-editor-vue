@@ -28,7 +28,7 @@
       </div>
 
       <div class="col-xs-6">
-        <div v-show="selectedProperty">
+        <div v-show="hasSelectRow">
           <div class="form-group">
             <label for="idField">{{$t('PROPERTY.FORMPROPERTIES.ID')}}</label>
             <input id="idField" class="form-control" type="text" v-model="selectedProperty.id"
@@ -42,7 +42,7 @@
           <div class="form-group">
             <label for="typeFieldType">{{$t('PROPERTY.FORMPROPERTIES.TYPE')}}</label>
             <select id="typeFieldType" class="form-control" v-model="selectedProperty.type"
-                    v-change="propertyTypeChanged">
+                    @change="propertyTypeChanged">
               <option>string</option>
               <option>long</option>
               <option>boolean</option>
@@ -89,7 +89,7 @@
                            :placeholder="$t('PROPERTY.FORMPROPERTIES.VALUES.NAME.PLACEHOLDER')"/>
                   </div>
                 </div>
-                <div v-show="!hasSelectEnum" class="muted no-property-selected">
+                <div v-show="!selectedEnumValue" class="muted no-property-selected">
                   {{$t('PROPERTY.FORMPROPERTIES.ENUMVALUES.EMPTY')}}
                 </div>
               </div>
