@@ -14,6 +14,7 @@ export default class EditorManager {
       'CollapsedSubProcess': 'subprocess.png',
       'EventSubProcess': 'event.subprocess.png'
     }
+
     this.current = this.modelId // 当前流程id
     this.loading = true
 
@@ -147,8 +148,8 @@ export default class EditorManager {
     let quickMenuItems = [];
     let morphRoles = [];
     for (let i = 0; i < data.rules.morphingRules.length; i++) {
-      var role = data.rules.morphingRules[i].role;
-      var roleItem = {'role': role, 'morphOptions': []};
+      let role = data.rules.morphingRules[i].role;
+      let roleItem = {'role': role, 'morphOptions': []};
       morphRoles.push(roleItem);
     }
 
@@ -157,17 +158,17 @@ export default class EditorManager {
     // Check all received items
     for (let stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) {
       // Check if the root group is the 'diagram' group. If so, this item should not be shown.
-      var currentGroupName = data.stencils[stencilIndex].groups[0];
+      let currentGroupName = data.stencils[stencilIndex].groups[0];
       if (currentGroupName === 'Diagram' || currentGroupName === 'Form') {
         continue;  // go to next item
       }
 
-      var removed = false;
+      let removed = false;
       if (data.stencils[stencilIndex].removed) {
         removed = true;
       }
 
-      var currentGroup = undefined;
+      let currentGroup = undefined;
       if (!removed) {
         // Check if this group already exists. If not, we create a new one
         if (currentGroupName !== null && currentGroupName !== undefined && currentGroupName.length > 0) {
@@ -178,7 +179,7 @@ export default class EditorManager {
           }
 
           // Add all child groups (if any)
-          for (var groupIndex = 1; groupIndex < data.stencils[stencilIndex].groups.length; groupIndex++) {
+          for (let groupIndex = 1; groupIndex < data.stencils[stencilIndex].groups.length; groupIndex++) {
             var childGroupName = data.stencils[stencilIndex].groups[groupIndex];
             var childGroup = findGroup(childGroupName, currentGroup.groups);
             if (childGroup === null) {
@@ -193,7 +194,7 @@ export default class EditorManager {
       }
 
       // Construct the stencil item
-      var stencilItem = {
+      let stencilItem = {
         'id': data.stencils[stencilIndex].id,
         'name': data.stencils[stencilIndex].title,
         'description': data.stencils[stencilIndex].description,
@@ -223,7 +224,7 @@ export default class EditorManager {
       }
 
       for (let i = 0; i < data.stencils[stencilIndex].roles.length; i++) {
-        var stencilRole = data.stencils[stencilIndex].roles[i];
+        let stencilRole = data.stencils[stencilIndex].roles[i];
         if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
           if (stencilRole === 'association_start') {
             stencilItem.canConnect = true;
@@ -271,10 +272,8 @@ export default class EditorManager {
       }
     }
 
-    console.log('stencilItemGroups_ary', stencilItemGroups_ary)
     this.showStencilData = stencilItemGroups_ary
     // this.UPDATE_stencilItemGroups(stencilItemGroups_ary)
-    console.log('stencilItemGroups', this.stencilItemGroups)
 
     let containmentRules = [];
     for (let i = 0; i < data.rules.containmentRules.length; i++) {
@@ -294,6 +293,8 @@ export default class EditorManager {
     // this.UPDATE_quickMenuItems(availableQuickMenuItems)
     this.quickMenuItems = availableQuickMenuItems
     this.morphRoles = morphRoles;
+    // console.log('availableQuickMenuItems', availableQuickMenuItems)
+    // console.log('morphRoles', morphRoles)
   }
 
   getSelection () { return this.editor.selection }
@@ -311,7 +312,7 @@ export default class EditorManager {
     //resetting the state
     this.canvasTracker = new Hash()
 
-    //avoid a reference to the original object.
+    // avoid a reference to the original object.
     // 第一个参数boolean代表是否进行深度拷贝
     var config = jQuery.extend(true, {}, this.modelData)
 
@@ -486,7 +487,7 @@ export default class EditorManager {
         this.previousSelectedShape = this.selectedShape
 
         // Only do something if another element is selected (Oryx fires this event multiple times)
-        if (this.selectedShape !== undefined && this.selectedShape.getId() === selectedShape.getId()) {
+        if (this.previousSelectedShape !== undefined && this.previousSelectedShape.getId() === selectedShape.getId()) {
           if (this.forceSelectionRefresh) {
             // Switch the flag again, this run will force refresh
             this.forceSelectionRefresh = false
@@ -577,6 +578,10 @@ export default class EditorManager {
 
         this.selectedItem = selectedItem
         this.selectedShape = selectedShape
+        FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, {
+          selectedItem,
+          selectedShape
+        })
       } else {
         this.selectedItem = {}
         this.selectedShape = null

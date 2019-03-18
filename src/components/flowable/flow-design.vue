@@ -56,10 +56,10 @@
       ...mapState('Flowable', ['paletteWrapperOpen'])
     },
     mounted () {
-      this.getJson()
-      // this.editorManager =  new EditorManager({
-      //   ...this.config,
-      // })
+      // this.getJson()
+      this.editorManager =  new EditorManager({
+        ...this.config,
+      })
 
       // this.UPDATE_modelData(this.config.modelData)
       this.resizeFun()

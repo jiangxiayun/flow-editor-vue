@@ -26,50 +26,35 @@ export const FLOWABLE = {
   eventBus: {
     /** Event fired when the editor is loaded and ready */
     EVENT_TYPE_EDITOR_READY: 'event-type-editor-ready',
-
     EVENT_TYPE_EDITOR_BOOTED: 'event-type-editor-booted',
-
     /** Event fired when a selection is made on the canvas. */
     EVENT_TYPE_SELECTION_CHANGE: 'event-type-selection-change',
-
     /** Event fired when a toolbar button has been clicked. */
     EVENT_TYPE_TOOLBAR_BUTTON_CLICKEDEVENT_TYPE_TOOLBAR_BUTTON_CLICKED: 'event-type-toolbar-button-clicked',
-
     /** Event fired when a stencil item is dropped on the canvas. */
     EVENT_TYPE_ITEM_DROPPED: 'event-type-item-dropped',
-
     /** Event fired when a property value is changed. */
     EVENT_TYPE_PROPERTY_VALUE_CHANGED: 'event-type-property-value-changed',
-
+    EVENT_TYPE_SELECTION_CHANGED: 'event-type-selection-changed',
     /** Event fired on double click in canvas. */
     EVENT_TYPE_DOUBLE_CLICK: 'event-type-double-click',
-
     /** Event fired on a mouse out */
     EVENT_TYPE_MOUSE_OUT: 'event-type-mouse-out',
-
     /** Event fired on a mouse over */
     EVENT_TYPE_MOUSE_OVER: 'event-type-mouse-over',
-
     /** Event fired when a model is saved. */
     EVENT_TYPE_MODEL_SAVED: 'event-type-model-saved',
-
     /** Event fired when the quick menu buttons should be hidden. */
     EVENT_TYPE_HIDE_SHAPE_BUTTONS: 'event-type-hide-shape-buttons',
-
     /** Event fired when the validation popup should be shown. */
     EVENT_TYPE_SHOW_VALIDATION_POPUP: 'event-type-show-validation-popup',
-
     /** Event fired when a different process must be loaded. */
     EVENT_TYPE_NAVIGATE_TO_PROCESS: 'event-type-navigate-to-process',
-
     EVENT_TYPE_UNDO_REDO_RESET: 'event-type-undo-redo-reset',
-
     /** A mapping for storing the listeners*/
     listeners: {},
-
     /** The Oryx editor, which is stored locally to send events to */
     editor: null,
-
     /**
      * Add an event listener to the event bus, listening to the event with the provided type.
      * Type and callback are mandatory parameters.
@@ -93,10 +78,10 @@ export const FLOWABLE = {
      */
     removeListener: function (type, callback, scope) {
       if (typeof this.listeners[type] != 'undefined') {
-        var numOfCallbacks = this.listeners[type].length
-        var newArray = []
+        const numOfCallbacks = this.listeners[type].length
+        let newArray = []
         for (let i = 0; i < numOfCallbacks; i++) {
-          var listener = this.listeners[type][i]
+          let listener = this.listeners[type][i]
           if (listener.scope === scope && listener.callback === callback) {
             // Do nothing, this is the listener and doesn't need to survive
           } else {
@@ -109,12 +94,12 @@ export const FLOWABLE = {
 
     hasListener: function (type, callback, scope) {
       if (typeof this.listeners[type] != 'undefined') {
-        var numOfCallbacks = this.listeners[type].length
+        const numOfCallbacks = this.listeners[type].length
         if (callback === undefined && scope === undefined) {
           return numOfCallbacks > 0
         }
         for (let i = 0; i < numOfCallbacks; i++) {
-          var listener = this.listeners[type][i]
+          const listener = this.listeners[type][i]
           if (listener.scope == scope && listener.callback == callback) {
             return true
           }
@@ -183,35 +168,30 @@ export const FLOWABLE = {
           this.shape.dockers.first().setDockedShape(this.connectedShape);
           this.shape.dockers.first().setReferencePoint(this.sourceRefPos);
         }
-      }
-      else {
+      } else {
         this.shape = this.facade.createShape(this.option);
-        this.edge = (!(this.shape instanceof ORYX.Core.Edge)) ? this.shape.getIncomingShapes().first() : undefined;
+        this.edge = (!(this.shape instanceof ORYX.Core.Edge)) ?
+          this.shape.getIncomingShapes().first() : undefined;
       }
 
       if (this.currentReference && this.position) {
-
         if (this.shape instanceof ORYX.Core.Edge) {
-
           if (!(this.currentReference instanceof ORYX.Core.Canvas)) {
             this.shape.dockers.last().setDockedShape(this.currentReference);
 
             if (this.currentReference.getStencil().idWithoutNs() === 'TextAnnotation') {
-              var midpoint = {};
+              let midpoint = {};
               midpoint.x = 0;
               midpoint.y = this.currentReference.bounds.height() / 2;
               this.shape.dockers.last().setReferencePoint(midpoint);
-            }
-            else {
+            } else {
               this.shape.dockers.last().setReferencePoint(this.currentReference.bounds.midPoint());
             }
-          }
-          else {
+          } else {
             this.shape.dockers.last().bounds.centerMoveTo(this.position);
           }
           this.sourceRefPos = this.shape.dockers.first().referencePoint;
           this.targetRefPos = this.shape.dockers.last().referencePoint;
-
         } else if (this.edge) {
           this.sourceRefPos = this.edge.dockers.first().referencePoint;
           this.targetRefPos = this.edge.dockers.last().referencePoint;
@@ -266,7 +246,6 @@ export const FLOWABLE = {
 
       this.facade.getCanvas().update();
       this.facade.updateSelection();
-
     },
     rollback: function () {
       this.facade.deleteShape(this.shape);
@@ -588,23 +567,6 @@ export const FLOWABLE = {
       }
     ]
   },
-  URL: {
-    getModel: function(modelId) {
-      return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/editor/json?version=' + Date.now();
-    },
-    getStencilSet: function() {
-      return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/editor?version=' + Date.now();
-    },
-    getCmmnStencilSet: function() {
-      return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/cmmneditor?version=' + Date.now();
-    },
-    putModel: function(modelId) {
-      return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/editor/json';
-    },
-    validateModel: function(){
-      return FLOWABLE.CONFIG.contextRoot + '/app/rest/model/validate';
-    }
-  },
   TOOLBAR: {
     ACTIONS: {
       closeEditor: function(services) {
@@ -877,12 +839,6 @@ export const FLOWABLE = {
 
 
 export function FLOWABLE_eventBus_initAddListener (editorManager) {
-  FLOWABLE.eventBus.addListener('ORYX-EDITOR-LOADED',() => {
-    this.editorFactory.resolve();
-    this.editorInitialized = true;
-    this.modelData = this.editorManager.getBaseModelData();
-  }, this);
-
   FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_EDITOR_READY, () => {
     var url = window.location.href
     var regex = new RegExp('[?&]subProcessId(=([^&#]*)|&|#|$)')
@@ -908,9 +864,6 @@ export function FLOWABLE_eventBus_initAddListener (editorManager) {
     }
 
   },this);
-
-
-
 
   FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_SHOW_VALIDATION_POPUP, function (event) {
     // Method to open validation dialog

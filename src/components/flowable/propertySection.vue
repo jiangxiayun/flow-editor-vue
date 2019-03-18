@@ -1,6 +1,7 @@
 <template>
   <!--表单信息区域-->
   <div id="propertiesHelpWrapper" class="col-xs-12">
+
     <div class="propertySection" id="propertySection"
          :class="{collapsed: propertyWindowState.collapsed}">
       <div class="selected-item-section">
@@ -110,7 +111,13 @@
           'message-definitions-write-template',
           'form-reference-write-template',
           'form-properties-write-template'
-        ]
+        ],
+        selectedItem: {
+          title: '',
+          properties: [],
+          auditData: {}
+        },
+        selectedShape: {}
       }
     },
     props: {
@@ -148,24 +155,16 @@
             || event.property.value.length == 0)
         }
       })
+      FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, (event) => {
+        if (this.currentSelectedProperty.mode != 'write') {
+          this.selectedItem = event.selectedItem
+          this.selectedShape = event.selectedShape
+        }
+      })
     },
     computed: {
       modelData () {
         return this.editorManager ? this.editorManager.getBaseModelData() : {}
-      },
-      selectedItem () {
-        let a = this.editorManager ? this.editorManager.getSelectedItem() : {
-          title: '',
-          properties: [],
-          auditData: {}
-        }
-        console.log(3333, a)
-        return a
-      },
-      selectedShape () {
-        let a = this.editorManager ? this.editorManager.getSelectedShape() : {}
-        console.log(44444, a)
-        return a
       }
     },
     methods: {

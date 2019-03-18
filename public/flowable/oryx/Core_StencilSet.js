@@ -27,7 +27,7 @@ ORYX.Core.StencilSet.Stencil = {
     if (!namespace) throw "Stencil does not provide namespace.";
     if (!source) throw "Stencil does not provide SVG source.";
     if (!stencilSet) throw "Fatal internal error loading stencilset.";
-    //if(!propertyPackages) throw "Fatal internal error loading stencilset.";
+    // if(!propertyPackages) throw "Fatal internal error loading stencilset.";
 
     this._source = source;
     this._jsonStencil = jsonStencil;
@@ -55,7 +55,6 @@ ORYX.Core.StencilSet.Stencil = {
     if (!this._jsonStencil.description) {
       this._jsonStencil.description = "";
     }
-    ;
     if (!this._jsonStencil.groups) {
       this._jsonStencil.groups = [];
     }
@@ -63,10 +62,10 @@ ORYX.Core.StencilSet.Stencil = {
       this._jsonStencil.roles = [];
     }
 
-    //add id of stencil to its roles
+    // add id of stencil to its roles
     this._jsonStencil.roles.push(this._jsonStencil.id);
 
-    //prepend namespace to each role
+    // prepend namespace to each role
     this._jsonStencil.roles.each((function (role, index) {
       this._jsonStencil.roles[index] = namespace + role;
     }).bind(this));
@@ -119,17 +118,14 @@ ORYX.Core.StencilSet.Stencil = {
       var parser = new DOMParser();
       var xml = parser.parseFromString(this._jsonStencil.view, "text/xml");
 
-      //check if result is a SVG document
+      // check if result is a SVG document
       if (ORYX.Editor.checkClassType(xml.documentElement, SVGSVGElement)) {
-
         this._view = xml.documentElement;
-
       } else {
         throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a valid SVG document."
       }
     } else {
-      new Ajax.Request(
-        url, {
+      new Ajax.Request(url, {
           asynchronous: false, method: 'get',
           onSuccess: this._loadSVGOnSuccess.bind(this),
           onFailure: this._loadSVGOnFailure.bind(this)
@@ -297,7 +293,6 @@ ORYX.Core.StencilSet.Stencil = {
   },
 
   _loadSVGOnSuccess: function (result) {
-
     var xml = null;
 
     /*
@@ -318,11 +313,9 @@ ORYX.Core.StencilSet.Stencil = {
     // get it the usual way.
     xml = result.responseXML;
 
-    //check if result is a SVG document
+    // check if result is a SVG document
     if (ORYX.Editor.checkClassType(xml.documentElement, SVGSVGElement)) {
-
       this._view = xml.documentElement;
-
     } else {
       throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a SVG document."
     }
@@ -573,8 +566,7 @@ ORYX.Core.StencilSet.Property = Clazz.extend({
    * @return {Boolean} True, if property has the same namespace and id.
    */
   equals: function (property) {
-    return (this._namespace === property.namespace() &&
-      this.id() === property.id()) ? true : false;
+    return (this._namespace === property.namespace() && this.id() === property.id());
   },
 
   namespace: function () {
@@ -2360,24 +2352,19 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
    *
    */
   construct: function (baseUrl, data) {
-
     this._extensions = new Hash();
-
     this._baseUrl = baseUrl;
     this._jsonObject = {};
-
     this._stencils = new Hash();
     this._availableStencils = new Hash();
     this._init(data);
   },
-
   /**
    * Finds a root stencil in this stencil set. There may be many of these. If
    * there are, the first one found will be used. In Firefox, this is the
    * topmost definition in the stencil set description file.
    */
   findRootStencilName: function () {
-
     // find any stencil that may be root.
     var rootStencil = this._stencils.values().find(function (stencil) {
       return stencil._jsonStencil.mayBeRoot
@@ -2392,7 +2379,6 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
     // return its id.
     return rootStencil.id();
   },
-
   /**
    * @param {ORYX.Core.StencilSet.StencilSet} stencilSet
    * @return {Boolean} True, if stencil set has the same namespace.
@@ -2400,9 +2386,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
   equals: function (stencilSet) {
     return (this.namespace() === stencilSet.namespace());
   },
-
   /**
-   *
    * @param {Oryx.Core.StencilSet.Stencil} rootStencil If rootStencil is defined, it only returns stencils
    *      that could be (in)direct child of that stencil.
    */
@@ -2467,7 +2451,6 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
       return (stencil.type() === 'node')
     });
   },
-
   edges: function () {
     return this._availableStencils.values().findAll(function (stencil) {
       return (stencil.type() === 'edge')
@@ -2503,7 +2486,6 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
   },
 
   addExtension: function (url) {
-
     new Ajax.Request(url, {
       method: 'GET',
       asynchronous: false,
@@ -2521,7 +2503,6 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
   },
 
   addExtensionDirectly: function (str) {
-
     try {
       eval("var jsonExtension = " + str);
 
@@ -2657,16 +2638,13 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
   },
 
   __handleStencilset: function (response) {
-
     this._jsonObject = response;
-
     // assert it was parsed.
     if (!this._jsonObject) {
       throw "Error evaluating stencilset. It may be corrupt.";
     }
 
     with (this._jsonObject) {
-
       // assert there is a namespace.
       if (!namespace || namespace === "")
         throw "Namespace definition missing in stencilset.";
@@ -2679,13 +2657,10 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
         namespace = namespace + "#";
 
       // assert title and description are strings.
-      if (!title)
-        title = "";
-      if (!description)
-        description = "";
+      if (!title) title = "";
+      if (!description) description = "";
     }
   },
-
   /**
    * This method is called when the HTTP request to get the requested stencil
    * set succeeds. The response is supposed to be a JSON representation
@@ -2694,12 +2669,10 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
    *      stencil set specification.
    */
   _init: function (response) {
-
     // init and check consistency.
     this.__handleStencilset(response);
 
     var pps = new Hash();
-
     // init property packages
     if (this._jsonObject.propertyPackages) {
       $A(this._jsonObject.propertyPackages).each((function (pp) {
@@ -2717,7 +2690,6 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
       var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this, pps, defaultPosition);
       this._stencils.set(oStencil.id(), oStencil);
       this._availableStencils.set(oStencil.id(), oStencil);
-
     }).bind(this));
   },
 
@@ -2838,23 +2810,21 @@ ORYX.Core.StencilSet.rules = function (editorId) {
  * initializes the Rules object for the editor instance.
  */
 ORYX.Core.StencilSet.loadStencilSet = function (url, stencilSet, editorId) {
-
-  //store stencil set
-  ORYX.Core.StencilSet._stencilSetsByNamespace.set(stencilSet.namespace(), stencilSet);
-
-  //store stencil set by url
-  ORYX.Core.StencilSet._stencilSetsByUrl.set(url, stencilSet);
-
   var namespace = stencilSet.namespace();
 
-  //store which editorInstance loads the stencil set
+  // store stencil set
+  ORYX.Core.StencilSet._stencilSetsByNamespace.set(namespace, stencilSet);
+  // store stencil set by url
+  ORYX.Core.StencilSet._stencilSetsByUrl.set(url, stencilSet);
+
+  // store which editorInstance loads the stencil set
   if (ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId)) {
     ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId).push(namespace);
   } else {
     ORYX.Core.StencilSet._StencilSetNSByEditorInstance.set(editorId, [namespace]);
   }
 
-  //store the rules for the editor instance
+  // store the rules for the editor instance
   if (ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId)) {
     ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId).initializeRules(stencilSet);
   } else {

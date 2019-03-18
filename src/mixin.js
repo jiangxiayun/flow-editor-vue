@@ -107,47 +107,6 @@ const commonMix = {
       this.editorHistory.push(historyItem);
     },
 
-    quickAddItem (newItemId) {
-      console.log('Oryx_button:', newItemId)
-      var shapes = this.editorManager.getSelection();
-      if (shapes && shapes.length == 1) {
-        this.currentSelectedShape = shapes.first();
-
-        var containedStencil = undefined;
-        var stencilSets = this.editorManager.getStencilSets().values();
-        for (var i = 0; i < stencilSets.length; i++) {
-          var stencilSet = stencilSets[i];
-          var nodes = stencilSet.nodes();
-          for (var j = 0; j < nodes.length; j++) {
-            if (nodes[j].idWithoutNs() === newItemId) {
-              containedStencil = nodes[j];
-              break;
-            }
-          }
-        }
-
-        if (!containedStencil) return;
-
-        var option = {type: this.currentSelectedShape.getStencil().namespace() + newItemId, namespace: this.currentSelectedShape.getStencil().namespace()};
-        option['connectedShape'] = this.currentSelectedShape;
-        option['parent'] = this.currentSelectedShape.parent;
-        option['containedStencil'] = containedStencil;
-
-        var args = { sourceShape: this.currentSelectedShape, targetStencil: containedStencil };
-        var targetStencil = this.editorManager.getRules().connectMorph(args);
-
-        // Check if there can be a target shape
-        if (!targetStencil) {
-          return;
-        }
-
-        option['connectingType'] = targetStencil.id();
-
-        var command = new FLOWABLE.CreateCommand(option, undefined, undefined, this.editorManager.getEditor());
-
-        this.editorManager.executeCommands([command]);
-      }
-    },
     editShape (){
       this.editorManager.edit(this.selectedShape.resourceId);
     },

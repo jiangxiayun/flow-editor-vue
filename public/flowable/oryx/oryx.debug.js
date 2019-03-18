@@ -1893,8 +1893,6 @@ ORYX = Object.extend(ORYX, {
   },
 
   _loadPlugins: function (plugins) {
-    console.log('plugins', plugins)
-
     ORYX.availablePlugins.length = 0;
 
     var resultXml = plugins
@@ -1906,7 +1904,6 @@ ORYX = Object.extend(ORYX, {
     var globalProperties = [];
     var preferences = $A(resultXml.getElementsByTagName("properties"));
     preferences.each(function (p) {
-
       var props = $A(p.childNodes);
       props.each(function (prop) {
         var property = new Hash();
@@ -1922,7 +1919,6 @@ ORYX = Object.extend(ORYX, {
         ;
       });
     });
-
 
     // TODO Why are we using XML if we don't respect structure anyway?
     // for each plugin element in the configuration..
@@ -1962,7 +1958,6 @@ ORYX = Object.extend(ORYX, {
         if (attributes.length > 0) {
           properties.push(property)
         }
-        ;
 
       });
 
@@ -1992,7 +1987,6 @@ ORYX = Object.extend(ORYX, {
       if (requires) {
         pluginData.set('requires', requires);
       }
-
 
       // Get the RequieredNodes
       var notUsesInNodes = node.getElementsByTagName("notUsesIn");
@@ -2027,13 +2021,10 @@ ORYX = Object.extend(ORYX, {
 
       // Add the Plugin-Data to all available Plugins
       ORYX.availablePlugins.push(pluginData);
-
     });
-
   },
 
   _loadPluginsOnFails: function (result) {
-
     ORYX.Log.error("Plugin configuration file not available.");
   }
 });

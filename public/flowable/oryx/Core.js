@@ -450,13 +450,12 @@ ORYX.Core.UIObject = {
    * Constructor of the UIObject class.
    */
   construct: function (options) {
-
-    this.isChanged = true;			//Flag, if UIObject has been changed since last update.
+    this.isChanged = true;			// Flag, if UIObject has been changed since last update.
     this.isResized = true;
-    this.isVisible = true;			//Flag, if UIObject's display attribute is set to 'inherit' or 'none'
-    this.isSelectable = false;		//Flag, if UIObject is selectable.
-    this.isResizable = false;		//Flag, if UIObject is resizable.
-    this.isMovable = false;			//Flag, if UIObject is movable.
+    this.isVisible = true;			// Flag, if UIObject's display attribute is set to 'inherit' or 'none'
+    this.isSelectable = false;		// Flag, if UIObject is selectable.
+    this.isResizable = false;		// Flag, if UIObject is resizable.
+    this.isMovable = false;			// Flag, if UIObject is movable.
 
     this.id = ORYX.Editor.provideId();	//get unique id
     this.parent = undefined;		//parent is defined, if this object is added to another uiObject.
@@ -700,7 +699,6 @@ ORYX.Core.UIObject = {
   },
 
   addEventHandlers: function (node) {
-
     node.addEventListener(ORYX.CONFIG.EVENT_MOUSEDOWN, this._delegateEvent.bind(this), false);
     node.addEventListener(ORYX.CONFIG.EVENT_MOUSEMOVE, this._delegateEvent.bind(this), false);
     node.addEventListener(ORYX.CONFIG.EVENT_MOUSEUP, this._delegateEvent.bind(this), false);
@@ -708,7 +706,6 @@ ORYX.Core.UIObject = {
     node.addEventListener(ORYX.CONFIG.EVENT_MOUSEOUT, this._delegateEvent.bind(this), false);
     node.addEventListener('click', this._delegateEvent.bind(this), false);
     node.addEventListener(ORYX.CONFIG.EVENT_DBLCLICK, this._delegateEvent.bind(this), false);
-
   },
 
   _delegateEvent: function (event) {
@@ -2308,7 +2305,6 @@ ORYX.Core.Shape = {
                     return;
                   }
 
-
                   /* Do not refresh the same svg element multiple times */
                   if (!refreshedSvgElements.get(svgElem.id) || prop == item.value()) {
                     svgElem.setAttributeNS(null, 'display', ((prop == item.value()) ? 'inherit' : 'none'));
@@ -2351,24 +2347,21 @@ ORYX.Core.Shape = {
                     if (svgElemSequential) {
                       if (prop === 'Sequential') {
                         svgElemSequential.setAttributeNS(null, 'display', 'inherit');
-                      }
-                      else {
+                      } else {
                         svgElemSequential.setAttributeNS(null, 'display', 'none');
                       }
                     }
                   }
                   return;
 
-                }
-                else if (property.type() === "cancelactivity") {
+                } else if (property.type() === "cancelactivity") {
                   var svgElemFrame = this.node.ownerDocument.getElementById(this.id + 'frame');
                   var svgElemFrame2 = this.node.ownerDocument.getElementById(this.id + 'frame2');
 
                   if (prop === 'true') {
                     svgElemFrame.setAttributeNS(null, 'display', 'inherit');
                     svgElemFrame2.setAttributeNS(null, 'display', 'inherit');
-                  }
-                  else {
+                  } else {
                     svgElemFrame.setAttributeNS(null, 'display', 'none');
                     svgElemFrame2.setAttributeNS(null, 'display', 'none');
                   }
@@ -3156,16 +3149,14 @@ ORYX.Core.Node = {
 
     this.dockers.invoke("update");
     if (this.isChanged) {
-
       var bounds = this.bounds;
       var oldBounds = this._oldBounds;
 
       if (this.isResized) {
-
         var widthDelta = bounds.width() / oldBounds.width();
         var heightDelta = bounds.height() / oldBounds.height();
 
-        //iterate over all relevant svg elements and resize them
+        // iterate over all relevant svg elements and resize them
         this._svgShapes.each(function (svgShape) {
           //adjust width
           if (svgShape.isHorizontallyResizable) {
@@ -3185,12 +3176,10 @@ ORYX.Core.Node = {
             anchorOffset = oldBounds.width() - (svgShape.oldX + svgShape.oldWidth);
             if (leftIncluded) {
               svgShape.width = bounds.width() - svgShape.x - anchorOffset;
-            }
-            else {
+            } else {
               svgShape.x = bounds.width() - (anchorOffset + svgShape.width);
             }
-          }
-          else if (!leftIncluded) {
+          } else if (!leftIncluded) {
             svgShape.x = widthDelta * svgShape.oldX;
             if (!svgShape.isHorizontallyResizable) {
               svgShape.x = svgShape.x + svgShape.width * widthDelta / 2 - svgShape.width / 2;
@@ -3204,15 +3193,13 @@ ORYX.Core.Node = {
             anchorOffset = oldBounds.height() - (svgShape.oldY + svgShape.oldHeight);
             if (topIncluded) {
               svgShape.height = bounds.height() - svgShape.y - anchorOffset;
-            }
-            else {
+            } else {
               // Hack for choreography task layouting
               if (!svgShape._isYLocked) {
                 svgShape.y = bounds.height() - (anchorOffset + svgShape.height);
               }
             }
-          }
-          else if (!topIncluded) {
+          } else if (!topIncluded) {
             svgShape.y = heightDelta * svgShape.oldY;
             if (!svgShape.isVerticallyResizable) {
               svgShape.y = svgShape.y + svgShape.height * heightDelta / 2 - svgShape.height / 2;
@@ -3269,11 +3256,6 @@ ORYX.Core.Node = {
           bounds.extend(p);
         }
 
-        //update magnets
-
-        var widthDelta = bounds.width() / oldBounds.width();
-        var heightDelta = bounds.height() / oldBounds.height();
-
         var leftIncluded, rightIncluded, topIncluded, bottomIncluded, center, newX, newY;
 
         this.magnets.each(function (magnet) {
@@ -3286,21 +3268,17 @@ ORYX.Core.Node = {
 
           if (leftIncluded) {
             newX = center.x;
-          }
-          else if (rightIncluded) {
+          } else if (rightIncluded) {
             newX = bounds.width() - (oldBounds.width() - center.x)
-          }
-          else {
+          } else {
             newX = center.x * widthDelta;
           }
 
           if (topIncluded) {
             newY = center.y;
-          }
-          else if (bottomIncluded) {
+          } else if (bottomIncluded) {
             newY = bounds.height() - (oldBounds.height() - center.y);
-          }
-          else {
+          } else {
             newY = center.y * heightDelta;
           }
 
@@ -3486,7 +3464,6 @@ ORYX.Core.Node = {
             return svgShape.isPointIncluded(point);
         });*/
   },
-
 
   /**
    * Calculate if the point is over an special offset area

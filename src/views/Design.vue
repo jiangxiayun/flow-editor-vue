@@ -13,7 +13,7 @@
       return {
         config: {
           type: 'flow',
-          // modelData: mockData,
+          modelData: mockData,
           stencilData: AA,
         }
       }

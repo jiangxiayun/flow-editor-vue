@@ -91,7 +91,7 @@
             paletteItems: [],
             visible: true,
           }
-        ]
+        ],
       }
     },
     components: {stencilItemTemplate, processTreeList, rootStencilItemTemplate},
@@ -99,14 +99,16 @@
       editorManager: {}
     },
     mounted () {
-
+      // let a = require('@/editorAA.js')
+      // console.log(333, a)
     },
     computed: {
       ...mapState('Flowable', ['paletteWrapperOpen']),
       stencilItemGroups () {
         if (!this.editorManager) return []
         const data = this.editorManager.getShowStencilData();
-        console.log('stencilItemGroups', data)
+        // console.log('stencilItemGroups', data)
+        // console.log(888888888)
         return data
       },
     },

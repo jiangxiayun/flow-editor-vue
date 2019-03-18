@@ -17,7 +17,6 @@ if (!ORYX.Core.Controls) {
  * @classDescription Abstract base class for all Controls.
  */
 ORYX.Core.Controls.Control = ORYX.Core.UIObject.extend({
-
   toString: function () {
     return "Control " + this.id;
   }
@@ -51,9 +50,7 @@ ORYX.Core.Controls.Docker = ORYX.Core.Controls.Control.extend({
     this.anchorTop;
     this.anchorBottom;
 
-    this.node = ORYX.Editor.graft("http://www.w3.org/2000/svg",
-      null,
-      ['g']);
+    this.node = ORYX.Editor.graft("http://www.w3.org/2000/svg", null, ['g']);
 
     // The DockerNode reprasentation
     this._dockerNode = ORYX.Editor.graft("http://www.w3.org/2000/svg",

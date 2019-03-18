@@ -697,7 +697,48 @@
             color: isValid ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
           })
         }
-      }
+      },
+      quickAddItem (newItemId) {
+        // console.log('Oryx_button:', newItemId)
+        let shapes = this.editorManager.getSelection();
+        if (shapes && shapes.length === 1) {
+          this.currentSelectedShape = shapes.first();
+
+          var containedStencil = undefined;
+          var stencilSets = this.editorManager.getStencilSets().values();
+          for (let i = 0; i < stencilSets.length; i++) {
+            let stencilSet = stencilSets[i];
+            let nodes = stencilSet.nodes();
+            for (let j = 0; j < nodes.length; j++) {
+              if (nodes[j].idWithoutNs() === newItemId) {
+                containedStencil = nodes[j];
+                break;
+              }
+            }
+          }
+
+          if (!containedStencil) return;
+
+          var option = {type: this.currentSelectedShape.getStencil().namespace() + newItemId, namespace: this.currentSelectedShape.getStencil().namespace()};
+          option['connectedShape'] = this.currentSelectedShape;
+          option['parent'] = this.currentSelectedShape.parent;
+          option['containedStencil'] = containedStencil;
+
+          var args = { sourceShape: this.currentSelectedShape, targetStencil: containedStencil };
+          var targetStencil = this.editorManager.getRules().connectMorph(args);
+
+          // Check if there can be a target shape
+          if (!targetStencil) {
+            return;
+          }
+
+          option['connectingType'] = targetStencil.id();
+
+          var command = new FLOWABLE.CreateCommand(option, undefined, undefined, this.editorManager.getEditor());
+
+          this.editorManager.executeCommands([command]);
+        }
+      },
     }
   }
 </script>

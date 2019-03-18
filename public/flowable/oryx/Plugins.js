@@ -1688,25 +1688,17 @@ ORYX.Plugins.CanvasResizeButton = Clazz.extend({
 });
 
 ORYX.Plugins.RenameShapes = Clazz.extend({
-
-  facade: undefined,
-
   construct: function (facade) {
-
     this.facade = facade;
-
     this.facade.registerOnEvent(ORYX.CONFIG.EVENT_CANVAS_SCROLL, this.hideField.bind(this));
     this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DBLCLICK, this.actOnDBLClick.bind(this));
     this.facade.offer({
       keyCodes: [{
         keyCode: 113, // F2-Key
         keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
-      }
-      ],
+      }],
       functionality: this.renamePerF2.bind(this)
     });
-
-
     document.documentElement.addEventListener(ORYX.CONFIG.EVENT_MOUSEDOWN, this.hide.bind(this), true);
   },
 
@@ -1720,7 +1712,6 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
   },
 
   actOnDBLClick: function (evt, shape) {
-
     if (!(shape instanceof ORYX.Core.Shape)) {
       return;
     }
@@ -1730,13 +1721,12 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 
     // Get all properties which where at least one ref to view is set
     var props = shape.getStencil().properties().findAll(function (item) {
-      return (item.refToView()
-        && item.refToView().length > 0
-        && item.directlyEditable());
+      return (item.refToView() && item.refToView().length > 0 && item.directlyEditable());
     });
     // from these, get all properties where write access are and the type is String or Expression
     props = props.findAll(function (item) {
-      return !item.readonly() && (item.type() == ORYX.CONFIG.TYPE_STRING || item.type() == ORYX.CONFIG.TYPE_EXPRESSION || item.type() == ORYX.CONFIG.TYPE_DATASOURCE);
+      return !item.readonly() &&
+        (item.type() == ORYX.CONFIG.TYPE_STRING || item.type() == ORYX.CONFIG.TYPE_EXPRESSION || item.type() == ORYX.CONFIG.TYPE_DATASOURCE);
     });
 
     // Get all ref ids
@@ -1744,12 +1734,12 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
       return prop.refToView();
     }).flatten().compact();
     // Get all labels from the shape with the ref ids
+
     var labels = shape.getLabels().findAll(function (label) {
       return allRefToViews.any(function (toView) {
         return label.id.endsWith(toView);
       });
     });
-
     // If there are no referenced labels --> return
     if (labels.length == 0) {
       return;
@@ -1759,11 +1749,18 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
     var nearestLabel = labels.length <= 1 ? labels[0] : null;
     if (!nearestLabel) {
       nearestLabel = labels.find(function (label) {
+        let el = label.id.split('_')
+        console.log(el)
+        return el[el.length -1 ] === 'name'
+      });
+    }
+    if (!nearestLabel) {
+      nearestLabel = labels.find(function (label) {
         return label.node == evt.target || label.node == evt.target.parentNode;
       });
       if (!nearestLabel) {
-
         var evtCoord = this.facade.eventCoordinates(evt);
+        console.log('evtCoord', evtCoord)
 
         var additionalIEZoom = 1;
         if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
@@ -1783,9 +1780,6 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
         }
 
         evtCoord.y += $("editor-header").clientHeight - $("canvasSection").scrollTop - 5;
-        if (FLOWABLE.HEADER_CONFIG.showAppTitle == false) {
-          evtCoord.y += 61;
-        }
 
         evtCoord.x -= $("canvasSection").scrollLeft;
 
@@ -1804,7 +1798,6 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
         });
 
         nearestLabel = diff[0].label;
-
       }
     }
     // Get the particular property for the label
@@ -1876,11 +1869,9 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 
     // Disable the keydown in the editor (that when hitting the delete button, the shapes not get deleted)
     this.facade.disableEvent(ORYX.CONFIG.EVENT_KEYDOWN);
-
   },
 
   getCenterPosition: function (svgNode, shape) {
-
     if (!svgNode) {
       return {x: 0, y: 0};
     }
@@ -1893,8 +1884,7 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
     while (hasParent) {
       if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram' || searchShape.getParentShape().getStencil().idWithoutNs() === 'CMMNDiagram') {
         hasParent = false;
-      }
-      else {
+      } else {
         var parentXY = searchShape.getParentShape().bounds.upperLeft();
         absoluteXY.x += parentXY.x;
         absoluteXY.y += parentXY.y;
@@ -1938,7 +1928,6 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
       center.y = center.y - (jQuery("#canvasSection").offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop);
       center.x = center.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft);
     }
-
 
     return center;
   },
@@ -3195,14 +3184,12 @@ ORYX.Plugins.DragDropResize = ORYX.Plugins.AbstractPlugin.extend({
   },
 
   onResizeEnd: function () {
-
     if (!(this.currentShapes instanceof Array) || this.currentShapes.length <= 0) {
       return;
     }
 
     // If Resizing finished, the Shapes will be resize
     if (this.isResizing) {
-
       var commandClass = ORYX.Core.Command.extend({
         construct: function (shape, newBounds, plugin) {
           this.shape = shape;
@@ -3213,13 +3200,11 @@ ORYX.Plugins.DragDropResize = ORYX.Plugins.AbstractPlugin.extend({
         execute: function () {
           this.shape.bounds.set(this.newBounds.a, this.newBounds.b);
           this.update(this.getOffset(this.oldBounds, this.newBounds));
-
         },
         rollback: function () {
           this.shape.bounds.set(this.oldBounds.a, this.oldBounds.b);
           this.update(this.getOffset(this.newBounds, this.oldBounds))
         },
-
         getOffset: function (b1, b2) {
           return {
             x: b2.a.x - b1.a.x,
@@ -3690,7 +3675,6 @@ ORYX.Plugins.SelectedRect = Clazz.extend({
 
   resize: function (bounds) {
     var upL = bounds.upperLeft();
-
     var padding = ORYX.CONFIG.SELECTED_AREA_PADDING;
 
     this.dashedArea.setAttributeNS(null, 'width', bounds.width() + 2 * padding);
@@ -3702,7 +3686,6 @@ ORYX.Plugins.SelectedRect = Clazz.extend({
 });
 
 ORYX.Plugins.GridLine = Clazz.extend({
-
   construct: function (parentId, direction) {
 
     if (ORYX.Plugins.GridLine.DIR_HORIZONTAL !== direction && ORYX.Plugins.GridLine.DIR_VERTICAL !== direction) {
@@ -3763,10 +3746,9 @@ ORYX.Plugins.GridLine = Clazz.extend({
 ORYX.Plugins.GridLine.DIR_HORIZONTAL = "hor";
 ORYX.Plugins.GridLine.DIR_VERTICAL = "ver";
 
+// 拖拽改变尺寸
 ORYX.Plugins.Resizer = Clazz.extend({
-
   construct: function (parentId, orientation, facade) {
-
     this.parentId = parentId;
     this.orientation = orientation;
     this.facade = facade;
@@ -3796,7 +3778,6 @@ ORYX.Plugins.Resizer = Clazz.extend({
 
     // Calculate the Offset
     this.scrollNode = this.node.parentNode.parentNode.parentNode;
-
   },
 
   handleMouseDown: function (event) {
@@ -3821,7 +3802,6 @@ ORYX.Plugins.Resizer = Clazz.extend({
     this.resizeEndCallbacks.each((function (value) {
       value(this.bounds);
     }).bind(this));
-
   },
 
   handleMouseMove: function (event) {
@@ -3998,19 +3978,15 @@ ORYX.Plugins.Resizer = Clazz.extend({
     if (this.bounds.width() < this.minSize.width) {
       this.bounds.set(upL.x, upL.y, upL.x + this.minSize.width, upL.y + this.bounds.height());
     }
-    ;
     if (this.bounds.height() < this.minSize.height) {
       this.bounds.set(upL.x, upL.y, upL.x + this.bounds.width(), upL.y + this.minSize.height);
     }
-    ;
     if (this.bounds.width() > this.maxSize.width) {
       this.bounds.set(upL.x, upL.y, upL.x + this.maxSize.width, upL.y + this.bounds.height());
     }
-    ;
     if (this.bounds.height() > this.maxSize.height) {
       this.bounds.set(upL.x, upL.y, upL.x + this.bounds.width(), upL.y + this.maxSize.height);
     }
-    ;
 
     var a = this.canvasNode.getScreenCTM();
 
