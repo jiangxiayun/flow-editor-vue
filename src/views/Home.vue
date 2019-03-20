@@ -190,9 +190,6 @@
       this.loadProcesses()
     },
     methods: {
-      getModelThumbnailUrl (modelId, version) {
-        return process.env.VUE_APP_API_PREFIX+'/app/rest/models/' + modelId + '/thumbnail' + (version ? "?version=" + version : "");
-      },
       setMainPageById (mainPageId) {
         for (let i = 0; i < this.mainNavigation.length; i++) {
           if (mainPageId == this.mainNavigation[i].id) {

@@ -3,11 +3,10 @@ export const mockData = {
   "name": "请假模型",
   "key": "leave-model",
   "description": "请假模型",
-  "lastUpdated": "2019-03-14T07:43:46.097+0000",
+  "lastUpdated": "2019-03-19T05:35:24.353+0000",
   "lastUpdatedBy": "admin",
   "model": {
     "modelId": "6609363a-3be5-11e9-afe0-82ad27eff10d",
-    // 外盒围大小
     "bounds": {
       "lowerRight": {
         "x": 1200,
@@ -18,7 +17,6 @@ export const mockData = {
         "y": 0
       }
     },
-    // 属性配置
     "properties": {
       "process_id": "leave-model",
       "name": "请假模型",
@@ -79,7 +77,7 @@ export const mockData = {
         "resourceId": "sid-F2289A33-D579-452D-86F8-AE5F37D39C5C",
         "properties": {
           "overrideid": "",
-          "name": "用户填写请假单",
+          "name": "用户填写请假单9988",
           "documentation": "",
           "asynchronousdefinition": "false",
           "exclusivedefinition": "false",
@@ -94,7 +92,21 @@ export const mockData = {
             "assignment": {
               "type": "idm",
               "idm": {
-                "type": "initiator"
+                "type": "user",
+                "assignee": {
+                  "id": "manager",
+                  "firstName": "manager",
+                  "lastName": "manager",
+                  "email": "manager@163.com",
+                  "fullName": "manager manager",
+                  "groups": [
+
+                  ],
+                  "privileges": [
+
+                  ],
+                  "$$hashKey": "object:558"
+                }
               }
             }
           },
@@ -120,16 +132,19 @@ export const mockData = {
         "outgoing": [
           {
             "resourceId": "sid-FF15BFB7-7C71-4C9D-9CBC-15E28C3EC563"
+          },
+          {
+            "resourceId": "sid-201372EC-0DF6-4719-A243-306EA547E86D"
           }
         ],
         "bounds": {
           "lowerRight": {
-            "x": 275,
-            "y": 218
+            "x": 265,
+            "y": 215
           },
           "upperLeft": {
-            "x": 175,
-            "y": 138
+            "x": 165,
+            "y": 135
           }
         },
         "dockers": [
@@ -160,12 +175,12 @@ export const mockData = {
         ],
         "bounds": {
           "lowerRight": {
-            "x": 174.15625,
-            "y": 178
+            "x": 164.78169969647763,
+            "y": 177.54813849089433
           },
           "upperLeft": {
-            "x": 130.609375,
-            "y": 178
+            "x": 130.06205030352237,
+            "y": 176.50654900910567
           }
         },
         "dockers": [
@@ -197,7 +212,28 @@ export const mockData = {
           "multiinstance_variable": "",
           "multiinstance_condition": "",
           "isforcompensation": "false",
-          "usertaskassignment": "",
+          "usertaskassignment": {
+            "assignment": {
+              "type": "idm",
+              "idm": {
+                "type": "user",
+                "assignee": {
+                  "id": "manager",
+                  "firstName": "manager",
+                  "lastName": "manager",
+                  "email": "manager@163.com",
+                  "fullName": "manager manager",
+                  "groups": [
+
+                  ],
+                  "privileges": [
+
+                  ],
+                  "$$hashKey": "object:2869"
+                }
+              }
+            }
+          },
           "formkeydefinition": "",
           "formreference": "",
           "duedatedefinition": "",
@@ -221,11 +257,11 @@ export const mockData = {
         "bounds": {
           "lowerRight": {
             "x": 445,
-            "y": 218
+            "y": 258
           },
           "upperLeft": {
             "x": 345,
-            "y": 138
+            "y": 178
           }
         },
         "dockers": [
@@ -256,18 +292,26 @@ export const mockData = {
         ],
         "bounds": {
           "lowerRight": {
-            "x": 344.859375,
-            "y": 178
+            "x": 344.78125,
+            "y": 218
           },
           "upperLeft": {
-            "x": 275.140625,
-            "y": 178
+            "x": 265.21875,
+            "y": 175
           }
         },
         "dockers": [
           {
             "x": 50,
             "y": 40
+          },
+          {
+            "x": 305,
+            "y": 175
+          },
+          {
+            "x": 305,
+            "y": 218
           },
           {
             "x": 50,
@@ -352,7 +396,7 @@ export const mockData = {
         "bounds": {
           "lowerRight": {
             "x": 524.78125,
-            "y": 178
+            "y": 218
           },
           "upperLeft": {
             "x": 445.21875,
@@ -363,6 +407,14 @@ export const mockData = {
           {
             "x": 50,
             "y": 40
+          },
+          {
+            "x": 485,
+            "y": 218
+          },
+          {
+            "x": 485,
+            "y": 178
           },
           {
             "x": 50,
@@ -449,6 +501,135 @@ export const mockData = {
         "target": {
           "resourceId": "sid-4D07711C-5A69-4825-8FA1-B0866540D733"
         }
+      },
+      {
+        "resourceId": "sid-55C254A0-BAD7-4A75-8897-994CF1706ACD",
+        "properties": {
+          "number": "",
+          "overrideid": "",
+          "name": "123",
+          "documentation": "",
+          "usertaskassignment": "",
+          "output": "",
+          "input": ""
+        },
+        "stencil": {
+          "id": "CustomActiveTask"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-C189E221-22BF-4ACF-82EE-38497E7FC688"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 415,
+            "y": 110
+          },
+          "upperLeft": {
+            "x": 315,
+            "y": 30
+          }
+        },
+        "dockers": [
+
+        ]
+      },
+      {
+        "resourceId": "sid-201372EC-0DF6-4719-A243-306EA547E86D",
+        "properties": {
+          "overrideid": "",
+          "name": "",
+          "documentation": "",
+          "conditionsequenceflow": "",
+          "executionlisteners": "",
+          "defaultflow": "false",
+          "skipexpression": "",
+          "showdiamondmarker": false
+        },
+        "stencil": {
+          "id": "SequenceFlow"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-55C254A0-BAD7-4A75-8897-994CF1706ACD"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 314.51769162540296,
+            "y": 134.9042988432407
+          },
+          "upperLeft": {
+            "x": 253.56824587459704,
+            "y": 71.54101365675929
+          }
+        },
+        "dockers": [
+          {
+            "x": 50,
+            "y": 40
+          },
+          {
+            "x": 1,
+            "y": 40
+          }
+        ],
+        "target": {
+          "resourceId": "sid-55C254A0-BAD7-4A75-8897-994CF1706ACD"
+        }
+      },
+      {
+        "resourceId": "sid-C189E221-22BF-4ACF-82EE-38497E7FC688",
+        "properties": {
+          "overrideid": "",
+          "name": "",
+          "documentation": "",
+          "conditionsequenceflow": "",
+          "executionlisteners": "",
+          "defaultflow": "false",
+          "skipexpression": ""
+        },
+        "stencil": {
+          "id": "SequenceFlow"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-6B994820-999F-470C-8774-903CEC5A4980"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 524.8919621976819,
+            "y": 152.23015198737923
+          },
+          "upperLeft": {
+            "x": 415.10803780231817,
+            "y": 95.76984801262076
+          }
+        },
+        "dockers": [
+          {
+            "x": 50,
+            "y": 40
+          },
+          {
+            "x": 50,
+            "y": 40
+          }
+        ],
+        "target": {
+          "resourceId": "sid-6B994820-999F-470C-8774-903CEC5A4980"
+        }
       }
     ],
     "stencil": {
@@ -457,7 +638,7 @@ export const mockData = {
     "stencilset": {
       "namespace": "http://b3mn.org/stencilset/bpmn2.0#",
       "url": "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
-    },
-    "modelType": "model"
+    }
   }
 }
+

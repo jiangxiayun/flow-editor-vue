@@ -1687,6 +1687,7 @@ ORYX.Plugins.CanvasResizeButton = Clazz.extend({
 
 });
 
+// 双击修改名称
 ORYX.Plugins.RenameShapes = Clazz.extend({
   construct: function (facade) {
     this.facade = facade;
@@ -1800,6 +1801,7 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
         nearestLabel = diff[0].label;
       }
     }
+
     // Get the particular property for the label
     var prop = props.find(function (item) {
       return item.refToView().any(function (toView) {

@@ -746,7 +746,7 @@
   "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE" : "Identity store",
   "PROPERTY.ASSIGNMENT.TYPE.STATIC" : "Fixed values",
   "PROPERTY.ASSIGNMENT.ASSIGNEE" : "Assignee",
-  "PROPERTY.ASSIGNMENT.MATCHING" : "Use &uparrow; and &downarrow; to select and press Enter to confirm or use the mouse",
+  "PROPERTY.ASSIGNMENT.MATCHING" : "Use  ↑ and ↓ to select and press Enter to confirm or use the mouse",
   "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER" : "Enter an assignee",
   "PROPERTY.ASSIGNMENT.EMPTY" : "No assignment selected",
   "PROPERTY.ASSIGNMENT.NONE" : "None ...",

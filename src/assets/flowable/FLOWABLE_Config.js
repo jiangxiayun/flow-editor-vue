@@ -176,6 +176,7 @@ export const FLOWABLE = {
 
       if (this.currentReference && this.position) {
         if (this.shape instanceof ORYX.Core.Edge) {
+
           if (!(this.currentReference instanceof ORYX.Core.Canvas)) {
             this.shape.dockers.last().setDockedShape(this.currentReference);
 
@@ -387,7 +388,15 @@ export const FLOWABLE = {
     "flowable-http-request-method": {
       "readModeTemplateUrl": "editor-app/configuration/properties/http-request-method-display-template.html",
       "writeModeTemplateUrl": "editor-app/configuration/properties/http-request-method-property-write-template.html"
-    }
+    },
+    "oryx-output-complex": {
+      "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
+      "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+    },
+    "oryx-input-complex": {
+      "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
+      "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+    },
   },
   TOOLBAR_CONFIG: {
     "items": [

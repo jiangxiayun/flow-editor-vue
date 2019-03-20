@@ -489,7 +489,7 @@ ORYX.Core.UIObject = {
       this.refresh();
       this.isChanged = false;
 
-      //call update of all children
+      // call update of all children
       this.children.each(function (value) {
         value.update();
       });
@@ -1643,7 +1643,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
 
     this.initializingShapes = true;
 
-    /*FIXME This implementation is very evil! At first, all shapes are created on
+    /* FIXME This implementation is very evil! At first, all shapes are created on
           canvas. In a second step, the attributes are applied. There must be a distinction
           between the configuration phase (where the outgoings, for example, are just named),
           and the creation phase (where the outgoings are evaluated). This must be reflected
@@ -1704,7 +1704,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
     // prepare deserialisation parameter
     shapes.each(function (shape) {
         var properties = [];
-        for (field in shape.json.properties) {
+        for (let field in shape.json.properties) {
           properties.push({
             prefix: 'oryx',
             name: field,
@@ -1744,7 +1744,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
           });
         }
 
-        //Dockers [{x:40, y:50}, {x:30, y:60}] => "40 50 30 60  #"
+        // Dockers [{x:40, y:50}, {x:30, y:60}] => "40 50 30 60  #"
         if (shape.json.dockers) {
           properties.push({
             prefix: 'oryx',
@@ -1755,7 +1755,7 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
           });
         }
 
-        //Parent
+        // Parent
         properties.push({
           prefix: 'raziel',
           name: 'parent',
@@ -2263,11 +2263,10 @@ ORYX.Core.Shape = {
    *  and updates the svg elements that are referenced by a property.
    */
   refresh: function () {
-    //call base class refresh method
+    // call base class refresh method
     arguments.callee.$.refresh.apply(this, arguments);
-
     if (this.node.ownerDocument) {
-      //adjust SVG to properties' values
+      // adjust SVG to properties' values
       var me = this;
       this.propertiesChanged.each((function (propChanged) {
         if (propChanged.value) {
@@ -2276,7 +2275,9 @@ ORYX.Core.Shape = {
           if (property != undefined) {
             this.propertiesChanged.set(propChanged.key, false);
 
-            //handle choice properties
+            console.log('property', propChanged.key)
+            console.log('property.type', property.type())
+            // handle choice properties
             if (property.type() == ORYX.CONFIG.TYPE_CHOICE) {
               //iterate all references to SVG elements
               property.refToView().each((function (ref) {
@@ -2318,9 +2319,11 @@ ORYX.Core.Shape = {
                 }).bind(this));
               }).bind(this));
 
-            } else { //handle properties that are not of type choice
-              //iterate all references to SVG elements
+            } else {
+              // handle properties that are not of type choice
+              // iterate all references to SVG elements
               property.refToView().each((function (ref) {
+                console.log('ref==========', ref)
                 //if the property does not reference an SVG element,
                 // do nothing
                 if (ref === "") {
@@ -2330,14 +2333,14 @@ ORYX.Core.Shape = {
                 var refId = this.id + ref;
 
                 if (property.type() === ORYX.CONFIG.TYPE_FLOWABLE_MULTIINSTANCE) {
-                  if (ref === "multiinstance") {
+                  // flowable-multiinstance
 
+                  if (ref === "multiinstance") {
                     var svgElemParallel = this.node.ownerDocument.getElementById(this.id + 'parallel');
                     if (svgElemParallel) {
                       if (prop === 'Parallel') {
                         svgElemParallel.setAttributeNS(null, 'display', 'inherit');
-                      }
-                      else {
+                      } else {
                         svgElemParallel.setAttributeNS(null, 'display', 'none');
                       }
                     }
@@ -2375,7 +2378,8 @@ ORYX.Core.Shape = {
                   //if the referenced SVG element is a SVGAElement, it cannot
                   // be found with getElementById (Firefox bug).
                   // this is a work around
-                  if (property.type() === ORYX.CONFIG.TYPE_URL || property.type() === ORYX.CONFIG.TYPE_DIAGRAM_LINK) {
+                  if (property.type() === ORYX.CONFIG.TYPE_URL ||
+                    property.type() === ORYX.CONFIG.TYPE_DIAGRAM_LINK) {
                     var svgElems = this.node.ownerDocument.getElementsByTagNameNS('http://www.w3.org/2000/svg', 'a');
 
                     svgElem = $A(svgElems).find(function (elem) {
@@ -2405,14 +2409,14 @@ ORYX.Core.Shape = {
 
                 } else {
                   switch (property.type()) {
-                    case ORYX.CONFIG.TYPE_BOOLEAN:
+                    case ORYX.CONFIG.TYPE_BOOLEAN: // boolean
                       if (typeof prop == "string")
                         prop = prop === "true"
 
                       svgElem.setAttributeNS(null, 'display', (!(prop === property.inverseBoolean())) ? 'inherit' : 'none');
 
                       break;
-                    case ORYX.CONFIG.TYPE_COLOR:
+                    case ORYX.CONFIG.TYPE_COLOR: // color
                       if (property.fill()) {
                         if (svgElem.tagName.toLowerCase() === "stop") {
                           if (prop) {
@@ -2443,30 +2447,33 @@ ORYX.Core.Shape = {
                         svgElem.setAttributeNS(null, 'stroke', prop);
                       }
                       break;
-                    case ORYX.CONFIG.TYPE_STRING:
-                      var label = this._labels.get(refId);
-                      if (label) {
-                        label.text(prop);
-                      }
-                      break;
+                    case ORYX.CONFIG.TYPE_STRING: // string
                     case ORYX.CONFIG.TYPE_EXPRESSION:
-                      var label = this._labels.get(refId);
-                      if (label) {
-                        label.text(prop);
-                      }
-                      break;
                     case ORYX.CONFIG.TYPE_DATASOURCE:
-                      var label = this._labels.get(refId);
-                      if (label) {
-                        label.text(prop);
-                      }
-                      break;
                     case ORYX.CONFIG.TYPE_INTEGER:
                       var label = this._labels.get(refId);
                       if (label) {
                         label.text(prop);
                       }
                       break;
+                    // case ORYX.CONFIG.TYPE_EXPRESSION:
+                    //   var label = this._labels.get(refId);
+                    //   if (label) {
+                    //     label.text(prop);
+                    //   }
+                    //   break;
+                    // case ORYX.CONFIG.TYPE_DATASOURCE:
+                    //   var label = this._labels.get(refId);
+                    //   if (label) {
+                    //     label.text(prop);
+                    //   }
+                    //   break;
+                    // case ORYX.CONFIG.TYPE_INTEGER:
+                    //   var label = this._labels.get(refId);
+                    //   if (label) {
+                    //     label.text(prop);
+                    //   }
+                    //   break;
                     case ORYX.CONFIG.TYPE_FLOAT:
                       if (property.fillOpacity()) {
                         svgElem.setAttributeNS(null, 'fill-opacity', prop);
@@ -2482,7 +2489,7 @@ ORYX.Core.Shape = {
                       }
                       break;
 
-                    case ORYX.CONFIG.TYPE_SUB_PROCESS_LINK:
+                    case ORYX.CONFIG.TYPE_SUB_PROCESS_LINK: // subprocess-link
                       if (ref == "subprocesslink") {
                         var onclickAttr = svgElem.getAttributeNodeNS('', 'onclick');
                         var styleAttr = svgElem.getAttributeNodeNS('', 'style');
@@ -2509,15 +2516,13 @@ ORYX.Core.Shape = {
                   }
                 }
               }).bind(this));
-
-
             }
           }
-
+          console.log('=====================')
         }
       }).bind(this));
 
-      //update labels
+      // update labels
       this._labels.values().each(function (label) {
         label.update();
       });
@@ -2525,11 +2530,9 @@ ORYX.Core.Shape = {
   },
 
   layout: function () {
-    //this.getStencil().layout(this)
     var layoutEvents = this.getStencil().layout()
     if (layoutEvents) {
       layoutEvents.each(function (event) {
-
         // setup additional attributes
         event.shape = this;
         event.forceExecution = true;
@@ -3122,8 +3125,8 @@ ORYX.Core.Node = {
     this._dockerUpdated = false;
     this.facade = facade;
 
-    this._oldBounds = new ORYX.Core.Bounds(); //init bounds with undefined values
-    this._svgShapes = []; //array of all SVGShape objects of
+    this._oldBounds = new ORYX.Core.Bounds(); // init bounds with undefined values
+    this._svgShapes = []; // array of all SVGShape objects of
     // SVG representation
 
     //TODO vielleicht in shape verschieben?
@@ -3146,7 +3149,6 @@ ORYX.Core.Node = {
    * super class update method.
    */
   _update: function () {
-
     this.dockers.invoke("update");
     if (this.isChanged) {
       var bounds = this.bounds;
@@ -3535,12 +3537,8 @@ ORYX.Core.Node = {
 
   deserialize: function (data) {
     arguments.callee.$.deserialize.apply(this, arguments);
-
     try {
-      //data = this.getStencil().deserialize(this, data);
-
       var deserializeEvent = this.getStencil().deserialize();
-
       /*
 			 * call serialize callback by reference, result should be found
 			 * in serializeEventInfo.result
@@ -3569,7 +3567,6 @@ ORYX.Core.Node = {
       if (!this.parent) {
         return
       }
-      ;
 
       // Set outgoing Shape
       var next = this.getCanvas().getChildShapeByResourceId(obj.value);
@@ -3618,7 +3615,6 @@ ORYX.Core.Node = {
    */
   _init: function (svgDocument) {
     arguments.callee.$._init.apply(this, arguments);
-
     var svgNode = svgDocument.getElementsByTagName("g")[0]; //outer most g node
     // set all required attributes
     var attributeTitle = svgDocument.ownerDocument.createAttribute("title");
@@ -3628,6 +3624,7 @@ ORYX.Core.Node = {
     var attributeId = svgDocument.ownerDocument.createAttribute("id");
     attributeId.nodeValue = this.id;
     svgNode.setAttributeNode(attributeId);
+
 
     //
     var stencilTargetNode = this.node.childNodes[0].childNodes[0]; //<g class=me>"
@@ -3681,10 +3678,10 @@ ORYX.Core.Node = {
     }
 
     /**get current bounds and adjust it to upperLeft == (0,0)*/
-    //initialize all SVGShape objects
+    // initialize all SVGShape objects
     this._svgShapes = this._initSVGShapes(svgNode);
 
-    //get upperLeft and lowerRight of stencil
+    // get upperLeft and lowerRight of stencil
     var upperLeft = {
       x: undefined,
       y: undefined
@@ -3720,15 +3717,15 @@ ORYX.Core.Node = {
       }
     });
 
-    //move all SVGShapes by -upperLeft
+    // move all SVGShapes by -upperLeft
     this._svgShapes.each(function (svgShape) {
       svgShape.x -= upperLeft.x;
       svgShape.y -= upperLeft.y;
       svgShape.update();
     });
 
-    //set bounds of shape
-    //the offsets are also needed for positioning the magnets and the docker
+    // set bounds of shape
+    // the offsets are also needed for positioning the magnets and the docker
     var offsetX = upperLeft.x;
     var offsetY = upperLeft.y;
 
@@ -3737,7 +3734,7 @@ ORYX.Core.Node = {
     upperLeft.x = 0;
     upperLeft.y = 0;
 
-    //prevent that width or height of initial bounds is 0
+    // prevent that width or height of initial bounds is 0
     if (lowerRight.x === 0) {
       lowerRight.x = 1;
     }
@@ -3801,8 +3798,7 @@ ORYX.Core.Node = {
           }
         }
       });
-    }
-    else {
+    } else {
       // Add a Magnet in the Center of Shape
       var magnet = new ORYX.Core.Controls.Magnet();
       magnet.bounds.centerMoveTo(this.bounds.width() / 2, this.bounds.height() / 2);
@@ -4150,7 +4146,6 @@ ORYX.Core.Edge = {
             }
 
             break;
-
           case "startmiddle":
             var angle = this._getAngle(this.dockers[0], this.dockers[1]);
             var pos = this.dockers.first().bounds.center();
@@ -4170,7 +4165,6 @@ ORYX.Core.Edge = {
             }
 
             break;
-
           case "startbottom":
             var angle = this._getAngle(this.dockers[0], this.dockers[1]);
             var pos = this.dockers.first().bounds.center();

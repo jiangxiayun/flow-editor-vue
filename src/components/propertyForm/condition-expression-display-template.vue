@@ -1,13 +1,16 @@
 <template>
   <!--连线条件-->
   <label>
-    <span v-if="property.value.expression.type != 'variables' && property.value.expression.staticValue">
-      {{property.value.expression.staticValue| limitLength(20)}}
-    </span>
-    <span v-if="property.value && !property.value.expression">
+    <template v-if="property.value">
+      <span v-if="!property.value.expression">
       {{property.value|limitLength(20)}}
     </span>
-    <span v-if="!property.value">
+      <span v-else-if="property.value.expression.type != 'variables' && property.value.expression.staticValue">
+      {{property.value.expression.staticValue| limitLength(20)}}
+    </span>
+    </template>
+
+    <span v-else>
       {{$t('PROPERTY.SEQUENCEFLOW.CONDITION.NO-CONDITION-DISPLAY')}}
     </span>
   </label>

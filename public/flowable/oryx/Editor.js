@@ -330,7 +330,9 @@ ORYX.Editor = {
 
   /**
    * Creates the Canvas
-   * @param {String} [stencilType] The stencil type used for creating the canvas. If not given, a stencil with myBeRoot = true from current stencil set is taken.
+   * @param {String} [stencilType] The stencil type used for creating the canvas.
+   * If not given, a stencil with myBeRoot = true from current stencil set is taken.
+   *
    * @param {Object} [canvasConfig] Any canvas properties (like language).
    */
   _createCanvas: function (stencilType, canvasConfig) {
@@ -369,7 +371,7 @@ ORYX.Editor = {
       // Migrate canvasConfig to an RDF-like structure
       //FIXME this isn't nice at all because we don't want rdf any longer
       var properties = [];
-      for (field in canvasConfig) {
+      for (let field in canvasConfig) {
         properties.push({
           prefix: 'oryx',
           name: field,
@@ -715,7 +717,7 @@ ORYX.Editor = {
     var shapes = this.getCanvas().addShapeObjects(model.childShapes, this.handleEvents.bind(this));
 
     if (model.properties) {
-      for (key in model.properties) {
+      for (let key in model.properties) {
         var value = model.properties[key];
         var prop = this.getCanvas().getStencil().property("oryx-" + key);
         if (!(typeof value === "string") && (!prop || !prop.isList())) {
@@ -1006,6 +1008,11 @@ ORYX.Editor = {
    */
   // 创建图形元素
   createShape: function (option) {
+    // If there is no argument, throw an exception
+    if (!option || !option.type || !option.namespace) {
+      throw "To create a new shape you have to give an argument with type and namespace";
+    }
+
     var newShapeObject;
 
     if (option && option.serialize && option.serialize instanceof Array) {
@@ -1024,11 +1031,6 @@ ORYX.Editor = {
       newShapeObject.deserialize(option.serialize);
 
       return newShapeObject;
-    }
-
-    // If there is no argument, throw an exception
-    if (!option || !option.type || !option.namespace) {
-      throw "To create a new shape you have to give an argument with type and namespace";
     }
 
     var canvas = this.getCanvas();
@@ -1218,9 +1220,7 @@ ORYX.Editor = {
    * @param {Object} uiObj Target-UiObj
    */
   handleEvents: function (event, uiObj) {
-
     ORYX.Log.trace("Dispatching event type %0 on %1", event.type, uiObj);
-
     switch (event.type) {
       case ORYX.CONFIG.EVENT_MOUSEDOWN:
         this._handleMouseDown(event, uiObj);

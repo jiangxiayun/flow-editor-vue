@@ -1,6 +1,6 @@
 <template>
   <div>
-    <span v-if="property.value && property.value.id">{{form.name}}</span>
+    <span v-if="property.value && property.value.id">{{property.value.name}}</span>
     <span v-if="!property.value || !property.value.id">{{$t('PROPERTY.FORMREFERENCE.EMPTY')}}</span>
   </div>
 </template>
@@ -23,7 +23,7 @@
     },
     mounted () {
       if (this.property && this.property.value && this.property.value.id) {
-        console.log('$http===========')
+        // console.log('$http===========')
         // $http.get(FLOWABLE.APP_URL.getModelUrl(this.property.value.id))
         //   .success(
         //     function(response) {

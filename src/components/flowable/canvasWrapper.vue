@@ -366,7 +366,7 @@
 
         FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS)
 
-        console.log('dragCanContain', this.dragCanContain)
+        // console.log('dragCanContain', this.dragCanContain)
         if (this.dragCanContain) {
           let item = this.editorManager.getStencilItemById(ui.draggable[0].id)
           let pos = { x: event.pageX, y: event.pageY }

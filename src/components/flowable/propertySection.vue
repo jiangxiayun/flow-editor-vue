@@ -35,7 +35,7 @@
                 <i>{{ property.title }}&nbsp;({{$t('PROPERTY.REMOVED')}})&nbsp;:</i>
               </span>
               <span class="value">
-                <!--{{getTemplateComponentName(property)}}||-->
+                {{getTemplateComponentName(property)}}||
 
                 <!--当编辑的属性非弹窗形式，使用此处渲染-->
                 <template v-if="!(property.mode === 'write' &&
@@ -110,7 +110,9 @@
           'signal-definitions-write-template',
           'message-definitions-write-template',
           'form-reference-write-template',
-          'form-properties-write-template'
+          'form-properties-write-template',
+          'assignment-write-template',
+          'condition-expression-write-template'
         ],
         selectedItem: {
           title: '',
@@ -225,13 +227,13 @@
           return
         }
 
-        var key = property.key
-        var newValue = property.value
-        var oldValue = shape.properties.get(key)
+        let key = property.key
+        let newValue = property.value
+        let oldValue = shape.properties.get(key)
 
-        let _this = this
+        const _this = this
         if (newValue != oldValue) {
-          var commandClass = ORYX.Core.Command.extend({
+          const commandClass = ORYX.Core.Command.extend({
             construct: function () {
               this.key = key
               this.oldValue = oldValue
@@ -277,7 +279,6 @@
           // Switch the property back to read mode, no update was needed
           property.mode = 'read'
         }
-
       }
     }
   }

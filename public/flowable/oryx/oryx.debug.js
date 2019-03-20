@@ -2017,7 +2017,8 @@ ORYX = Object.extend(ORYX, {
       // Add the Script-Tag to the Site
       //Kickstart.require(url);
 
-      ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
+      // 加载成功log
+      // ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
 
       // Add the Plugin-Data to all available Plugins
       ORYX.availablePlugins.push(pluginData);

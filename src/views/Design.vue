@@ -4,8 +4,8 @@
 
 <script>
   import flowDesign from '@/components/flowable/flow-design'
-  import { AA } from '../editorAA.js'
-  import { mockData } from '../mockData.js'
+  import { AA } from '@/mock/stencilData.js'
+  import { mockData } from '@/mock/mockData.js'
 
   export default {
     name: 'Editor',

@@ -40,46 +40,49 @@
           }
           if (value.assignment.candidateUsers.length > 0) {
             // 候选用户
-            return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY', {length: value.assignment.candidateUsers})
+            return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY', {length: value.assignment.candidateUsers.length})
           }
           if (value.assignment.candidateGroups.length > 0) {
             // 候选组
-            return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY', {length: value.assignment.candidateGroups})
+            return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY', {length: value.assignment.candidateGroups.length})
           }
         } else if (value.assignment.type === 'idm') {
           if (value.assignment.idm.assignee) {
             if (value.assignment.idm.assignee.id) {
               // 用户
-              return this.$t('PROPERTY.ASSIGNMENT.USER_IDM_DISPLAY', {length: value.assignment.idm.assignee})
+              return this.$t('PROPERTY.ASSIGNMENT.USER_IDM_DISPLAY', {
+                firstName: value.assignment.idm.assignee.firstName,
+                lastName: value.assignment.idm.assignee.lastName
+              })
             } else {
-              return this.$t('PROPERTY.ASSIGNMENT.USER_IDM_EMAIL_DISPLAY', {email: value.assignment.idm.assignee})
+              return this.$t('PROPERTY.ASSIGNMENT.USER_IDM_EMAIL_DISPLAY', {email: value.assignment.idm.assignee.email})
             }
           }
 
           if (value.assignment.idm.assigneeField && value.assignment.idm.assigneeField.id) {
-            return this.$t('PROPERTY.ASSIGNMENT.USER_IDM_FIELD_DISPLAY', {name: value.assignment.idm.assigneeField})
+            return this.$t('PROPERTY.ASSIGNMENT.USER_IDM_FIELD_DISPLAY', {name: value.assignment.idm.assigneeField.name})
           }
 
           if (value.assignment.idm.candidateUsers &&
             value.assignment.idm.candidateUsers.length > 0 &&
             (!value.assignment.idm.candidateUserFields || value.assignment.idm.candidateUserFields.length === 0)) {
-            return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY', {length: value.assignment.idm.candidateUsers})
+            return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY', {length: value.assignment.idm.candidateUsers.length})
           }
 
           if (value.assignment.idm.candidateGroups && value.assignment.idm.candidateGroups.length > 0
             && (!value.assignment.idm.candidateGroupFields || value.assignment.idm.candidateGroupFields.length === 0)) {
-            return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY', {length: value.assignment.idm.candidateGroups})
+            return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY', {length: value.assignment.idm.candidateGroups.length})
           }
 
           if (value.assignment.idm.candidateUserFields && value.assignment.idm.candidateUserFields.length > 0) {
             // 候选用户
             if ((!value.assignment.idm.candidateUsers || value.assignment.idm.candidateUsers.length === 0)) {
               return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY', {
-                length: value.assignment.idm.candidateUserFields
+                length: value.assignment.idm.candidateUserFields.length
               })
             } else if (value.assignment.idm.candidateUsers && value.assignment.idm.candidateUsers.length > 0) {
               return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY', {
-                length: value.assignment.idm.candidateUserFields.concat(value.assignment.idm.candidateUsers)
+                length: value.assignment.idm.candidateUserFields.concat(value.assignment.idm.candidateUsers).length
               })
             }
           }
@@ -88,11 +91,11 @@
             // 候选组
             if ((!value.assignment.idm.candidateGroups || value.assignment.idm.candidateGroups.length === 0)) {
               return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY', {
-                length: value.assignment.idm.candidateGroupFields
+                length: value.assignment.idm.candidateGroupFields.length
               })
             } else if (value.assignment.idm.candidateGroups && value.assignment.idm.candidateGroups.length > 0) {
               return this.$t('PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY', {
-                length: value.assignment.idm.candidateGroupFields.concat(value.assignment.idm.candidateGroups)
+                length: value.assignment.idm.candidateGroupFields.concat(value.assignment.idm.candidateGroups).length
               })
             }
           }

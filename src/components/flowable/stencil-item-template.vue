@@ -204,8 +204,8 @@
               } else {
                 let containmentRules = this.editorManager.containmentRules
 
-                for (let i = 0; i < this.containmentRules.length; i++) {
-                  let rule = this.containmentRules[i];
+                for (let i = 0; i < containmentRules.length; i++) {
+                  let rule = containmentRules[i];
                   if (rule.role === parentItem.id) {
                     for (let j = 0; j < rule.contains.length; j++) {
                       if (item.roles.indexOf(rule.contains[j]) > -1) {

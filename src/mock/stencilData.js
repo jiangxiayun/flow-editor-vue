@@ -4,6 +4,32 @@ export const AA = {
   "description": "BPMN process editor",
   "propertyPackages": [
     {
+      "name": "outputpackage",
+      "properties": [
+        {
+          "id": "output",
+          "type": "Complex",
+          "title": "输出",
+          "value": "",
+          "description": "活动输出内容",
+          "popular": true
+        }
+      ]
+    },
+    {
+      "name": "inputpackage",
+      "properties": [
+        {
+          "id": "input",
+          "type": "Complex",
+          "title": "输入",
+          "value": "",
+          "description": "活动输入内容",
+          "popular": true
+        }
+      ]
+    },
+    {
       "name": "numberepackage",
       "properties": [
         {
@@ -1673,7 +1699,8 @@ export const AA = {
         "namepackage",
         "documentationpackage",
         "usertaskassignmentpackage",
-        "formreferencepackage",
+        "outputpackage",
+        "inputpackage",
       ],
       "hiddenPropertyPackages": [
 

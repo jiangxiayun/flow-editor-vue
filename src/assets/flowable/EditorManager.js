@@ -15,6 +15,7 @@ export default class EditorManager {
       'EventSubProcess': 'event.subprocess.png'
     }
 
+    this.setModelId(config.modelData.modelId)
     this.current = this.modelId // 当前流程id
     this.loading = true
 
@@ -51,6 +52,7 @@ export default class EditorManager {
 
   getSelectedItem () { return this.selectedItem }
   getSelectedShape () { return this.selectedShape }
+  getContainmentRules () { return this.containmentRules }
 
   getToolbarItems () { return this.toolbarItems }
   setToolbarItems () {
@@ -94,6 +96,7 @@ export default class EditorManager {
 
     //this is an object.
     var editorConfig = this.editor.getJSON()
+    console.log(222, this.modelId)
     var model = {
       modelId: this.modelId,
       bounds: editorConfig.bounds,
@@ -172,7 +175,6 @@ export default class EditorManager {
       if (!removed) {
         // Check if this group already exists. If not, we create a new one
         if (currentGroupName !== null && currentGroupName !== undefined && currentGroupName.length > 0) {
-
           currentGroup = findGroup(currentGroupName, stencilItemGroups_ary); // Find group in root groups array
           if (currentGroup === null) {
             currentGroup = addGroup(currentGroupName, stencilItemGroups_ary);
@@ -312,7 +314,6 @@ export default class EditorManager {
     //resetting the state
     this.canvasTracker = new Hash()
 
-    // avoid a reference to the original object.
     // 第一个参数boolean代表是否进行深度拷贝
     var config = jQuery.extend(true, {}, this.modelData)
 
@@ -320,10 +321,10 @@ export default class EditorManager {
       config.model.childShapes = []
     }
 
-    //this will remove any childshapes of a collapseable subprocess.
+    // this will remove any childshapes of a collapseable subprocess.
     this.findAndRegisterCanvas(config.model.childShapes)
 
-    //this will be overwritten almost instantly.
+    // this will be overwritten almost instantly.
     this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes))
 
     this.editor = new ORYX.Editor(config)

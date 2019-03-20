@@ -12,6 +12,9 @@ const APIS = {
 
   validateModel: (params) => Promise.resolve(appServer.get('/app/rest/model/validate', { params: params })),
 
+  // 获取表单列表
+  getFormModelsUrl: (params) => Promise.resolve(appServer.get('/app/rest/form-models', { params: params })),
+
 
   // 获取所有用户以及拥有角色
   // userList: (params) => Promise.resolve(appServer.post('/pdm/product/userRoleRelation/queryAllUserAndRole', {...params})),

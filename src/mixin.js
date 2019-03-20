@@ -9,6 +9,9 @@ const commonMix = {
   },
   created () {},
   methods: {
+    getModelThumbnailUrl (modelId, version) {
+      return process.env.VUE_APP_API_PREFIX+'/app/rest/models/' + modelId + '/thumbnail' + (version ? "?version=" + version : "");
+    },
     getStencilSetName () {
       var modelMetaData = this.editorManager.getBaseModelData();
       if (modelMetaData.model.stencilset.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
