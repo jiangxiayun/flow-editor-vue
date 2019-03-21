@@ -25,8 +25,13 @@ export default new Router({
       component: () => import('./views/Home.vue')
     },
     {
-      path: '/design/:id',
-      name: 'design',
+      path: '/design/kpm/:id',
+      name: 'design-kpm',
+      component: () => import('./views/Design-kpm.vue')
+    },
+    {
+      path: '/design/bpm/:id',
+      name: 'design-bpm',
       component: () => import('./views/Design.vue')
     }
   ]

@@ -259,143 +259,144 @@ export const FLOWABLE = {
   }),
   PROPERTY_CONFIG: {
     "string": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/string-property-write-mode-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "string-property-write-mode-template"
     },
     "boolean": {
-      "templateUrl": "editor-app/configuration/properties/boolean-property-template.html"
+      "templateUrl": "boolean-property-template"
     },
     "text": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/text-property-write-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "text-property-write-template"
     },
     "flowable-calledelementtype": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/calledelementtype-property-write-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "calledelementtype-property-write-template"
     },
     "flowable-multiinstance": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/multiinstance-property-write-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "multiinstance-property-write-template"
     },
     "flowable-processhistorylevel": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/process-historylevel-property-write-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "process-historylevel-property-write-template"
     },
     "flowable-ordering": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/ordering-property-write-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "ordering-property-write-template"
     },
     "oryx-dataproperties-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/data-properties-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/data-properties-write-template.html"
+      "readModeTemplateUrl": "data-properties-display-template",
+      "writeModeTemplateUrl": "data-properties-write-template"
     },
     "oryx-formproperties-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/form-properties-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/form-properties-write-template.html"
+      "readModeTemplateUrl": "form-properties-display-template",
+      "writeModeTemplateUrl": "form-properties-write-template"
     },
     "oryx-executionlisteners-multiplecomplex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/execution-listeners-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/execution-listeners-write-template.html"
+      "readModeTemplateUrl": "execution-listeners-display-template",
+      "writeModeTemplateUrl": "execution-listeners-write-template"
     },
     "oryx-tasklisteners-multiplecomplex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/task-listeners-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/task-listeners-write-template.html"
+      "readModeTemplateUrl": "task-listeners-display-template",
+      "writeModeTemplateUrl": "task-listeners-write-template"
     },
     "oryx-eventlisteners-multiplecomplex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/event-listeners-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/event-listeners-write-template.html"
+      "readModeTemplateUrl": "event-listeners-display-template",
+      "writeModeTemplateUrl": "event-listeners-write-template"
     },
     "oryx-usertaskassignment-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/assignment-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/assignment-write-template.html"
+      "readModeTemplateUrl": "assignment-display-template",
+      "writeModeTemplateUrl": "assignment-write-template"
     },
     "oryx-servicetaskfields-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/fields-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/fields-write-template.html"
+      "readModeTemplateUrl": "fields-display-template",
+      "writeModeTemplateUrl": "fields-write-template"
     },
     "oryx-callactivityinparameters-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/in-parameters-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/in-parameters-write-template.html"
+      "readModeTemplateUrl": "in-parameters-display-template",
+      "writeModeTemplateUrl": "in-parameters-write-template"
     },
     "oryx-callactivityoutparameters-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/out-parameters-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/out-parameters-write-template.html"
+      "readModeTemplateUrl": "out-parameters-display-template",
+      "writeModeTemplateUrl": "out-parameters-write-template"
     },
+    // oryx子进程引用子进程链接
     "oryx-subprocessreference-subprocess-link": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/subprocess-reference-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/subprocess-reference-write-template.html"
+      "readModeTemplateUrl": "subprocess-reference-display-template",
+      "writeModeTemplateUrl": "subprocess-reference-write-template"
     },
     "oryx-formreference-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+      "readModeTemplateUrl": "form-reference-display-template",
+      "writeModeTemplateUrl": "form-reference-write-template"
     },
     "oryx-sequencefloworder-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/sequenceflow-order-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/sequenceflow-order-write-template.html"
+      "readModeTemplateUrl": "sequenceflow-order-display-template",
+      "writeModeTemplateUrl": "sequenceflow-order-write-template"
     },
     "oryx-conditionsequenceflow-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/condition-expression-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/condition-expression-write-template.html"
+      "readModeTemplateUrl": "condition-expression-display-template",
+      "writeModeTemplateUrl": "condition-expression-write-template"
     },
     "oryx-signaldefinitions-multiplecomplex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/signal-definitions-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/signal-definitions-write-template.html"
+      "readModeTemplateUrl": "signal-definitions-display-template",
+      "writeModeTemplateUrl": "signal-definitions-write-template"
     },
     "oryx-signalref-string": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/signal-property-write-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "signal-property-write-template"
     },
     "oryx-messagedefinitions-multiplecomplex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/message-definitions-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/message-definitions-write-template.html"
+      "readModeTemplateUrl": "message-definitions-display-template",
+      "writeModeTemplateUrl": "message-definitions-write-template"
     },
     "oryx-messageref-string": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/message-property-write-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "message-property-write-template"
     },
     "oryx-duedatedefinition-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/duedate-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/duedate-write-template.html"
+      "readModeTemplateUrl": "duedate-display-template",
+      "writeModeTemplateUrl": "duedate-write-template"
     },
     "oryx-decisiontaskdecisiontablereference-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-write-template.html"
+      "readModeTemplateUrl": "decisiontable-reference-display-template",
+      "writeModeTemplateUrl": "decisiontable-reference-write-template"
     },
     "oryx-casetaskcasereference-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/case-reference-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/case-reference-write-template.html"
+      "readModeTemplateUrl": "case-reference-display-template",
+      "writeModeTemplateUrl": "case-reference-write-template"
     },
     "oryx-processtaskprocessreference-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/process-reference-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/process-reference-write-template.html"
+      "readModeTemplateUrl": "process-reference-display-template",
+      "writeModeTemplateUrl": "process-reference-write-template"
     },
     "oryx-processtaskinparameters-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/in-parameters-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/in-parameters-write-template.html"
+      "readModeTemplateUrl": "in-parameters-display-template",
+      "writeModeTemplateUrl": "in-parameters-write-template"
     },
     "oryx-processtaskoutparameters-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/out-parameters-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/out-parameters-write-template.html"
+      "readModeTemplateUrl": "out-parameters-display-template",
+      "writeModeTemplateUrl": "out-parameters-write-template"
     },
     "flowable-transitionevent": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/transition-event-write-template.html"
+      "readModeTemplateUrl": "default-value-display-template",
+      "writeModeTemplateUrl": "transition-event-write-template"
     },
     "flowable-planitem-dropdown": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-read-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-write-template.html"
+      "readModeTemplateUrl": "planitem-dropdown-read-template",
+      "writeModeTemplateUrl": "planitem-dropdown-write-template"
     },
     "flowable-http-request-method": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/http-request-method-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/http-request-method-property-write-template.html"
+      "readModeTemplateUrl": "http-request-method-display-template",
+      "writeModeTemplateUrl": "http-request-method-property-write-template"
     },
     "oryx-output-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+      "readModeTemplateUrl": "form-reference-display-template",
+      "writeModeTemplateUrl": "form-reference-write-template"
     },
     "oryx-input-complex": {
-      "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
-      "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+      "readModeTemplateUrl": "form-reference-display-template",
+      "writeModeTemplateUrl": "form-reference-write-template"
     },
   },
   TOOLBAR_CONFIG: {

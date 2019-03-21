@@ -19,3 +19,7 @@ ORYX.Core.Canvas.addShapeObjects 创建shape
 // ORYX.Core.StencilSet.Stencil 节点元素  ，解析xml svg文件
 
 loadSerialized
+
+
+
+// FLOWABLE PROPERTY_CONFIG  属性编辑配置文件映射

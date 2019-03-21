@@ -95,7 +95,7 @@
         'UPDATE_dragModeOver', 'UPDATE_dragCanContain',
         'UPDATE_quickMenu']),
       deleteShape () {
-        FLOWABLE.TOOLBAR.ACTIONS.deleteItem({ 'this': this, 'editorManager': this.editorManager })
+        FLOWABLE.TOOLBAR.ACTIONS.deleteItem({ '$scope': this, 'editorManager': this.editorManager })
       },
       morphShape () {
         var shapes = this.editorManager.getSelection()

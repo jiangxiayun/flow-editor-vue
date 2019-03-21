@@ -95,6 +95,7 @@
   import taskListenersWriteTemplate from '@/components/propertyForm/task-listeners-write-template'
   import conditionExpressionDisplayTemplate from '@/components/propertyForm/condition-expression-display-template'
   import conditionExpressionWriteTemplate from '@/components/propertyForm/condition-expression-write-template'
+  import multiinstancePropertyWriteTemplate from '@/components/propertyForm/multiinstance-property-write-template'
 
   export default {
     name: 'propertySection',
@@ -139,7 +140,8 @@
       formPropertiesDisplayTemplate, formPropertiesWriteTemplate,
       assignmentDisplayTemplate, assignmentWriteTemplate,
       taskListenersDisplayTemplate, taskListenersWriteTemplate,
-      conditionExpressionDisplayTemplate, conditionExpressionWriteTemplate
+      conditionExpressionDisplayTemplate, conditionExpressionWriteTemplate,
+      multiinstancePropertyWriteTemplate
     },
     mounted () {
       /*
@@ -183,15 +185,8 @@
         }
         this.currentSelectedProperty = this.selectedItem.properties[index]
       },
-      getTemplateComponentName22 (url) {
-        let a = url.split('?')
-        let b = a[0].split('/')
-        let html = b.pop()
-        return html.split('.')[0]
-      },
       // 获取字段对应的渲染组件
       getTemplateComponentName (property) {
-        // "editor-app/configuration/properties/default-value-display-template.html?version=undefined"
         let templateUrl = null
         if (!property.hasReadWriteMode) {
           templateUrl = property.templateUrl
@@ -202,10 +197,7 @@
         if (property.hasReadWriteMode && property.mode == 'write') {
           templateUrl = property.writeModeTemplateUrl
         }
-        let a = templateUrl.split('?')
-        let b = a[0].split('/')
-        let html = b.pop()
-        return html.split('.')[0]
+        return templateUrl
       },
 
       /* Method available to all sub controllers (for property controllers) to update the internal Oryx model */

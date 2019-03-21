@@ -4,14 +4,22 @@
     <toolbar :editor="editor" :editorManager="editorManager"></toolbar>
     <div class="full" style="height: calc(100% - 60px);">
       <div class="row row-no-gutter full-height">
-        <paletteWrapper :editorManager="editorManager"></paletteWrapper>
+
+        <slot name="paletteWrapper" v-bind:editorManager="editorManager">
+          <paletteWrapper :editorManager="editorManager"></paletteWrapper>
+        </slot>
+
         <div id="contentCanvasWrapper" :class="{collapsedCanvasWrapper: !paletteWrapperOpen}">
           <div id="paletteSectionOpen" :class="{hidden: paletteWrapperOpen}"
                @click="UPDATE_paletteWrapperOpen(true)">
             <i class="glyphicon glyphicon-chevron-right"></i>
           </div>
           <canvasWrapper :editorManager="editorManager"></canvasWrapper>
-          <propertySection :editorManager="editorManager"></propertySection>
+
+
+          <slot name="propertyWrapper" v-bind:editorManager="editorManager">
+            <propertySection :editorManager="editorManager"></propertySection>
+          </slot>
         </div>
       </div>
     </div>

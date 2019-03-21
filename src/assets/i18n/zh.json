@@ -976,5 +976,9 @@
   "PROPERTY.CASEREFERENCE.TITLE" : "Case模型引用",
   "PROPERTY.CASEREFERENCE.ERROR.FORM" : "加载case模型时出错。稍后再试一次",
   "PROPERTY.CASEREFERENCE.CASE.LOADING" : "加载case模型...",
-  "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "此文件夹不包含任何case模型"
+  "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "此文件夹不包含任何case模型",
+
+  "PROPERTY.PACKAGEA": {
+
+  }
 }

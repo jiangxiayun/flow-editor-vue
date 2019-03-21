@@ -12,7 +12,8 @@ export const AA = {
           "title": "输出",
           "value": "",
           "description": "活动输出内容",
-          "popular": true
+          "popular": true,
+          "refToView": "text_output"
         }
       ]
     },
@@ -25,7 +26,8 @@ export const AA = {
           "title": "输入",
           "value": "",
           "description": "活动输入内容",
-          "popular": true
+          "popular": true,
+          "refToView": "text_input"
         }
       ]
     },
@@ -1683,36 +1685,6 @@ export const AA = {
     }
   ],
   "stencils": [
-    {
-      "type": "node",
-      "id": "CustomActiveTask",
-      "title": "活动节点",
-      "description": "扩展活动节点",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg   xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\"   height=\"82\"   version=\"1.0\"><defs></defs><oryx:magnets><oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /></oryx:magnets><g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"><rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /><rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" /><text font-size=\"10\" id=\"text_number\" x=\"50\" y=\"15\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\" ></text><line oryx:resize=\"vertical horizontal\" fill=\"none\" stroke=\"#bbbbbb\" x1=\"0\" y1=\"20\"  x2=\"100\" y2=\"20\"  stroke-width=\"1\" /><text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\" ></text><line oryx:resize=\"vertical horizontal\" fill=\"none\" stroke=\"#bbbbbb\" x1=\"0\" y1=\"55\"  x2=\"100\" y2=\"55\" stroke-width=\"1\" /><line oryx:resize=\"vertical horizontal\" fill=\"none\" stroke=\"#bbbbbb\" x1=\"50\" y1=\"55\"  x2=\"50\" y2=\"80\" stroke-width=\"1\" /><text font-size=\"12\" id=\"text_role\" x=\"15\" y=\"70\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\" ></text><text font-size=\"12\" id=\"text_department\" x=\"75\" y=\"70\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\" ></text><g id=\"userTask\" transform=\"translate(3,3)\"><path oryx:anchors=\"top left\" style=\"fill:#d1b575;stroke:none;\"  d=\"m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17\"  /></g></g></svg>",
-      "icon": "activity/list/type.user.png",
-      "groups": [
-        "扩展节点"
-      ],
-      "propertyPackages": [
-        "numberepackage",
-        "overrideidpackage",
-        "namepackage",
-        "documentationpackage",
-        "usertaskassignmentpackage",
-        "outputpackage",
-        "inputpackage",
-      ],
-      "hiddenPropertyPackages": [
-
-      ],
-      "roles": [
-        "Activity",
-        "sequence_start",
-        "sequence_end",
-        "ActivitiesMorph",
-        "all"
-      ]
-    },
     {
       "type": "node",
       "id": "BPMNDiagram",

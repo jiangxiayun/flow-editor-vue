@@ -3,7 +3,7 @@ export const mockData = {
   "name": "请假模型",
   "key": "leave-model",
   "description": "请假模型",
-  "lastUpdated": "2019-03-19T05:35:24.353+0000",
+  "lastUpdated": "2019-03-21T06:12:28.780+0000",
   "lastUpdatedBy": "admin",
   "model": {
     "modelId": "6609363a-3be5-11e9-afe0-82ad27eff10d",
@@ -82,7 +82,7 @@ export const mockData = {
           "asynchronousdefinition": "false",
           "exclusivedefinition": "false",
           "executionlisteners": "",
-          "multiinstance_type": "None",
+          "multiinstance_type": "Parallel",
           "multiinstance_cardinality": "",
           "multiinstance_collection": "",
           "multiinstance_variable": "",
@@ -131,10 +131,7 @@ export const mockData = {
         ],
         "outgoing": [
           {
-            "resourceId": "sid-FF15BFB7-7C71-4C9D-9CBC-15E28C3EC563"
-          },
-          {
-            "resourceId": "sid-201372EC-0DF6-4719-A243-306EA547E86D"
+            "resourceId": "sid-E35C6DE9-D5A4-43F3-B928-CD486296E07D"
           }
         ],
         "bounds": {
@@ -256,12 +253,12 @@ export const mockData = {
         ],
         "bounds": {
           "lowerRight": {
-            "x": 445,
-            "y": 258
+            "x": 535,
+            "y": 335
           },
           "upperLeft": {
-            "x": 345,
-            "y": 178
+            "x": 435,
+            "y": 255
           }
         },
         "dockers": [
@@ -269,101 +266,70 @@ export const mockData = {
         ]
       },
       {
-        "resourceId": "sid-FF15BFB7-7C71-4C9D-9CBC-15E28C3EC563",
+        "resourceId": "sid-4D07711C-5A69-4825-8FA1-B0866540D733",
         "properties": {
           "overrideid": "",
           "name": "",
           "documentation": "",
-          "conditionsequenceflow": "",
-          "executionlisteners": "",
-          "defaultflow": "false",
-          "skipexpression": ""
+          "executionlisteners": ""
         },
         "stencil": {
-          "id": "SequenceFlow"
+          "id": "EndNoneEvent"
         },
         "childShapes": [
 
         ],
         "outgoing": [
-          {
-            "resourceId": "sid-3B2BA28A-F373-4DAD-B916-FBD2C1ED714E"
-          }
+
         ],
         "bounds": {
           "lowerRight": {
-            "x": 344.78125,
-            "y": 218
+            "x": 718,
+            "y": 192
           },
           "upperLeft": {
-            "x": 265.21875,
-            "y": 175
+            "x": 690,
+            "y": 164
           }
         },
         "dockers": [
-          {
-            "x": 50,
-            "y": 40
-          },
-          {
-            "x": 305,
-            "y": 175
-          },
-          {
-            "x": 305,
-            "y": 218
-          },
-          {
-            "x": 50,
-            "y": 40
-          }
-        ],
-        "target": {
-          "resourceId": "sid-3B2BA28A-F373-4DAD-B916-FBD2C1ED714E"
-        }
+
+        ]
       },
       {
-        "resourceId": "sid-6B994820-999F-470C-8774-903CEC5A4980",
+        "resourceId": "sid-CD1B2BB6-E102-46F1-AFCF-61D7C71419C7",
         "properties": {
           "overrideid": "",
-          "name": "决策",
+          "name": "",
           "documentation": "",
           "asynchronousdefinition": "false",
           "exclusivedefinition": "false",
+          "dataproperties": "",
           "executionlisteners": "",
           "multiinstance_type": "None",
           "multiinstance_cardinality": "",
           "multiinstance_collection": "",
           "multiinstance_variable": "",
           "multiinstance_condition": "",
-          "isforcompensation": "false",
-          "decisiontaskdecisiontablereference": {
-            "id": "cb9667fb-4241-11e9-afe0-82ad27eff10d",
-            "name": "dmndemo",
-            "key": "dmndemokey"
-          },
-          "decisiontaskthrowerroronnohits": "false",
-          "decisiontaskfallbacktodefaulttenant": "false"
+          "istransaction": "false"
         },
         "stencil": {
-          "id": "DecisionTask"
+          "id": "CollapsedSubProcess"
         },
         "childShapes": [
 
         ],
         "outgoing": [
-          {
-            "resourceId": "sid-F304E9FB-DA24-43A9-A62B-C12F4565BC1F"
-          }
+
         ],
         "bounds": {
           "lowerRight": {
-            "x": 625,
-            "y": 218
+            "x": 295,
+            "y": 365
           },
           "upperLeft": {
-            "x": 525,
-            "y": 138
+            "x": 195,
+            "y": 285
           }
         },
         "dockers": [
@@ -390,17 +356,17 @@ export const mockData = {
         ],
         "outgoing": [
           {
-            "resourceId": "sid-6B994820-999F-470C-8774-903CEC5A4980"
+            "resourceId": "sid-4D07711C-5A69-4825-8FA1-B0866540D733"
           }
         ],
         "bounds": {
           "lowerRight": {
-            "x": 524.78125,
-            "y": 218
+            "x": 691.1414192437379,
+            "y": 268.02097226720247
           },
           "upperLeft": {
-            "x": 445.21875,
-            "y": 178
+            "x": 535.4992057562621,
+            "y": 184.86965273279753
           }
         },
         "dockers": [
@@ -409,47 +375,46 @@ export const mockData = {
             "y": 40
           },
           {
-            "x": 485,
-            "y": 218
-          },
-          {
-            "x": 485,
-            "y": 178
-          },
-          {
-            "x": 50,
-            "y": 40
+            "x": 14,
+            "y": 14
           }
         ],
         "target": {
-          "resourceId": "sid-6B994820-999F-470C-8774-903CEC5A4980"
+          "resourceId": "sid-4D07711C-5A69-4825-8FA1-B0866540D733"
         }
       },
       {
-        "resourceId": "sid-4D07711C-5A69-4825-8FA1-B0866540D733",
+        "resourceId": "sid-9012C71B-5A95-4979-8605-2E67F8ED0712",
         "properties": {
           "overrideid": "",
           "name": "",
           "documentation": "",
-          "executionlisteners": ""
+          "asynchronousdefinition": "false",
+          "exclusivedefinition": "false",
+          "sequencefloworder": ""
         },
         "stencil": {
-          "id": "EndNoneEvent"
+          "id": "ExclusiveGateway"
         },
         "childShapes": [
 
         ],
         "outgoing": [
-
+          {
+            "resourceId": "sid-B15F4736-8C5A-42FE-9E80-7AA659C64042"
+          },
+          {
+            "resourceId": "sid-FC4FB9E4-4E20-4B93-9C95-EF2DE78CDA97"
+          }
         ],
         "bounds": {
           "lowerRight": {
-            "x": 698,
-            "y": 192
+            "x": 355,
+            "y": 198
           },
           "upperLeft": {
-            "x": 670,
-            "y": 164
+            "x": 315,
+            "y": 158
           }
         },
         "dockers": [
@@ -457,7 +422,149 @@ export const mockData = {
         ]
       },
       {
-        "resourceId": "sid-F304E9FB-DA24-43A9-A62B-C12F4565BC1F",
+        "resourceId": "sid-E35C6DE9-D5A4-43F3-B928-CD486296E07D",
+        "properties": {
+          "overrideid": "",
+          "name": "",
+          "documentation": "",
+          "conditionsequenceflow": "",
+          "executionlisteners": "",
+          "defaultflow": "false",
+          "skipexpression": ""
+        },
+        "stencil": {
+          "id": "SequenceFlow"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-9012C71B-5A95-4979-8605-2E67F8ED0712"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 315.2503123535919,
+            "y": 177.5062578088398
+          },
+          "upperLeft": {
+            "x": 265.6871876464081,
+            "y": 176.2671796911602
+          }
+        },
+        "dockers": [
+          {
+            "x": 50,
+            "y": 40
+          },
+          {
+            "x": 20,
+            "y": 20
+          }
+        ],
+        "target": {
+          "resourceId": "sid-9012C71B-5A95-4979-8605-2E67F8ED0712"
+        }
+      },
+      {
+        "resourceId": "sid-4F6722CA-9043-4310-8BDD-2B3B97392E34",
+        "properties": {
+          "overrideid": "",
+          "name": "",
+          "documentation": "",
+          "asynchronousdefinition": "false",
+          "exclusivedefinition": "false",
+          "executionlisteners": "",
+          "multiinstance_type": "None",
+          "multiinstance_cardinality": "",
+          "multiinstance_collection": "",
+          "multiinstance_variable": "",
+          "multiinstance_condition": "",
+          "isforcompensation": "false",
+          "usertaskassignment": "",
+          "formkeydefinition": "",
+          "formreference": "",
+          "duedatedefinition": "",
+          "prioritydefinition": "",
+          "formproperties": "",
+          "tasklisteners": "",
+          "skipexpression": "",
+          "categorydefinition": ""
+        },
+        "stencil": {
+          "id": "UserTask"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-2B855895-02F2-4FC0-94BE-3634AA7FEFAD"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 535,
+            "y": 125
+          },
+          "upperLeft": {
+            "x": 435,
+            "y": 45
+          }
+        },
+        "dockers": [
+
+        ]
+      },
+      {
+        "resourceId": "sid-B15F4736-8C5A-42FE-9E80-7AA659C64042",
+        "properties": {
+          "overrideid": "",
+          "name": "",
+          "documentation": "",
+          "conditionsequenceflow": "",
+          "executionlisteners": "",
+          "defaultflow": "false",
+          "skipexpression": ""
+        },
+        "stencil": {
+          "id": "SequenceFlow"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-4F6722CA-9043-4310-8BDD-2B3B97392E34"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 434.51348916164955,
+            "y": 170.6650587001788
+          },
+          "upperLeft": {
+            "x": 348.02752646335045,
+            "y": 116.5751756748212
+          }
+        },
+        "dockers": [
+          {
+            "x": 20.5,
+            "y": 20.5
+          },
+          {
+            "x": 50,
+            "y": 40
+          }
+        ],
+        "target": {
+          "resourceId": "sid-4F6722CA-9043-4310-8BDD-2B3B97392E34"
+        }
+      },
+      {
+        "resourceId": "sid-2B855895-02F2-4FC0-94BE-3634AA7FEFAD",
         "properties": {
           "overrideid": "",
           "name": "",
@@ -480,12 +587,12 @@ export const mockData = {
         ],
         "bounds": {
           "lowerRight": {
-            "x": 669.375,
-            "y": 178
+            "x": 691.1029931475042,
+            "y": 172.52318887085798
           },
           "upperLeft": {
-            "x": 625.390625,
-            "y": 178
+            "x": 535.5376318524958,
+            "y": 106.46118612914204
           }
         },
         "dockers": [
@@ -503,90 +610,7 @@ export const mockData = {
         }
       },
       {
-        "resourceId": "sid-55C254A0-BAD7-4A75-8897-994CF1706ACD",
-        "properties": {
-          "number": "",
-          "overrideid": "",
-          "name": "123",
-          "documentation": "",
-          "usertaskassignment": "",
-          "output": "",
-          "input": ""
-        },
-        "stencil": {
-          "id": "CustomActiveTask"
-        },
-        "childShapes": [
-
-        ],
-        "outgoing": [
-          {
-            "resourceId": "sid-C189E221-22BF-4ACF-82EE-38497E7FC688"
-          }
-        ],
-        "bounds": {
-          "lowerRight": {
-            "x": 415,
-            "y": 110
-          },
-          "upperLeft": {
-            "x": 315,
-            "y": 30
-          }
-        },
-        "dockers": [
-
-        ]
-      },
-      {
-        "resourceId": "sid-201372EC-0DF6-4719-A243-306EA547E86D",
-        "properties": {
-          "overrideid": "",
-          "name": "",
-          "documentation": "",
-          "conditionsequenceflow": "",
-          "executionlisteners": "",
-          "defaultflow": "false",
-          "skipexpression": "",
-          "showdiamondmarker": false
-        },
-        "stencil": {
-          "id": "SequenceFlow"
-        },
-        "childShapes": [
-
-        ],
-        "outgoing": [
-          {
-            "resourceId": "sid-55C254A0-BAD7-4A75-8897-994CF1706ACD"
-          }
-        ],
-        "bounds": {
-          "lowerRight": {
-            "x": 314.51769162540296,
-            "y": 134.9042988432407
-          },
-          "upperLeft": {
-            "x": 253.56824587459704,
-            "y": 71.54101365675929
-          }
-        },
-        "dockers": [
-          {
-            "x": 50,
-            "y": 40
-          },
-          {
-            "x": 1,
-            "y": 40
-          }
-        ],
-        "target": {
-          "resourceId": "sid-55C254A0-BAD7-4A75-8897-994CF1706ACD"
-        }
-      },
-      {
-        "resourceId": "sid-C189E221-22BF-4ACF-82EE-38497E7FC688",
+        "resourceId": "sid-FC4FB9E4-4E20-4B93-9C95-EF2DE78CDA97",
         "properties": {
           "overrideid": "",
           "name": "",
@@ -604,23 +628,23 @@ export const mockData = {
         ],
         "outgoing": [
           {
-            "resourceId": "sid-6B994820-999F-470C-8774-903CEC5A4980"
+            "resourceId": "sid-3B2BA28A-F373-4DAD-B916-FBD2C1ED714E"
           }
         ],
         "bounds": {
           "lowerRight": {
-            "x": 524.8919621976819,
-            "y": 152.23015198737923
+            "x": 434.5725444459134,
+            "y": 255.70368848126364
           },
           "upperLeft": {
-            "x": 415.10803780231817,
-            "y": 95.76984801262076
+            "x": 346.8005024290866,
+            "y": 187.30607714373636
           }
         },
         "dockers": [
           {
-            "x": 50,
-            "y": 40
+            "x": 20.5,
+            "y": 20.5
           },
           {
             "x": 50,
@@ -628,7 +652,7 @@ export const mockData = {
           }
         ],
         "target": {
-          "resourceId": "sid-6B994820-999F-470C-8774-903CEC5A4980"
+          "resourceId": "sid-3B2BA28A-F373-4DAD-B916-FBD2C1ED714E"
         }
       }
     ],
@@ -638,7 +662,8 @@ export const mockData = {
     "stencilset": {
       "namespace": "http://b3mn.org/stencilset/bpmn2.0#",
       "url": "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
-    }
+    },
+    "modelType": "model"
   }
 }
 

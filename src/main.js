@@ -8,7 +8,11 @@ import './directives.js'
 import commonMix from './mixin'
 import i18n from './i18n'
 
+import stencilDragItemTemplate from '@/components/flowable/stencil-drag-item-template'
+
 Vue.config.productionTip = false
+
+Vue.component('stencilDragItem', stencilDragItemTemplate)
 
 Vue.filter('limitLength', function (value, len) {
   if (!value) return ''

@@ -526,6 +526,7 @@ export default class EditorManager {
 
           if (propertyConfig === undefined || propertyConfig === null) {
             console.log('WARNING: no property configuration defined for ' + key + ' of type ' + property.type())
+            console.warn('警告: 找不到 ' + key + ' of type ' + property.type() + '属性所对应的组件')
           } else {
             if (selectedShape.properties.get(key) === 'true') {
               selectedShape.properties.set(key, true)
@@ -554,14 +555,14 @@ export default class EditorManager {
             }
 
             if (propertyConfig.readModeTemplateUrl !== undefined && propertyConfig.readModeTemplateUrl !== null) {
-              currentProperty.readModeTemplateUrl = propertyConfig.readModeTemplateUrl + '?version=' + this.staticIncludeVersion
+              currentProperty.readModeTemplateUrl = propertyConfig.readModeTemplateUrl
             }
             if (propertyConfig.writeModeTemplateUrl !== null && propertyConfig.writeModeTemplateUrl !== null) {
-              currentProperty.writeModeTemplateUrl = propertyConfig.writeModeTemplateUrl + '?version=' + this.staticIncludeVersion
+              currentProperty.writeModeTemplateUrl = propertyConfig.writeModeTemplateUrl
             }
 
             if (propertyConfig.templateUrl !== undefined && propertyConfig.templateUrl !== null) {
-              currentProperty.templateUrl = propertyConfig.templateUrl + '?version=' + this.staticIncludeVersion
+              currentProperty.templateUrl = propertyConfig.templateUrl
               currentProperty.hasReadWriteMode = false
             } else {
               currentProperty.hasReadWriteMode = true
