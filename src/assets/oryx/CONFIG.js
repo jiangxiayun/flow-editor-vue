@@ -1,328 +1,25 @@
 // oryx constants.
-var ORYX_LOGLEVEL_TRACE = 5;
-var ORYX_LOGLEVEL_DEBUG = 4;
-var ORYX_LOGLEVEL_INFO = 3;
-var ORYX_LOGLEVEL_WARN = 2;
-var ORYX_LOGLEVEL_ERROR = 1;
-var ORYX_LOGLEVEL_FATAL = 0;
-var ORYX_LOGLEVEL = 3;
-var ORYX_CONFIGURATION_DELAY = 100;
-var ORYX_CONFIGURATION_WAIT_ATTEMPTS = 10;
-
-
-if (!ORYX) var ORYX = {};
-
-if (!ORYX.CONFIG) ORYX.CONFIG = {};
-
-/**
- * This file contains URI constants that may be used for XMLHTTPRequests.
- * 此文件包含可用于xmlhttpRequests的uri常量
- */
-
-ORYX.CONFIG.ROOT_PATH = "editor/"; //TODO: Remove last slash!!
-ORYX.CONFIG.EXPLORER_PATH = "explorer";
-ORYX.CONFIG.LIBS_PATH = "libs";
-
-/**
- * Regular Config
- */
-ORYX.CONFIG.SERVER_HANDLER_ROOT = "service";
-ORYX.CONFIG.SERVER_EDITOR_HANDLER = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/editor";
-ORYX.CONFIG.SERVER_MODEL_HANDLER = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/model";
-ORYX.CONFIG.STENCILSET_HANDLER = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/editor_stencilset?embedsvg=true&url=true&namespace=";
-ORYX.CONFIG.STENCIL_SETS_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/editor_stencilset";
-
-ORYX.CONFIG.PLUGINS_CONFIG = "editor-app/plugins.xml";
-ORYX.CONFIG.SYNTAXCHECKER_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/syntaxchecker";
-ORYX.CONFIG.DEPLOY_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/model/deploy";
-ORYX.CONFIG.MODEL_LIST_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/models";
-ORYX.CONFIG.FORM_FLOW_LIST_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/formflows";
-ORYX.CONFIG.FORM_FLOW_IMAGE_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/formflow";
-ORYX.CONFIG.FORM_LIST_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/forms";
-ORYX.CONFIG.FORM_IMAGE_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/form";
-ORYX.CONFIG.SUB_PROCESS_LIST_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/subprocesses";
-ORYX.CONFIG.SUB_PROCESS_IMAGE_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/subprocess";
-ORYX.CONFIG.TEST_SERVICE_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/service/";
-
-ORYX.CONFIG.SERVICE_LIST_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/services";
-ORYX.CONFIG.CONDITION_ELEMENT_LIST_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/conditionelements";
-ORYX.CONFIG.VARIABLEDEF_ELEMENT_LIST_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/variabledefinitionelements";
-ORYX.CONFIG.VALIDATOR_LIST_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/validators";
-
-ORYX.CONFIG.SS_EXTENSIONS_FOLDER = ORYX.CONFIG.ROOT_PATH + "stencilsets/extensions/";
-ORYX.CONFIG.SS_EXTENSIONS_CONFIG = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/editor_ssextensions";
-ORYX.CONFIG.ORYX_NEW_URL = "/new";
-ORYX.CONFIG.BPMN_LAYOUTER = ORYX.CONFIG.ROOT_PATH + "bpmnlayouter";
-
-ORYX.CONFIG.EXPRESSION_METADATA_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/expression-metadata";
-ORYX.CONFIG.DATASOURCE_METADATA_URL = ORYX.CONFIG.SERVER_HANDLER_ROOT + "/datasource-metadata";
-
-/**
- * Signavio specific variables
- */
-ORYX.CONFIG.BACKEND_SWITCH = true;
-ORYX.CONFIG.PANEL_LEFT_WIDTH = 250;
-ORYX.CONFIG.PANEL_RIGHT_COLLAPSED = true;
-ORYX.CONFIG.PANEL_RIGHT_WIDTH = 300;
-ORYX.CONFIG.APPNAME = 'Flowable';
-ORYX.CONFIG.WEB_URL = ".";
-
-ORYX.CONFIG.BLANK_IMAGE = ORYX.CONFIG.LIBS_PATH + '/ext-2.0.2/resources/images/default/s.gif';
-
-/* Specify offset of header */
-ORYX.CONFIG.OFFSET_HEADER = 61;
-
-/* Show grid line while dragging */
-ORYX.CONFIG.SHOW_GRIDLINE = true;
-
-/* Editor-Mode */
-ORYX.CONFIG.MODE_READONLY = "readonly";
-ORYX.CONFIG.MODE_FULLSCREEN = "fullscreen";
-ORYX.CONFIG.WINDOW_HEIGHT = 800;
-ORYX.CONFIG.PREVENT_LOADINGMASK_AT_READY = false;
-
-/* Plugins */
-ORYX.CONFIG.PLUGINS_ENABLED = true;
-ORYX.CONFIG.PLUGINS_FOLDER = "Plugins/";
-
-ORYX.CONFIG.BPMN20_SCHEMA_VALIDATION_ON = true;
-
-/* Namespaces */
-ORYX.CONFIG.NAMESPACE_ORYX = "http://www.b3mn.org/oryx";
-ORYX.CONFIG.NAMESPACE_SVG = "http://www.w3.org/2000/svg";
-
-/* UI */
-ORYX.CONFIG.CANVAS_WIDTH = 1200;
-ORYX.CONFIG.CANVAS_HEIGHT = 1050;
-ORYX.CONFIG.CANVAS_RESIZE_INTERVAL = 100;
-ORYX.CONFIG.CANVAS_MIN_WIDTH = 800;
-ORYX.CONFIG.CANVAS_MIN_HEIGHT = 300;
-ORYX.CONFIG.SELECTED_AREA_PADDING = 4;
-ORYX.CONFIG.CANVAS_BACKGROUND_COLOR = "none";
-ORYX.CONFIG.GRID_DISTANCE = 30;
-ORYX.CONFIG.GRID_ENABLED = true;
-ORYX.CONFIG.ZOOM_OFFSET = 0.1;
-ORYX.CONFIG.DEFAULT_SHAPE_MARGIN = 60;
-ORYX.CONFIG.SCALERS_SIZE = 7;
-ORYX.CONFIG.MINIMUM_SIZE = 20;
-ORYX.CONFIG.MAXIMUM_SIZE = 10000;
-ORYX.CONFIG.OFFSET_MAGNET = 15;
-ORYX.CONFIG.OFFSET_EDGE_LABEL_TOP = 8;
-ORYX.CONFIG.OFFSET_EDGE_LABEL_BOTTOM = 8;
-ORYX.CONFIG.OFFSET_EDGE_BOUNDS = 5;
-ORYX.CONFIG.COPY_MOVE_OFFSET = 30;
-
-ORYX.CONFIG.BORDER_OFFSET = 14;
-
-ORYX.CONFIG.MAX_NUM_SHAPES_NO_GROUP = 20; // Updated so the form editor shows all elements at once
-
-ORYX.CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER = 30;
-ORYX.CONFIG.SHAPEMENU_CREATE_OFFSET = 45;
-
-/* Shape-Menu Align */
-ORYX.CONFIG.SHAPEMENU_RIGHT = "Oryx_Right";
-ORYX.CONFIG.SHAPEMENU_BOTTOM = "Oryx_Bottom";
-ORYX.CONFIG.SHAPEMENU_LEFT = "Oryx_Left";
-ORYX.CONFIG.SHAPEMENU_TOP = "Oryx_Top";
-
-
-/* Morph-Menu Item */
-ORYX.CONFIG.MORPHITEM_DISABLED = "Oryx_MorphItem_disabled";
-
-/* Property type names */
-ORYX.CONFIG.TYPE_STRING = "string";
-ORYX.CONFIG.TYPE_BOOLEAN = "boolean";
-ORYX.CONFIG.TYPE_INTEGER = "integer";
-ORYX.CONFIG.TYPE_FLOAT = "float";
-ORYX.CONFIG.TYPE_COLOR = "color";
-ORYX.CONFIG.TYPE_DATE = "date";
-ORYX.CONFIG.TYPE_CHOICE = "choice";
-ORYX.CONFIG.TYPE_URL = "url";
-ORYX.CONFIG.TYPE_DIAGRAM_LINK = "diagramlink";
-ORYX.CONFIG.TYPE_COMPLEX = "complex";
-ORYX.CONFIG.TYPE_MULTIPLECOMPLEX = "multiplecomplex";
-ORYX.CONFIG.TYPE_TEXT = "text";
-ORYX.CONFIG.TYPE_FLOWABLE_MULTIINSTANCE = "flowable-multiinstance";
-ORYX.CONFIG.TYPE_MODEL_LINK = "modellink";
-ORYX.CONFIG.TYPE_FORM_FLOW_LINK = "formflowlink";
-ORYX.CONFIG.TYPE_FORM_LINK = "formlink";
-ORYX.CONFIG.TYPE_SUB_PROCESS_LINK = "subprocess-link";
-ORYX.CONFIG.TYPE_SERVICE_LINK = "servicelink";
-ORYX.CONFIG.TYPE_CONDITIONS = "conditions";
-ORYX.CONFIG.TYPE_VARIABLES = "variables";
-ORYX.CONFIG.TYPE_LISTENER = "listener";
-ORYX.CONFIG.TYPE_EPC_FREQ = "epcfrequency";
-ORYX.CONFIG.TYPE_GLOSSARY_LINK = "glossarylink";
-ORYX.CONFIG.TYPE_EXPRESSION = "expression";
-ORYX.CONFIG.TYPE_DATASOURCE = "datasource";
-ORYX.CONFIG.TYPE_DATASOURCE_MINIMAL = "datasource-minimal";
-ORYX.CONFIG.TYPE_VALIDATORS = "validators";
-ORYX.CONFIG.TYPE_FLOWABLE_HTTP_REQUEST_METHOD = "flowable-http-request-method";
-
-
-/* Vertical line distance of multiline labels */
-ORYX.CONFIG.LABEL_LINE_DISTANCE = 2;
-ORYX.CONFIG.LABEL_DEFAULT_LINE_HEIGHT = 12;
-
-/* Open Morph Menu with Hover */
-ORYX.CONFIG.ENABLE_MORPHMENU_BY_HOVER = false;
-
-
-/* Editor constants come here */
-ORYX.CONFIG.EDITOR_ALIGN_BOTTOM = 0x01;
-ORYX.CONFIG.EDITOR_ALIGN_MIDDLE = 0x02;
-ORYX.CONFIG.EDITOR_ALIGN_TOP = 0x04;
-ORYX.CONFIG.EDITOR_ALIGN_LEFT = 0x08;
-ORYX.CONFIG.EDITOR_ALIGN_CENTER = 0x10;
-ORYX.CONFIG.EDITOR_ALIGN_RIGHT = 0x20;
-ORYX.CONFIG.EDITOR_ALIGN_SIZE = 0x30;
-
-/* Event types */
-ORYX.CONFIG.EVENT_MOUSEDOWN = "mousedown";
-ORYX.CONFIG.EVENT_MOUSEUP = "mouseup";
-ORYX.CONFIG.EVENT_MOUSEOVER = "mouseover";
-ORYX.CONFIG.EVENT_MOUSEOUT = "mouseout";
-ORYX.CONFIG.EVENT_MOUSEMOVE = "mousemove";
-ORYX.CONFIG.EVENT_DBLCLICK = "dblclick";
-ORYX.CONFIG.EVENT_KEYDOWN = "keydown";
-ORYX.CONFIG.EVENT_KEYUP = "keyup";
-
-ORYX.CONFIG.EVENT_LOADED = "editorloaded";
-ORYX.CONFIG.EVENT_SAVED = "editorSaved";
-
-ORYX.CONFIG.EVENT_EXECUTE_COMMANDS = "executeCommands";
-ORYX.CONFIG.EVENT_STENCIL_SET_LOADED = "stencilSetLoaded";
-ORYX.CONFIG.EVENT_SELECTION_CHANGED = "selectionchanged";
-ORYX.CONFIG.EVENT_SHAPEADDED = "shapeadded";
-ORYX.CONFIG.EVENT_SHAPEREMOVED = "shaperemoved";
-ORYX.CONFIG.EVENT_PROPERTY_CHANGED = "propertyChanged";
-ORYX.CONFIG.EVENT_DRAGDROP_START = "dragdrop.start";
-ORYX.CONFIG.EVENT_SHAPE_MENU_CLOSE = "shape.menu.close";
-ORYX.CONFIG.EVENT_DRAGDROP_END = "dragdrop.end";
-ORYX.CONFIG.EVENT_RESIZE_START = "resize.start";
-ORYX.CONFIG.EVENT_RESIZE_END = "resize.end";
-ORYX.CONFIG.EVENT_DRAGDOCKER_DOCKED = "dragDocker.docked";
-ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW = "highlight.showHighlight";
-ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE = "highlight.hideHighlight";
-ORYX.CONFIG.EVENT_LOADING_ENABLE = "loading.enable";
-ORYX.CONFIG.EVENT_LOADING_DISABLE = "loading.disable";
-ORYX.CONFIG.EVENT_LOADING_STATUS = "loading.status";
-ORYX.CONFIG.EVENT_OVERLAY_SHOW = "overlay.show";
-ORYX.CONFIG.EVENT_OVERLAY_HIDE = "overlay.hide";
-ORYX.CONFIG.EVENT_ARRANGEMENT_TOP = "arrangement.setToTop";
-ORYX.CONFIG.EVENT_ARRANGEMENT_BACK = "arrangement.setToBack";
-ORYX.CONFIG.EVENT_ARRANGEMENT_FORWARD = "arrangement.setForward";
-ORYX.CONFIG.EVENT_ARRANGEMENT_BACKWARD = "arrangement.setBackward";
-ORYX.CONFIG.EVENT_PROPWINDOW_PROP_CHANGED = "propertyWindow.propertyChanged";
-ORYX.CONFIG.EVENT_LAYOUT_ROWS = "layout.rows";
-ORYX.CONFIG.EVENT_LAYOUT_BPEL = "layout.BPEL";
-ORYX.CONFIG.EVENT_LAYOUT_BPEL_VERTICAL = "layout.BPEL.vertical";
-ORYX.CONFIG.EVENT_LAYOUT_BPEL_HORIZONTAL = "layout.BPEL.horizontal";
-ORYX.CONFIG.EVENT_LAYOUT_BPEL_SINGLECHILD = "layout.BPEL.singlechild";
-ORYX.CONFIG.EVENT_LAYOUT_BPEL_AUTORESIZE = "layout.BPEL.autoresize";
-ORYX.CONFIG.EVENT_AUTOLAYOUT_LAYOUT = "autolayout.layout";
-ORYX.CONFIG.EVENT_UNDO_EXECUTE = "undo.execute";
-ORYX.CONFIG.EVENT_UNDO_ROLLBACK = "undo.rollback";
-ORYX.CONFIG.EVENT_UNDO_RESET = "undo.reset";
-ORYX.CONFIG.EVENT_BUTTON_UPDATE = "toolbar.button.update";
-ORYX.CONFIG.EVENT_LAYOUT = "layout.dolayout";
-ORYX.CONFIG.EVENT_GLOSSARY_LINK_EDIT = "glossary.link.edit";
-ORYX.CONFIG.EVENT_GLOSSARY_SHOW = "glossary.show.info";
-ORYX.CONFIG.EVENT_GLOSSARY_NEW = "glossary.show.new";
-ORYX.CONFIG.EVENT_DOCKERDRAG = "dragTheDocker";
-ORYX.CONFIG.EVENT_CANVAS_SCROLL = "canvas.scroll";
-
-ORYX.CONFIG.EVENT_SHOW_PROPERTYWINDOW = "propertywindow.show";
-ORYX.CONFIG.EVENT_ABOUT_TO_SAVE = "file.aboutToSave";
-
-//extra events
-ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED = "editor.init.completed";
-
-//actions events that are fired when a button or key was pressed after completing the initial logic.
-ORYX.CONFIG.ACTION_DELETE_COMPLETED = 'delete.action.completed';
-
-/* Selection Shapes Highlights */
-ORYX.CONFIG.SELECTION_HIGHLIGHT_SIZE = 5;
-ORYX.CONFIG.SELECTION_HIGHLIGHT_COLOR = "#4444FF";
-ORYX.CONFIG.SELECTION_HIGHLIGHT_COLOR2 = "#9999FF";
-
-ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_CORNER = "corner";
-ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE = "rectangle";
-
-ORYX.CONFIG.SELECTION_VALID_COLOR = "#00FF00";
-ORYX.CONFIG.SELECTION_INVALID_COLOR = "#FF0000";
-
-
-ORYX.CONFIG.DOCKER_DOCKED_COLOR = "#00FF00";
-ORYX.CONFIG.DOCKER_UNDOCKED_COLOR = "#FF0000";
-ORYX.CONFIG.DOCKER_SNAP_OFFSET = 10;
-
-/* Copy & Paste */
-ORYX.CONFIG.EDIT_OFFSET_PASTE = 10;
-
-/* Key-Codes */
-ORYX.CONFIG.KEY_CODE_X = 88;
-ORYX.CONFIG.KEY_CODE_C = 67;
-ORYX.CONFIG.KEY_CODE_V = 86;
-ORYX.CONFIG.KEY_CODE_DELETE = 46;
-ORYX.CONFIG.KEY_CODE_META = 224;
-ORYX.CONFIG.KEY_CODE_BACKSPACE = 8;
-ORYX.CONFIG.KEY_CODE_LEFT = 37;
-ORYX.CONFIG.KEY_CODE_RIGHT = 39;
-ORYX.CONFIG.KEY_CODE_UP = 38;
-ORYX.CONFIG.KEY_CODE_DOWN = 40;
-
-// TODO Determine where the lowercase constants are still used and remove them from here.
-ORYX.CONFIG.KEY_Code_enter = 12;
-ORYX.CONFIG.KEY_Code_left = 37;
-ORYX.CONFIG.KEY_Code_right = 39;
-ORYX.CONFIG.KEY_Code_top = 38;
-ORYX.CONFIG.KEY_Code_bottom = 40;
-
-/* Supported Meta Keys */
-
-ORYX.CONFIG.META_KEY_META_CTRL = "metactrl";
-ORYX.CONFIG.META_KEY_ALT = "alt";
-ORYX.CONFIG.META_KEY_SHIFT = "shift";
-
-/* Key Actions */
-
-ORYX.CONFIG.KEY_ACTION_DOWN = "down";
-ORYX.CONFIG.KEY_ACTION_UP = "up";
-
-
-/* Form Rowlayouting */
-ORYX.CONFIG.FORM_ROW_WIDTH = 350;
-ORYX.CONFIG.FORM_GROUP_MARGIN = 5;
-ORYX.CONFIG.FORM_GROUP_EMPTY_HEIGHT = 100;
-
-/* Form element types */
-ORYX.CONFIG.FORM_ELEMENT_ID_PREFIX = 'http://b3mn.org/stencilset/xforms';
-ORYX.CONFIG.FORM_ELEMENT_TYPE_ROOT = 'http://b3mn.org/stencilset/xforms#XForm';
-ORYX.CONFIG.FORM_ELEMENT_TYPE_GROUP = 'http://b3mn.org/stencilset/xforms#Group';
-ORYX.CONFIG.FORM_ELEMENT_TYPE_REPEATING_GROUP = 'http://b3mn.org/stencilset/xforms#RepeatingGroup';
-ORYX.CONFIG.FORM_ELEMENT_TYPE_LABEL_FIELD = 'http://b3mn.org/stencilset/xforms#LabelField';
-
-
+const ORYX_CONFIGURATION_DELAY = 100
+const ORYX_CONFIGURATION_WAIT_ATTEMPTS = 10
 
 /*
  * Save and triple generation behaviour. Use this area to configure
  * data management to your needs.
  */
-var USE_ASYNCHRONOUS_REQUESTS = true;
-var DISCARD_UNUSED_TRIPLES = true;
-var PREFER_SPANS_OVER_DIVS = true;
-var PREFER_TITLE_OVER_TEXTNODE = false;
-var RESOURCE_ID_PREFIX = 'resource';
+const USE_ASYNCHRONOUS_REQUESTS = true
+const DISCARD_UNUSED_TRIPLES = true
+const PREFER_SPANS_OVER_DIVS = true
+const PREFER_TITLE_OVER_TEXTNODE = false
+const RESOURCE_ID_PREFIX = 'resource'
 
-var SHOW_DEBUG_ALERTS_WHEN_SAVING = false;
-var SHOW_EXTENDED_DEBUG_INFORMATION = false;
+const SHOW_DEBUG_ALERTS_WHEN_SAVING = false
+const SHOW_EXTENDED_DEBUG_INFORMATION = false
 
 /*
  * Back end specific workarounds.
  */
 
-var USE_ARESS_WORKAROUNDS = true;
+const USE_ARESS_WORKAROUNDS = true
 
 /*
  * Data management constants. Do not change these, as they are used
@@ -331,19 +28,19 @@ var USE_ARESS_WORKAROUNDS = true;
  */
 
 // Resource constants
-var RESOURCE_CREATED = 0x01;
-var RESOURCE_REMOVED = 0x02;
-var RESOURCE_SAVED = 0x04;
-var RESOURCE_RELOADED = 0x08;
-var RESOURCE_SYNCHRONIZED = 0x10;
+const RESOURCE_CREATED = 0x01
+const RESOURCE_REMOVED = 0x02
+const RESOURCE_SAVED = 0x04
+const RESOURCE_RELOADED = 0x08
+const RESOURCE_SYNCHRONIZED = 0x10
 
 // Triple constants
-var TRIPLE_REMOVE = 0x01;
-var TRIPLE_ADD = 0x02;
-var TRIPLE_RELOAD = 0x04;
-var TRIPLE_SAVE = 0x08;
+const TRIPLE_REMOVE = 0x01
+const TRIPLE_ADD = 0x02
+const TRIPLE_RELOAD = 0x04
+const TRIPLE_SAVE = 0x08
 
-var PROCESSDATA_REF = 'processdata';
+const PROCESSDATA_REF = 'processdata'
 
 // HTTP status code constants
 //
@@ -371,3 +68,302 @@ var PROCESSDATA_REF = 'processdata';
 //const 502_BAD_GATEWAY =				'Bad Gateway';
 //const 503_SERVICE_UNAVAILABLE =		'Service Unavailable';
 //
+
+
+// if (!ORYX.CONFIG) ORYX.CONFIG = {}
+
+const ROOT_PATH = 'editor/'  //TODO: Remove last slash!!
+const LIBS_PATH = 'libs'
+const SERVER_HANDLER_ROOT = 'service'
+
+const ORYX_CONFIG = {
+  /**
+   * This file contains URI constants that may be used for XMLHTTPRequests.
+   * 此文件包含可用于xmlhttpRequests的uri常量
+   */
+  ROOT_PATH: 'editor/', //TODO: Remove last slash!!
+  EXPLORER_PATH: 'explorer',
+
+  DISABLE_GRADIENT: true,
+  /**
+   * Regular Config
+   */
+  SERVER_HANDLER_ROOT: 'service',
+  SERVER_EDITOR_HANDLER: SERVER_HANDLER_ROOT + '/editor',
+  SERVER_MODEL_HANDLER: SERVER_HANDLER_ROOT + '/model',
+  STENCILSET_HANDLER: SERVER_HANDLER_ROOT + '/editor_stencilset?embedsvg=true&url=true&namespace=',
+  STENCIL_SETS_URL: SERVER_HANDLER_ROOT + '/editor_stencilset',
+
+  PLUGINS_CONFIG: 'editor-app/plugins.xml',
+  SYNTAXCHECKER_URL: SERVER_HANDLER_ROOT + '/syntaxchecker',
+  DEPLOY_URL: SERVER_HANDLER_ROOT + '/model/deploy',
+  MODEL_LIST_URL: SERVER_HANDLER_ROOT + '/models',
+  FORM_FLOW_LIST_URL: SERVER_HANDLER_ROOT + '/formflows',
+  FORM_FLOW_IMAGE_URL: SERVER_HANDLER_ROOT + '/formflow',
+  FORM_LIST_URL: SERVER_HANDLER_ROOT + '/forms',
+  FORM_IMAGE_URL: SERVER_HANDLER_ROOT + '/form',
+  SUB_PROCESS_LIST_URL: SERVER_HANDLER_ROOT + '/subprocesses',
+  SUB_PROCESS_IMAGE_URL: SERVER_HANDLER_ROOT + '/subprocess',
+  TEST_SERVICE_URL: SERVER_HANDLER_ROOT + '/service/',
+
+  SERVICE_LIST_URL: SERVER_HANDLER_ROOT + '/services',
+  CONDITION_ELEMENT_LIST_URL: SERVER_HANDLER_ROOT + '/conditionelements',
+  constIABLEDEF_ELEMENT_LIST_URL: SERVER_HANDLER_ROOT + '/constiabledefinitionelements',
+  VALIDATOR_LIST_URL: SERVER_HANDLER_ROOT + '/validators',
+
+  SS_EXTENSIONS_FOLDER: ROOT_PATH + 'stencilsets/extensions/',
+  SS_EXTENSIONS_CONFIG: SERVER_HANDLER_ROOT + '/editor_ssextensions',
+  ORYX_NEW_URL: '/new',
+  BPMN_LAYOUTER: ROOT_PATH + 'bpmnlayouter',
+
+  EXPRESSION_METADATA_URL: SERVER_HANDLER_ROOT + '/expression-metadata',
+  DATASOURCE_METADATA_URL: SERVER_HANDLER_ROOT + '/datasource-metadata',
+
+  /**
+   * Signavio specific constiables
+   */
+  BACKEND_SWITCH: true,
+  PANEL_LEFT_WIDTH: 250,
+  PANEL_RIGHT_COLLAPSED: true,
+  PANEL_RIGHT_WIDTH: 300,
+  APPNAME: 'Flowable',
+  WEB_URL: '.',
+
+  BLANK_IMAGE: LIBS_PATH + '/ext-2.0.2/resources/images/default/s.gif',
+
+  /* Specify offset of header */
+  OFFSET_HEADER: 61,
+
+  /* Show grid line while dragging */
+  SHOW_GRIDLINE: true,
+
+  /* Editor-Mode */
+  MODE_READONLY: 'readonly',
+  MODE_FULLSCREEN: 'fullscreen',
+  WINDOW_HEIGHT: 800,
+  PREVENT_LOADINGMASK_AT_READY: false,
+
+  /* Plugins */
+  PLUGINS_ENABLED: true,
+  PLUGINS_FOLDER: 'Plugins/',
+
+  BPMN20_SCHEMA_VALIDATION_ON: true,
+
+  /* Namespaces */
+  NAMESPACE_ORYX: 'http://www.b3mn.org/oryx',
+  NAMESPACE_SVG: 'http://www.w3.org/2000/svg',
+
+  /* UI */
+  CANVAS_WIDTH: 1200,
+  CANVAS_HEIGHT: 1050,
+  CANVAS_RESIZE_INTERVAL: 100,
+  CANVAS_MIN_WIDTH: 800,
+  CANVAS_MIN_HEIGHT: 300,
+  SELECTED_AREA_PADDING: 4,
+  CANVAS_BACKGROUND_COLOR: 'none',
+  GRID_DISTANCE: 30,
+  GRID_ENABLED: true,
+  ZOOM_OFFSET: 0.1,
+  DEFAULT_SHAPE_MARGIN: 60,
+  SCALERS_SIZE: 7,
+  MINIMUM_SIZE: 20,
+  MAXIMUM_SIZE: 10000,
+  OFFSET_MAGNET: 15,
+  OFFSET_EDGE_LABEL_TOP: 8,
+  OFFSET_EDGE_LABEL_BOTTOM: 8,
+  OFFSET_EDGE_BOUNDS: 5,
+  COPY_MOVE_OFFSET: 30,
+
+  BORDER_OFFSET: 14,
+
+  MAX_NUM_SHAPES_NO_GROUP: 20, // Updated so the form editor shows all elements at once
+
+  SHAPEMENU_CREATE_OFFSET_CORNER: 30,
+  SHAPEMENU_CREATE_OFFSET: 45,
+
+  /* Shape-Menu Align */
+  SHAPEMENU_RIGHT: 'Oryx_Right',
+  SHAPEMENU_BOTTOM: 'Oryx_Bottom',
+  SHAPEMENU_LEFT: 'Oryx_Left',
+  SHAPEMENU_TOP: 'Oryx_Top',
+
+
+  /* Morph-Menu Item */
+  MORPHITEM_DISABLED: 'Oryx_MorphItem_disabled',
+
+  /* Property type names */
+  TYPE_STRING: 'string',
+  TYPE_BOOLEAN: 'boolean',
+  TYPE_INTEGER: 'integer',
+  TYPE_FLOAT: 'float',
+  TYPE_COLOR: 'color',
+  TYPE_DATE: 'date',
+  TYPE_CHOICE: 'choice',
+  TYPE_URL: 'url',
+  TYPE_DIAGRAM_LINK: 'diagramlink',
+  TYPE_COMPLEX: 'complex',
+  TYPE_MULTIPLECOMPLEX: 'multiplecomplex',
+  TYPE_TEXT: 'text',
+  TYPE_FLOWABLE_MULTIINSTANCE: 'flowable-multiinstance',
+  TYPE_MODEL_LINK: 'modellink',
+  TYPE_FORM_FLOW_LINK: 'formflowlink',
+  TYPE_FORM_LINK: 'formlink',
+  TYPE_SUB_PROCESS_LINK: 'subprocess-link',
+  TYPE_SERVICE_LINK: 'servicelink',
+  TYPE_CONDITIONS: 'conditions',
+  TYPE_constIABLES: 'constiables',
+  TYPE_LISTENER: 'listener',
+  TYPE_EPC_FREQ: 'epcfrequency',
+  TYPE_GLOSSARY_LINK: 'glossarylink',
+  TYPE_EXPRESSION: 'expression',
+  TYPE_DATASOURCE: 'datasource',
+  TYPE_DATASOURCE_MINIMAL: 'datasource-minimal',
+  TYPE_VALIDATORS: 'validators',
+  TYPE_FLOWABLE_HTTP_REQUEST_METHOD: 'flowable-http-request-method',
+
+
+  /* Vertical line distance of multiline labels */
+  LABEL_LINE_DISTANCE: 2,
+  LABEL_DEFAULT_LINE_HEIGHT: 12,
+
+  /* Open Morph Menu with Hover */
+  ENABLE_MORPHMENU_BY_HOVER: false,
+
+
+  /* Editor constants come here */
+  EDITOR_ALIGN_BOTTOM: 0x01,
+  EDITOR_ALIGN_MIDDLE: 0x02,
+  EDITOR_ALIGN_TOP: 0x04,
+  EDITOR_ALIGN_LEFT: 0x08,
+  EDITOR_ALIGN_CENTER: 0x10,
+  EDITOR_ALIGN_RIGHT: 0x20,
+  EDITOR_ALIGN_SIZE: 0x30,
+
+  /* Event types */
+  EVENT_MOUSEDOWN: 'mousedown',
+  EVENT_MOUSEUP: 'mouseup',
+  EVENT_MOUSEOVER: 'mouseover',
+  EVENT_MOUSEOUT: 'mouseout',
+  EVENT_MOUSEMOVE: 'mousemove',
+  EVENT_DBLCLICK: 'dblclick',
+  EVENT_KEYDOWN: 'keydown',
+  EVENT_KEYUP: 'keyup',
+
+  EVENT_LOADED: 'editorloaded',
+  EVENT_SAVED: 'editorSaved',
+
+  EVENT_EXECUTE_COMMANDS: 'executeCommands',
+  EVENT_STENCIL_SET_LOADED: 'stencilSetLoaded',
+  EVENT_SELECTION_CHANGED: 'selectionchanged',
+  EVENT_SHAPEADDED: 'shapeadded',
+  EVENT_SHAPEREMOVED: 'shaperemoved',
+  EVENT_PROPERTY_CHANGED: 'propertyChanged',
+  EVENT_DRAGDROP_START: 'dragdrop.start',
+  EVENT_SHAPE_MENU_CLOSE: 'shape.menu.close',
+  EVENT_DRAGDROP_END: 'dragdrop.end',
+  EVENT_RESIZE_START: 'resize.start',
+  EVENT_RESIZE_END: 'resize.end',
+  EVENT_DRAGDOCKER_DOCKED: 'dragDocker.docked',
+  EVENT_HIGHLIGHT_SHOW: 'highlight.showHighlight',
+  EVENT_HIGHLIGHT_HIDE: 'highlight.hideHighlight',
+  EVENT_LOADING_ENABLE: 'loading.enable',
+  EVENT_LOADING_DISABLE: 'loading.disable',
+  EVENT_LOADING_STATUS: 'loading.status',
+  EVENT_OVERLAY_SHOW: 'overlay.show',
+  EVENT_OVERLAY_HIDE: 'overlay.hide',
+  EVENT_ARRANGEMENT_TOP: 'arrangement.setToTop',
+  EVENT_ARRANGEMENT_BACK: 'arrangement.setToBack',
+  EVENT_ARRANGEMENT_FORWARD: 'arrangement.setForward',
+  EVENT_ARRANGEMENT_BACKWARD: 'arrangement.setBackward',
+  EVENT_PROPWINDOW_PROP_CHANGED: 'propertyWindow.propertyChanged',
+  EVENT_LAYOUT_ROWS: 'layout.rows',
+  EVENT_LAYOUT_BPEL: 'layout.BPEL',
+  EVENT_LAYOUT_BPEL_VERTICAL: 'layout.BPEL.vertical',
+  EVENT_LAYOUT_BPEL_HORIZONTAL: 'layout.BPEL.horizontal',
+  EVENT_LAYOUT_BPEL_SINGLECHILD: 'layout.BPEL.singlechild',
+  EVENT_LAYOUT_BPEL_AUTORESIZE: 'layout.BPEL.autoresize',
+  EVENT_AUTOLAYOUT_LAYOUT: 'autolayout.layout',
+  EVENT_UNDO_EXECUTE: 'undo.execute',
+  EVENT_UNDO_ROLLBACK: 'undo.rollback',
+  EVENT_UNDO_RESET: 'undo.reset',
+  EVENT_BUTTON_UPDATE: 'toolbar.button.update',
+  EVENT_LAYOUT: 'layout.dolayout',
+  EVENT_GLOSSARY_LINK_EDIT: 'glossary.link.edit',
+  EVENT_GLOSSARY_SHOW: 'glossary.show.info',
+  EVENT_GLOSSARY_NEW: 'glossary.show.new',
+  EVENT_DOCKERDRAG: 'dragTheDocker',
+  EVENT_CANVAS_SCROLL: 'canvas.scroll',
+
+  EVENT_SHOW_PROPERTYWINDOW: 'propertywindow.show',
+  EVENT_ABOUT_TO_SAVE: 'file.aboutToSave',
+
+  //extra events
+  EVENT_EDITOR_INIT_COMPLETED: 'editor.init.completed',
+
+  //actions events that are fired when a button or key was pressed after completing the initial logic.
+  ACTION_DELETE_COMPLETED: 'delete.action.completed',
+
+  /* Selection Shapes Highlights */
+  SELECTION_HIGHLIGHT_SIZE: 5,
+  SELECTION_HIGHLIGHT_COLOR: '#4444FF',
+  SELECTION_HIGHLIGHT_COLOR2: '#9999FF',
+
+  SELECTION_HIGHLIGHT_STYLE_CORNER: 'corner',
+  SELECTION_HIGHLIGHT_STYLE_RECTANGLE: 'rectangle',
+
+  SELECTION_VALID_COLOR: '#00FF00',
+  SELECTION_INVALID_COLOR: '#FF0000',
+
+
+  DOCKER_DOCKED_COLOR: '#00FF00',
+  DOCKER_UNDOCKED_COLOR: '#FF0000',
+  DOCKER_SNAP_OFFSET: 10,
+
+  /* Copy & Paste */
+  EDIT_OFFSET_PASTE: 10,
+
+  /* Key-Codes */
+  KEY_CODE_X: 88,
+  KEY_CODE_C: 67,
+  KEY_CODE_V: 86,
+  KEY_CODE_DELETE: 46,
+  KEY_CODE_META: 224,
+  KEY_CODE_BACKSPACE: 8,
+  KEY_CODE_LEFT: 37,
+  KEY_CODE_RIGHT: 39,
+  KEY_CODE_UP: 38,
+  KEY_CODE_DOWN: 40,
+
+  // TODO Determine where the lowercase constants are still used and remove them from here.
+  KEY_Code_enter: 12,
+  KEY_Code_left: 37,
+  KEY_Code_right: 39,
+  KEY_Code_top: 38,
+  KEY_Code_bottom: 40,
+
+  /* Supported Meta Keys */
+
+  META_KEY_META_CTRL: 'metactrl',
+  META_KEY_ALT: 'alt',
+  META_KEY_SHIFT: 'shift',
+
+  /* Key Actions */
+
+  KEY_ACTION_DOWN: 'down',
+  KEY_ACTION_UP: 'up',
+
+
+  /* Form Rowlayouting */
+  FORM_ROW_WIDTH: 350,
+  FORM_GROUP_MARGIN: 5,
+  FORM_GROUP_EMPTY_HEIGHT: 100,
+
+  /* Form element types */
+  FORM_ELEMENT_ID_PREFIX: 'http://b3mn.org/stencilset/xforms',
+  FORM_ELEMENT_TYPE_ROOT: 'http://b3mn.org/stencilset/xforms#XForm',
+  FORM_ELEMENT_TYPE_GROUP: 'http://b3mn.org/stencilset/xforms#Group',
+  FORM_ELEMENT_TYPE_REPEATING_GROUP: 'http://b3mn.org/stencilset/xforms#RepeatingGroup',
+  FORM_ELEMENT_TYPE_LABEL_FIELD: 'http://b3mn.org/stencilset/xforms#LabelField'
+}
+
+export default ORYX_CONFIG

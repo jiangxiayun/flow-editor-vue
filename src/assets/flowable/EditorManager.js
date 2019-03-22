@@ -1,5 +1,7 @@
 import { FLOWABLE, FLOWABLE_eventBus_initAddListener } from './FLOWABLE_Config'
 import { findGroup, addGroup } from '@/assets/Util'
+import ORYX from '@/assets/oryx'
+
 
 /**流程图编辑器 类
  * @params modelData: 流程图实例数据

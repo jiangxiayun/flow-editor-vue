@@ -4,10 +4,15 @@ module.exports = {
   configureWebpack: {
     // 把原本需要写在webpack.config.js中的配置代码 写在这里 会自动合并
     externals: {
-      'jQuery' : '$',
+      jquery : 'jQuery',
       'ORYX':'ORYX'
     }
   },
+
+/*
+  上面的例子。属性名称是 jquery，表示应该排除 import $ from 'jquery' 中的 jquery 模块。
+  为了替换这个模块，jQuery 的值将被用来检索一个全局的 jQuery 变量。
+*/
 
   pluginOptions: {
     i18n: {
