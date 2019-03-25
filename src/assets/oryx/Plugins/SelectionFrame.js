@@ -1,91 +1,92 @@
+import ORYX_Config from '../CONFIG'
+import ORYX_Editor from '../Editor'
+
+import ORYX_Canvas from '../core/Canvas'
+
 export default class SelectionFrame {
 
   constructor (facade) {
-    this.facade = facade;
+    this.facade = facade
 
     // Register on MouseEvents
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this));
-    document.documentElement.addEventListener(ORYX.CONFIG.EVENT_MOUSEUP, this.handleMouseUp.bind(this), true);
+    this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this))
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUp.bind(this), true)
 
     // Some initiale variables
-    this.position = {x: 0, y: 0};
-    this.size = {width: 0, height: 0};
-    this.offsetPosition = {x: 0, y: 0};
+    this.position = { x: 0, y: 0 }
+    this.size = { width: 0, height: 0 }
+    this.offsetPosition = { x: 0, y: 0 }
 
     // (Un)Register Mouse-Move Event
-    this.moveCallback = undefined;
-    this.offsetScroll = {x: 0, y: 0};
+    this.moveCallback = undefined
+    this.offsetScroll = { x: 0, y: 0 }
     // HTML-Node of Selection-Frame
-    this.node = ORYX.Editor.graft("http://www.w3.org/1999/xhtml", $('canvasSection'),
-      ['div', {'class': 'Oryx_SelectionFrame'}]);
+    this.node = ORYX_Editor.graft('http://www.w3.org/1999/xhtml', $('canvasSection'),
+      ['div', { 'class': 'Oryx_SelectionFrame' }])
 
-    this.hide();
+    this.hide()
   }
 
   handleMouseDown (event, uiObj) {
     // If there is the Canvas
-    if (uiObj instanceof ORYX.Core.Canvas) {
+    if (uiObj instanceof ORYX_Canvas) {
       // Calculate the Offset
-      var scrollNode = uiObj.rootNode.parentNode.parentNode;
-
-      var a = this.facade.getCanvas().node.getScreenCTM();
+      let scrollNode = uiObj.rootNode.parentNode.parentNode
+      let a = this.facade.getCanvas().node.getScreenCTM()
       this.offsetPosition = {
         x: a.e,
         y: a.f
-      };
+      }
 
       // Set the new Position
       this.setPos({
-        x: Event.pointerX(event) - jQuery("#canvasSection").offset().left,
-        y: Event.pointerY(event) - jQuery("#canvasSection").offset().top + 5
-      });
+        x: Event.pointerX(event) - jQuery('#canvasSection').offset().left,
+        y: Event.pointerY(event) - jQuery('#canvasSection').offset().top + 5
+      })
 
       // Reset the size
-      this.resize({width: 0, height: 0});
-      this.moveCallback = this.handleMouseMove.bind(this);
+      this.resize({ width: 0, height: 0 })
+      this.moveCallback = this.handleMouseMove.bind(this)
 
       // Register Mouse-Move Event
-      document.documentElement.addEventListener(ORYX.CONFIG.EVENT_MOUSEMOVE, this.moveCallback, false);
+      document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.moveCallback, false)
 
-      this.offsetScroll = {x: scrollNode.scrollLeft, y: scrollNode.scrollTop};
+      this.offsetScroll = { x: scrollNode.scrollLeft, y: scrollNode.scrollTop }
 
       // Show the Frame
-      this.show();
+      this.show()
     }
 
-    Event.stop(event);
+    Event.stop(event)
   }
 
-  handleMouseUp(event) {
+  handleMouseUp (event) {
     // If there was an MouseMoving
     if (this.moveCallback) {
       // Hide the Frame
-      this.hide();
+      this.hide()
 
       // Unregister Mouse-Move
-      document.documentElement.removeEventListener(ORYX.CONFIG.EVENT_MOUSEMOVE, this.moveCallback, false);
+      document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.moveCallback, false)
 
-      this.moveCallback = undefined;
-
-      var corrSVG = this.facade.getCanvas().node.getScreenCTM();
-
+      this.moveCallback = undefined
+      let corrSVG = this.facade.getCanvas().node.getScreenCTM()
       // Calculate the positions of the Frame
-      var a = {
+      let a = {
         x: this.size.width > 0 ? this.position.x : this.position.x + this.size.width,
         y: this.size.height > 0 ? this.position.y : this.position.y + this.size.height
-      };
-
-      var b = {
+      }
+      let b = {
         x: a.x + Math.abs(this.size.width),
         y: a.y + Math.abs(this.size.height)
-      };
+      }
 
-      var additionalIEZoom = 1;
+      let additionalIEZoom = 1
       if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-        var ua = navigator.userAgent;
+        let ua = navigator.userAgent
         if (ua.indexOf('MSIE') >= 0) {
           //IE 10 and below
-          var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100);
+          let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
           if (zoom !== 100) {
             additionalIEZoom = zoom / 100
           }
@@ -93,102 +94,95 @@ export default class SelectionFrame {
       }
 
       if (additionalIEZoom === 1) {
-        a.x = a.x - (corrSVG.e - jQuery("#canvasSection").offset().left);
-        a.y = a.y - (corrSVG.f - jQuery("#canvasSection").offset().top);
-        b.x = b.x - (corrSVG.e - jQuery("#canvasSection").offset().left);
-        b.y = b.y - (corrSVG.f - jQuery("#canvasSection").offset().top);
-
+        a.x = a.x - (corrSVG.e - jQuery('#canvasSection').offset().left)
+        a.y = a.y - (corrSVG.f - jQuery('#canvasSection').offset().top)
+        b.x = b.x - (corrSVG.e - jQuery('#canvasSection').offset().left)
+        b.y = b.y - (corrSVG.f - jQuery('#canvasSection').offset().top)
       } else {
-        var canvasOffsetLeft = jQuery("#canvasSection").offset().left;
-        var canvasScrollLeft = jQuery("#canvasSection").scrollLeft();
-        var canvasScrollTop = jQuery("#canvasSection").scrollTop();
+        let canvasOffsetLeft = jQuery('#canvasSection').offset().left
+        let canvasScrollLeft = jQuery('#canvasSection').scrollLeft()
+        let canvasScrollTop = jQuery('#canvasSection').scrollTop()
 
-        var offset = a.e - (canvasOffsetLeft * additionalIEZoom);
-        var additionaloffset = 0;
+        let offset = a.e - (canvasOffsetLeft * additionalIEZoom)
+        let additionaloffset = 0
         if (offset > 10) {
-          additionaloffset = (offset / additionalIEZoom) - offset;
+          additionaloffset = (offset / additionalIEZoom) - offset
         }
 
-        a.x = a.x - (corrSVG.e - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft));
-        a.y = a.y - (corrSVG.f - (jQuery("#canvasSection").offset().top * additionalIEZoom) + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop));
-        b.x = b.x - (corrSVG.e - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft));
-        b.y = b.y - (corrSVG.f - (jQuery("#canvasSection").offset().top * additionalIEZoom) + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop));
+        a.x = a.x - (corrSVG.e - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft))
+        a.y = a.y - (corrSVG.f - (jQuery('#canvasSection').offset().top * additionalIEZoom) + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop))
+        b.x = b.x - (corrSVG.e - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft))
+        b.y = b.y - (corrSVG.f - (jQuery('#canvasSection').offset().top * additionalIEZoom) + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop))
       }
-
-
       // Fit to SVG-Coordinates
-      a.x /= corrSVG.a;
-      a.y /= corrSVG.d;
-      b.x /= corrSVG.a;
-      b.y /= corrSVG.d;
+      a.x /= corrSVG.a
+      a.y /= corrSVG.d
+      b.x /= corrSVG.a
+      b.y /= corrSVG.d
 
       // Calculate the elements from the childs of the canvas
-      var elements = this.facade.getCanvas().getChildShapes(true).findAll(function (value) {
-        var absBounds = value.absoluteBounds();
-
-        var bA = absBounds.upperLeft();
-        var bB = absBounds.lowerRight();
-
+      let elements = this.facade.getCanvas().getChildShapes(true).findAll(function (value) {
+        let absBounds = value.absoluteBounds()
+        let bA = absBounds.upperLeft()
+        let bB = absBounds.lowerRight()
         if (bA.x > a.x && bA.y > a.y && bB.x < b.x && bB.y < b.y)
-          return true;
-        return false;
-      });
+          return true
+        return false
+      })
 
       // Set the selection
-      this.facade.setSelection(elements);
+      this.facade.setSelection(elements)
     }
   }
 
   handleMouseMove (event) {
     // Calculate the size
-    var size = {
-      width: Event.pointerX(event) - this.position.x - jQuery("#canvasSection").offset().left,
-      height: Event.pointerY(event) - this.position.y - jQuery("#canvasSection").offset().top + 5
-    };
+    let size = {
+      width: Event.pointerX(event) - this.position.x - jQuery('#canvasSection').offset().left,
+      height: Event.pointerY(event) - this.position.y - jQuery('#canvasSection').offset().top + 5
+    }
 
-    var scrollNode = this.facade.getCanvas().rootNode.parentNode.parentNode;
-    size.width -= this.offsetScroll.x - scrollNode.scrollLeft;
-    size.height -= this.offsetScroll.y - scrollNode.scrollTop;
+    let scrollNode = this.facade.getCanvas().rootNode.parentNode.parentNode
+    size.width -= this.offsetScroll.x - scrollNode.scrollLeft
+    size.height -= this.offsetScroll.y - scrollNode.scrollTop
 
     // Set the size
-    this.resize(size);
-
-    Event.stop(event);
+    this.resize(size)
+    Event.stop(event)
   }
 
   hide () {
-    this.node.style.display = "none";
+    this.node.style.display = 'none'
   }
 
   show () {
-    this.node.style.display = "";
+    this.node.style.display = ''
   }
 
   setPos (pos) {
     // Set the Position
-    this.node.style.top = pos.y + "px";
-    this.node.style.left = pos.x + "px";
-    this.position = pos;
+    this.node.style.top = pos.y + 'px'
+    this.node.style.left = pos.x + 'px'
+    this.position = pos
   }
 
-  resize(size) {
-
+  resize (size) {
     // Calculate the negative offset
-    this.setPos(this.position);
-    this.size = Object.clone(size);
+    this.setPos(this.position)
+    this.size = Object.clone(size)
 
     if (size.width < 0) {
-      this.node.style.left = (this.position.x + size.width) + "px";
-      size.width = -size.width;
+      this.node.style.left = (this.position.x + size.width) + 'px'
+      size.width = -size.width
     }
     if (size.height < 0) {
-      this.node.style.top = (this.position.y + size.height) + "px";
-      size.height = -size.height;
+      this.node.style.top = (this.position.y + size.height) + 'px'
+      size.height = -size.height
     }
 
     // Set the size
-    this.node.style.width = size.width + "px";
-    this.node.style.height = size.height + "px";
+    this.node.style.width = size.width + 'px'
+    this.node.style.height = size.height + 'px'
   }
 
 }

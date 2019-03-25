@@ -1,3 +1,8 @@
+import ORYX_Config from '../CONFIG'
+
+import ORYX_Command from '../core/Command'
+import ORYX_Controls from '../core/Controls/index'
+import ORYX_Edge from '../core/Edge'
 
 export default class AddDocker {
 
@@ -10,7 +15,7 @@ export default class AddDocker {
     this.enableAdd = false;
     this.enableRemove = false;
 
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this));
+    this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this));
   }
 
   setEnableAdd(enable) {
@@ -46,7 +51,7 @@ export default class AddDocker {
    *
    */
   handleMouseDown (event, uiObj) {
-    if (this.enabledAdd() && uiObj instanceof ORYX.Core.Edge) {
+    if (this.enabledAdd() && uiObj instanceof ORYX_Edge) {
       this.newDockerCommand({
         edge: uiObj,
         position: this.facade.eventCoordinates(event)
@@ -54,8 +59,8 @@ export default class AddDocker {
       this.setEnableAdd(false);
 
     } else if (this.enabledRemove() &&
-      uiObj instanceof ORYX.Core.Controls.Docker &&
-      uiObj.parent instanceof ORYX.Core.Edge) {
+      uiObj instanceof ORYX_Controls.Docker &&
+      uiObj.parent instanceof ORYX_Edge) {
       this.newDockerCommand({
         edge: uiObj.parent,
         docker: uiObj
@@ -70,7 +75,7 @@ export default class AddDocker {
     if (!options.edge)
       return;
 
-    var commandClass = ORYX.Core.Command.extend({
+    let commandClass = ORYX_Command.extend({
       construct: function (addEnabled, deleteEnabled, edge, docker, pos, facade) {
         this.addEnabled = addEnabled;
         this.deleteEnabled = deleteEnabled;
@@ -99,11 +104,10 @@ export default class AddDocker {
       },
       rollback: function () {
         if (this.addEnabled) {
-          if (this.docker instanceof ORYX.Core.Controls.Docker) {
+          if (this.docker instanceof ORYX_Controls.Docker) {
             this.edge.removeDocker(this.docker);
           }
-        }
-        else if (this.deleteEnabled) {
+        } else if (this.deleteEnabled) {
           this.edge.add(this.docker, this.index);
         }
         this.edge.getLabels().invoke("show");
@@ -112,7 +116,7 @@ export default class AddDocker {
       }
     })
 
-    var command = new commandClass(this.enabledAdd(), this.enabledRemove(), options.edge, options.docker, options.position, this.facade);
+    let command = new commandClass(this.enabledAdd(), this.enabledRemove(), options.edge, options.docker, options.position, this.facade);
 
     this.facade.executeCommands([command]);
   }

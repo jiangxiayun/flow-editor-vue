@@ -1,4 +1,12 @@
 import Shape from './Shape'
+import ORYX_SVG from './SVG'
+import ORYX_Math from './Math'
+import ORYX_Editor from '../Editor'
+import ORYX_Config from '../CONFIG'
+import ORYX_Controls from './Controls'
+import ERDF from '../ERDF'
+
+import ORYX_Node from '../core/Node'
 
 /**
  * @classDescription Abstract base class for all connections.
@@ -35,14 +43,13 @@ export default class Edge extends Shape {
     this.attachedNodePositionData = new Hash()
 
     //TODO was muss hier initial erzeugt werden?
-    var stencilNode = this.node.childNodes[0].childNodes[0]
-    stencilNode = ORYX.Editor.graft('http://www.w3.org/2000/svg', stencilNode, ['g', {
+    let stencilNode = this.node.childNodes[0].childNodes[0]
+    stencilNode = ORYX_Editor.graft('http://www.w3.org/2000/svg', stencilNode, ['g', {
       'pointer-events': 'painted'
     }])
 
     //Add to the EventHandler
     this.addEventHandlers(stencilNode.parentNode)
-
 
     this._oldBounds = this.bounds.clone()
 
@@ -57,12 +64,11 @@ export default class Edge extends Shape {
 
   _update (force) {
     if (this._dockerUpdated || this.isChanged || force) {
-
       this.dockers.invoke('update')
 
       if (false && (this.bounds.width() === 0 || this.bounds.height() === 0)) {
-        var width = this.bounds.width()
-        var height = this.bounds.height()
+        let width = this.bounds.width()
+        let height = this.bounds.height()
         this.bounds.extend({
           x: width === 0 ? 2 : 0,
           y: height === 0 ? 2 : 0
@@ -71,18 +77,17 @@ export default class Edge extends Shape {
           x: width === 0 ? -1 : 0,
           y: height === 0 ? -1 : 0
         })
-
       }
 
       // TODO: Bounds muss abhaengig des Eltern-Shapes gesetzt werden
-      var upL = this.bounds.upperLeft()
-      var oldUpL = this._oldBounds.upperLeft()
-      var oldWidth = this._oldBounds.width() === 0 ? this.bounds.width() : this._oldBounds.width()
-      var oldHeight = this._oldBounds.height() === 0 ? this.bounds.height() : this._oldBounds.height()
-      var diffX = upL.x - oldUpL.x
-      var diffY = upL.y - oldUpL.y
-      var diffWidth = (this.bounds.width() / oldWidth) || 1
-      var diffHeight = (this.bounds.height() / oldHeight) || 1
+      let upL = this.bounds.upperLeft()
+      let oldUpL = this._oldBounds.upperLeft()
+      let oldWidth = this._oldBounds.width() === 0 ? this.bounds.width() : this._oldBounds.width()
+      let oldHeight = this._oldBounds.height() === 0 ? this.bounds.height() : this._oldBounds.height()
+      let diffX = upL.x - oldUpL.x
+      let diffY = upL.y - oldUpL.y
+      let diffWidth = (this.bounds.width() / oldWidth) || 1
+      let diffHeight = (this.bounds.height() / oldHeight) || 1
 
       this.dockers.each((function (docker) {
         // Unregister on BoundsChangedCallback
@@ -94,9 +99,8 @@ export default class Edge extends Shape {
           docker.bounds.moveBy(diffX, diffY)
 
           if (diffWidth !== 1 || diffHeight !== 1) {
-            var relX = docker.bounds.upperLeft().x - upL.x
-            var relY = docker.bounds.upperLeft().y - upL.y
-
+            let relX = docker.bounds.upperLeft().x - upL.x
+            let relY = docker.bounds.upperLeft().y - upL.y
             docker.bounds.moveTo(upL.x + relX * diffWidth, upL.y + relY * diffHeight)
           }
         }
@@ -107,11 +111,11 @@ export default class Edge extends Shape {
       }).bind(this))
 
       if (this._dockerUpdated) {
-        var a = this.dockers.first().bounds.center()
-        var b = this.dockers.first().bounds.center()
+        let a = this.dockers.first().bounds.center()
+        let b = this.dockers.first().bounds.center()
 
         this.dockers.each((function (docker) {
-          var center = docker.bounds.center()
+          let center = docker.bounds.center()
           a.x = Math.min(a.x, center.x)
           a.y = Math.min(a.y, center.y)
           b.x = Math.max(b.x, center.x)
@@ -131,15 +135,14 @@ export default class Edge extends Shape {
 
       //reposition labels
       this.getLabels().each(function (label) {
-
         if (label.getReferencePoint()) {
-          var ref = label.getReferencePoint()
-          var from = ref.segment.from, to = ref.segment.to
+          let ref = label.getReferencePoint()
+          let from = ref.segment.from, to = ref.segment.to
           if (!from || !from.parent || !to || !to.parent) {
             return
           }
 
-          var fromPosition = from.bounds.center(), toPosition = to.bounds.center()
+          let fromPosition = from.bounds.center(), toPosition = to.bounds.center()
 
           if (fromPosition.x === ref.segment.fromPosition.x && fromPosition.y === ref.segment.fromPosition.y &&
             toPosition.x === ref.segment.toPosition.x && toPosition.y === ref.segment.toPosition.y && !ref.dirty) {
@@ -147,28 +150,28 @@ export default class Edge extends Shape {
           }
 
           if (!this.parent.initializingShapes) {
-            var oldDistance = ORYX.Core.Math.getDistanceBetweenTwoPoints(ref.segment.fromPosition, ref.segment.toPosition, ref.intersection)
-            var newIntersection = ORYX.Core.Math.getPointBetweenTwoPoints(fromPosition, toPosition, isNaN(oldDistance) ? 0.5 : oldDistance)
+            let oldDistance = ORYX_Math.getDistanceBetweenTwoPoints(ref.segment.fromPosition, ref.segment.toPosition, ref.intersection)
+            let newIntersection = ORYX_Math.getPointBetweenTwoPoints(fromPosition, toPosition, isNaN(oldDistance) ? 0.5 : oldDistance)
 
             /**
              * Set position
              */
               // Get the orthogonal identity vector of the current segment
-            var oiv = ORYX.Core.Math.getOrthogonalIdentityVector(fromPosition, toPosition)
-            var isHor = Math.abs(oiv.y) === 1, isVer = Math.abs(oiv.x) === 1
+            let oiv = ORYX_Math.getOrthogonalIdentityVector(fromPosition, toPosition)
+            let isHor = Math.abs(oiv.y) === 1, isVer = Math.abs(oiv.x) === 1
             oiv.x *= ref.distance
             oiv.y *= ref.distance 				// vector * distance
             oiv.x += newIntersection.x
             oiv.y += newIntersection.y 	// vector + the intersection point
-            var mx = isHor && ref.orientation && (ref.iorientation || ref.orientation).endsWith('r') ? -label.getWidth() : 0
-            var my = isVer && ref.orientation && (ref.iorientation || ref.orientation).startsWith('l') ? -label.getHeight() + 2 : 0
+            let mx = isHor && ref.orientation && (ref.iorientation || ref.orientation).endsWith('r') ? -label.getWidth() : 0
+            let my = isVer && ref.orientation && (ref.iorientation || ref.orientation).startsWith('l') ? -label.getHeight() + 2 : 0
             label.setX(oiv.x + mx)
             label.setY(oiv.y + my)
 
             // Update the reference point
             this.updateReferencePointOfLabel(label, newIntersection, from, to)
           } else {
-            var oiv = ORYX.Core.Math.getOrthogonalIdentityVector(fromPosition, toPosition)
+            let oiv = ORYX_Math.getOrthogonalIdentityVector(fromPosition, toPosition)
             oiv.x *= ref.distance
             oiv.y *= ref.distance // vector * distance
             oiv.x += ref.intersection.x
@@ -184,12 +187,12 @@ export default class Edge extends Shape {
 
         // Update label position if no reference point is set
         if (label.position && !this.parent.initializingShapes) {
-          var x = label.position.x + (diffX * (diffWidth || 1))
+          let x = label.position.x + (diffX * (diffWidth || 1))
           if (x > this.bounds.lowerRight().x) {
             x += this.bounds.width() - (this.bounds.width() / (diffWidth || 1))
           }
 
-          var y = label.position.y + (diffY * (diffHeight || 1))
+          let y = label.position.y + (diffY * (diffHeight || 1))
           if (y > this.bounds.lowerRight().y) {
             y += this.bounds.height() - (this.bounds.height() / (diffHeight || 1))
           }
@@ -197,11 +200,11 @@ export default class Edge extends Shape {
           label.setY(y)
           return
         }
-
+        let angle, pos, numOfDockers, index, length
         switch (label.getEdgePosition()) {
           case 'starttop':
-            var angle = this._getAngle(this.dockers[0], this.dockers[1])
-            var pos = this.dockers.first().bounds.center()
+            angle = this._getAngle(this.dockers[0], this.dockers[1])
+            pos = this.dockers.first().bounds.center()
 
             if (angle <= 90 || angle > 270) {
               label.horizontalAlign('left')
@@ -219,8 +222,8 @@ export default class Edge extends Shape {
 
             break
           case 'startmiddle':
-            var angle = this._getAngle(this.dockers[0], this.dockers[1])
-            var pos = this.dockers.first().bounds.center()
+            angle = this._getAngle(this.dockers[0], this.dockers[1])
+            pos = this.dockers.first().bounds.center()
 
             if (angle <= 90 || angle > 270) {
               label.horizontalAlign('left')
@@ -238,8 +241,8 @@ export default class Edge extends Shape {
 
             break
           case 'startbottom':
-            var angle = this._getAngle(this.dockers[0], this.dockers[1])
-            var pos = this.dockers.first().bounds.center()
+            angle = this._getAngle(this.dockers[0], this.dockers[1])
+            pos = this.dockers.first().bounds.center()
 
             if (angle <= 90 || angle > 270) {
               label.horizontalAlign('left')
@@ -257,12 +260,12 @@ export default class Edge extends Shape {
 
             break
           case 'midtop':
-            var numOfDockers = this.dockers.length
+            numOfDockers = this.dockers.length
             if (numOfDockers % 2 == 0) {
-              var angle = this._getAngle(this.dockers[numOfDockers / 2 - 1], this.dockers[numOfDockers / 2])
-              var pos1 = this.dockers[numOfDockers / 2 - 1].bounds.center()
-              var pos2 = this.dockers[numOfDockers / 2].bounds.center()
-              var pos = { x: (pos1.x + pos2.x) / 2.0, y: (pos1.y + pos2.y) / 2.0 }
+              let angle = this._getAngle(this.dockers[numOfDockers / 2 - 1], this.dockers[numOfDockers / 2])
+              let pos1 = this.dockers[numOfDockers / 2 - 1].bounds.center()
+              let pos2 = this.dockers[numOfDockers / 2].bounds.center()
+              let pos = { x: (pos1.x + pos2.x) / 2.0, y: (pos1.y + pos2.y) / 2.0 }
 
               label.horizontalAlign('center')
               label.verticalAlign('bottom')
@@ -275,9 +278,9 @@ export default class Edge extends Shape {
                 label.rotate(180 - angle, pos)
               }
             } else {
-              var index = parseInt(numOfDockers / 2)
-              var angle = this._getAngle(this.dockers[index], this.dockers[index + 1])
-              var pos = this.dockers[index].bounds.center()
+              index = parseInt(numOfDockers / 2)
+              angle = this._getAngle(this.dockers[index], this.dockers[index + 1])
+              pos = this.dockers[index].bounds.center()
 
               if (angle <= 90 || angle > 270) {
                 label.horizontalAlign('left')
@@ -296,12 +299,12 @@ export default class Edge extends Shape {
 
             break
           case 'midbottom':
-            var numOfDockers = this.dockers.length
+            numOfDockers = this.dockers.length
             if (numOfDockers % 2 == 0) {
-              var angle = this._getAngle(this.dockers[numOfDockers / 2 - 1], this.dockers[numOfDockers / 2])
-              var pos1 = this.dockers[numOfDockers / 2 - 1].bounds.center()
-              var pos2 = this.dockers[numOfDockers / 2].bounds.center()
-              var pos = { x: (pos1.x + pos2.x) / 2.0, y: (pos1.y + pos2.y) / 2.0 }
+              let angle = this._getAngle(this.dockers[numOfDockers / 2 - 1], this.dockers[numOfDockers / 2])
+              let pos1 = this.dockers[numOfDockers / 2 - 1].bounds.center()
+              let pos2 = this.dockers[numOfDockers / 2].bounds.center()
+              let pos = { x: (pos1.x + pos2.x) / 2.0, y: (pos1.y + pos2.y) / 2.0 }
 
               label.horizontalAlign('center')
               label.verticalAlign('top')
@@ -314,9 +317,9 @@ export default class Edge extends Shape {
                 label.rotate(180 - angle, pos)
               }
             } else {
-              var index = parseInt(numOfDockers / 2)
-              var angle = this._getAngle(this.dockers[index], this.dockers[index + 1])
-              var pos = this.dockers[index].bounds.center()
+              index = parseInt(numOfDockers / 2)
+              angle = this._getAngle(this.dockers[index], this.dockers[index + 1])
+              pos = this.dockers[index].bounds.center()
 
               if (angle <= 90 || angle > 270) {
                 label.horizontalAlign('left')
@@ -335,9 +338,9 @@ export default class Edge extends Shape {
 
             break
           case 'endtop':
-            var length = this.dockers.length
-            var angle = this._getAngle(this.dockers[length - 2], this.dockers[length - 1])
-            var pos = this.dockers.last().bounds.center()
+            length = this.dockers.length
+            angle = this._getAngle(this.dockers[length - 2], this.dockers[length - 1])
+            pos = this.dockers.last().bounds.center()
 
             if (angle <= 90 || angle > 270) {
               label.horizontalAlign('right')
@@ -355,9 +358,9 @@ export default class Edge extends Shape {
 
             break
           case 'endbottom':
-            var length = this.dockers.length
-            var angle = this._getAngle(this.dockers[length - 2], this.dockers[length - 1])
-            var pos = this.dockers.last().bounds.center()
+            length = this.dockers.length
+            angle = this._getAngle(this.dockers[length - 2], this.dockers[length - 1])
+            pos = this.dockers.last().bounds.center()
 
             if (angle <= 90 || angle > 270) {
               label.horizontalAlign('right')
@@ -378,7 +381,7 @@ export default class Edge extends Shape {
       }.bind(this))
 
       this.children.each(function (value) {
-        if (value instanceof ORYX.Core.Node) {
+        if (value instanceof ORYX_Node) {
           this.calculatePositionOfAttachedChildNode.call(this, value)
         }
       }.bind(this))
@@ -394,7 +397,7 @@ export default class Edge extends Shape {
 
 
     // IE10 specific fix, start and end-markes get left behind when moving path
-    var userAgent = navigator.userAgent
+    let userAgent = navigator.userAgent
     if (navigator.appVersion.indexOf('MSIE 10') !== -1 || (userAgent.indexOf('Trident') !== -1 && userAgent.indexOf('rv:11') !== -1)) {
       this.node.parentNode.insertBefore(this.node, this.node)
     }
@@ -418,12 +421,12 @@ export default class Edge extends Shape {
    */
   refreshAttachedNodes () {
     this.attachedNodePositionData.values().each(function (nodeData) {
-      var startPoint = nodeData.segment.docker1.bounds.center()
-      var endPoint = nodeData.segment.docker2.bounds.center()
+      let startPoint = nodeData.segment.docker1.bounds.center()
+      let endPoint = nodeData.segment.docker2.bounds.center()
       this.relativizePoint(startPoint)
       this.relativizePoint(endPoint)
 
-      var newNodePosition = new Object()
+      let newNodePosition = new Object()
 
       /* Calculate new x-coordinate */
       newNodePosition.x = startPoint.x
@@ -456,7 +459,7 @@ export default class Edge extends Shape {
    */
   calculatePositionOfAttachedChildNode (node) {
     /* Initialize position */
-    var position = new Object()
+    let position = new Object()
     position.x = 0
     position.y = 0
 
@@ -471,7 +474,6 @@ export default class Edge extends Shape {
       this.findEdgeSegmentForNode(node)
     }
 
-
   }
 
   /**
@@ -482,17 +484,17 @@ export default class Edge extends Shape {
    *    The concerning node
    */
   findEdgeSegmentForNode (node) {
-    var length = this.dockers.length
-    var smallestDistance = undefined
+    let length = this.dockers.length
+    let smallestDistance = undefined
 
-    for (i = 1; i < length; i++) {
-      var lineP1 = this.dockers[i - 1].bounds.center()
-      var lineP2 = this.dockers[i].bounds.center()
+    for (let i = 1; i < length; i++) {
+      let lineP1 = this.dockers[i - 1].bounds.center()
+      let lineP2 = this.dockers[i].bounds.center()
       this.relativizePoint(lineP1)
       this.relativizePoint(lineP2)
 
-      var nodeCenterPoint = node.bounds.center()
-      var distance = ORYX.Core.Math.distancePointLinie(
+      let nodeCenterPoint = node.bounds.center()
+      let distance = ORYX.Core.Math.distancePointLinie(
         lineP1,
         lineP2,
         nodeCenterPoint,
@@ -515,8 +517,8 @@ export default class Edge extends Shape {
        *
        */
       if (!distance && !smallestDistance && smallestDistance != 0) {
-        var distanceCenterToLineOne = ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP1)
-        var distanceCenterToLineTwo = ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP2)
+        let distanceCenterToLineOne = ORYX_Math.getDistancePointToPoint(nodeCenterPoint, lineP1)
+        let distanceCenterToLineTwo = ORYX_Math.getDistancePointToPoint(nodeCenterPoint, lineP2)
 
         if (distanceCenterToLineOne < distanceCenterToLineTwo) {
           this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 0
@@ -546,17 +548,15 @@ export default class Edge extends Shape {
    *   toDocker, {X/Y} position, {int} distance
    */
   findSegment (node) {
+    let length = this.dockers.length
+    let result
+    let nodeCenterPoint = node instanceof ORYX.Core.UIObject ? node.bounds.center() : node
 
-    var length = this.dockers.length
-    var result
+    for (let i = 1; i < length; i++) {
+      let lineP1 = this.dockers[i - 1].bounds.center()
+      let lineP2 = this.dockers[i].bounds.center()
 
-    var nodeCenterPoint = node instanceof ORYX.Core.UIObject ? node.bounds.center() : node
-
-    for (i = 1; i < length; i++) {
-      var lineP1 = this.dockers[i - 1].bounds.center()
-      var lineP2 = this.dockers[i].bounds.center()
-
-      var distance = ORYX.Core.Math.distancePointLinie(lineP1, lineP2, nodeCenterPoint, true)
+      let distance = ORYX_Math.distancePointLinie(lineP1, lineP2, nodeCenterPoint, true)
 
       if (typeof distance == 'number' && (result === undefined || distance < result.distance)) {
         result = {
@@ -585,12 +585,12 @@ export default class Edge extends Shape {
    *    The scalar value to determine the position on the line
    */
   getLineParameterForPosition (docker1, docker2, node) {
-    var dockerPoint1 = docker1.bounds.center()
-    var dockerPoint2 = docker2.bounds.center()
+    let dockerPoint1 = docker1.bounds.center()
+    let dockerPoint2 = docker2.bounds.center()
     this.relativizePoint(dockerPoint1)
     this.relativizePoint(dockerPoint2)
 
-    var intersectionPoint = ORYX.Core.Math.getPointOfIntersectionPointLine(
+    let intersectionPoint = ORYX_Math.getPointOfIntersectionPointLine(
       dockerPoint1,
       dockerPoint2,
       node.bounds.center(), true)
@@ -598,9 +598,9 @@ export default class Edge extends Shape {
       return 0
     }
 
-    var relativeDistance =
-      ORYX.Core.Math.getDistancePointToPoint(intersectionPoint, dockerPoint1) /
-      ORYX.Core.Math.getDistancePointToPoint(dockerPoint1, dockerPoint2)
+    let relativeDistance =
+      ORYX_Math.getDistancePointToPoint(intersectionPoint, dockerPoint1) /
+      ORYX_Math.getDistancePointToPoint(dockerPoint1, dockerPoint2)
 
     return relativeDistance
   }
@@ -624,11 +624,9 @@ export default class Edge extends Shape {
    *
    */
   optimizedUpdate () {
-
-    var updateDocker = function (docker) {
-      if (!docker._dockedShape || !docker._dockedShapeBounds)
-        return
-      var off = {
+    let updateDocker = function (docker) {
+      if (!docker._dockedShape || !docker._dockedShapeBounds) return
+      let off = {
         x: docker._dockedShape.bounds.a.x - docker._dockedShapeBounds.a.x,
         y: docker._dockedShape.bounds.a.y - docker._dockedShapeBounds.a.y
       }
@@ -644,25 +642,25 @@ export default class Edge extends Shape {
 
   refresh () {
     //call base class refresh method
-    arguments.callee.$.refresh.apply(this, arguments)
+    // arguments.callee.$.refresh.apply(this, arguments)
 
+    super.refresh()
     //TODO consider points for marker mids
-    var lastPoint
+    let lastPoint
     this._paths.each((function (path, index) {
-      var dockers = this._dockersByPath.get(path.id)
-      var c = undefined
-      var d = undefined
+      let dockers = this._dockersByPath.get(path.id)
+      let c = undefined
+      let d = undefined
       if (lastPoint) {
         d = 'M' + lastPoint.x + ' ' + lastPoint.y
-      }
-      else {
+      } else {
         c = dockers[0].bounds.center()
         lastPoint = c
 
         d = 'M' + c.x + ' ' + c.y
       }
 
-      for (var i = 1; i < dockers.length; i++) {
+      for (let i = 1; i < dockers.length; i++) {
         // for each docker, draw a line to the center
         c = dockers[i].bounds.center()
         d = d + 'L' + c.x + ' ' + c.y + ' '
@@ -677,9 +675,8 @@ export default class Edge extends Shape {
 
     /* move child shapes of an edge */
     if (this.getChildNodes().length > 0) {
-      var x = this.bounds.upperLeft().x
-      var y = this.bounds.upperLeft().y
-
+      let x = this.bounds.upperLeft().x
+      let y = this.bounds.upperLeft().y
       this.node.firstChild.childNodes[1].setAttributeNS(null, 'transform', 'translate(' + x + ', ' + y + ')')
     }
 
@@ -691,10 +688,8 @@ export default class Edge extends Shape {
    * @param {PointB}
    */
   getIntersectionPoint () {
-
-    var length = Math.floor(this.dockers.length / 2)
-
-    return ORYX.Core.Math.midPoint(this.dockers[length - 1].bounds.center(), this.dockers[length].bounds.center())
+    let length = Math.floor(this.dockers.length / 2)
+    return ORYX_Math.midPoint(this.dockers[length - 1].bounds.center(), this.dockers[length].bounds.center())
   }
 
   /**
@@ -703,15 +698,15 @@ export default class Edge extends Shape {
    *
    */
   isBoundsIncluded (bounds) {
-    var dockers = this.dockers, size = dockers.length
+    let dockers = this.dockers, size = dockers.length
     return dockers.any(function (docker, i) {
       if (i == size - 1) {
         return false
       }
-      var a = docker.bounds.center()
-      var b = dockers[i + 1].bounds.center()
+      let a = docker.bounds.center()
+      let b = dockers[i + 1].bounds.center()
 
-      return ORYX.Core.Math.isRectOverLine(a.x, a.y, b.x, b.y, bounds.a.x, bounds.a.y, bounds.b.x, bounds.b.y)
+      return ORYX_Math.isRectOverLine(a.x, a.y, b.x, b.y, bounds.a.x, bounds.a.y, bounds.b.x, bounds.b.y)
     })
   }
 
@@ -721,27 +716,21 @@ export default class Edge extends Shape {
    * @param {PointY}
    */
   isPointIncluded (pointX, pointY) {
-
-    var isbetweenAB = this.absoluteBounds().isIncluded(pointX, pointY,
-      ORYX.CONFIG.OFFSET_EDGE_BOUNDS)
-
-    var isPointIncluded = undefined
+    let isbetweenAB = this.absoluteBounds().isIncluded(pointX, pointY, ORYX_Config.OFFSET_EDGE_BOUNDS)
+    let isPointIncluded = undefined
 
     if (isbetweenAB && this.dockers.length > 0) {
-
-      var i = 0
-      var point1, point2
-
+      let i = 0
+      let point1, point2
 
       do {
-
         point1 = this.dockers[i].bounds.center()
         point2 = this.dockers[++i].bounds.center()
 
-        isPointIncluded = ORYX.Core.Math.isPointInLine(pointX, pointY,
+        isPointIncluded = ORYX_Math.isPointInLine(pointX, pointY,
           point1.x, point1.y,
           point2.x, point2.y,
-          ORYX.CONFIG.OFFSET_EDGE_BOUNDS)
+          ORYX_Config.OFFSET_EDGE_BOUNDS)
 
       } while (!isPointIncluded && i < this.dockers.length - 1)
 
@@ -780,25 +769,25 @@ export default class Edge extends Shape {
    * (0 - 359.99999999)
    */
   _getAngle (docker1, docker2) {
-    var p1 = docker1 instanceof ORYX.Core.Controls.Docker ? docker1.absoluteCenterXY() : docker1
-    var p2 = docker2 instanceof ORYX.Core.Controls.Docker ? docker2.absoluteCenterXY() : docker2
+    let p1 = docker1 instanceof ORYX_Controls.Docker ? docker1.absoluteCenterXY() : docker1
+    let p2 = docker2 instanceof ORYX_Controls.Docker ? docker2.absoluteCenterXY() : docker2
 
-    return ORYX.Core.Math.getAngle(p1, p2)
+    return ORYX_Math.getAngle(p1, p2)
   }
 
   alignDockers () {
     this._update(true)
 
-    var firstPoint = this.dockers.first().bounds.center()
-    var lastPoint = this.dockers.last().bounds.center()
+    let firstPoint = this.dockers.first().bounds.center()
+    let lastPoint = this.dockers.last().bounds.center()
 
-    var deltaX = lastPoint.x - firstPoint.x
-    var deltaY = lastPoint.y - firstPoint.y
+    let deltaX = lastPoint.x - firstPoint.x
+    let deltaY = lastPoint.y - firstPoint.y
 
-    var numOfDockers = this.dockers.length - 1
+    let numOfDockers = this.dockers.length - 1
 
     this.dockers.each((function (docker, index) {
-      var part = index / numOfDockers
+      let part = index / numOfDockers
       docker.bounds.unregisterCallback(this._dockerChangedCallback)
       docker.bounds.moveTo(firstPoint.x + part * deltaX, firstPoint.y + part * deltaY)
       docker.bounds.registerCallback(this._dockerChangedCallback)
@@ -808,12 +797,13 @@ export default class Edge extends Shape {
   }
 
   add (shape) {
-    arguments.callee.$.add.apply(this, arguments)
+    // arguments.callee.$.add.apply(this, arguments)
+    super.add(shape)
 
     // If the new shape is a Docker which is not contained
-    if (shape instanceof ORYX.Core.Controls.Docker && this.dockers.include(shape)) {
+    if (shape instanceof ORYX_Controls.Docker && this.dockers.include(shape)) {
       // Add it to the dockers list ordered by paths
-      var pathArray = this._dockersByPath.values()[0]
+      let pathArray = this._dockersByPath.values()[0]
       if (pathArray) {
         pathArray.splice(this.dockers.indexOf(shape), 0, shape)
       }
@@ -831,28 +821,28 @@ export default class Edge extends Shape {
    */
   handleChildShapesAfterAddDocker (docker) {
     /* Ensure type of Docker */
-    if (!docker instanceof ORYX.Core.Controls.Docker) {
+    if (!docker instanceof ORYX_Controls.Docker) {
       return undefined
     }
 
-    var index = this.dockers.indexOf(docker)
+    let index = this.dockers.indexOf(docker)
     if (!(0 < index && index < this.dockers.length - 1)) {
       /* Exception: Expect added docker between first and last node of the edge */
       return undefined
     }
 
     /* Get child nodes concerning the segment of the new docker */
-    var startDocker = this.dockers[index - 1]
-    var endDocker = this.dockers[index + 1]
+    let startDocker = this.dockers[index - 1]
+    let endDocker = this.dockers[index + 1]
 
     /* Adjust the position of edge's child nodes */
-    var segmentElements =
+    let segmentElements =
       this.getAttachedNodePositionDataForSegment(startDocker, endDocker)
 
-    var lengthSegmentPart1 = ORYX.Core.Math.getDistancePointToPoint(
+    let lengthSegmentPart1 = ORYX_Math.getDistancePointToPoint(
       startDocker.bounds.center(),
       docker.bounds.center())
-    var lengthSegmentPart2 = ORYX.Core.Math.getDistancePointToPoint(
+    let lengthSegmentPart2 = ORYX_Math.getDistancePointToPoint(
       endDocker.bounds.center(),
       docker.bounds.center())
 
@@ -860,7 +850,7 @@ export default class Edge extends Shape {
       return
     }
 
-    var relativDockerPosition = lengthSegmentPart1 / (lengthSegmentPart1 + lengthSegmentPart2)
+    let relativDockerPosition = lengthSegmentPart1 / (lengthSegmentPart1 + lengthSegmentPart2)
 
     segmentElements.each(function (nodePositionData) {
       /* Assign child node to the new segment */
@@ -872,8 +862,8 @@ export default class Edge extends Shape {
       } else {
         /* Case: after added Docker */
         nodePositionData.value.segment.docker1 = docker
-        var newFullDistance = 1 - relativDockerPosition
-        var relativPartOfSegment =
+        let newFullDistance = 1 - relativDockerPosition
+        let relativPartOfSegment =
           nodePositionData.value.relativDistanceFromDocker1
           - relativDockerPosition
 
@@ -886,24 +876,23 @@ export default class Edge extends Shape {
 
     // Update all labels reference points
     this.getLabels().each(function (label) {
-
-      var ref = label.getReferencePoint()
+      let ref = label.getReferencePoint()
       if (!ref) {
         return
       }
-      var index = this.dockers.indexOf(docker)
+      let index = this.dockers.indexOf(docker)
       if (index >= ref.segment.fromIndex && index <= ref.segment.toIndex) {
 
-        var segment = this.findSegment(ref.intersection)
+        let segment = this.findSegment(ref.intersection)
         if (!segment) {
           // Choose whether the first of the last segment
           segment.fromDocker = ref.segment.fromIndex >= (this.dockers.length / 2) ? this.dockers[0] : this.dockers[this.dockers.length - 2]
           segment.toDocker = this.dockers[this.dockers.indexOf(from) + 1] // The next one if the to docker
         }
 
-        var fromPosition = segment.fromDocker.bounds.center(), toPosition = segment.toDocker.bounds.center()
+        let fromPosition = segment.fromDocker.bounds.center(), toPosition = segment.toDocker.bounds.center()
 
-        var intersection = ORYX.Core.Math.getPointOfIntersectionPointLine(
+        let intersection = ORYX_Math.getPointOfIntersectionPointLine(
           fromPosition, 		// P1 - Center of the first docker
           toPosition, 		// P2 - Center of the second docker
           ref.intersection, 	// P3 - Center of the label
@@ -936,13 +925,13 @@ export default class Edge extends Shape {
    */
   getAttachedNodePositionDataForSegment (startDocker, endDocker) {
     /* Ensure that the segment is defined correctly */
-    if (!((startDocker instanceof ORYX.Core.Controls.Docker)
-      && (endDocker instanceof ORYX.Core.Controls.Docker))) {
+    if (!((startDocker instanceof ORYX_Controls.Docker)
+      && (endDocker instanceof ORYX_Controls.Docker))) {
       return []
     }
 
     /* Get elements of the segment */
-    var elementsOfSegment =
+    let elementsOfSegment =
       this.attachedNodePositionData.findAll(function (nodePositionData) {
         return nodePositionData.value.segment.docker1 === startDocker &&
           nodePositionData.value.segment.docker2 === endDocker
@@ -960,14 +949,15 @@ export default class Edge extends Shape {
    * Removes an edge's child shape
    */
   remove (shape) {
-    arguments.callee.$.remove.apply(this, arguments)
+    // arguments.callee.$.remove.apply(this, arguments)
+    super.remove(shape)
 
     if (this.attachedNodePositionData.get(shape.getId())) {
       this.attachedNodePositionData.unset[shape.getId()]
     }
 
     /* Adjust child shapes if neccessary */
-    if (shape instanceof ORYX.Core.Controls.Docker) {
+    if (shape instanceof ORYX_Controls.Docker) {
       this.handleChildShapesAfterRemoveDocker(shape)
     }
   }
@@ -977,11 +967,10 @@ export default class Edge extends Shape {
       return
     }
 
-    var ref = label.getReferencePoint()
+    let ref = label.getReferencePoint()
 
-    //
     if (ref.orientation && ref.orientation !== 'ce') {
-      var angle = this._getAngle(from, to)
+      let angle = this._getAngle(from, to)
       if (ref.distance >= 0) {
         if (angle == 0) {
           label.horizontalAlign('left')//ref.orientation == "lr" ? "right" : "left");
@@ -1061,22 +1050,21 @@ export default class Edge extends Shape {
    */
   handleChildShapesAfterRemoveDocker (docker) {
     /* Ensure docker type */
-    if (!(docker instanceof ORYX.Core.Controls.Docker)) {
+    if (!(docker instanceof ORYX_Controls.Docker)) {
       return
     }
 
     this.attachedNodePositionData.each(function (nodePositionData) {
       if (nodePositionData.value.segment.docker1 === docker) {
         /* The new start of the segment is the predecessor of docker2. */
-        var index = this.dockers.indexOf(nodePositionData.value.segment.docker2)
+        let index = this.dockers.indexOf(nodePositionData.value.segment.docker2)
         if (index == -1) {
           return
         }
         nodePositionData.value.segment.docker1 = this.dockers[index - 1]
-      }
-      else if (nodePositionData.value.segment.docker2 === docker) {
+      } else if (nodePositionData.value.segment.docker2 === docker) {
         /* The new end of the segment is the successor of docker1. */
-        var index = this.dockers.indexOf(nodePositionData.value.segment.docker1)
+        let index = this.dockers.indexOf(nodePositionData.value.segment.docker1)
         if (index == -1) {
           return
         }
@@ -1086,19 +1074,18 @@ export default class Edge extends Shape {
 
     // Update all labels reference points
     this.getLabels().each(function (label) {
-
-      var ref = label.getReferencePoint()
+      let ref = label.getReferencePoint()
       if (!ref) {
         return
       }
-      var from = ref.segment.from
-      var to = ref.segment.to
+      let from = ref.segment.from
+      let to = ref.segment.to
 
       if (from !== docker && to !== docker) {
         return
       }
 
-      var segment = this.findSegment(ref.intersection)
+      let segment = this.findSegment(ref.intersection)
       if (!segment) {
         from = segment.fromDocker
         to = segment.toDocker
@@ -1107,7 +1094,7 @@ export default class Edge extends Shape {
         to = this.dockers[this.dockers.indexOf(from) + 1]
       }
 
-      var intersection = ORYX.Core.Math.getPointOfIntersectionPointLine(from.bounds.center(), to.bounds.center(), ref.intersection, true)
+      let intersection = ORYX_Math.getPointOfIntersectionPointLine(from.bounds.center(), to.bounds.center(), ref.intersection, true)
       // Update the reference point
       this.updateReferencePointOfLabel(label, intersection, from, to, true)
     }.bind(this))
@@ -1120,24 +1107,23 @@ export default class Edge extends Shape {
    *@deprecated Use the .createDocker() Method and set the point via the bounds
    */
   addDocker (position, exDocker) {
-    var lastDocker
-    var result
+    let lastDocker
+    let result
     this._dockersByPath.any((function (pair) {
       return pair.value.any((function (docker, index) {
         if (!lastDocker) {
           lastDocker = docker
           return false
-        }
-        else {
-          var point1 = lastDocker.bounds.center()
-          var point2 = docker.bounds.center()
+        } else {
+          let point1 = lastDocker.bounds.center()
+          let point2 = docker.bounds.center()
 
-          var additionalIEZoom = 1
+          let additionalIEZoom = 1
           if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-            var ua = navigator.userAgent
+            let ua = navigator.userAgent
             if (ua.indexOf('MSIE') >= 0) {
               //IE 10 and below
-              var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
+              let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
               if (zoom !== 100) {
                 additionalIEZoom = zoom / 100
               }
@@ -1149,25 +1135,25 @@ export default class Edge extends Shape {
             position.y = position.y / additionalIEZoom
           }
 
-          if (ORYX.Core.Math.isPointInLine(position.x, position.y, point1.x, point1.y, point2.x, point2.y, 10)) {
-            var path = this._paths.find(function (path) {
+          if (ORYX_Math.isPointInLine(position.x, position.y, point1.x, point1.y, point2.x, point2.y, 10)) {
+            let path = this._paths.find(function (path) {
               return path.id === pair.key
             })
             if (path) {
-              var allowAttr = path.getAttributeNS(NAMESPACE_ORYX, 'allowDockers')
+              let allowAttr = path.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'allowDockers')
               if (allowAttr && allowAttr.toLowerCase() === 'no') {
                 return true
               }
             }
 
-            var newDocker = (exDocker) ? exDocker : this.createDocker(this.dockers.indexOf(lastDocker) + 1, position)
+            let newDocker = (exDocker) ? exDocker : this.createDocker(this.dockers.indexOf(lastDocker) + 1, position)
             newDocker.bounds.centerMoveTo(position)
-            if (exDocker)
+            if (exDocker) {
               this.add(newDocker, this.dockers.indexOf(lastDocker) + 1)
+            }
             result = newDocker
             return true
-          }
-          else {
+          } else {
             lastDocker = docker
             return false
           }
@@ -1203,25 +1189,25 @@ export default class Edge extends Shape {
    * (key is the removed position of the docker, value is docker themselve)
    */
   removeUnusedDockers () {
-    var marked = new Hash()
+    let marked = new Hash()
 
     this.dockers.each(function (docker, i) {
       if (i == 0 || i == this.dockers.length - 1) {
         return
       }
-      var previous = this.dockers[i - 1]
+      let previous = this.dockers[i - 1]
 
       /* Do not consider already removed dockers */
       if (marked.values().indexOf(previous) != -1 && this.dockers[i - 2]) {
         previous = this.dockers[i - 2]
       }
-      var next = this.dockers[i + 1]
+      let next = this.dockers[i + 1]
 
-      var cp = previous.getDockedShape() && previous.referencePoint ? previous.getAbsoluteReferencePoint() : previous.bounds.center()
-      var cn = next.getDockedShape() && next.referencePoint ? next.getAbsoluteReferencePoint() : next.bounds.center()
-      var cd = docker.bounds.center()
+      let cp = previous.getDockedShape() && previous.referencePoint ? previous.getAbsoluteReferencePoint() : previous.bounds.center()
+      let cn = next.getDockedShape() && next.referencePoint ? next.getAbsoluteReferencePoint() : next.bounds.center()
+      let cd = docker.bounds.center()
 
-      if (ORYX.Core.Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)) {
+      if (ORYX_Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)) {
         marked.set(i, docker)
       }
     }.bind(this))
@@ -1242,65 +1228,63 @@ export default class Edge extends Shape {
    * @param {SVGDocument} svgDocument
    */
   _init (svgDocument) {
-    arguments.callee.$._init.apply(this, arguments)
+    // arguments.callee.$._init.apply(this, arguments)
+    super._init(svgDocument)
 
-    var minPointX, minPointY, maxPointX, maxPointY
+    let minPointX, minPointY, maxPointX, maxPointY
 
-    //init markers
-    var defs = svgDocument.getElementsByTagNameNS(NAMESPACE_SVG, 'defs')
+    // init markers
+    let defs = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'defs')
     if (defs.length > 0) {
       defs = defs[0]
-      var markerElements = $A(defs.getElementsByTagNameNS(NAMESPACE_SVG, 'marker'))
-      var marker
-      var me = this
+      let markerElements = $A(defs.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'marker'))
+      let marker
+      let me = this
       markerElements.each(function (markerElement) {
         try {
-          marker = new ORYX.Core.SVG.SVGMarker(markerElement.cloneNode(true))
+          marker = new ORYX_SVG.SVGMarker(markerElement.cloneNode(true))
           me._markers.set(marker.id, marker)
-          var textElements = $A(marker.element.getElementsByTagNameNS(NAMESPACE_SVG, 'text'))
-          var label
+          let textElements = $A(marker.element.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text'))
+          let label
           textElements.each(function (textElement) {
-            label = new ORYX.Core.SVG.Label({
+            label = new ORYX_SVG.Label({
               textElement: textElement,
               shapeId: this.id
             })
             me._labels.set(label.id, label)
           })
         }
-        catch (e) {
-        }
+        catch (e) {}
       })
     }
 
 
-    var gs = svgDocument.getElementsByTagNameNS(NAMESPACE_SVG, 'g')
+    let gs = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'g')
     if (gs.length <= 0) {
       throw 'Edge: No g element found.'
     }
-    var g = gs[0]
 
-
+    let g = gs[0]
     g.setAttributeNS(null, 'id', null)
-
-    var isFirst = true
+    let isFirst = true
 
     $A(g.childNodes).each((function (path, index) {
-      if (ORYX.Editor.checkClassType(path, SVGPathElement)) {
+      if (ORYX_Editor.checkClassType(path, SVGPathElement)) {
         path = path.cloneNode(false)
 
-        var pathId = this.id + '_' + index
+        let pathId = this.id + '_' + index
         path.setAttributeNS(null, 'id', pathId)
         this._paths.push(path)
 
         //check, if markers are set and update the id
-        var markersByThisPath = []
-        var markerUrl = path.getAttributeNS(null, 'marker-start')
+        let markersByThisPath = []
+        let markerUrl = path.getAttributeNS(null, 'marker-start')
 
         if (markerUrl && markerUrl !== '') {
           markerUrl = markerUrl.strip()
           markerUrl = markerUrl.replace(/^url\(#/, '')
 
-          var markerStartId = this.getValidMarkerId(markerUrl)
+          let markerStartId = this.getValidMarkerId(markerUrl)
           path.setAttributeNS(null, 'marker-start', 'url(#' + markerStartId + ')')
 
           markersByThisPath.push(this._markers.get(markerStartId))
@@ -1311,7 +1295,7 @@ export default class Edge extends Shape {
         if (markerUrl && markerUrl !== '') {
           markerUrl = markerUrl.strip()
           markerUrl = markerUrl.replace(/^url\(#/, '')
-          var markerMidId = this.getValidMarkerId(markerUrl)
+          let markerMidId = this.getValidMarkerId(markerUrl)
           path.setAttributeNS(null, 'marker-mid', 'url(#' + markerMidId + ')')
 
           markersByThisPath.push(this._markers.get(markerMidId))
@@ -1322,7 +1306,7 @@ export default class Edge extends Shape {
         if (markerUrl && markerUrl !== '') {
           markerUrl = markerUrl.strip()
 
-          var markerEndId = this.getValidMarkerId(markerUrl)
+          let markerEndId = this.getValidMarkerId(markerUrl)
           path.setAttributeNS(null, 'marker-end', 'url(#' + markerEndId + ')')
 
           markersByThisPath.push(this._markers.get(markerEndId))
@@ -1331,8 +1315,8 @@ export default class Edge extends Shape {
         this._markersByPath[pathId] = markersByThisPath
 
         //init dockers
-        var parser = new PathParser()
-        var handler = new ORYX.Core.SVG.PointsPathHandler()
+        let parser = new PathParser()
+        let handler = new ORYX_SVG.PointsPathHandler()
         parser.setHandler(handler)
         parser.parsePath(path)
 
@@ -1342,12 +1326,12 @@ export default class Edge extends Shape {
 
         this._dockersByPath.set(pathId, [])
 
-        for (var i = 0; i < handler.points.length; i += 2) {
+        for (let i = 0; i < handler.points.length; i += 2) {
           //handler.points.each((function(point, pIndex){
-          var x = handler.points[i]
-          var y = handler.points[i + 1]
+          let x = handler.points[i]
+          let y = handler.points[i + 1]
           if (isFirst || i > 0) {
-            var docker = new ORYX.Core.Controls.Docker({
+            let docker = new ORYX_Controls.Docker({
               eventHandlerCallback: this.eventHandlerCallback
             })
             docker.bounds.centerMoveTo(x, y)
@@ -1360,8 +1344,7 @@ export default class Edge extends Shape {
             if (minPointX) {
               minPointX = Math.min(x, minPointX)
               minPointY = Math.min(y, minPointY)
-            }
-            else {
+            } else {
               minPointX = x
               minPointY = y
             }
@@ -1369,8 +1352,7 @@ export default class Edge extends Shape {
             if (maxPointX) {
               maxPointX = Math.max(x, maxPointX)
               maxPointY = Math.max(y, maxPointY)
-            }
-            else {
+            } else {
               maxPointX = x
               maxPointY = y
             }
@@ -1384,8 +1366,8 @@ export default class Edge extends Shape {
     this.bounds.set(minPointX, minPointY, maxPointX, maxPointY)
 
     if (false && (this.bounds.width() === 0 || this.bounds.height() === 0)) {
-      var width = this.bounds.width()
-      var height = this.bounds.height()
+      let width = this.bounds.width()
+      let height = this.bounds.height()
 
       this.bounds.extend({
         x: width === 0 ? 2 : 0,
@@ -1403,7 +1385,7 @@ export default class Edge extends Shape {
 
     //add paths to this.node
     this._paths.reverse()
-    var paths = []
+    let paths = []
     this._paths.each((function (path) {
       paths.push(this.node.childNodes[0].childNodes[0].childNodes[0].appendChild(path))
     }).bind(this))
@@ -1412,7 +1394,7 @@ export default class Edge extends Shape {
 
     //init interaction path
     this._paths.each((function (path) {
-      var iPath = path.cloneNode(false)
+      let iPath = path.cloneNode(false)
       iPath.setAttributeNS(null, 'id', undefined)
       iPath.setAttributeNS(null, 'stroke-width', 10)
       iPath.setAttributeNS(null, 'visibility', 'hidden')
@@ -1427,10 +1409,10 @@ export default class Edge extends Shape {
     this._interactionPaths.reverse()
 
     /**initialize labels*/
-    var textElems = svgDocument.getElementsByTagNameNS(ORYX.CONFIG.NAMESPACE_SVG, 'text')
+    let textElems = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text')
 
     $A(textElems).each((function (textElem) {
-      var label = new ORYX.Core.SVG.Label({
+      var label = new ORYX_SVG.Label({
         textElement: textElem,
         shapeId: this.id
       })
@@ -1457,7 +1439,7 @@ export default class Edge extends Shape {
   getValidMarkerId (markerUrl) {
     if (markerUrl.indexOf('url("#') >= 0) {
       // Fix for IE9, additional quotes are added to the <id
-      var rawId = markerUrl.replace(/^url\(\"#/, '').replace(/\"\)$/, '')
+      let rawId = markerUrl.replace(/^url\(\"#/, '').replace(/\"\)$/, '')
       return this.id + rawId
     } else {
       markerUrl = markerUrl.replace(/^url\(#/, '')
@@ -1482,13 +1464,13 @@ export default class Edge extends Shape {
    * Has to be called, while this.node is part of DOM.
    */
   removeMarkers () {
-    var svgElement = this.node.ownerSVGElement
+    let svgElement = this.node.ownerSVGElement
     if (svgElement) {
-      var defs = svgElement.getElementsByTagNameNS(NAMESPACE_SVG, 'defs')
+      let defs = svgElement.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'defs')
       if (defs.length > 0) {
         defs = defs[0]
         this._markers.each(function (marker) {
-          var foundMarker = defs.ownerDocument.getElementById(marker.value.id)
+          let foundMarker = defs.ownerDocument.getElementById(marker.value.id)
           if (foundMarker) {
             marker.value.element = defs.removeChild(marker.value.element)
           }
@@ -1508,13 +1490,14 @@ export default class Edge extends Shape {
   }
 
   serialize () {
-    var result = arguments.callee.$.serialize.apply(this)
+    let result = super.serialize()
+    // var result = arguments.callee.$.serialize.apply(this)
 
     //add dockers triple
-    var value = ''
+    let value = ''
     this._dockersByPath.each((function (pair) {
       pair.value.each(function (docker) {
-        var position = docker.getDockedShape() && docker.referencePoint ? docker.referencePoint : docker.bounds.center()
+        let position = docker.getDockedShape() && docker.referencePoint ? docker.referencePoint : docker.bounds.center()
         value = value.concat(position.x + ' ' + position.y + ' ')
       })
 
@@ -1579,9 +1562,8 @@ export default class Edge extends Shape {
     //}
 
     //serialize target and source
-    var lastDocker = this.dockers.last()
-
-    var target = lastDocker.getDockedShape()
+    let lastDocker = this.dockers.last()
+    let target = lastDocker.getDockedShape()
 
     if (target) {
       result.push({
@@ -1594,7 +1576,7 @@ export default class Edge extends Shape {
 
     try {
       //result = this.getStencil().serialize(this, result);
-      var serializeEvent = this.getStencil().serialize()
+      let serializeEvent = this.getStencil().serialize()
 
       /*
        * call serialize callback by reference, result should be found
@@ -1613,8 +1595,7 @@ export default class Edge extends Shape {
         }
       }
     }
-    catch (e) {
-    }
+    catch (e) {}
     return result
   }
 
@@ -1622,7 +1603,7 @@ export default class Edge extends Shape {
     try {
       //data = this.getStencil().deserialize(this, data);
 
-      var deserializeEvent = this.getStencil().deserialize()
+      let deserializeEvent = this.getStencil().deserialize()
 
       /*
        * call serialize callback by reference, result should be found
@@ -1640,19 +1621,18 @@ export default class Edge extends Shape {
         }
       }
     }
-    catch (e) {
-    }
+    catch (e) {}
 
     // Set the outgoing shapes
-    var target = data.find(function (ser) {
+    let target = data.find(function (ser) {
       return (ser.prefix + '-' + ser.name) == 'raziel-target'
     })
-    var targetShape
+    let targetShape
     if (target) {
       targetShape = this.getCanvas().getChildShapeByResourceId(target.value)
     }
 
-    var outgoing = data.findAll(function (ser) {
+    let outgoing = data.findAll(function (ser) {
       return (ser.prefix + '-' + ser.name) == 'raziel-outgoing'
     })
     outgoing.each((function (obj) {
@@ -1663,14 +1643,14 @@ export default class Edge extends Shape {
 
 
       // Set outgoing Shape
-      var next = this.getCanvas().getChildShapeByResourceId(obj.value)
+      let next = this.getCanvas().getChildShapeByResourceId(obj.value)
 
       if (next) {
         if (next == targetShape) {
           // If this is an edge, set the last docker to the next shape
           this.dockers.last().setDockedShape(next)
           this.dockers.last().setReferencePoint({ x: next.bounds.width() / 2.0, y: next.bounds.height() / 2.0 })
-        } else if (next instanceof ORYX.Core.Edge) {
+        } else if (next instanceof Edge) {
           //Set the first docker of the next shape
           next.dockers.first().setDockedShape(this)
           //next.dockers.first().setReferencePoint({x: this.bounds.width() / 2.0, y: this.bounds.height() / 2.0});
@@ -1683,35 +1663,33 @@ export default class Edge extends Shape {
 
     }).bind(this))
 
-
-    var oryxDockers = data.find(function (obj) {
+    let oryxDockers = data.find(function (obj) {
       return (obj.prefix === 'oryx' &&
         obj.name === 'dockers')
     })
 
     if (oryxDockers) {
-      var dataByPath = oryxDockers.value.split('#').without('').without(' ')
+      let dataByPath = oryxDockers.value.split('#').without('').without(' ')
 
       dataByPath.each((function (data, index) {
-        var values = data.replace(/,/g, ' ').split(' ').without('')
+        let values = data.replace(/,/g, ' ').split(' ').without('')
 
         //for each docker two values must be defined
         if (values.length % 2 === 0) {
-          var path = this._paths[index]
+          let path = this._paths[index]
 
           if (path) {
             if (index === 0) {
               while (this._dockersByPath.get(path.id).length > 2) {
                 this.removeDocker(this._dockersByPath.get(path.id)[1])
               }
-            }
-            else {
+            } else {
               while (this._dockersByPath.get(path.id).length > 1) {
                 this.removeDocker(this._dockersByPath.get(path.id)[0])
               }
             }
 
-            var dockersByPath = this._dockersByPath.get(path.id)
+            let dockersByPath = this._dockersByPath.get(path.id)
 
             if (index === 0) {
               //set position of first docker
@@ -1723,8 +1701,7 @@ export default class Edge extends Shape {
                   x: x,
                   y: y
                 })
-              }
-              else {
+              } else {
                 dockersByPath.first().bounds.centerMoveTo(x, y)
               }
             }
@@ -1743,11 +1720,11 @@ export default class Edge extends Shape {
             }
 
             //add additional dockers
-            for (var i = 0; i < values.length; i++) {
+            for (let i = 0; i < values.length; i++) {
               x = parseFloat(values[i])
               y = parseFloat(values[++i])
 
-              var newDocker = this.createDocker()
+              let newDocker = this.createDocker()
               newDocker.bounds.centerMoveTo(x, y)
 
               //this.dockers = this.dockers.without(newDocker);
@@ -1761,8 +1738,8 @@ export default class Edge extends Shape {
       this.alignDockers()
     }
 
-    arguments.callee.$.deserialize.apply(this, arguments)
-
+    // arguments.callee.$.deserialize.apply(this, arguments)
+    super.deserialize(data)
     this._changed()
   }
 
@@ -1790,7 +1767,7 @@ export default class Edge extends Shape {
    * @return {boolean} True if edge is docked
    */
   isDocked () {
-    var isDocked = false
+    let isDocked = false
     this.dockers.each(function (docker) {
       if (docker.isDocked()) {
         isDocked = true
@@ -1804,7 +1781,8 @@ export default class Edge extends Shape {
    * Calls {@link ORYX.Core.AbstractShape#toJSON} and add a some stencil set information.
    */
   toJSON () {
-    var json = arguments.callee.$.toJSON.apply(this, arguments)
+    // var json = arguments.callee.$.toJSON.apply(this, arguments)
+    let json = super.toJSON()
 
     if (this.getTarget()) {
       json.target = {

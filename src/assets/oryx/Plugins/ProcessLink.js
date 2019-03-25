@@ -1,22 +1,20 @@
+import ORYX_Config from '../CONFIG'
+import ORYX_Editor from '../Editor'
 
+import ORYX_Node from '../core/Node'
 /**
  * Supports EPCs by offering a syntax check and export and import ability..
  *
  *
  */
 export default class ProcessLink {
-
-  facade = undefined
-
   /**
    * Offers the plugin functionality:
    *
    */
   constructor (facade) {
-
     this.facade = facade;
-
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_PROPERTY_CHANGED, this.propertyChanged.bind(this));
+    this.facade.registerOnEvent(ORYX_Config.EVENT_PROPERTY_CHANGED, this.propertyChanged.bind(this));
 
   }
 
@@ -26,22 +24,15 @@ export default class ProcessLink {
    * @param {Object} option
    */
   propertyChanged (option, node) {
-
-    if (option.name !== "oryx-refuri" || !node instanceof ORYX.Core.Node) {
+    if (option.name !== "oryx-refuri" || !node instanceof ORYX_Node) {
       return
     }
 
-
     if (option.value && option.value.length > 0 && option.value != "undefined") {
-
       this.show(node, option.value);
-
     } else {
-
       this.hide(node);
-
     }
-
   }
 
   /**
@@ -51,10 +42,8 @@ export default class ProcessLink {
    * @param {Object} url
    */
   show (shape, url) {
-
-
     // Generate the svg-representation of a link
-    var link = ORYX.Editor.graft("http://www.w3.org/2000/svg", null,
+    let link = ORYX_Editor.graft("http://www.w3.org/2000/svg", null,
       ['a',
         {'target': '_blank'},
         ['path',
@@ -68,7 +57,7 @@ export default class ProcessLink {
         ]
       ]);
 
-    var link = ORYX.Editor.graft("http://www.w3.org/2000/svg", null,
+     link = ORYX_Editor.graft("http://www.w3.org/2000/svg", null,
       ['a',
         {'target': '_blank'},
         ['path', {
@@ -108,7 +97,7 @@ export default class ProcessLink {
 
     // Shows the link in the overlay
     this.facade.raiseEvent({
-      type: ORYX.CONFIG.EVENT_OVERLAY_SHOW,
+      type: ORYX_Config.EVENT_OVERLAY_SHOW,
       id: "arissupport.urlref_" + shape.id,
       shapes: [shape],
       node: link,
@@ -125,7 +114,7 @@ export default class ProcessLink {
   hide(shape) {
 
     this.facade.raiseEvent({
-      type: ORYX.CONFIG.EVENT_OVERLAY_HIDE,
+      type: ORYX_Config.EVENT_OVERLAY_HIDE,
       id: "arissupport.urlref_" + shape.id
     });
 

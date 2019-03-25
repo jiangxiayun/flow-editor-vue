@@ -1,4 +1,17 @@
 import AbstractShape from './AbstractShape'
+import UIObject from './UIObject'
+// import ORYX_Node from './Node'
+// import ORYX_Edge from './Edge'
+import ORYX_Canvas from './Canvas'
+import ORYX_Controls from './Controls'
+
+import ORYX_Editor from '../Editor'
+import ERDF from '../ERDF'
+import ORYX_Utils from '../Utils'
+import ORYX_Log from '../Log'
+import ORYX_Config from '../CONFIG'
+
+
 
 /**
  * @classDescription Base class for Shapes.
@@ -29,7 +42,7 @@ export default class Shape extends AbstractShape {
     this._labels = new Hash()
 
     // create SVG node
-    this.node = ORYX.Editor.graft('http://www.w3.org/2000/svg',
+    this.node = ORYX_Editor.graft('http://www.w3.org/2000/svg',
       null,
       ['g', { id: 'svg-' + this.resourceId },
         ['g', { 'class': 'stencils' },
@@ -71,11 +84,11 @@ export default class Shape extends AbstractShape {
 
     if (this.node.ownerDocument) {
       // adjust SVG to properties' values
-      var me = this
+      const me = this
       this.propertiesChanged.each((function (propChanged) {
         if (propChanged.value) {
-          var prop = this.properties.get(propChanged.key)
-          var property = this.getStencil().property(propChanged.key)
+          let prop = this.properties.get(propChanged.key)
+          let property = this.getStencil().property(propChanged.key)
           if (property != undefined) {
             this.propertiesChanged.set(propChanged.key, false)
 
@@ -87,7 +100,7 @@ export default class Shape extends AbstractShape {
               property.refToView().each((function (ref) {
                 //if property is referencing a label, update the label
                 if (ref !== '') {
-                  var label = this._labels.get(this.id + ref)
+                  let label = this._labels.get(this.id + ref)
                   if (label && property.item(prop)) {
                     label.text(property.item(prop).title())
                   }
@@ -97,14 +110,14 @@ export default class Shape extends AbstractShape {
               //if the choice's items are referencing SVG elements
               // show the selected and hide all other referenced SVG
               // elements
-              var refreshedSvgElements = new Hash()
+              let refreshedSvgElements = new Hash()
               property.items().each((function (item) {
                 item.refToView().each((function (itemRef) {
                   if (itemRef == '') {
                     return
                   }
 
-                  var svgElem = this.node.ownerDocument.getElementById(this.id + itemRef)
+                  let svgElem = this.node.ownerDocument.getElementById(this.id + itemRef)
 
                   if (!svgElem) {
                     return
@@ -117,7 +130,7 @@ export default class Shape extends AbstractShape {
                   }
 
                   // Reload the href if there is an image-tag
-                  if (ORYX.Editor.checkClassType(svgElem, SVGImageElement)) {
+                  if (ORYX_Editor.checkClassType(svgElem, SVGImageElement)) {
                     svgElem.setAttributeNS('http://www.w3.org/1999/xlink', 'href', svgElem.getAttributeNS('http://www.w3.org/1999/xlink', 'href'))
                   }
                 }).bind(this))
@@ -134,13 +147,13 @@ export default class Shape extends AbstractShape {
                   return
                 }
 
-                var refId = this.id + ref
+                let refId = this.id + ref
 
-                if (property.type() === ORYX.CONFIG.TYPE_FLOWABLE_MULTIINSTANCE) {
+                if (property.type() === ORYX_Config.TYPE_FLOWABLE_MULTIINSTANCE) {
                   // flowable-multiinstance
 
                   if (ref === 'multiinstance') {
-                    var svgElemParallel = this.node.ownerDocument.getElementById(this.id + 'parallel')
+                    let svgElemParallel = this.node.ownerDocument.getElementById(this.id + 'parallel')
                     if (svgElemParallel) {
                       if (prop === 'Parallel') {
                         svgElemParallel.setAttributeNS(null, 'display', 'inherit')
@@ -149,7 +162,7 @@ export default class Shape extends AbstractShape {
                       }
                     }
 
-                    var svgElemSequential = this.node.ownerDocument.getElementById(this.id + 'sequential')
+                    let svgElemSequential = this.node.ownerDocument.getElementById(this.id + 'sequential')
 
                     if (svgElemSequential) {
                       if (prop === 'Sequential') {
@@ -162,8 +175,8 @@ export default class Shape extends AbstractShape {
                   return
 
                 } else if (property.type() === 'cancelactivity') {
-                  var svgElemFrame = this.node.ownerDocument.getElementById(this.id + 'frame')
-                  var svgElemFrame2 = this.node.ownerDocument.getElementById(this.id + 'frame2')
+                  let svgElemFrame = this.node.ownerDocument.getElementById(this.id + 'frame')
+                  let svgElemFrame2 = this.node.ownerDocument.getElementById(this.id + 'frame2')
 
                   if (prop === 'true') {
                     svgElemFrame.setAttributeNS(null, 'display', 'inherit')
@@ -175,16 +188,16 @@ export default class Shape extends AbstractShape {
                 }
 
                 //get the SVG element
-                var svgElem = this.node.ownerDocument.getElementById(refId)
+                let svgElem = this.node.ownerDocument.getElementById(refId)
 
                 //if the SVG element can not be found
                 if (!svgElem || !(svgElem.ownerSVGElement)) {
                   //if the referenced SVG element is a SVGAElement, it cannot
                   // be found with getElementById (Firefox bug).
                   // this is a work around
-                  if (property.type() === ORYX.CONFIG.TYPE_URL ||
-                    property.type() === ORYX.CONFIG.TYPE_DIAGRAM_LINK) {
-                    var svgElems = this.node.ownerDocument.getElementsByTagNameNS('http://www.w3.org/2000/svg', 'a')
+                  if (property.type() === ORYX_Config.TYPE_URL ||
+                    property.type() === ORYX_Config.TYPE_DIAGRAM_LINK) {
+                    let svgElems = this.node.ownerDocument.getElementsByTagNameNS('http://www.w3.org/2000/svg', 'a')
 
                     svgElem = $A(svgElems).find(function (elem) {
                       return elem.getAttributeNS(null, 'id') === refId
@@ -200,11 +213,11 @@ export default class Shape extends AbstractShape {
                 }
 
                 if (property.complexAttributeToView()) {
-                  var label = this._labels.get(refId)
+                  let label = this._labels.get(refId)
                   if (label) {
                     try {
-                      propJson = prop.evalJSON()
-                      var value = propJson[property.complexAttributeToView()]
+                      let propJson = prop.evalJSON()
+                      let value = propJson[property.complexAttributeToView()]
                       label.text(value ? value : prop)
                     } catch (e) {
                       label.text(prop)
@@ -213,34 +226,34 @@ export default class Shape extends AbstractShape {
 
                 } else {
                   switch (property.type()) {
-                    case ORYX.CONFIG.TYPE_BOOLEAN: // boolean
-                      if (typeof prop == 'string')
+                    case ORYX_Config.TYPE_BOOLEAN: // boolean
+                      if (typeof prop == 'string') {
                         prop = prop === 'true'
+                      }
 
                       svgElem.setAttributeNS(null, 'display', (!(prop === property.inverseBoolean())) ? 'inherit' : 'none')
 
                       break
-                    case ORYX.CONFIG.TYPE_COLOR: // color
+                    case ORYX_Config.TYPE_COLOR: // color
                       if (property.fill()) {
                         if (svgElem.tagName.toLowerCase() === 'stop') {
                           if (prop) {
-
                             if (property.lightness() && property.lightness() !== 1) {
-                              prop = ORYX.Utils.adjustLightness(prop, property.lightness())
+                              prop = ORYX_Utils.adjustLightness(prop, property.lightness())
                             }
 
                             svgElem.setAttributeNS(null, 'stop-color', prop)
 
                             // Adjust stop color of the others
                             if (svgElem.parentNode.tagName.toLowerCase() === 'radialgradient') {
-                              ORYX.Utils.adjustGradient(svgElem.parentNode, svgElem)
+                              ORYX_Utils.adjustGradient(svgElem.parentNode, svgElem)
                             }
                           }
 
                           // If there is no value, set opaque
                           if (svgElem.parentNode.tagName.toLowerCase() === 'radialgradient') {
                             $A(svgElem.parentNode.getElementsByTagName('stop')).each(function (stop) {
-                              stop.setAttributeNS(null, 'stop-opacity', prop ? stop.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'default-stop-opacity') || 1 : 0)
+                              stop.setAttributeNS(null, 'stop-opacity', prop ? stop.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'default-stop-opacity') || 1 : 0)
                             }.bind(this))
                           }
                         } else {
@@ -251,11 +264,11 @@ export default class Shape extends AbstractShape {
                         svgElem.setAttributeNS(null, 'stroke', prop)
                       }
                       break
-                    case ORYX.CONFIG.TYPE_STRING: // string
-                    case ORYX.CONFIG.TYPE_EXPRESSION:
-                    case ORYX.CONFIG.TYPE_DATASOURCE:
-                    case ORYX.CONFIG.TYPE_INTEGER:
-                      var label = this._labels.get(refId)
+                    case ORYX_Config.TYPE_STRING: // string
+                    case ORYX_Config.TYPE_EXPRESSION:
+                    case ORYX_Config.TYPE_DATASOURCE:
+                    case ORYX_Config.TYPE_INTEGER:
+                      let label = this._labels.get(refId)
                       if (label) {
                         label.text(prop)
                       }
@@ -278,7 +291,7 @@ export default class Shape extends AbstractShape {
                     //     label.text(prop);
                     //   }
                     //   break;
-                    case ORYX.CONFIG.TYPE_FLOAT:
+                    case ORYX_Config.TYPE_FLOAT:
                       if (property.fillOpacity()) {
                         svgElem.setAttributeNS(null, 'fill-opacity', prop)
                       }
@@ -286,17 +299,17 @@ export default class Shape extends AbstractShape {
                         svgElem.setAttributeNS(null, 'stroke-opacity', prop)
                       }
                       if (!property.fillOpacity() && !property.strokeOpacity()) {
-                        var label = this._labels.get(refId)
+                        let label = this._labels.get(refId)
                         if (label) {
                           label.text(prop)
                         }
                       }
                       break
 
-                    case ORYX.CONFIG.TYPE_SUB_PROCESS_LINK: // subprocess-link
+                    case ORYX_Config.TYPE_SUB_PROCESS_LINK: // subprocess-link
                       if (ref == 'subprocesslink') {
-                        var onclickAttr = svgElem.getAttributeNodeNS('', 'onclick')
-                        var styleAttr = svgElem.getAttributeNodeNS('', 'style')
+                        let onclickAttr = svgElem.getAttributeNodeNS('', 'onclick')
+                        let styleAttr = svgElem.getAttributeNodeNS('', 'style')
 
                         if (onclickAttr) {
                           if (prop && prop.id) {
@@ -314,7 +327,7 @@ export default class Shape extends AbstractShape {
                       }
                       break
 
-                    case ORYX.CONFIG.TYPE_URL:
+                    case ORYX_Config.TYPE_URL:
                       break
 
                   }
@@ -334,7 +347,7 @@ export default class Shape extends AbstractShape {
   }
 
   layout () {
-    var layoutEvents = this.getStencil().layout()
+    let layoutEvents = this.getStencil().layout()
     if (layoutEvents) {
       layoutEvents.each(function (event) {
         // setup additional attributes
@@ -381,7 +394,7 @@ export default class Shape extends AbstractShape {
    *
    */
   showLabels () {
-    var labels = this.getLabels()
+    let labels = this.getLabels()
     labels.invoke('show')
     labels.each(function (label) {
       label.update()
@@ -389,7 +402,6 @@ export default class Shape extends AbstractShape {
   }
 
   setOpacity (value, animate) {
-
     value = Math.max(Math.min((typeof value == 'number' ? value : 1.0), 1.0), 0.0)
 
     if (value !== 1.0) {
@@ -436,7 +448,9 @@ export default class Shape extends AbstractShape {
 
   getIncomingNodes (iterator) {
     return this.incoming.select(function (incoming) {
-      var isNode = (incoming instanceof ORYX.Core.Node)
+      //todo open
+      // let isNode = (incoming instanceof ORYX_Node)
+      let isNode = null
       if (isNode && iterator) iterator(incoming)
       return isNode
     })
@@ -452,14 +466,16 @@ export default class Shape extends AbstractShape {
 
   getOutgoingNodes (iterator) {
     return this.outgoing.select(function (out) {
-      var isNode = (out instanceof ORYX.Core.Node)
+      // todo open
+      // let isNode = (out instanceof ORYX_Node)
+      let isNode = null
       if (isNode && iterator) iterator(out)
       return isNode
     })
   }
 
   getAllDockedShapes (iterator) {
-    var result = this.incoming.concat(this.outgoing)
+    let result = this.incoming.concat(this.outgoing)
     if (iterator) {
       result.each(iterator)
     }
@@ -467,9 +483,9 @@ export default class Shape extends AbstractShape {
   }
 
   getCanvas () {
-    if (this.parent instanceof ORYX.Core.Canvas) {
+    if (this.parent instanceof ORYX_Canvas) {
       return this.parent
-    } else if (this.parent instanceof ORYX.Core.Shape) {
+    } else if (this.parent instanceof Shape) {
       return this.parent.getCanvas()
     } else {
       return undefined
@@ -485,7 +501,7 @@ export default class Shape extends AbstractShape {
     if (!deep && !iterator) {
       return this.nodes.clone()
     } else {
-      var result = []
+      let result = []
       this.nodes.each(function (uiObject) {
         if (!uiObject.isVisible) {
           return
@@ -495,7 +511,7 @@ export default class Shape extends AbstractShape {
         }
         result.push(uiObject)
 
-        if (deep && uiObject instanceof ORYX.Core.Shape) {
+        if (deep && uiObject instanceof Shape) {
           result = result.concat(uiObject.getChildNodes(deep, iterator))
         }
       })
@@ -512,8 +528,9 @@ export default class Shape extends AbstractShape {
   add (uiObject, index, silent) {
     //parameter has to be an UIObject, but
     // must not be an Edge.
-    if (uiObject instanceof ORYX.Core.UIObject
-      && !(uiObject instanceof ORYX.Core.Edge)) {
+
+    // todo open   && !(uiObject instanceof ORYX_Edge)
+    if (uiObject instanceof UIObject) {
 
       if (!(this.children.member(uiObject))) {
         //if uiObject is child of another parent, remove it from that parent.
@@ -531,20 +548,22 @@ export default class Shape extends AbstractShape {
         uiObject.parent = this
 
         //add uiObject.node to this.node depending on the type of uiObject
-        var parent
-        if (uiObject instanceof ORYX.Core.Node) {
-          parent = this.node.childNodes[0].childNodes[1]
-          this.nodes.push(uiObject)
-        } else if (uiObject instanceof ORYX.Core.Controls.Control) {
-          var ctrls = this.node.childNodes[1]
-          if (uiObject instanceof ORYX.Core.Controls.Docker) {
+        let parent
+        // todo open
+        // if (uiObject instanceof ORYX_Node) {
+        //   parent = this.node.childNodes[0].childNodes[1]
+        //   this.nodes.push(uiObject)
+        // } else
+          if (uiObject instanceof ORYX_Controls.Control) {
+          let ctrls = this.node.childNodes[1]
+          if (uiObject instanceof ORYX_Controls.Docker) {
             parent = ctrls.childNodes[0]
             if (this.dockers.length >= 2) {
               this.dockers.splice(index !== undefined ? Math.min(index, this.dockers.length - 1) : this.dockers.length - 1, 0, uiObject)
             } else {
               this.dockers.push(uiObject)
             }
-          } else if (uiObject instanceof ORYX.Core.Controls.Magnet) {
+          } else if (uiObject instanceof ORYX_Controls.Magnet) {
             parent = ctrls.childNodes[1]
             this.magnets.push(uiObject)
           } else {
@@ -564,15 +583,13 @@ export default class Shape extends AbstractShape {
 
 
         if (this.eventHandlerCallback && silent !== true)
-          this.eventHandlerCallback({ type: ORYX.CONFIG.EVENT_SHAPEADDED, shape: uiObject })
+          this.eventHandlerCallback({ type: ORYX_Config.EVENT_SHAPEADDED, shape: uiObject })
 
       } else {
-
-        ORYX.Log.warn('add: ORYX.Core.UIObject is already a child of this object.')
+        ORYX_Log.warn('add: ORYX.Core.UIObject is already a child of this object.')
       }
     } else {
-
-      ORYX.Log.warn('add: Parameter is not of type ORYX.Core.UIObject.')
+      ORYX_Log.warn('add: Parameter is not of type ORYX.Core.UIObject.')
     }
   }
 
@@ -584,7 +601,7 @@ export default class Shape extends AbstractShape {
     //if uiObject is a child of this object, remove it.
     if (this.children.member(uiObject)) {
       //remove uiObject from children
-      var parent = uiObject.parent
+      let parent = uiObject.parent
 
       this.children = this.children.without(uiObject)
 
@@ -592,19 +609,21 @@ export default class Shape extends AbstractShape {
       uiObject.parent = undefined
 
       //delete uiObject.node from this.node
-      if (uiObject instanceof ORYX.Core.Shape) {
-        if (uiObject instanceof ORYX.Core.Edge) {
-          uiObject.removeMarkers()
-          uiObject.node = this.node.childNodes[0].childNodes[2].removeChild(uiObject.node)
-        } else {
+      if (uiObject instanceof Shape) {
+        // todo open
+        // if (uiObject instanceof ORYX_Edge) {
+        //   uiObject.removeMarkers()
+        //   uiObject.node = this.node.childNodes[0].childNodes[2].removeChild(uiObject.node)
+        // } else
+          {
           uiObject.node = this.node.childNodes[0].childNodes[1].removeChild(uiObject.node)
           this.nodes = this.nodes.without(uiObject)
         }
-      } else if (uiObject instanceof ORYX.Core.Controls.Control) {
-        if (uiObject instanceof ORYX.Core.Controls.Docker) {
+      } else if (uiObject instanceof ORYX_Controls.Control) {
+        if (uiObject instanceof ORYX_Controls.Docker) {
           uiObject.node = this.node.childNodes[1].childNodes[0].removeChild(uiObject.node)
           this.dockers = this.dockers.without(uiObject)
-        } else if (uiObject instanceof ORYX.Core.Controls.Magnet) {
+        } else if (uiObject instanceof ORYX_Controls.Magnet) {
           uiObject.node = this.node.childNodes[1].childNodes[1].removeChild(uiObject.node)
           this.magnets = this.magnets.without(uiObject)
         } else {
@@ -613,13 +632,12 @@ export default class Shape extends AbstractShape {
       }
 
       if (this.eventHandlerCallback && silent !== true)
-        this.eventHandlerCallback({ type: ORYX.CONFIG.EVENT_SHAPEREMOVED, shape: uiObject, parent: parent })
+        this.eventHandlerCallback({ type: ORYX_Config.EVENT_SHAPEREMOVED, shape: uiObject, parent: parent })
 
       this._changed()
       //uiObject.bounds.unregisterCallback(this._changedCallback);
     } else {
-
-      ORYX.Log.warn('remove: ORYX.Core.UIObject is not a child of this object.')
+      ORYX_Log.warn('remove: ORYX.Core.UIObject is not a child of this object.')
     }
   }
 
@@ -629,8 +647,7 @@ export default class Shape extends AbstractShape {
    * @param {PointB}
    */
   getIntersectionPoint () {
-
-    var pointAX, pointAY, pointBX, pointBY
+    let pointAX, pointAY, pointBX, pointBY
 
     // Get the the two Points
     switch (arguments.length) {
@@ -652,9 +669,8 @@ export default class Shape extends AbstractShape {
 
 
     // Defined an include and exclude point
-    var includePointX, includePointY, excludePointX, excludePointY
-
-    var bounds = this.absoluteBounds()
+    let includePointX, includePointY, excludePointX, excludePointY
+    let bounds = this.absoluteBounds()
 
     if (this.isPointIncluded(pointAX, pointAY, bounds)) {
       includePointX = pointAX
@@ -677,23 +693,20 @@ export default class Shape extends AbstractShape {
       return undefined
     }
 
-    var midPointX = 0
-    var midPointY = 0
-
-    var refPointX, refPointY
-
-    var minDifferent = 1
+    let midPointX = 0
+    let midPointY = 0
+    let refPointX, refPointY
+    let minDifferent = 1
     // Get the UpperLeft and LowerRight
     //var ul = bounds.upperLeft();
     //var lr = bounds.lowerRight();
 
-    var i = 0
+    let i = 0
 
     while (true) {
       // Calculate the midpoint of the current to points
-      var midPointX = Math.min(includePointX, excludePointX) + ((Math.max(includePointX, excludePointX) - Math.min(includePointX, excludePointX)) / 2.0)
-      var midPointY = Math.min(includePointY, excludePointY) + ((Math.max(includePointY, excludePointY) - Math.min(includePointY, excludePointY)) / 2.0)
-
+      let midPointX = Math.min(includePointX, excludePointX) + ((Math.max(includePointX, excludePointX) - Math.min(includePointX, excludePointX)) / 2.0)
+      let midPointY = Math.min(includePointY, excludePointY) + ((Math.max(includePointY, excludePointY) - Math.min(includePointY, excludePointY)) / 2.0)
 
       // Set the new midpoint by the means of the include of the bounds
       if (this.isPointIncluded(midPointX, midPointY, bounds)) {
@@ -705,7 +718,7 @@ export default class Shape extends AbstractShape {
       }
 
       // Calc the length of the line
-      var length = Math.sqrt(Math.pow(includePointX - excludePointX, 2) + Math.pow(includePointY - excludePointY, 2))
+      let length = Math.sqrt(Math.pow(includePointX - excludePointX, 2) + Math.pow(includePointY - excludePointY, 2))
       // Calc a point one step from the include point
       refPointX = includePointX + ((excludePointX - includePointX) / length),
         refPointY = includePointY + ((excludePointY - includePointY) / length)
@@ -715,7 +728,6 @@ export default class Shape extends AbstractShape {
       if (!this.isPointIncluded(refPointX, refPointY, bounds)) {
         break
       }
-
 
     }
 
@@ -741,7 +753,7 @@ export default class Shape extends AbstractShape {
    *
    */
   containsNode (node) {
-    var me = this.node.firstChild.firstChild
+    let me = this.node.firstChild.firstChild
     while (node) {
       if (node == me) {
         return true
@@ -768,7 +780,7 @@ export default class Shape extends AbstractShape {
    *
    */
   createDocker (index, position) {
-    var docker = new ORYX.Core.Controls.Docker({ eventHandlerCallback: this.eventHandlerCallback })
+    let docker = new ORYX_Controls.Docker({ eventHandlerCallback: this.eventHandlerCallback })
     docker.bounds.registerCallback(this._dockerChangedCallback)
     if (position) {
       docker.bounds.centerMoveTo(position)
@@ -788,7 +800,7 @@ export default class Shape extends AbstractShape {
    */
   serialize () {
     // var serializedObject = arguments.callee.$.serialize.apply(this);
-    var serializedObject = super.serialize()
+    let serializedObject = super.serialize()
 
     // Add the bounds
     serializedObject.push({ name: 'bounds', prefix: 'oryx', value: this.bounds.serializeForERDF(), type: 'literal' })
@@ -821,24 +833,26 @@ export default class Shape extends AbstractShape {
     // arguments.callee.$.deserialize.apply(this, arguments);
     super.deserialize()
     // Set the Bounds
-    var bounds = serialize.find(function (ser) {
+    let bounds = serialize.find(function (ser) {
       return 'oryx-bounds' === (ser.prefix + '-' + ser.name)
     })
     if (bounds) {
-      var b = bounds.value.replace(/,/g, ' ').split(' ').without('')
-      if (this instanceof ORYX.Core.Edge) {
-        if (!this.dockers.first().isChanged)
-          this.dockers.first().bounds.centerMoveTo(parseFloat(b[0]), parseFloat(b[1]))
-        if (!this.dockers.last().isChanged)
-          this.dockers.last().bounds.centerMoveTo(parseFloat(b[2]), parseFloat(b[3]))
-      } else {
+      let b = bounds.value.replace(/,/g, ' ').split(' ').without('')
+      // todo open
+      // if (this instanceof ORYX_Edge) {
+      //   if (!this.dockers.first().isChanged)
+      //     this.dockers.first().bounds.centerMoveTo(parseFloat(b[0]), parseFloat(b[1]))
+      //   if (!this.dockers.last().isChanged)
+      //     this.dockers.last().bounds.centerMoveTo(parseFloat(b[2]), parseFloat(b[3]))
+      // } else
+        {
         this.bounds.set(parseFloat(b[0]), parseFloat(b[1]), parseFloat(b[2]), parseFloat(b[3]))
       }
     }
 
     if (json && json.labels instanceof Array) {
       json.labels.each(function (slabel) {
-        var label = this.getLabel(slabel.ref)
+        let label = this.getLabel(slabel.ref)
         if (label) {
           label.deserialize(slabel, this)
         }
@@ -848,11 +862,11 @@ export default class Shape extends AbstractShape {
 
   toJSON () {
     // var json = arguments.callee.$.toJSON.apply(this, arguments);
-    var json = super.toJSON()
+    let json = super.toJSON()
 
-    var labels = [], id = this.id
+    let labels = [], id = this.id
     this._labels.each(function (obj) {
-      var slabel = obj.value.serialize()
+      let slabel = obj.value.serialize()
       if (slabel) {
         slabel.ref = obj.key.replace(id, '')
         labels.push(slabel)
@@ -885,7 +899,7 @@ export default class Shape extends AbstractShape {
 
   _adjustIds(element, idIndex) {
     if (element instanceof Element) {
-      var eid = element.getAttributeNS(null, 'id')
+      let eid = element.getAttributeNS(null, 'id')
       if (eid && eid !== '') {
         element.setAttributeNS(null, 'id', this.id + eid)
       } else {
@@ -894,14 +908,14 @@ export default class Shape extends AbstractShape {
       }
 
       // Replace URL in fill attribute
-      var fill = element.getAttributeNS(null, 'fill')
+      let fill = element.getAttributeNS(null, 'fill')
       if (fill && fill.include('url(#')) {
         fill = fill.replace(/url\(#/g, 'url(#' + this.id)
         element.setAttributeNS(null, 'fill', fill)
       }
 
       if (element.hasChildNodes()) {
-        for (var i = 0; i < element.childNodes.length; i++) {
+        for (let i = 0; i < element.childNodes.length; i++) {
           idIndex = this._adjustIds(element.childNodes[i], idIndex)
         }
       }

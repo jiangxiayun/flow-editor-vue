@@ -1,26 +1,28 @@
 import AbstractPlugin from './AbstractPlugin'
+import ORYX_Config from '../CONFIG'
+import ORYX_Command from '../core/Command'
+import ORYX_Node from '../core/Node'
+import ORYX_Edge from '../core/Edge'
+import ORYX_Canvas from '../core/Canvas'
 
 Array.prototype.insertFrom = function (from, to) {
-  to = Math.max(0, to);
-  from = Math.min(Math.max(0, from), this.length - 1);
+  to = Math.max(0, to)
+  from = Math.min(Math.max(0, from), this.length - 1)
 
-  var el = this[from];
-  var old = this.without(el);
-  var newA = old.slice(0, to);
-  newA.push(el);
+  let el = this[from]
+  let old = this.without(el)
+  let newA = old.slice(0, to)
+  newA.push(el)
   if (old.length > to) {
     newA = newA.concat(old.slice(to))
   }
-  ;
-  return newA;
+  return newA
 }
 export default class Arrangement extends AbstractPlugin {
 
-  facade = undefined
-
-  constructor(facade) {
+  constructor (facade) {
     super()
-    this.facade = facade;
+    this.facade = facade
 
     // Z-Ordering
     /** Hide for SIGNAVIO
@@ -102,103 +104,110 @@ export default class Arrangement extends AbstractPlugin {
 
      **/
 
+    const I18N = {
+      Arrangement: {
+        am: 'Alignment Middle',
+        groupA: 'Alignment',
+        amDesc: 'Middle',
+        ac: 'Alignment Center',
+        acDesc: 'Center',
+        as: 'Alignment Same Size',
+        asDesc: 'Same Size',
+      }
+
+    }
+
     this.facade.offer({
-      'name': ORYX.I18N.Arrangement.am,
-      'functionality': this.alignShapes.bind(this, [ORYX.CONFIG.EDITOR_ALIGN_MIDDLE]),
-      'group': ORYX.I18N.Arrangement.groupA,
-      'icon': ORYX.PATH + "images/shape_align_middle.png",
-      'description': ORYX.I18N.Arrangement.amDesc,
+      'name': I18N.Arrangement.am,
+      'functionality': this.alignShapes.bind(this, [ORYX_Config.EDITOR_ALIGN_MIDDLE]),
+      'group': I18N.Arrangement.groupA,
+      'icon': ORYX_Config.PATH + 'images/shape_align_middle.png',
+      'description': I18N.Arrangement.amDesc,
       'index': 1,
       'minShape': 2
-    });
+    })
 
     this.facade.offer({
-      'name': ORYX.I18N.Arrangement.ac,
-      'functionality': this.alignShapes.bind(this, [ORYX.CONFIG.EDITOR_ALIGN_CENTER]),
-      'group': ORYX.I18N.Arrangement.groupA,
-      'icon': ORYX.PATH + "images/shape_align_center.png",
-      'description': ORYX.I18N.Arrangement.acDesc,
+      'name': I18N.Arrangement.ac,
+      'functionality': this.alignShapes.bind(this, [ORYX_Config.EDITOR_ALIGN_CENTER]),
+      'group': I18N.Arrangement.groupA,
+      'icon': ORYX_Config.PATH + 'images/shape_align_center.png',
+      'description': I18N.Arrangement.acDesc,
       'index': 2,
       'minShape': 2
-    });
-
+    })
 
     this.facade.offer({
-      'name': ORYX.I18N.Arrangement.as,
-      'functionality': this.alignShapes.bind(this, [ORYX.CONFIG.EDITOR_ALIGN_SIZE]),
-      'group': ORYX.I18N.Arrangement.groupA,
-      'icon': ORYX.PATH + "images/shape_align_size.png",
-      'description': ORYX.I18N.Arrangement.asDesc,
+      'name': I18N.Arrangement.as,
+      'functionality': this.alignShapes.bind(this, [ORYX_Config.EDITOR_ALIGN_SIZE]),
+      'group': I18N.Arrangement.groupA,
+      'icon': ORYX_Config.PATH + 'images/shape_align_size.png',
+      'description': I18N.Arrangement.asDesc,
       'index': 3,
       'minShape': 2
-    });
+    })
 
-
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_ARRANGEMENT_TOP, this.setZLevel.bind(this, this.setToTop));
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_ARRANGEMENT_BACK, this.setZLevel.bind(this, this.setToBack));
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_ARRANGEMENT_FORWARD, this.setZLevel.bind(this, this.setForward));
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_ARRANGEMENT_BACKWARD, this.setZLevel.bind(this, this.setBackward));
-
+    this.facade.registerOnEvent(ORYX_Config.EVENT_ARRANGEMENT_TOP, this.setZLevel.bind(this, this.setToTop))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_ARRANGEMENT_BACK, this.setZLevel.bind(this, this.setToBack))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_ARRANGEMENT_FORWARD, this.setZLevel.bind(this, this.setForward))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_ARRANGEMENT_BACKWARD, this.setZLevel.bind(this, this.setBackward))
 
   }
 
   onSelectionChanged (elemnt) {
-    var selection = this.facade.getSelection();
-    if (selection.length === 1 && selection[0] instanceof ORYX.Core.Edge) {
-      this.setToTop(selection);
+    let selection = this.facade.getSelection()
+    if (selection.length === 1 && selection[0] instanceof ORYX_Edge) {
+      this.setToTop(selection)
     }
   }
 
   setZLevel (callback, event) {
-
     //Command-Pattern for dragging one docker
-    var zLevelCommand = ORYX.Core.Command.extend({
+    let zLevelCommand = ORYX_Command.extend({
       construct: function (callback, elements, facade) {
-        this.callback = callback;
-        this.elements = elements;
+        this.callback = callback
+        this.elements = elements
         // For redo, the previous elements get stored
         this.elAndIndex = elements.map(function (el) {
-          return {el: el, previous: el.parent.children[el.parent.children.indexOf(el) - 1]}
+          return { el: el, previous: el.parent.children[el.parent.children.indexOf(el) - 1] }
         })
-        this.facade = facade;
+        this.facade = facade
       },
       execute: function () {
-
         // Call the defined z-order callback with the elements
         this.callback(this.elements)
         this.facade.setSelection(this.elements)
       },
       rollback: function () {
-
         // Sort all elements on the index of there containment
-        var sortedEl = this.elAndIndex.sortBy(function (el) {
-          var value = el.el;
-          var t = $A(value.node.parentNode.childNodes);
-          return t.indexOf(value.node);
-        });
+        let sortedEl = this.elAndIndex.sortBy(function (el) {
+          let value = el.el
+          let t = $A(value.node.parentNode.childNodes)
+          return t.indexOf(value.node)
+        })
 
         // Every element get setted back bevor the old previous element
-        for (var i = 0; i < sortedEl.length; i++) {
-          var el = sortedEl[i].el;
-          var p = el.parent;
-          var oldIndex = p.children.indexOf(el);
-          var newIndex = p.children.indexOf(sortedEl[i].previous);
+        for (let i = 0; i < sortedEl.length; i++) {
+          let el = sortedEl[i].el
+          let p = el.parent
+          let oldIndex = p.children.indexOf(el)
+          let newIndex = p.children.indexOf(sortedEl[i].previous)
           newIndex = newIndex || 0
           p.children = p.children.insertFrom(oldIndex, newIndex)
-          el.node.parentNode.insertBefore(el.node, el.node.parentNode.childNodes[newIndex + 1]);
+          el.node.parentNode.insertBefore(el.node, el.node.parentNode.childNodes[newIndex + 1])
         }
 
         // Reset the selection
         this.facade.setSelection(this.elements)
       }
-    });
+    })
 
     // Instanziate the dockCommand
-    var command = new zLevelCommand(callback, this.facade.getSelection(), this.facade);
+    let command = new zLevelCommand(callback, this.facade.getSelection(), this.facade)
     if (event.excludeCommand) {
-      command.execute();
+      command.execute()
     } else {
-      this.facade.executeCommands([command]);
+      this.facade.executeCommands([command])
     }
 
   }
@@ -206,155 +215,153 @@ export default class Arrangement extends AbstractPlugin {
   setToTop (elements) {
 
     // Sortieren des Arrays nach dem Index des SVGKnotens im Bezug auf dem Elternknoten.
-    var tmpElem = elements.sortBy(function (value, index) {
-      var t = $A(value.node.parentNode.childNodes);
-      return t.indexOf(value.node);
-    });
+    let tmpElem = elements.sortBy(function (value, index) {
+      let t = $A(value.node.parentNode.childNodes)
+      return t.indexOf(value.node)
+    })
     // Sortiertes Array wird nach oben verschoben.
     tmpElem.each(function (value) {
-      var p = value.parent;
+      let p = value.parent
       if (p.children.last() === value) {
-        return;
+        return
       }
       p.children = p.children.without(value)
-      p.children.push(value);
-      value.node.parentNode.appendChild(value.node);
-    });
+      p.children.push(value)
+      value.node.parentNode.appendChild(value.node)
+    })
   }
 
-  setToBack(elements) {
+  setToBack (elements) {
     // Sortieren des Arrays nach dem Index des SVGKnotens im Bezug auf dem Elternknoten.
-    var tmpElem = elements.sortBy(function (value, index) {
-      var t = $A(value.node.parentNode.childNodes);
-      return t.indexOf(value.node);
-    });
+    let tmpElem = elements.sortBy(function (value, index) {
+      let t = $A(value.node.parentNode.childNodes)
+      return t.indexOf(value.node)
+    })
 
-    tmpElem = tmpElem.reverse();
+    tmpElem = tmpElem.reverse()
 
     // Sortiertes Array wird nach unten verschoben.
     tmpElem.each(function (value) {
-      var p = value.parent
+      let p = value.parent
       p.children = p.children.without(value)
-      p.children.unshift(value);
-      value.node.parentNode.insertBefore(value.node, value.node.parentNode.firstChild);
-    });
+      p.children.unshift(value)
+      value.node.parentNode.insertBefore(value.node, value.node.parentNode.firstChild)
+    })
 
 
   }
 
   setBackward (elements) {
     // Sortieren des Arrays nach dem Index des SVGKnotens im Bezug auf dem Elternknoten.
-    var tmpElem = elements.sortBy(function (value, index) {
-      var t = $A(value.node.parentNode.childNodes);
-      return t.indexOf(value.node);
-    });
+    let tmpElem = elements.sortBy(function (value, index) {
+      let t = $A(value.node.parentNode.childNodes)
+      return t.indexOf(value.node)
+    })
 
     // Reverse the elements
-    tmpElem = tmpElem.reverse();
+    tmpElem = tmpElem.reverse()
 
     // Delete all Nodes who are the next Node in the nodes-Array
-    var compactElem = tmpElem.findAll(function (el) {
+    let compactElem = tmpElem.findAll(function (el) {
       return !tmpElem.some(function (checkedEl) {
         return checkedEl.node == el.node.previousSibling
       })
-    });
+    })
 
     // Sortiertes Array wird nach eine Ebene nach oben verschoben.
     compactElem.each(function (el) {
       if (el.node.previousSibling === null) {
-        return;
+        return
       }
-      var p = el.parent;
-      var index = p.children.indexOf(el);
+      let p = el.parent
+      let index = p.children.indexOf(el)
       p.children = p.children.insertFrom(index, index - 1)
-      el.node.parentNode.insertBefore(el.node, el.node.previousSibling);
-    });
+      el.node.parentNode.insertBefore(el.node, el.node.previousSibling)
+    })
 
 
   }
 
   setForward (elements) {
     // Sortieren des Arrays nach dem Index des SVGKnotens im Bezug auf dem Elternknoten.
-    var tmpElem = elements.sortBy(function (value, index) {
-      var t = $A(value.node.parentNode.childNodes);
-      return t.indexOf(value.node);
-    });
+    let tmpElem = elements.sortBy(function (value, index) {
+      let t = $A(value.node.parentNode.childNodes)
+      return t.indexOf(value.node)
+    })
 
 
     // Delete all Nodes who are the next Node in the nodes-Array
-    var compactElem = tmpElem.findAll(function (el) {
+    let compactElem = tmpElem.findAll(function (el) {
       return !tmpElem.some(function (checkedEl) {
         return checkedEl.node == el.node.nextSibling
       })
-    });
+    })
 
 
     // Sortiertes Array wird eine Ebene nach unten verschoben.
     compactElem.each(function (el) {
-      var nextNode = el.node.nextSibling
+      let nextNode = el.node.nextSibling
       if (nextNode === null) {
-        return;
+        return
       }
-      var index = el.parent.children.indexOf(el);
-      var p = el.parent;
+      let index = el.parent.children.indexOf(el)
+      let p = el.parent
       p.children = p.children.insertFrom(index, index + 1)
-      el.node.parentNode.insertBefore(nextNode, el.node);
-    });
+      el.node.parentNode.insertBefore(nextNode, el.node)
+    })
   }
 
   alignShapes (way) {
-
-    var elements = this.facade.getSelection();
+    let elements = this.facade.getSelection()
 
     // Set the elements to all Top-Level elements
-    elements = this.facade.getCanvas().getShapesWithSharedParent(elements);
+    elements = this.facade.getCanvas().getShapesWithSharedParent(elements)
     // Get only nodes
     elements = elements.findAll(function (value) {
-      return (value instanceof ORYX.Core.Node)
-    });
+      return (value instanceof ORYX_Node)
+    })
     // Delete all attached intermediate events from the array
     elements = elements.findAll(function (value) {
-      var d = value.getIncomingShapes()
+      let d = value.getIncomingShapes()
       return d.length == 0 || !elements.include(d[0])
-    });
+    })
     if (elements.length < 2) {
-      return;
+      return
     }
 
     // get bounds of all shapes.
-    var bounds = elements[0].absoluteBounds().clone();
+    let bounds = elements[0].absoluteBounds().clone()
     elements.each(function (shape) {
-      bounds.include(shape.absoluteBounds().clone());
-    });
+      bounds.include(shape.absoluteBounds().clone())
+    })
 
     // get biggest width and heigth
-    var maxWidth = 0;
-    var maxHeight = 0;
+    let maxWidth = 0
+    let maxHeight = 0
     elements.each(function (shape) {
-      maxWidth = Math.max(shape.bounds.width(), maxWidth);
-      maxHeight = Math.max(shape.bounds.height(), maxHeight);
-    });
+      maxWidth = Math.max(shape.bounds.width(), maxWidth)
+      maxHeight = Math.max(shape.bounds.height(), maxHeight)
+    })
 
-    var commandClass = ORYX.Core.Command.extend({
+    const commandClass = ORYX_Command.extend({
       construct: function (elements, bounds, maxHeight, maxWidth, way, plugin) {
-        this.elements = elements;
-        this.bounds = bounds;
-        this.maxHeight = maxHeight;
-        this.maxWidth = maxWidth;
-        this.way = way;
-        this.facade = plugin.facade;
-        this.plugin = plugin;
-        this.orgPos = [];
+        this.elements = elements
+        this.bounds = bounds
+        this.maxHeight = maxHeight
+        this.maxWidth = maxWidth
+        this.way = way
+        this.facade = plugin.facade
+        this.plugin = plugin
+        this.orgPos = []
       },
       setBounds: function (shape, maxSize) {
         if (!maxSize)
-          maxSize = {width: ORYX.CONFIG.MAXIMUM_SIZE, height: ORYX.CONFIG.MAXIMUM_SIZE};
-
+          maxSize = { width: ORYX_Config.MAXIMUM_SIZE, height: ORYX_Config.MAXIMUM_SIZE }
         if (!shape.bounds) {
-          throw "Bounds not definined."
+          throw 'Bounds not definined.'
         }
 
-        var newBounds = {
+        let newBounds = {
           a: {
             x: shape.bounds.upperLeft().x - (this.maxWidth - shape.bounds.width()) / 2,
             y: shape.bounds.upperLeft().y - (this.maxHeight - shape.bounds.height()) / 2
@@ -368,7 +375,7 @@ export default class Arrangement extends AbstractPlugin {
         /* If the new width of shape exceeds the maximum width, set width value to maximum. */
         if (this.maxWidth > maxSize.width) {
           newBounds.a.x = shape.bounds.upperLeft().x -
-            (maxSize.width - shape.bounds.width()) / 2;
+            (maxSize.width - shape.bounds.width()) / 2
 
           newBounds.b.x = shape.bounds.lowerRight().x + (maxSize.width - shape.bounds.width()) / 2
         }
@@ -376,113 +383,113 @@ export default class Arrangement extends AbstractPlugin {
         /* If the new height of shape exceeds the maximum height, set height value to maximum. */
         if (this.maxHeight > maxSize.height) {
           newBounds.a.y = shape.bounds.upperLeft().y -
-            (maxSize.height - shape.bounds.height()) / 2;
+            (maxSize.height - shape.bounds.height()) / 2
 
           newBounds.b.y = shape.bounds.lowerRight().y + (maxSize.height - shape.bounds.height()) / 2
         }
 
         /* set bounds of shape */
-        shape.bounds.set(newBounds);
+        shape.bounds.set(newBounds)
 
       },
       execute: function () {
         // align each shape according to the way that was specified.
         this.elements.each(function (shape, index) {
-          this.orgPos[index] = shape.bounds.upperLeft();
+          this.orgPos[index] = shape.bounds.upperLeft()
 
-          var relBounds = this.bounds.clone();
-          var newCoordinates;
-          if (shape.parent && !(shape.parent instanceof ORYX.Core.Canvas)) {
-            var upL = shape.parent.absoluteBounds().upperLeft();
-            relBounds.moveBy(-upL.x, -upL.y);
+          let relBounds = this.bounds.clone()
+          let newCoordinates
+          if (shape.parent && !(shape.parent instanceof ORYX_Canvas)) {
+            let upL = shape.parent.absoluteBounds().upperLeft()
+            relBounds.moveBy(-upL.x, -upL.y)
           }
 
           switch (this.way) {
             // align the shapes in the requested way.
-            case ORYX.CONFIG.EDITOR_ALIGN_BOTTOM:
+            case ORYX_Config.EDITOR_ALIGN_BOTTOM:
               newCoordinates = {
                 x: shape.bounds.upperLeft().x,
                 y: relBounds.b.y - shape.bounds.height()
-              };
-              break;
+              }
+              break
 
-            case ORYX.CONFIG.EDITOR_ALIGN_MIDDLE:
+            case ORYX_Config.EDITOR_ALIGN_MIDDLE:
               newCoordinates = {
                 x: shape.bounds.upperLeft().x,
                 y: (relBounds.a.y + relBounds.b.y - shape.bounds.height()) / 2
-              };
-              break;
+              }
+              break
 
-            case ORYX.CONFIG.EDITOR_ALIGN_TOP:
+            case ORYX_Config.EDITOR_ALIGN_TOP:
               newCoordinates = {
                 x: shape.bounds.upperLeft().x,
                 y: relBounds.a.y
-              };
-              break;
+              }
+              break
 
-            case ORYX.CONFIG.EDITOR_ALIGN_LEFT:
+            case ORYX_Config.EDITOR_ALIGN_LEFT:
               newCoordinates = {
                 x: relBounds.a.x,
                 y: shape.bounds.upperLeft().y
-              };
-              break;
+              }
+              break
 
-            case ORYX.CONFIG.EDITOR_ALIGN_CENTER:
+            case ORYX_Config.EDITOR_ALIGN_CENTER:
               newCoordinates = {
                 x: (relBounds.a.x + relBounds.b.x - shape.bounds.width()) / 2,
                 y: shape.bounds.upperLeft().y
-              };
-              break;
+              }
+              break
 
-            case ORYX.CONFIG.EDITOR_ALIGN_RIGHT:
+            case ORYX_Config.EDITOR_ALIGN_RIGHT:
               newCoordinates = {
                 x: relBounds.b.x - shape.bounds.width(),
                 y: shape.bounds.upperLeft().y
-              };
-              break;
-
-            case ORYX.CONFIG.EDITOR_ALIGN_SIZE:
-              if (shape.isResizable) {
-                this.orgPos[index] = {a: shape.bounds.upperLeft(), b: shape.bounds.lowerRight()};
-                this.setBounds(shape, shape.maximumSize);
               }
-              break;
+              break
+
+            case ORYX_Config.EDITOR_ALIGN_SIZE:
+              if (shape.isResizable) {
+                this.orgPos[index] = { a: shape.bounds.upperLeft(), b: shape.bounds.lowerRight() }
+                this.setBounds(shape, shape.maximumSize)
+              }
+              break
           }
 
           if (newCoordinates) {
-            var offset = {
+            let offset = {
               x: shape.bounds.upperLeft().x - newCoordinates.x,
               y: shape.bounds.upperLeft().y - newCoordinates.y
             }
             // Set the new position
-            shape.bounds.moveTo(newCoordinates);
-            this.plugin.layoutEdges(shape, shape.getAllDockedShapes(), offset);
+            shape.bounds.moveTo(newCoordinates)
+            this.plugin.layoutEdges(shape, shape.getAllDockedShapes(), offset)
             //shape.update()
           }
-        }.bind(this));
+        }.bind(this))
 
         //this.facade.getCanvas().update();
         //this.facade.updateSelection();
       },
       rollback: function () {
         this.elements.each(function (shape, index) {
-          if (this.way == ORYX.CONFIG.EDITOR_ALIGN_SIZE) {
+          if (this.way == ORYX_Config.EDITOR_ALIGN_SIZE) {
             if (shape.isResizable) {
-              shape.bounds.set(this.orgPos[index]);
+              shape.bounds.set(this.orgPos[index])
             }
           } else {
-            shape.bounds.moveTo(this.orgPos[index]);
+            shape.bounds.moveTo(this.orgPos[index])
           }
-        }.bind(this));
+        }.bind(this))
 
         //this.facade.getCanvas().update();
         //this.facade.updateSelection();
       }
     })
 
-    var command = new commandClass(elements, bounds, maxHeight, maxWidth, parseInt(way), this);
+    const command = new commandClass(elements, bounds, maxHeight, maxWidth, parseInt(way), this)
 
-    this.facade.executeCommands([command]);
+    this.facade.executeCommands([command])
   }
 }
 

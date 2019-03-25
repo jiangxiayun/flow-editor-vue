@@ -260,10 +260,10 @@
           }
           this.selectedListener.fields.push(newField)
         } else {
-          this.$message({
-            type: 'warning',
-            message: '请先选择一个执行监听器'
-          })
+          // this.$message({
+          //   type: 'warning',
+          //   message: '请先选择一个执行监听器'
+          // })
         }
       },
       // Click handler for save button

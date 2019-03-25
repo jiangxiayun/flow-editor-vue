@@ -13,7 +13,7 @@ function computeOutCode (x, y, xmin, ymin, xmax, ymax) {
   return code
 }
 
-const Math = {
+const ORYX_Math = {
   /**
    * Calculate the middle point between two given points
    * 计算两点之间的中点
@@ -63,7 +63,7 @@ const Math = {
       return false
     }
 
-    var s = (lPoint1Y - lPoint2Y) / (lPoint1X - lPoint2X)
+    let s = (lPoint1Y - lPoint2Y) / (lPoint1X - lPoint2X)
 
     return Math.abs(pointY - ((s * pointX) + lPoint1Y - s * lPoint1X)) < offset
   },
@@ -73,13 +73,12 @@ const Math = {
    * 判断点是否在多边形中
    */
   isPointInEllipse: function (pointX, pointY, cx, cy, rx, ry) {
-
     if (cx === undefined || cy === undefined || rx === undefined || ry === undefined) {
       throw 'ORYX.Core.Math.isPointInEllipse needs a ellipse with these properties: x, y, radiusX, radiusY'
     }
 
-    var tx = (pointX - cx) / rx
-    var ty = (pointY - cy) / ry
+    let tx = (pointX - cx) / rx
+    let ty = (pointY - cy) / ry
 
     return tx * tx + ty * ty < 1.0
   },
@@ -96,18 +95,18 @@ const Math = {
       throw 'ORYX.Core.Math.isPointInPolygone needs two arguments'
     }
 
-    var lastIndex = polygone.length - 1
+    let lastIndex = polygone.length - 1
 
     if (polygone[0] !== polygone[lastIndex - 1] || polygone[1] !== polygone[lastIndex]) {
       polygone.push(polygone[0])
       polygone.push(polygone[1])
     }
 
-    var crossings = 0
+    let crossings = 0
 
-    var x1, y1, x2, y2, d
+    let x1, y1, x2, y2, d
 
-    for (var i = 0; i < polygone.length - 3;) {
+    for (let i = 0; i < polygone.length - 3;) {
       x1 = polygone[i]
       y1 = polygone[++i]
       x2 = polygone[++i]
@@ -139,13 +138,13 @@ const Math = {
    *    Flag to signal if only the segment of the line shell be evaluated.
    */
   distancePointLinie: function (lineP1, lineP2, point, toSegmentOnly) {
-    var intersectionPoint = ORYX.Core.Math.getPointOfIntersectionPointLine(lineP1, lineP2, point, toSegmentOnly)
+    let intersectionPoint = ORYX_Math.getPointOfIntersectionPointLine(lineP1, lineP2, point, toSegmentOnly)
 
     if (!intersectionPoint) {
       return null
     }
 
-    return ORYX.Core.Math.getDistancePointToPoint(point, intersectionPoint)
+    return ORYX_Math.getDistancePointToPoint(point, intersectionPoint)
   },
 
   /**
@@ -166,8 +165,8 @@ const Math = {
    * @param {point} point
    */
   getDistanceBetweenTwoPoints: function (between1, between2, point) {
-    return ORYX.Core.Math.getDistancePointToPoint(point, between1) /
-      ORYX.Core.Math.getDistancePointToPoint(between1, between2)
+    return ORYX_Math.getDistancePointToPoint(point, between1) /
+      ORYX_Math.getDistancePointToPoint(between1, between2)
   },
 
 
@@ -180,8 +179,8 @@ const Math = {
    * @param {point} point
    */
   pointIsLeftOfLine: function (lineP1, lineP2, point) {
-    var vec1 = ORYX.Core.Math.getVector(lineP1, lineP2)
-    var vec2 = ORYX.Core.Math.getVector(lineP1, point)
+    let vec1 = ORYX_Math.getVector(lineP1, lineP2)
+    let vec2 = ORYX_Math.getVector(lineP1, point)
     // if the cross produkt is more than 0
     return ((vec1.x * vec2.y) - (vec2.x * vec1.y)) > 0
   },
@@ -232,10 +231,10 @@ const Math = {
    */
   getIdentityVector: function (vector) {
     if (arguments.length == 2) {
-      vector = ORYX.Core.Math.getVector(arguments[0], arguments[1])
+      vector = ORYX_Math.getVector(arguments[0], arguments[1])
     }
 
-    var length = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y))
+    let length = Math.sqrt((vector.x * vector.x) + (vector.y * vector.y))
     return {
       x: vector.x / (length || 1),
       y: vector.y / (length || 1)
@@ -243,7 +242,7 @@ const Math = {
   },
 
   getOrthogonalIdentityVector: function (point1, point2) {
-    var vec = arguments.length == 1 ? point1 : ORYX.Core.Math.getIdentityVector(point1, point2)
+    let vec = arguments.length == 1 ? point1 : ORYX_Math.getIdentityVector(point1, point2)
     return {
       x: vec.y,
       y: -vec.x
@@ -268,13 +267,13 @@ const Math = {
      * [P3 - P1 - u(P2 - P1)] dot (P2 - P1) = 0
      * u =((x3-x1)(x2-x1)+(y3-y1)(y2-y1))/(p2-p1)²
      */
-    var denominator = Math.pow(lineP2.x - lineP1.x, 2)
+    let denominator = Math.pow(lineP2.x - lineP1.x, 2)
       + Math.pow(lineP2.y - lineP1.y, 2)
     if (denominator == 0) {
       return undefined
     }
 
-    var u = ((point.x - lineP1.x) * (lineP2.x - lineP1.x)
+    let u = ((point.x - lineP1.x) * (lineP2.x - lineP1.x)
       + (point.y - lineP1.y) * (lineP2.y - lineP1.y))
       / denominator
 
@@ -284,7 +283,7 @@ const Math = {
       }
     }
 
-    pointOfIntersection = new Object()
+    let pointOfIntersection = new Object()
     pointOfIntersection.x = lineP1.x + u * (lineP2.x - lineP1.x)
     pointOfIntersection.y = lineP1.y + u * (lineP2.y - lineP1.y)
 
@@ -298,8 +297,8 @@ const Math = {
    * @return {Object} Includes x, y
    */
   getTranslatedPoint: function (point, matrix) {
-    var x = matrix.a * point.x + matrix.c * point.y + matrix.e * 1
-    var y = matrix.b * point.x + matrix.d * point.y + matrix.f * 1
+    let x = matrix.a * point.x + matrix.c * point.y + matrix.e * 1
+    let y = matrix.b * point.x + matrix.d * point.y + matrix.f * 1
     return { x: x, y: y }
   },
 
@@ -309,7 +308,7 @@ const Math = {
    * @return {Matrix}
    */
   getInverseMatrix: function (matrix) {
-    var det = ORYX.Core.Math.getDeterminant(matrix), m = matrix
+    let det = ORYX_Math.getDeterminant(matrix), m = matrix
     // +-     -+
     // | a c e |
     // | b d f |
@@ -343,18 +342,18 @@ const Math = {
    * @return {Object} Includes x, y, width, height
    */
   getTranslatedBoundingBox: function (node) {
-    var matrix = node.getCTM()
-    var bb = node.getBBox()
-    var ul = ORYX.Core.Math.getTranslatedPoint({ x: bb.x, y: bb.y }, matrix)
-    var ll = ORYX.Core.Math.getTranslatedPoint({ x: bb.x, y: bb.y + bb.height }, matrix)
-    var ur = ORYX.Core.Math.getTranslatedPoint({ x: bb.x + bb.width, y: bb.y }, matrix)
-    var lr = ORYX.Core.Math.getTranslatedPoint({ x: bb.x + bb.width, y: bb.y + bb.height }, matrix)
+    let matrix = node.getCTM()
+    let bb = node.getBBox()
+    let ul = ORYX_Math.getTranslatedPoint({ x: bb.x, y: bb.y }, matrix)
+    let ll = ORYX_Math.getTranslatedPoint({ x: bb.x, y: bb.y + bb.height }, matrix)
+    let ur = ORYX_Math.getTranslatedPoint({ x: bb.x + bb.width, y: bb.y }, matrix)
+    let lr = ORYX_Math.getTranslatedPoint({ x: bb.x + bb.width, y: bb.y + bb.height }, matrix)
 
-    var minPoint = {
+    let minPoint = {
       x: Math.min(ul.x, ll.x, ur.x, lr.x),
       y: Math.min(ul.y, ll.y, ur.y, lr.y)
     }
-    var maxPoint = {
+    let maxPoint = {
       x: Math.max(ul.x, ll.x, ur.x, lr.x),
       y: Math.max(ul.y, ll.y, ur.y, lr.y)
     }
@@ -376,7 +375,7 @@ const Math = {
     if (p1.x == p2.x && p1.y == p2.y)
       return 0
 
-    var angle = Math.asin(Math.sqrt(Math.pow(p1.y - p2.y, 2))
+    let angle = Math.asin(Math.sqrt(Math.pow(p1.y - p2.y, 2))
       / (Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p1.y - p2.y, 2))))
       * 180 / Math.PI
 
@@ -401,7 +400,7 @@ const Math = {
    * @param {Object} ymax
    */
   isRectOverLine: function (x1, y1, x2, y2, xmin, ymin, xmax, ymax) {
-    return !!ORYX.Core.Math.clipLineOnRect.apply(ORYX.Core.Math, arguments)
+    return !!ORYX_Math.clipLineOnRect.apply(ORYX_Math, arguments)
   },
 
   /**
@@ -419,8 +418,8 @@ const Math = {
    */
   clipLineOnRect: function (x1, y1, x2, y2, xmin, ymin, xmax, ymax) {
     //Outcodes for P0, P1, and whatever point lies outside the clip rectangle
-    var outcode0, outcode1, outcodeOut, hhh = 0
-    var accept = false, done = false
+    let outcode0, outcode1, outcodeOut, hhh = 0
+    let accept = false, done = false
 
     //compute outcodes
     outcode0 = computeOutCode(x1, y1, xmin, ymin, xmax, ymax)
@@ -435,7 +434,7 @@ const Math = {
       } else {
         //failed both tests, so calculate the line segment to clip
         //from an outside point to an intersection with clip edge
-        var x = 0, y = 0
+        let x = 0, y = 0
         //At least one endpoint is outside the clip rectangle; pick it.
         outcodeOut = outcode0 != 0 ? outcode0 : outcode1
         //Now find the intersection point;
@@ -476,4 +475,4 @@ const Math = {
   }
 }
 
-export default Math
+export default ORYX_Math

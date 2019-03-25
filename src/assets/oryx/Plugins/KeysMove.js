@@ -1,112 +1,112 @@
 import AbstractPlugin from './AbstractPlugin'
+import ORYX_Config from '../CONFIG'
+import ORYX_Edge from '../core/Edge'
+import ORYX_Node from '../core/Node'
+import ORYX_Command from '../core/Command'
+import ORYX_Controls from '../core/Controls/index'
 
 export default class KeysMove extends AbstractPlugin {
-
-  facade = undefined
-
-  constructor(facade) {
+  constructor (facade) {
     super()
-    this.facade = facade;
-    this.copyElements = [];
+    this.facade = facade
+    this.copyElements = []
 
     //this.facade.registerOnEvent(ORYX.CONFIG.EVENT_KEYDOWN, this.keyHandler.bind(this));
 
     // SELECT ALL
     this.facade.offer({
       keyCodes: [{
-        metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
+        metaKeys: [ORYX_Config.META_KEY_META_CTRL],
         keyCode: 65,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
       functionality: this.selectAll.bind(this)
-    });
+    })
 
     // MOVE LEFT SMALL
     this.facade.offer({
       keyCodes: [{
-        metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
-        keyCode: ORYX.CONFIG.KEY_CODE_LEFT,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        metaKeys: [ORYX_Config.META_KEY_META_CTRL],
+        keyCode: ORYX_Config.KEY_CODE_LEFT,
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
-      functionality: this.move.bind(this, ORYX.CONFIG.KEY_CODE_LEFT, false)
-    });
+      functionality: this.move.bind(this, ORYX_Config.KEY_CODE_LEFT, false)
+    })
 
     // MOVE LEFT
     this.facade.offer({
       keyCodes: [{
-        keyCode: ORYX.CONFIG.KEY_CODE_LEFT,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        keyCode: ORYX_Config.KEY_CODE_LEFT,
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
-      functionality: this.move.bind(this, ORYX.CONFIG.KEY_CODE_LEFT, true)
-    });
+      functionality: this.move.bind(this, ORYX_Config.KEY_CODE_LEFT, true)
+    })
 
     // MOVE RIGHT SMALL
     this.facade.offer({
       keyCodes: [{
-        metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
-        keyCode: ORYX.CONFIG.KEY_CODE_RIGHT,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        metaKeys: [ORYX_Config.META_KEY_META_CTRL],
+        keyCode: ORYX_Config.KEY_CODE_RIGHT,
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
-      functionality: this.move.bind(this, ORYX.CONFIG.KEY_CODE_RIGHT, false)
-    });
+      functionality: this.move.bind(this, ORYX_Config.KEY_CODE_RIGHT, false)
+    })
 
     // MOVE RIGHT
     this.facade.offer({
       keyCodes: [{
-        keyCode: ORYX.CONFIG.KEY_CODE_RIGHT,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        keyCode: ORYX_Config.KEY_CODE_RIGHT,
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
-      functionality: this.move.bind(this, ORYX.CONFIG.KEY_CODE_RIGHT, true)
-    });
+      functionality: this.move.bind(this, ORYX_Config.KEY_CODE_RIGHT, true)
+    })
 
     // MOVE UP SMALL
     this.facade.offer({
       keyCodes: [{
-        metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
-        keyCode: ORYX.CONFIG.KEY_CODE_UP,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        metaKeys: [ORYX_Config.META_KEY_META_CTRL],
+        keyCode: ORYX_Config.KEY_CODE_UP,
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
-      functionality: this.move.bind(this, ORYX.CONFIG.KEY_CODE_UP, false)
-    });
+      functionality: this.move.bind(this, ORYX_Config.KEY_CODE_UP, false)
+    })
 
     // MOVE UP
     this.facade.offer({
       keyCodes: [{
-        keyCode: ORYX.CONFIG.KEY_CODE_UP,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        keyCode: ORYX_Config.KEY_CODE_UP,
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
-      functionality: this.move.bind(this, ORYX.CONFIG.KEY_CODE_UP, true)
-    });
+      functionality: this.move.bind(this, ORYX_Config.KEY_CODE_UP, true)
+    })
 
     // MOVE DOWN SMALL
     this.facade.offer({
       keyCodes: [{
-        metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
-        keyCode: ORYX.CONFIG.KEY_CODE_DOWN,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        metaKeys: [ORYX_Config.META_KEY_META_CTRL],
+        keyCode: ORYX_Config.KEY_CODE_DOWN,
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
-      functionality: this.move.bind(this, ORYX.CONFIG.KEY_CODE_DOWN, false)
-    });
+      functionality: this.move.bind(this, ORYX_Config.KEY_CODE_DOWN, false)
+    })
 
     // MOVE DOWN
     this.facade.offer({
       keyCodes: [{
-        keyCode: ORYX.CONFIG.KEY_CODE_DOWN,
-        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+        keyCode: ORYX_Config.KEY_CODE_DOWN,
+        keyAction: ORYX_Config.KEY_ACTION_DOWN
       }
       ],
-      functionality: this.move.bind(this, ORYX.CONFIG.KEY_CODE_DOWN, true)
-    });
-
-
+      functionality: this.move.bind(this, ORYX_Config.KEY_CODE_DOWN, true)
+    })
   }
 
   /**
@@ -114,87 +114,81 @@ export default class KeysMove extends AbstractPlugin {
    *
    */
   selectAll (e) {
-    Event.stop(e.event);
+    Event.stop(e.event)
     this.facade.setSelection(this.facade.getCanvas().getChildShapes(true))
   }
 
   move (key, far, e) {
-
-    Event.stop(e.event);
-
+    Event.stop(e.event)
     // calculate the distance to move the objects and get the selection.
-    var distance = far ? 20 : 5;
-    var selection = this.facade.getSelection();
-    var currentSelection = this.facade.getSelection();
-    var p = {x: 0, y: 0};
+    let distance = far ? 20 : 5
+    let selection = this.facade.getSelection()
+    let currentSelection = this.facade.getSelection()
+    let p = { x: 0, y: 0 }
 
     // switch on the key pressed and populate the point to move by.
     switch (key) {
-
-      case ORYX.CONFIG.KEY_CODE_LEFT:
-        p.x = -1 * distance;
-        break;
-      case ORYX.CONFIG.KEY_CODE_RIGHT:
-        p.x = distance;
-        break;
-      case ORYX.CONFIG.KEY_CODE_UP:
-        p.y = -1 * distance;
-        break;
-      case ORYX.CONFIG.KEY_CODE_DOWN:
-        p.y = distance;
-        break;
+      case ORYX_Config.KEY_CODE_LEFT:
+        p.x = -1 * distance
+        break
+      case ORYX_Config.KEY_CODE_RIGHT:
+        p.x = distance
+        break
+      case ORYX_Config.KEY_CODE_UP:
+        p.y = -1 * distance
+        break
+      case ORYX_Config.KEY_CODE_DOWN:
+        p.y = distance
+        break
     }
 
     // move each shape in the selection by the point calculated and update it.
     selection = selection.findAll(function (shape) {
       // Check if this shape is docked to an shape in the selection
-      if (shape instanceof ORYX.Core.Node && shape.dockers.length == 1 && selection.include(shape.dockers.first().getDockedShape())) {
+      if (shape instanceof ORYX_Node && shape.dockers.length == 1 && selection.include(shape.dockers.first().getDockedShape())) {
         return false
       }
 
       // Check if any of the parent shape is included in the selection
-      var s = shape.parent;
+      let s = shape.parent
       do {
         if (selection.include(s)) {
           return false
         }
-      } while (s = s.parent);
+      } while (s = s.parent)
 
       // Otherwise, return true
-      return true;
-
-    });
+      return true
+    })
 
     /* Edges must not be movable, if only edges are selected and at least
      * one of them is docked.
      */
-    var edgesMovable = true;
-    var onlyEdgesSelected = selection.all(function (shape) {
-      if (shape instanceof ORYX.Core.Edge) {
+    let edgesMovable = true
+    let onlyEdgesSelected = selection.all(function (shape) {
+      if (shape instanceof ORYX_Edge) {
         if (shape.isDocked()) {
-          edgesMovable = false;
+          edgesMovable = false
         }
-        return true;
+        return true
       }
-      return false;
-    });
+      return false
+    })
 
     if (onlyEdgesSelected && !edgesMovable) {
       /* Abort moving shapes */
-      return;
+      return
     }
 
     selection = selection.map(function (shape) {
-      if (shape instanceof ORYX.Core.Node) {
+      if (shape instanceof ORYX_Node) {
         /*if( shape.dockers.length == 1 ){
          return shape.dockers.first()
          } else {*/
         return shape
         //}
-      } else if (shape instanceof ORYX.Core.Edge) {
-
-        var dockers = shape.dockers;
-
+      } else if (shape instanceof ORYX_Edge) {
+        let dockers = shape.dockers
         if (selection.include(shape.dockers.first().getDockedShape())) {
           dockers = dockers.without(shape.dockers.first())
         }
@@ -204,74 +198,71 @@ export default class KeysMove extends AbstractPlugin {
         }
 
         return dockers
-
       } else {
         return null
       }
 
-    }).flatten().compact();
+    }).flatten().compact()
 
     if (selection.size() > 0) {
-
       //Stop moving at canvas borders
-      var selectionBounds = [this.facade.getCanvas().bounds.lowerRight().x,
+      let selectionBounds = [this.facade.getCanvas().bounds.lowerRight().x,
         this.facade.getCanvas().bounds.lowerRight().y,
         0,
-        0];
+        0]
       selection.each(function (s) {
-        selectionBounds[0] = Math.min(selectionBounds[0], s.bounds.upperLeft().x);
-        selectionBounds[1] = Math.min(selectionBounds[1], s.bounds.upperLeft().y);
-        selectionBounds[2] = Math.max(selectionBounds[2], s.bounds.lowerRight().x);
-        selectionBounds[3] = Math.max(selectionBounds[3], s.bounds.lowerRight().y);
-      });
+        selectionBounds[0] = Math.min(selectionBounds[0], s.bounds.upperLeft().x)
+        selectionBounds[1] = Math.min(selectionBounds[1], s.bounds.upperLeft().y)
+        selectionBounds[2] = Math.max(selectionBounds[2], s.bounds.lowerRight().x)
+        selectionBounds[3] = Math.max(selectionBounds[3], s.bounds.lowerRight().y)
+      })
       if (selectionBounds[0] + p.x < 0)
-        p.x = -selectionBounds[0];
+        p.x = -selectionBounds[0]
       if (selectionBounds[1] + p.y < 0)
-        p.y = -selectionBounds[1];
+        p.y = -selectionBounds[1]
       if (selectionBounds[2] + p.x > this.facade.getCanvas().bounds.lowerRight().x)
-        p.x = this.facade.getCanvas().bounds.lowerRight().x - selectionBounds[2];
+        p.x = this.facade.getCanvas().bounds.lowerRight().x - selectionBounds[2]
       if (selectionBounds[3] + p.y > this.facade.getCanvas().bounds.lowerRight().y)
-        p.y = this.facade.getCanvas().bounds.lowerRight().y - selectionBounds[3];
+        p.y = this.facade.getCanvas().bounds.lowerRight().y - selectionBounds[3]
 
       if (p.x != 0 || p.y != 0) {
         // Instantiate the moveCommand
-        var commands = [new ORYX.Core.Command.Move(selection, p, null, currentSelection, this)];
+        const commands = [new ORYX_Command.Move(selection, p, null, currentSelection, this)]
         // Execute the commands
-        this.facade.executeCommands(commands);
+        this.facade.executeCommands(commands)
       }
 
     }
   }
 
   getUndockedCommant (shapes) {
-
-    var undockEdgeCommand = ORYX.Core.Command.extend({
+    const undockEdgeCommand = ORYX_Command.extend({
       construct: function (moveShapes) {
         this.dockers = moveShapes.collect(function (shape) {
-          return shape instanceof ORYX.Core.Controls.Docker ? {
+          return shape instanceof ORYX_Controls.Docker ? {
             docker: shape,
             dockedShape: shape.getDockedShape(),
             refPoint: shape.referencePoint
           } : undefined
-        }).compact();
+        }).compact()
       },
       execute: function () {
         this.dockers.each(function (el) {
-          el.docker.setDockedShape(undefined);
+          el.docker.setDockedShape(undefined)
         })
       },
       rollback: function () {
         this.dockers.each(function (el) {
-          el.docker.setDockedShape(el.dockedShape);
-          el.docker.setReferencePoint(el.refPoint);
+          el.docker.setDockedShape(el.dockedShape)
+          el.docker.setReferencePoint(el.refPoint)
           //el.docker.update();
         })
       }
-    });
+    })
 
-    command = new undockEdgeCommand(shapes);
-    command.execute();
-    return command;
+    command = new undockEdgeCommand(shapes)
+    command.execute()
+    return command
   }
 
   //    /**

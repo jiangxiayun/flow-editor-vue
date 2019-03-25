@@ -1,15 +1,18 @@
+import CanvasResizeButton from './CanvasResizeButton'
+import ORYX_Command from '../core/Command'
+import ORYX_Config from '../CONFIG'
+
 /**
  * This plugin is responsible for resizing the canvas.
  * @param {Object} facade The editor plugin facade to register enhancements with.
  */
 export default class CanvasResize {
   constructor(facade) {
-
     this.facade = facade;
-    new ORYX.Plugins.CanvasResizeButton(this.facade.getCanvas(), "N", this.resize.bind(this));
-    new ORYX.Plugins.CanvasResizeButton(this.facade.getCanvas(), "W", this.resize.bind(this));
-    new ORYX.Plugins.CanvasResizeButton(this.facade.getCanvas(), "E", this.resize.bind(this));
-    new ORYX.Plugins.CanvasResizeButton(this.facade.getCanvas(), "S", this.resize.bind(this));
+    new CanvasResizeButton(this.facade.getCanvas(), "N", this.resize.bind(this));
+    new CanvasResizeButton(this.facade.getCanvas(), "W", this.resize.bind(this));
+    new CanvasResizeButton(this.facade.getCanvas(), "E", this.resize.bind(this));
+    new CanvasResizeButton(this.facade.getCanvas(), "S", this.resize.bind(this));
 
     window.setTimeout(function () {
       jQuery(window).trigger('resize');
@@ -18,11 +21,10 @@ export default class CanvasResize {
   }
 
   resize(position, shrink) {
-
-    resizeCanvas = function (position, extentionSize, facade) {
-      var canvas = facade.getCanvas();
-      var b = canvas.bounds;
-      var scrollNode = facade.getCanvas().getHTMLContainer().parentNode.parentNode;
+    let resizeCanvas = function (position, extentionSize, facade) {
+      let canvas = facade.getCanvas();
+      let b = canvas.bounds;
+      let scrollNode = facade.getCanvas().getHTMLContainer().parentNode.parentNode;
 
       if (position == "E" || position == "W") {
         canvas.setSize({width: (b.width() + extentionSize) * canvas.zoomLevel, height: (b.height()) * canvas.zoomLevel})
@@ -32,18 +34,17 @@ export default class CanvasResize {
       }
 
       if (position == "N" || position == "W") {
-
-        var move = position == "N" ? {x: 0, y: extentionSize} : {x: extentionSize, y: 0};
+        let move = position == "N" ? {x: 0, y: extentionSize} : {x: extentionSize, y: 0};
 
         // Move all children
         canvas.getChildNodes(false, function (shape) {
           shape.bounds.moveBy(move)
         })
         // Move all dockers, when the edge has at least one docked shape
-        var edges = canvas.getChildEdges().findAll(function (edge) {
+        let edges = canvas.getChildEdges().findAll(function (edge) {
           return edge.getAllDockedShapes().length > 0
         })
-        var dockers = edges.collect(function (edge) {
+        let dockers = edges.collect(function (edge) {
           return edge.dockers.findAll(function (docker) {
             return !docker.getDockedShape()
           })
@@ -63,7 +64,7 @@ export default class CanvasResize {
       facade.updateSelection();
     }
 
-    var commandClass = ORYX.Core.Command.extend({
+    const commandClass = ORYX_Command.extend({
       construct: function (position, extentionSize, facade) {
         this.position = position;
         this.extentionSize = extentionSize;
@@ -79,13 +80,11 @@ export default class CanvasResize {
       }
     });
 
-    var extentionSize = ORYX.CONFIG.CANVAS_RESIZE_INTERVAL;
+    let extentionSize = ORYX_Config.CANVAS_RESIZE_INTERVAL;
     if (shrink) extentionSize = -extentionSize;
-    var command = new commandClass(position, extentionSize, this.facade);
+    const command = new commandClass(position, extentionSize, this.facade);
 
     this.facade.executeCommands([command]);
-
   }
-
 }
 

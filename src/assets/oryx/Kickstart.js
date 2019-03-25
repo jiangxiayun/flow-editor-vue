@@ -23,9 +23,15 @@ const Kickstart = {
 
   register: function (callback) {
     //TODO Add some mutual exclusion between kick and register calls.
-    with (Kickstart) {
-      if (started) window.setTimeout(callback, 1);
-      else Kickstart.callbacks.push(callback)
+    // with (Kickstart) {
+    //   if (started) window.setTimeout(callback, 1);
+    //   else Kickstart.callbacks.push(callback)
+    // }
+
+    if (Kickstart.started){
+      window.setTimeout(callback, 1);
+    } else {
+      Kickstart.callbacks.push(callback)
     }
   },
 
@@ -706,3 +712,7 @@ Event.observe(window, 'load', Kickstart.load);
 
 
 Kickstart.register(DataManager.init);
+
+export {
+  DataManager
+}

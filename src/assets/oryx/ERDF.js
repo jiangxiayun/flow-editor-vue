@@ -1,3 +1,14 @@
+const XMLNS = {
+  ATOM: "http://www.w3.org/2005/Atom",
+  XHTML: "http://www.w3.org/1999/xhtml",
+  ERDF: "http://purl.org/NET/erdf/profile",
+  RDFS: "http://www.w3.org/2000/01/rdf-schema#",
+  RDF: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  RAZIEL: "http://b3mn.org/Raziel",
+  SCHEMA: ""
+}
+
+
 const ERDF = {
   LITERAL: 0x01,
   RESOURCE: 0x02,

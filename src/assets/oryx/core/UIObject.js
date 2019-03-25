@@ -6,7 +6,7 @@
  */
 import ORYX_Config from '../CONFIG'
 import ORYX_Log from '../Log'
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 import Bounds from './Bounds'
 
 export default class UIObject {
@@ -18,7 +18,7 @@ export default class UIObject {
     this.isResizable = false		// Flag, if UIObject is resizable.
     this.isMovable = false			// Flag, if UIObject is movable.
 
-    this.id = ORYX_Editor.provideId()	//get unique id
+    this.id = ORYX_Utils.provideId()	//get unique id
     this.parent = undefined		//parent is defined, if this object is added to another uiObject.
     this.node = undefined			//this is a reference to the SVG representation, either locally or in DOM.
     this.children = []				//array for all add uiObjects
@@ -32,7 +32,6 @@ export default class UIObject {
       this.eventHandlerCallback = options.eventHandlerCallback
     }
   }
-
   /**
    * Sets isChanged flag to true. Callback for the bounds object.
    */

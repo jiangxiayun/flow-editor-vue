@@ -1,3 +1,16 @@
+import ORYX_Log from './Log'
+import ORYX_Config from './CONFIG'
+import ORYX_Editor from './Editor'
+import ORYX_Utils from './Utils'
+import ORYX_Edge from './core/Edge'
+import ORYX_Node from './core/Node'
+import ORYX_Shape from './core/Shape'
+import ORYX_Canvas from './core/Canvas'
+import ORYX_StencilSet from './core/StencilSet'
+
+import ORYX_Command from './core/Command'
+import ORYX_Controls_Docker from './core/Controls/Docker'
+
 /**
  * The Editor class.
  * @class ORYX.Editor
@@ -15,13 +28,10 @@ export default class Editor {
   constructor (config) {
     // Defines the global dom event listener
     this.DOMEventListeners = new Hash()
-
     // Defines the selection
     this.selection = []
-
     // Defines the current zoom level
     this.zoomLevel = 1.0
-
     // initialization.
     this._eventsQueue = []
     this.loadedPlugins = []
@@ -30,7 +40,7 @@ export default class Editor {
     //meta data about the model for the signavio warehouse
     //directory, new, name, description, revision, model (the model data)
 
-    var model = config
+    let model = config
     this.id = model.modelId
 
     if (config.model) {
@@ -40,7 +50,7 @@ export default class Editor {
     if (!this.id) {
       this.id = model.id
       if (!this.id) {
-        this.id = ORYX.Editor.provideId()
+        this.id = ORYX_Utils.provideId()
       }
     }
 
@@ -57,9 +67,9 @@ export default class Editor {
     this._generateGUI()
 
     // Initializing of a callback to check loading ends
-    var loadPluginFinished = false
-    var loadContentFinished = false
-    var initFinished = function () {
+    let loadPluginFinished = false
+    let loadContentFinished = false
+    let initFinished = function () {
       if (!loadPluginFinished || !loadContentFinished) {
         return
       }
@@ -79,30 +89,21 @@ export default class Editor {
       this.getCanvas().update()
       loadContentFinished = true
       initFinished()
-      this.handleEvents({ type: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED })
+      this.handleEvents({ type: ORYX_Config.EVENT_EDITOR_INIT_COMPLETED })
     }.bind(this), 200)
 
     this.Cookie = {
-
       callbacks: [],
-
       onChange: function (callback, interval) {
-
         this.callbacks.push(callback)
         this.start(interval)
-
       },
-
       start: function (interval) {
-
         if (this.pe) {
           return
         }
-
-        var currentString = document.cookie
-
+        let currentString = document.cookie
         this.pe = new PeriodicalExecuter(function () {
-
           if (currentString != document.cookie) {
             currentString = document.cookie
             this.callbacks.each(function (callback) {
@@ -114,7 +115,6 @@ export default class Editor {
       },
 
       stop: function () {
-
         if (this.pe) {
           this.pe.stop()
           this.pe = null
@@ -122,13 +122,11 @@ export default class Editor {
       },
 
       getParams: function () {
-        var res = {}
-
-        var p = document.cookie
+        let res = {}
+        let p = document.cookie
         p.split('; ').each(function (param) {
           res[param.split('=')[0]] = param.split('=')[1]
         })
-
         return res
       },
 
@@ -136,36 +134,28 @@ export default class Editor {
         return document.cookie
       }
     }
-
-    /**
-     * Workaround for SAFARI/Webkit, because
-     * when trying to check SVGSVGElement of instanceof there is
-     * raising an error
-     *
-     */
-    this.SVGClassElementsAreAvailable = true
   }
 
   _finishedLoading () {
     // Raise Loaded Event
-    this.handleEvents({ type: ORYX.CONFIG.EVENT_LOADED })
+    this.handleEvents({ type: ORYX_Config.EVENT_LOADED })
   }
 
   _initEventListener () {
     // Register on Events
-    document.documentElement.addEventListener(ORYX.CONFIG.EVENT_KEYDOWN, this.catchKeyDownEvents.bind(this), false)
-    document.documentElement.addEventListener(ORYX.CONFIG.EVENT_KEYUP, this.catchKeyUpEvents.bind(this), false)
+    document.documentElement.addEventListener(ORYX_Config.EVENT_KEYDOWN, this.catchKeyDownEvents.bind(this), false)
+    document.documentElement.addEventListener(ORYX_Config.EVENT_KEYUP, this.catchKeyUpEvents.bind(this), false)
 
     // Enable Key up and down Event
     this._keydownEnabled = true
     this._keyupEnabled = true
 
-    this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEDOWN, [])
-    this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEUP, [])
-    this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEOVER, [])
-    this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEOUT, [])
-    this.DOMEventListeners.set(ORYX.CONFIG.EVENT_SELECTION_CHANGED, [])
-    this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEMOVE, [])
+    this.DOMEventListeners.set(ORYX_Config.EVENT_MOUSEDOWN, [])
+    this.DOMEventListeners.set(ORYX_Config.EVENT_MOUSEUP, [])
+    this.DOMEventListeners.set(ORYX_Config.EVENT_MOUSEOVER, [])
+    this.DOMEventListeners.set(ORYX_Config.EVENT_MOUSEOUT, [])
+    this.DOMEventListeners.set(ORYX_Config.EVENT_SELECTION_CHANGED, [])
+    this.DOMEventListeners.set(ORYX_Config.EVENT_MOUSEMOVE, [])
   }
 
   /**
@@ -175,8 +165,8 @@ export default class Editor {
    */
   _generateGUI () {
     // Defines the layout height if it's NOT fullscreen
-    var layoutHeight = ORYX.CONFIG.WINDOW_HEIGHT
-    var canvasParent = this.getCanvas().rootNode.parentNode
+    let layoutHeight = ORYX_Config.WINDOW_HEIGHT
+    let canvasParent = this.getCanvas().rootNode.parentNode
 
     jQuery('#canvasSection').append(canvasParent)
     if (canvasParent.parentNode) {
@@ -184,15 +174,15 @@ export default class Editor {
       canvasParent.parentNode.setAttributeNS(null, 'align', 'center')
       canvasParent.setAttributeNS(null, 'align', 'left')
       this.getCanvas().setSize({
-        width: ORYX.CONFIG.CANVAS_WIDTH,
-        height: ORYX.CONFIG.CANVAS_HEIGHT
+        width: ORYX_Config.CANVAS_WIDTH,
+        height: ORYX_Config.CANVAS_HEIGHT
       })
     }
 
   }
 
   getAvailablePlugins () {
-    var curAvailablePlugins = ORYX.availablePlugins.clone()
+    let curAvailablePlugins = ORYX.availablePlugins.clone()
     curAvailablePlugins.each(function (plugin) {
       if (this.loadedPlugins.find(function (loadedPlugin) {
         return loadedPlugin.type == this.name
@@ -206,7 +196,7 @@ export default class Editor {
   }
 
   loadScript (url, callback) {
-    var script = document.createElement('script')
+    let script = document.createElement('script')
     script.type = 'text/javascript'
     if (script.readyState) {  //IE
       script.onreadystatechange = function () {
@@ -233,16 +223,15 @@ export default class Editor {
    *      errorCodes: NOTUSEINSTENCILSET, REQUIRESTENCILSET, NOTFOUND, YETACTIVATED
    */
   activatePluginByName (name, callback, loadTry) {
-
-    var match = this.getAvailablePlugins().find(function (value) {
+    let match = this.getAvailablePlugins().find(function (value) {
       return value.name == name
     })
     if (match && (!match.engaged || (match.engaged === 'false'))) {
-      var loadedStencilSetsNamespaces = this.getStencilSets().keys()
-      var facade = this._getPluginFacade()
-      var newPlugin
-      var me = this
-      ORYX.Log.debug('Initializing plugin \'%0\'', match.name)
+      let loadedStencilSetsNamespaces = this.getStencilSets().keys()
+      let facade = this._getPluginFacade()
+      let newPlugin
+      const me = this
+      ORYX_Log.debug('Initializing plugin \'%0\'', match.name)
 
       if (!match.requires || !match.requires.namespaces || match.requires.namespaces.any(function (req) {
         return loadedStencilSetsNamespaces.indexOf(req) >= 0
@@ -252,9 +241,8 @@ export default class Editor {
         })) {
 
           try {
-
-            var className = eval(match.name)
-            var newPlugin = new className(facade, match)
+            let className = eval(match.name)
+            let newPlugin = new className(facade, match)
             newPlugin.type = match.name
 
             // If there is an GUI-Plugin, they get all Plugins-Offer-Meta-Data
@@ -263,7 +251,7 @@ export default class Editor {
 
             // If there have an onSelection-Method it will pushed to the Editor Event-Handler
             if (newPlugin.onSelectionChanged)
-              me.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, newPlugin.onSelectionChanged.bind(newPlugin))
+              me.registerOnEvent(ORYX_Config.EVENT_SELECTION_CHANGED, newPlugin.onSelectionChanged.bind(newPlugin))
             this.loadedPlugins.push(newPlugin)
             this.loadedPlugins.each(function (loaded) {
               if (loaded.registryChanged)
@@ -272,7 +260,7 @@ export default class Editor {
             callback(true)
 
           } catch (e) {
-            ORYX.Log.warn('Plugin %0 is not available', match.name)
+            ORYX_Log.warn('Plugin %0 is not available', match.name)
             if (!!loadTry) {
               callback(false, 'INITFAILED')
               return
@@ -281,12 +269,12 @@ export default class Editor {
           }
         } else {
           callback(false, 'NOTUSEINSTENCILSET')
-          ORYX.Log.info('Plugin need a stencilset which is not loaded\'', match.name)
+          ORYX_Log.info('Plugin need a stencilset which is not loaded\'', match.name)
         }
 
       } else {
         callback(false, 'REQUIRESTENCILSET')
-        ORYX.Log.info('Plugin need a stencilset which is not loaded\'', match.name)
+        ORYX_Log.info('Plugin need a stencilset which is not loaded\'', match.name)
       }
 
 
@@ -300,7 +288,6 @@ export default class Editor {
    *  Laden der Plugins
    */
   loadPlugins () {
-
     // if there should be plugins but still are none, try again.
     // TODO this should wait for every plugin respectively.
     /*if (!ORYX.Plugins && ORYX.availablePlugins.length > 0) {
@@ -308,37 +295,38 @@ export default class Editor {
      return;
      }*/
 
-    var me = this
-    var newPlugins = []
+    const me = this
+    let newPlugins = []
 
-
-    var loadedStencilSetsNamespaces = this.getStencilSets().keys()
+    let loadedStencilSetsNamespaces = this.getStencilSets().keys()
 
     // Available Plugins will be initalize
-    var facade = this._getPluginFacade()
+    let facade = this._getPluginFacade()
 
     // If there is an Array where all plugins are described, than only take those
     // (that comes from the usage of oryx with a mashup api)
-    if (ORYX.MashupAPI && ORYX.MashupAPI.loadablePlugins && ORYX.MashupAPI.loadablePlugins instanceof Array) {
+    //todo MashupAPI
+    // if (ORYX.MashupAPI && ORYX.MashupAPI.loadablePlugins && ORYX.MashupAPI.loadablePlugins instanceof Array) {
+    //
+    //   // Get the plugins from the available plugins (those who are in the plugins.xml)
+    //   ORYX.availablePlugins = $A(ORYX.availablePlugins).findAll(function (value) {
+    //     return ORYX.MashupAPI.loadablePlugins.include(value.name)
+    //   })
+    //
+    //   // Add those plugins to the list, which are only in the loadablePlugins list
+    //   ORYX.MashupAPI.loadablePlugins.each(function (className) {
+    //     if (!(ORYX.availablePlugins.find(function (val) {
+    //       return val.name == className
+    //     }))) {
+    //       ORYX.availablePlugins.push({ name: className })
+    //     }
+    //   })
+    // }
 
-      // Get the plugins from the available plugins (those who are in the plugins.xml)
-      ORYX.availablePlugins = $A(ORYX.availablePlugins).findAll(function (value) {
-        return ORYX.MashupAPI.loadablePlugins.include(value.name)
-      })
 
-      // Add those plugins to the list, which are only in the loadablePlugins list
-      ORYX.MashupAPI.loadablePlugins.each(function (className) {
-        if (!(ORYX.availablePlugins.find(function (val) {
-          return val.name == className
-        }))) {
-          ORYX.availablePlugins.push({ name: className })
-        }
-      })
-    }
-
-
+    //todo availablePlugins
     ORYX.availablePlugins.each(function (value) {
-      ORYX.Log.debug('Initializing plugin \'%0\'', value.get('name'))
+      ORYX_Log.debug('Initializing plugin \'%0\'', value.get('name'))
 
       if ((!value.get('requires') || !value.get('requires').namespaces || value.get('requires').namespaces.any(function (req) {
           return loadedStencilSetsNamespaces.indexOf(req) >= 0
@@ -358,11 +346,11 @@ export default class Editor {
             plugin.engaged = true
           }
         } catch (e) {
-          ORYX.Log.warn('Plugin %0 is not available %1', value.get('name'), e)
+          ORYX_Log.warn('Plugin %0 is not available %1', value.get('name'), e)
         }
 
       } else {
-        ORYX.Log.info('Plugin need a stencilset which is not loaded\'', value.get('name'))
+        ORYX_Log.info('Plugin need a stencilset which is not loaded\'', value.get('name'))
       }
 
     })
@@ -374,15 +362,12 @@ export default class Editor {
 
       // If there have an onSelection-Method it will pushed to the Editor Event-Handler
       if (value.onSelectionChanged)
-        me.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, value.onSelectionChanged.bind(value))
+        me.registerOnEvent(ORYX_Config.EVENT_SELECTION_CHANGED, value.onSelectionChanged.bind(value))
     })
 
     this.loadedPlugins = newPlugins
-
     this.registerPluginsOnKeyEvents()
-
     this.setSelection()
-
   }
 
   /**
@@ -404,21 +389,21 @@ export default class Editor {
     }
 
     // get the stencil associated with the type
-    var canvasStencil = ORYX.Core.StencilSet.stencil(stencilType)
+    let canvasStencil = ORYX_StencilSet.stencil(stencilType)
 
     if (!canvasStencil)
-      ORYX.Log.fatal('Initialisation failed, because the stencil with the type %0 is not part of one of the loaded stencil sets.', stencilType)
+      ORYX_Log.fatal('Initialisation failed, because the stencil with the type %0 is not part of one of the loaded stencil sets.', stencilType)
 
     // create all dom
     // TODO fix border, so the visible canvas has a double border and some spacing to the scrollbars
-    var div = ORYX.Editor.graft('http://www.w3.org/1999/xhtml', null, ['div'])
+    let div = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', null, ['div'])
     // set class for custom styling
     div.addClassName('ORYX_Editor')
 
     // create the canvas
-    this._canvas = new ORYX.Core.Canvas({
-      width: ORYX.CONFIG.CANVAS_WIDTH,
-      height: ORYX.CONFIG.CANVAS_HEIGHT,
+    this._canvas = new ORYX_Canvas({
+      width: ORYX_Config.CANVAS_WIDTH,
+      height: ORYX_Config.CANVAS_HEIGHT,
       'eventHandlerCallback': this.handleEvents.bind(this),
       id: this.id,
       parentNode: div
@@ -427,7 +412,7 @@ export default class Editor {
     if (canvasConfig) {
       // Migrate canvasConfig to an RDF-like structure
       //FIXME this isn't nice at all because we don't want rdf any longer
-      var properties = []
+      let properties = []
       for (let field in canvasConfig) {
         properties.push({
           prefix: 'oryx',
@@ -435,10 +420,8 @@ export default class Editor {
           value: canvasConfig[field]
         })
       }
-
       this._canvas.deserialize(properties)
     }
-
   }
 
   /**
@@ -446,13 +429,11 @@ export default class Editor {
    * To be used in plugin initialization.
    */
   _getPluginFacade () {
-
     // if there is no pluginfacade already created:
     if (!(this._pluginFacade))
 
     // create it.
       this._pluginFacade = {
-
         activatePluginByName: this.activatePluginByName.bind(this),
         //deactivatePluginByName:		this.deactivatePluginByName.bind(this),
         getAvailablePlugins: this.getAvailablePlugins.bind(this),
@@ -526,7 +507,7 @@ export default class Editor {
 
     // Iterate over all commands
     while (this.commandStack.length > 0) {
-      var command = this.commandStack.shift()
+      let command = this.commandStack.shift()
       // and execute it
       command.execute()
       this.commandStackExecuted.push(command)
@@ -534,7 +515,7 @@ export default class Editor {
 
     // Raise event for executing commands
     this.handleEvents({
-      type: ORYX.CONFIG.EVENT_EXECUTE_COMMANDS,
+      type: ORYX_Config.EVENT_EXECUTE_COMMANDS,
       commands: this.commandStackExecuted
     })
 
@@ -545,7 +526,6 @@ export default class Editor {
 
 
     this.updateSelection()
-
   }
 
   /**
@@ -553,7 +533,7 @@ export default class Editor {
    * @return {Object} Returns JSON representation as JSON object.
    */
   getJSON () {
-    var canvasJSON = this.getCanvas().toJSON()
+    let canvasJSON = this.getCanvas().toJSON()
     canvasJSON.ssextensions = this.getStencilSets().values()[0].extensions().keys().findAll(function (sse) {
       return !sse.endsWith('/meta#')
     })
@@ -575,7 +555,6 @@ export default class Editor {
    * @throws {SyntaxError} If the serialized json object contains syntax errors
    */
   importJSON (jsonObject, noSelectionAfterImport) {
-
     try {
       jsonObject = this.renewResourceIds(jsonObject)
     } catch (error) {
@@ -584,10 +563,12 @@ export default class Editor {
     //check, if the imported json model can be loaded in this editor
     // (stencil set has to fit)
     if (jsonObject.stencilset.namespace && jsonObject.stencilset.namespace !== this.getCanvas().getStencil().stencilSet().namespace()) {
-      alert(String.format(ORYX.I18N.JSONImport.wrongSS, jsonObject.stencilset.namespace, this.getCanvas().getStencil().stencilSet().namespace()))
+      let wrongSS = 'The stencil set of the imported file ({0}) does not match to the loaded stencil set ({1}).'
+      alert(String.format(wrongSS, jsonObject.stencilset.namespace, this.getCanvas().getStencil().stencilSet().namespace()))
+      // alert(String.format(ORYX.I18N.JSONImport.wrongSS, jsonObject.stencilset.namespace, this.getCanvas().getStencil().stencilSet().namespace()))
       return null
     } else {
-      var commandClass = ORYX.Core.Command.extend({
+      const commandClass = ORYX_Command.extend({
         construct: function (jsonObject, loadSerializedCB, noSelectionAfterImport, facade) {
           this.jsonObject = jsonObject
           this.noSelection = noSelectionAfterImport
@@ -599,16 +580,13 @@ export default class Editor {
           this.loadSerialized = loadSerializedCB
         },
         execute: function () {
-
           if (!this.shapes) {
             // Import the shapes out of the serialization
             this.shapes = this.loadSerialized(this.jsonObject)
-
             //store all connections
             this.shapes.each(function (shape) {
-
               if (shape.getDockers) {
-                var dockers = shape.getDockers()
+                let dockers = shape.getDockers()
                 if (dockers) {
                   if (dockers.length > 0) {
                     this.connections.push([dockers.first(), dockers.first().getDockedShape(), dockers.first().referencePoint])
@@ -648,8 +626,7 @@ export default class Editor {
 
         },
         rollback: function () {
-          var selection = this.facade.getSelection()
-
+          let selection = this.facade.getSelection()
           this.shapes.each(function (shape) {
             selection = selection.without(shape)
             this.facade.deleteShape(shape)
@@ -661,18 +638,16 @@ export default class Editor {
            }.bind(this));*/
 
           this.facade.getCanvas().update()
-
           this.facade.setSelection(selection)
         }
       })
 
-      var command = new commandClass(jsonObject,
+      const command = new commandClass(jsonObject,
         this.loadSerialized.bind(this),
         noSelectionAfterImport,
         this._getPluginFacade())
 
       this.executeCommands([command])
-
       return command.shapes.clone()
     }
   }
@@ -688,31 +663,32 @@ export default class Editor {
    * @private
    */
   renewResourceIds (jsonObject) {
+    let serJsonObject
     // For renewing resource ids, a serialized and object version is needed
     if (Object.prototype.toString.call(jsonObject) === 'String') {
       try {
-        var serJsonObject = jsonObject
+        serJsonObject = jsonObject
         jsonObject = JSON.parse(jsonObject)
       } catch (error) {
         throw new SyntaxError(error.message)
       }
     } else {
-      var serJsonObject = JSON.stringify(jsonObject)
+      serJsonObject = JSON.stringify(jsonObject)
     }
 
     // collect all resourceIds recursively
-    var collectResourceIds = function (shapes) {
+    let collectResourceIds = function (shapes) {
       if (!shapes) return []
 
       return shapes.map(function (shape) {
         return collectResourceIds(shape.childShapes).concat(shape.resourceId)
       }).flatten()
     }
-    var resourceIds = collectResourceIds(jsonObject.childShapes)
+    let resourceIds = collectResourceIds(jsonObject.childShapes)
 
     // Replace each resource id by a new one
     resourceIds.each(function (oldResourceId) {
-      var newResourceId = ORYX.Editor.provideId()
+      let newResourceId = ORYX_Utils.provideId()
       serJsonObject = serJsonObject.replace(new RegExp(oldResourceId, 'g'), newResourceId)
     })
 
@@ -756,7 +732,7 @@ export default class Editor {
    * @methodOf ORYX.Editor.prototype
    */
   loadSerialized (model, requestMeta) {
-    var canvas = this.getCanvas()
+    let canvas = this.getCanvas()
 
     // Bugfix (cf. http://code.google.com/p/oryx-editor/issues/detail?id=240)
     // Deserialize the canvas' stencil set extensions properties first!
@@ -765,18 +741,18 @@ export default class Editor {
     // Load Meta Data Extension if available
     // #Signavio
     if (requestMeta === true) {
-      var metaDataExtension = this.getExtensionForMetaData()
+      let metaDataExtension = this.getExtensionForMetaData()
       if (metaDataExtension) {
         this.loadSSExtension(metaDataExtension)
       }
     }
 
-    var shapes = this.getCanvas().addShapeObjects(model.childShapes, this.handleEvents.bind(this))
+    let shapes = this.getCanvas().addShapeObjects(model.childShapes, this.handleEvents.bind(this))
 
     if (model.properties) {
       for (let key in model.properties) {
-        var value = model.properties[key]
-        var prop = this.getCanvas().getStencil().property('oryx-' + key)
+        let value = model.properties[key]
+        let prop = this.getCanvas().getStencil().property('oryx-' + key)
         if (!(typeof value === 'string') && (!prop || !prop.isList())) {
           value = JSON.stringify(value)
         }
@@ -805,8 +781,8 @@ export default class Editor {
       return null
     }
 
-    var stencilsets = this.getStencilSets()
-    var extension = this.ss_extensions_def.extensions.find(function (ex) {
+    let stencilsets = this.getStencilSets()
+    let extension = this.ss_extensions_def.extensions.find(function (ex) {
       return !!stencilsets[ex['extends']] && ex.namespace.endsWith('/meta#')
     })
 
@@ -831,18 +807,15 @@ export default class Editor {
    * be loaded when the editor is initialized.
    */
   loadSSExtension (ss_extension_namespace) {
-
     if (this.ss_extensions_def) {
-      var extension = this.ss_extensions_def.extensions.find(function (ex) {
+      let extension = this.ss_extensions_def.extensions.find(function (ex) {
         return (ex.namespace == ss_extension_namespace)
       })
-
       if (!extension) {
         return
       }
 
-      var stencilset = this.getStencilSets()[extension['extends']]
-
+      let stencilset = this.getStencilSets()[extension['extends']]
       if (!stencilset) {
         return
       }
@@ -851,43 +824,43 @@ export default class Editor {
       if ((extension['definition'] || '').startsWith('/')) {
         stencilset.addExtension(extension['definition'])
       } else {
-        stencilset.addExtension(ORYX.CONFIG.SS_EXTENSIONS_FOLDER + extension['definition'])
+        stencilset.addExtension(ORYX_Config.SS_EXTENSIONS_FOLDER + extension['definition'])
       }
 
       //stencilset.addExtension("/oryx/build/stencilsets/extensions/" + extension["definition"])
       this.getRules().initializeRules(stencilset)
 
       this._getPluginFacade().raiseEvent({
-        type: ORYX.CONFIG.EVENT_STENCIL_SET_LOADED
+        type: ORYX_Config.EVENT_STENCIL_SET_LOADED
       })
     }
 
   }
 
   disableEvent (eventType) {
-    if (eventType == ORYX.CONFIG.EVENT_KEYDOWN) {
+    if (eventType == ORYX_Config.EVENT_KEYDOWN) {
       this._keydownEnabled = false
     }
-    if (eventType == ORYX.CONFIG.EVENT_KEYUP) {
+    if (eventType == ORYX_Config.EVENT_KEYUP) {
       this._keyupEnabled = false
     }
     if (this.DOMEventListeners.keys().member(eventType)) {
-      var value = this.DOMEventListeners.unset(eventType)
+      let value = this.DOMEventListeners.unset(eventType)
       this.DOMEventListeners.set('disable_' + eventType, value)
     }
   }
 
   enableEvent (eventType) {
-    if (eventType == ORYX.CONFIG.EVENT_KEYDOWN) {
+    if (eventType == ORYX_Config.EVENT_KEYDOWN) {
       this._keydownEnabled = true
     }
 
-    if (eventType == ORYX.CONFIG.EVENT_KEYUP) {
+    if (eventType == ORYX_Config.EVENT_KEYUP) {
       this._keyupEnabled = true
     }
 
     if (this.DOMEventListeners.keys().member('disable_' + eventType)) {
-      var value = this.DOMEventListeners.unset('disable_' + eventType)
+      let value = this.DOMEventListeners.unset('disable_' + eventType)
       this.DOMEventListeners.set(eventType, value)
     }
   }
@@ -916,19 +889,19 @@ export default class Editor {
   }
 
   getStencilSets () {
-    return ORYX.Core.StencilSet.stencilSets(this.id)
+    return ORYX_StencilSet.stencilSets(this.id)
   }
 
   getRules () {
-    return ORYX.Core.StencilSet.rules(this.id)
+    return ORYX_StencilSet.rules(this.id)
   }
 
   loadStencilSet (source) {
     try {
-      ORYX.Core.StencilSet.loadStencilSet(source, this.modelMetaData, this.id)
-      this.handleEvents({ type: ORYX.CONFIG.EVENT_STENCIL_SET_LOADED })
+      ORYX_StencilSet.loadStencilSet(source, this.modelMetaData, this.id)
+      this.handleEvents({ type: ORYX_Config.EVENT_STENCIL_SET_LOADED })
     } catch (e) {
-      ORYX.Log.warn('Requesting stencil set file failed. (' + e + ')')
+      ORYX_Log.warn('Requesting stencil set file failed. (' + e + ')')
     }
   }
 
@@ -950,27 +923,26 @@ export default class Editor {
     this.pluginsData.each(function (pluginData) {
 
       if (pluginData.keyCodes) {
-
         pluginData.keyCodes.each(function (keyComb) {
-          var eventName = 'key.event'
+          let eventName = 'key.event'
 
           /* Include key action */
           eventName += '.' + keyComb.keyAction
 
           if (keyComb.metaKeys) {
             /* Register on ctrl or apple meta key as meta key */
-            if (keyComb.metaKeys.indexOf(ORYX.CONFIG.META_KEY_META_CTRL) > -1) {
-              eventName += '.' + ORYX.CONFIG.META_KEY_META_CTRL
+            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_META_CTRL) > -1) {
+              eventName += '.' + ORYX_Config.META_KEY_META_CTRL
             }
 
             /* Register on alt key as meta key */
-            if (keyComb.metaKeys.indexOf(ORYX.CONFIG.META_KEY_ALT) > -1) {
-              eventName += '.' + ORYX.CONFIG.META_KEY_ALT
+            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_ALT) > -1) {
+              eventName += '.' + ORYX_Config.META_KEY_ALT
             }
 
             /* Register on shift key as meta key */
-            if (keyComb.metaKeys.indexOf(ORYX.CONFIG.META_KEY_SHIFT) > -1) {
-              eventName += '.' + ORYX.CONFIG.META_KEY_SHIFT
+            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_SHIFT) > -1) {
+              eventName += '.' + ORYX_Config.META_KEY_SHIFT
             }
           }
 
@@ -980,7 +952,7 @@ export default class Editor {
           }
 
           /* Register the event */
-          ORYX.Log.debug('Register Plugin on Key Event: %0', eventName)
+          ORYX_Log.debug('Register Plugin on Key Event: %0', eventName)
           if (pluginData.toggle === true && pluginData.buttonInstance) {
             this.registerOnEvent(eventName, function () {
               pluginData.buttonInstance.toggle(!pluginData.buttonInstance.pressed) // Toggle
@@ -1009,7 +981,6 @@ export default class Editor {
   }
 
   setSelection (elements, subSelectionElement, force) {
-
     if (!elements) {
       elements = []
     }
@@ -1018,10 +989,10 @@ export default class Editor {
     }
 
     elements = elements.findAll(function (n) {
-      return n && n instanceof ORYX.Core.Shape
+      return n && n instanceof ORYX_Shape
     })
 
-    if (elements[0] instanceof ORYX.Core.Canvas) {
+    if (elements[0] instanceof ORYX_Canvas) {
       elements = []
     }
 
@@ -1033,7 +1004,7 @@ export default class Editor {
     this._subSelection = subSelectionElement
 
     this.handleEvents({
-      type: ORYX.CONFIG.EVENT_SELECTION_CHANGED,
+      type: ORYX_Config.EVENT_SELECTION_CHANGED,
       elements: elements,
       subSelection: subSelectionElement,
       force: !!force
@@ -1071,18 +1042,18 @@ export default class Editor {
       throw 'To create a new shape you have to give an argument with type and namespace'
     }
 
-    var newShapeObject
+    let newShapeObject
 
     if (option && option.serialize && option.serialize instanceof Array) {
-      var type = option.serialize.find(function (obj) {
+      let type = option.serialize.find(function (obj) {
         return (obj.prefix + '-' + obj.name) == 'oryx-type'
       })
-      var stencil = ORYX.Core.StencilSet.stencil(type.value)
+      var stencil = ORYX_StencilSet.stencil(type.value)
 
       if (stencil.type() == 'node') {
-        newShapeObject = new ORYX.Core.Node({ 'eventHandlerCallback': this.handleEvents.bind(this) }, stencil, this._getPluginFacade())
+        newShapeObject = new ORYX_Node({ 'eventHandlerCallback': this.handleEvents.bind(this) }, stencil, this._getPluginFacade())
       } else {
-        newShapeObject = new ORYX.Core.Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, stencil, this._getPluginFacade())
+        newShapeObject = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, stencil, this._getPluginFacade())
       }
 
       this.getCanvas().add(newShapeObject)
@@ -1091,16 +1062,16 @@ export default class Editor {
       return newShapeObject
     }
 
-    var canvas = this.getCanvas()
+    let canvas = this.getCanvas()
     // Get the shape type
-    var shapetype = option.type
+    let shapetype = option.type
     // Get the stencil set
-    var sset = ORYX.Core.StencilSet.stencilSet(option.namespace)
+    let sset = ORYX_StencilSet.stencilSet(option.namespace)
     // Create an New Shape, dependents on an Edge or a Node
     if (sset.stencil(shapetype).type() == 'node') {
-      newShapeObject = new ORYX.Core.Node({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
+      newShapeObject = new ORYX_Node({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
     } else {
-      newShapeObject = new ORYX.Core.Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
+      newShapeObject = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
     }
 
     // when there is a template, inherit the properties.
@@ -1110,29 +1081,25 @@ export default class Editor {
     }
 
     // Add to the canvas
-    if (option.parent && newShapeObject instanceof ORYX.Core.Node) {
+    if (option.parent && newShapeObject instanceof ORYX_Node) {
       option.parent.add(newShapeObject)
     } else {
       canvas.add(newShapeObject)
     }
 
-
     // Set the position
-    var point = option.position ? option.position : { x: 100, y: 200 }
-
-
-    var con
+    let point = option.position ? option.position : { x: 100, y: 200 }
+    let con
     // If there is create a shape and in the argument there is given an ConnectingType and is instance of an edge
-    if (option.connectingType && option.connectedShape && !(newShapeObject instanceof ORYX.Core.Edge)) {
-
+    if (option.connectingType && option.connectedShape && !(newShapeObject instanceof ORYX_Edge)) {
       // there will be create a new Edge
-      con = new ORYX.Core.Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(option.connectingType))
+      con = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(option.connectingType))
 
       // And both endings dockers will be referenced to the both shapes
       con.dockers.first().setDockedShape(option.connectedShape)
 
-      var magnet = option.connectedShape.getDefaultMagnet()
-      var cPoint = magnet ? magnet.bounds.center() : option.connectedShape.bounds.midPoint()
+      let magnet = option.connectedShape.getDefaultMagnet()
+      let cPoint = magnet ? magnet.bounds.center() : option.connectedShape.bounds.midPoint()
       con.dockers.first().setReferencePoint(cPoint)
       con.dockers.last().setDockedShape(newShapeObject)
       con.dockers.last().setReferencePoint(newShapeObject.getDefaultMagnet().bounds.center())
@@ -1140,29 +1107,27 @@ export default class Editor {
       // The Edge will be added to the canvas and be updated
       canvas.add(con)
       //con.update();
-
     }
 
     // Move the new Shape to the position
-    if (newShapeObject instanceof ORYX.Core.Edge && option.connectedShape) {
-
+    if (newShapeObject instanceof ORYX_Edge && option.connectedShape) {
       newShapeObject.dockers.first().setDockedShape(option.connectedShape)
 
-      if (option.connectedShape instanceof ORYX.Core.Node) {
+      if (option.connectedShape instanceof ORYX_Node) {
         newShapeObject.dockers.first().setReferencePoint(option.connectedShape.getDefaultMagnet().bounds.center())
         newShapeObject.dockers.last().bounds.centerMoveTo(point)
       } else {
         newShapeObject.dockers.first().setReferencePoint(option.connectedShape.bounds.midPoint())
       }
 
-      var start = newShapeObject.dockers.first()
-      var end = newShapeObject.dockers.last()
+      let start = newShapeObject.dockers.first()
+      let end = newShapeObject.dockers.last()
 
       if (start.getDockedShape() && end.getDockedShape()) {
-        var startPoint = start.getAbsoluteReferencePoint()
-        var endPoint = end.getAbsoluteReferencePoint()
+        let startPoint = start.getAbsoluteReferencePoint()
+        let endPoint = end.getAbsoluteReferencePoint()
 
-        var docker = newShapeObject.createDocker()
+        let docker = newShapeObject.createDocker()
         docker.bounds.centerMoveTo({
           x: startPoint.x + (endPont.x - startPoint.x) / 2,
           y: startPoint.y + (endPont.y - startPoint.y) / 2
@@ -1170,29 +1135,27 @@ export default class Editor {
       }
 
     } else {
-
-      var b = newShapeObject.bounds
-      if (newShapeObject instanceof ORYX.Core.Node && newShapeObject.dockers.length == 1) {
+      let b = newShapeObject.bounds
+      if (newShapeObject instanceof ORYX_Node && newShapeObject.dockers.length == 1) {
         b = newShapeObject.dockers.first().bounds
       }
 
       b.centerMoveTo(point)
 
-      var upL = b.upperLeft()
+      let upL = b.upperLeft()
       b.moveBy(-Math.min(upL.x, 0), -Math.min(upL.y, 0))
 
-      var lwR = b.lowerRight()
+      let lwR = b.lowerRight()
       b.moveBy(-Math.max(lwR.x - canvas.bounds.width(), 0), -Math.max(lwR.y - canvas.bounds.height(), 0))
-
     }
 
     // Update the shape
-    if (newShapeObject instanceof ORYX.Core.Edge) {
+    if (newShapeObject instanceof ORYX_Edge) {
       newShapeObject._update(false)
     }
 
     // And refresh the selection
-    if (!(newShapeObject instanceof ORYX.Core.Edge) && !(option.dontUpdateSelection)) {
+    if (!(newShapeObject instanceof ORYX_Edge) && !(option.dontUpdateSelection)) {
       this.setSelection([newShapeObject])
     }
 
@@ -1217,7 +1180,7 @@ export default class Editor {
 
     // delete references to outgoing edges
     shape.getOutgoingShapes().each(function (os) {
-      var docker = os.getDockers().first()
+      let docker = os.getDockers().first()
       if (docker && docker.getDockedShape() == shape) {
         docker.setDockedShape(undefined)
       }
@@ -1225,7 +1188,7 @@ export default class Editor {
 
     // delete references to incoming edges
     shape.getIncomingShapes().each(function (is) {
-      var docker = is.getDockers().last()
+      let docker = is.getDockers().last()
       if (docker && docker.getDockedShape() == shape) {
         docker.setDockedShape(undefined)
       }
@@ -1266,7 +1229,7 @@ export default class Editor {
   _executeEvents () {
     this._queueRunning = true
     while (this._eventsQueue.length > 0) {
-      var val = this._eventsQueue.shift()
+      let val = this._eventsQueue.shift()
       this._executeEventImmediately(val)
     }
     this._queueRunning = false
@@ -1278,21 +1241,21 @@ export default class Editor {
    * @param {Object} uiObj Target-UiObj
    */
   handleEvents (event, uiObj) {
-    ORYX.Log.trace('Dispatching event type %0 on %1', event.type, uiObj)
+    ORYX_Log.trace('Dispatching event type %0 on %1', event.type, uiObj)
     switch (event.type) {
-      case ORYX.CONFIG.EVENT_MOUSEDOWN:
+      case ORYX_Config.EVENT_MOUSEDOWN:
         this._handleMouseDown(event, uiObj)
         break
-      case ORYX.CONFIG.EVENT_MOUSEMOVE:
+      case ORYX_Config.EVENT_MOUSEMOVE:
         this._handleMouseMove(event, uiObj)
         break
-      case ORYX.CONFIG.EVENT_MOUSEUP:
+      case ORYX_Config.EVENT_MOUSEUP:
         this._handleMouseUp(event, uiObj)
         break
-      case ORYX.CONFIG.EVENT_MOUSEOVER:
+      case ORYX_Config.EVENT_MOUSEOVER:
         this._handleMouseHover(event, uiObj)
         break
-      case ORYX.CONFIG.EVENT_MOUSEOUT:
+      case ORYX_Config.EVENT_MOUSEOUT:
         this._handleMouseOut(event, uiObj)
         break
     }
@@ -1314,8 +1277,8 @@ export default class Editor {
 
   isValidEvent (e) {
     try {
-      var isInput = ['INPUT', 'TEXTAREA'].include(e.target.tagName.toUpperCase())
-      var gridHasFocus = e.target.className.include('x-grid3-focus') && !e.target.className.include('x-grid3-focus-canvas')
+      let isInput = ['INPUT', 'TEXTAREA'].include(e.target.tagName.toUpperCase())
+      let gridHasFocus = e.target.className.include('x-grid3-focus') && !e.target.className.include('x-grid3-focus-canvas')
       return !isInput && !gridHasFocus
     } catch (e) {
       return false
@@ -1336,9 +1299,9 @@ export default class Editor {
     }
 
     /* Create key up event type */
-    var keyUpEvent = this.createKeyCombEvent(event, ORYX.CONFIG.KEY_ACTION_UP)
+    let keyUpEvent = this.createKeyCombEvent(event, ORYX_Config.KEY_ACTION_UP)
 
-    ORYX.Log.debug('Key Event to handle: %0', keyUpEvent)
+    ORYX_Log.debug('Key Event to handle: %0', keyUpEvent)
 
     /* forward to dispatching. */
     this.handleEvents({ type: keyUpEvent, event: event })
@@ -1377,9 +1340,9 @@ export default class Editor {
     }
 
     /* Create key up event type */
-    var keyDownEvent = this.createKeyCombEvent(event, ORYX.CONFIG.KEY_ACTION_DOWN)
+    let keyDownEvent = this.createKeyCombEvent(event, ORYX_Config.KEY_ACTION_DOWN)
 
-    ORYX.Log.debug('Key Event to handle: %0', keyDownEvent)
+    ORYX_Log.debug('Key Event to handle: %0', keyDownEvent)
 
     /* Forward to dispatching. */
     this.handleEvents({ type: keyDownEvent, event: event })
@@ -1392,13 +1355,12 @@ export default class Editor {
    *    The source keyDownEvent to build up the event name
    */
   createKeyCombEvent (keyEvent, keyAction) {
-
     /* Get the currently pressed key code. */
-    var pressedKey = keyEvent.which || keyEvent.keyCode
+    let pressedKey = keyEvent.which || keyEvent.keyCode
     //this.__currentKey = pressedKey;
 
     /* Event name */
-    var eventName = 'key.event'
+    let eventName = 'key.event'
 
     /* Key action */
     if (keyAction) {
@@ -1407,17 +1369,17 @@ export default class Editor {
 
     /* Ctrl or apple meta key is pressed */
     if (keyEvent.ctrlKey || keyEvent.metaKey) {
-      eventName += '.' + ORYX.CONFIG.META_KEY_META_CTRL
+      eventName += '.' + ORYX_Config.META_KEY_META_CTRL
     }
 
     /* Alt key is pressed */
     if (keyEvent.altKey) {
-      eventName += '.' + ORYX.CONFIG.META_KEY_ALT
+      eventName += '.' + ORYX_Config.META_KEY_ALT
     }
 
     /* Alt key is pressed */
     if (keyEvent.shiftKey) {
-      eventName += '.' + ORYX.CONFIG.META_KEY_SHIFT
+      eventName += '.' + ORYX_Config.META_KEY_SHIFT
     }
 
     /* Return the composed event name */
@@ -1425,32 +1387,29 @@ export default class Editor {
   }
 
   _handleMouseDown (event, uiObj) {
-
     // get canvas.
-    var canvas = this.getCanvas()
+    let canvas = this.getCanvas()
     // Try to get the focus
     canvas.focus()
 
     // find the shape that is responsible for this element's id.
-    var element = event.currentTarget
-    var elementController = uiObj
+    let element = event.currentTarget
+    let elementController = uiObj
 
     // gather information on selection.
-    var currentIsSelectable = (elementController !== null) &&
+    let currentIsSelectable = (elementController !== null) &&
       (elementController !== undefined) && (elementController.isSelectable)
-    var currentIsMovable = (elementController !== null) &&
+    let currentIsMovable = (elementController !== null) &&
       (elementController !== undefined) && (elementController.isMovable)
-    var modifierKeyPressed = event.shiftKey || event.ctrlKey
-    var noObjectsSelected = this.selection.length === 0
-    var currentIsSelected = this.selection.member(elementController)
-
+    let modifierKeyPressed = event.shiftKey || event.ctrlKey
+    let noObjectsSelected = this.selection.length === 0
+    let currentIsSelected = this.selection.member(elementController)
 
     // Rule #1: When there is nothing selected, select the clicked object.
     if (currentIsSelectable && noObjectsSelected) {
-
       this.setSelection([elementController])
 
-      ORYX.Log.trace('Rule #1 applied for mouse down on %0', element.id)
+      ORYX_Log.trace('Rule #1 applied for mouse down on %0', element.id)
 
       // Rule #3: When at least one element is selected, and there is no
       // control key pressed, and the clicked object is not selected, select
@@ -1459,31 +1418,30 @@ export default class Editor {
       !modifierKeyPressed && !currentIsSelected) {
 
       this.setSelection([elementController])
-
       //var objectType = elementController.readAttributes();
       //alert(objectType[0] + ": " + objectType[1]);
 
-      ORYX.Log.trace('Rule #3 applied for mouse down on %0', element.id)
+      ORYX_Log.trace('Rule #3 applied for mouse down on %0', element.id)
 
       // Rule #4: When the control key is pressed, and the current object is
       // not selected, add it to the selection.
     } else if (currentIsSelectable && modifierKeyPressed
       && !currentIsSelected) {
 
-      var newSelection = this.selection.clone()
+      let newSelection = this.selection.clone()
       newSelection.push(elementController)
       this.setSelection(newSelection)
 
-      ORYX.Log.trace('Rule #4 applied for mouse down on %0', element.id)
+      ORYX_Log.trace('Rule #4 applied for mouse down on %0', element.id)
 
       // Rule #6
     } else if (currentIsSelectable && currentIsSelected &&
       modifierKeyPressed) {
 
-      var newSelection = this.selection.clone()
+      let newSelection = this.selection.clone()
       this.setSelection(newSelection.without(elementController))
 
-      ORYX.Log.trace('Rule #6 applied for mouse down on %0', elementController.id)
+      ORYX_Log.trace('Rule #6 applied for mouse down on %0', elementController.id)
 
       // Rule #5: When there is at least one object selected and no control
       // key pressed, we're dragging.
@@ -1496,34 +1454,27 @@ export default class Editor {
       // Rule #2: When clicked on something that is neither
       // selectable nor movable, clear the selection, and return.
     } else if (!currentIsSelectable && !currentIsMovable) {
-
       this.setSelection([])
-
-      ORYX.Log.trace('Rule #2 applied for mouse down on %0', element.id)
-
+      ORYX_Log.trace('Rule #2 applied for mouse down on %0', element.id)
       return
 
       // Rule #7: When the current object is not selectable but movable,
       // it is probably a control. Leave the selection unchanged but set
       // the movedObject to the current one and enable Drag. Dockers will
       // be processed in the dragDocker plugin.
-    } else if (!currentIsSelectable && currentIsMovable && !(elementController instanceof ORYX.Core.Controls.Docker)) {
+    } else if (!currentIsSelectable && currentIsMovable && !(elementController instanceof ORYX_Controls_Docker)) {
 
       // TODO: If there is any moveable elements, do this in a plugin
       //ORYX.Core.UIEnableDrag(event, elementController);
 
-      ORYX.Log.trace('Rule #7 applied for mouse down on %0', element.id)
+      ORYX_Log.trace('Rule #7 applied for mouse down on %0', element.id)
 
       // Rule #8: When the element is selectable and is currently selected and no
       // modifier key is pressed
-    } else if (currentIsSelectable && currentIsSelected &&
-      !modifierKeyPressed) {
-
+    } else if (currentIsSelectable && currentIsSelected && !modifierKeyPressed) {
       this._subSelection = this._subSelection != elementController ? elementController : undefined
-
       this.setSelection(this.selection, this._subSelection)
-
-      ORYX.Log.trace('Rule #8 applied for mouse down on %0', element.id)
+      ORYX_Log.trace('Rule #8 applied for mouse down on %0', element.id)
     }
 
 
@@ -1538,13 +1489,13 @@ export default class Editor {
 
   _handleMouseUp (event, uiObj) {
     // get canvas.
-    var canvas = this.getCanvas()
+    let canvas = this.getCanvas()
 
     // find the shape that is responsible for this elemement's id.
-    var elementController = uiObj
+    let elementController = uiObj
 
     //get event position
-    var evPos = this.eventCoordinates(event)
+    let evPos = this.eventCoordinates(event)
 
     //Event.stop(event);
   }
@@ -1563,19 +1514,18 @@ export default class Editor {
    * @return {SVGPoint} The event coordinates in the SVG document
    */
   eventCoordinates (event) {
+    let canvas = this.getCanvas()
 
-    var canvas = this.getCanvas()
-
-    var svgPoint = canvas.node.ownerSVGElement.createSVGPoint()
+    let svgPoint = canvas.node.ownerSVGElement.createSVGPoint()
     svgPoint.x = event.clientX
     svgPoint.y = event.clientY
 
-    var additionalIEZoom = 1
+    let additionalIEZoom = 1
     if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-      var ua = navigator.userAgent
+      let ua = navigator.userAgent
       if (ua.indexOf('MSIE') >= 0) {
         //IE 10 and below
-        var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
+        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
         if (zoom !== 100) {
           additionalIEZoom = zoom / 100
         }
@@ -1587,24 +1537,23 @@ export default class Editor {
       svgPoint.y = svgPoint.y * additionalIEZoom
     }
 
-    var matrix = canvas.node.getScreenCTM()
+    let matrix = canvas.node.getScreenCTM()
     return svgPoint.matrixTransform(matrix.inverse())
   }
 
   eventCoordinatesXY (x, y) {
+    let canvas = this.getCanvas()
 
-    var canvas = this.getCanvas()
-
-    var svgPoint = canvas.node.ownerSVGElement.createSVGPoint()
+    let svgPoint = canvas.node.ownerSVGElement.createSVGPoint()
     svgPoint.x = x
     svgPoint.y = y
 
-    var additionalIEZoom = 1
+    let additionalIEZoom = 1
     if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-      var ua = navigator.userAgent
+      let ua = navigator.userAgent
       if (ua.indexOf('MSIE') >= 0) {
         //IE 10 and below
-        var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
+        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
         if (zoom !== 100) {
           additionalIEZoom = zoom / 100
         }
@@ -1616,7 +1565,7 @@ export default class Editor {
       svgPoint.y = svgPoint.y * additionalIEZoom
     }
 
-    var matrix = canvas.node.getScreenCTM()
+    let matrix = canvas.node.getScreenCTM()
     return svgPoint.matrixTransform(matrix.inverse())
   }
 
@@ -1631,96 +1580,25 @@ export default class Editor {
       method: 'GET',
       onSuccess: function (transport) {
         var editorConfig = JSON.parse(transport.responseText)
-        new ORYX.Editor(editorConfig)
+        new ORYX_Editor(editorConfig)
       }.bind(this)
     })
   }
 
-  // TODO Implement namespace awareness on attribute level.
-  /**
-   * graft() function
-   * Originally by Sean M. Burke from interglacial.com, altered for usage with
-   * SVG and namespace (xmlns) support. Be sure you understand xmlns before
-   * using this funtion, as it creates all grafted elements in the xmlns
-   * provided by you and all element's attribures in default xmlns. If you
-   * need to graft elements in a certain xmlns and wish to assign attributes
-   * in both that and another xmlns, you will need to do stepwise grafting,
-   * adding non-default attributes yourself or you'll have to enhance this
-   * function. Latter, I would appreciate: martin�apfelfabrik.de
-   * @param {Object} namespace The namespace in which
-   *          elements should be grafted.
-   * @param {Object} parent The element that should contain the grafted
-   *          structure after the function returned.
-   * @param {Object} t the crafting structure.
-   * @param {Object} doc the document in which grafting is performed.
-   */
-  graft (namespace, parent, t, doc) {
-
-    doc = (doc || (parent && parent.ownerDocument) || document)
-    var e
-    if (t === undefined) {
-      throw 'Can\'t graft an undefined value'
-    } else if (t.constructor == String) {
-      e = doc.createTextNode(t)
-    } else {
-      for (var i = 0; i < t.length; i++) {
-        if (i === 0 && t[i].constructor == String) {
-          var snared
-          snared = t[i].match(/^([a-z][a-z0-9]*)\.([^\s\.]+)$/i)
-          if (snared) {
-            e = doc.createElementNS(namespace, snared[1])
-            e.setAttributeNS(null, 'class', snared[2])
-            continue
-          }
-          snared = t[i].match(/^([a-z][a-z0-9]*)$/i)
-          if (snared) {
-            e = doc.createElementNS(namespace, snared[1])  // but no class
-            continue
-          }
-
-          // Otherwise:
-          e = doc.createElementNS(namespace, 'span')
-          e.setAttribute(null, 'class', 'namelessFromLOL')
-        }
-
-        if (t[i] === undefined) {
-          throw 'Can\'t graft an undefined value in a list!'
-        } else if (t[i].constructor == String || t[i].constructor == Array) {
-          this.graft(namespace, e, t[i], doc)
-        } else if (t[i].constructor == Number) {
-          this.graft(namespace, e, t[i].toString(), doc)
-        } else if (t[i].constructor == Object) {
-          // hash's properties => element's attributes
-          for (var k in t[i]) {
-            e.setAttributeNS(null, k, t[i][k])
-          }
-        } else {
-
-        }
-      }
-    }
-    if (parent && parent.appendChild) {
-      parent.appendChild(e)
-    } else {
-
-    }
-    return e // return the topmost created node
-  }
-
-  provideId () {
-    var res = [], hex = '0123456789ABCDEF'
-
-    for (var i = 0; i < 36; i++) res[i] = Math.floor(Math.random() * 0x10)
-
-    res[14] = 4
-    res[19] = (res[19] & 0x3) | 0x8
-
-    for (var i = 0; i < 36; i++) res[i] = hex[res[i]]
-
-    res[8] = res[13] = res[18] = res[23] = '-'
-
-    return 'oryx_' + res.join('')
-  }
+  // provideId () {
+  //   let res = [], hex = '0123456789ABCDEF'
+  //
+  //   for (let i = 0; i < 36; i++) res[i] = Math.floor(Math.random() * 0x10)
+  //
+  //   res[14] = 4
+  //   res[19] = (res[19] & 0x3) | 0x8
+  //
+  //   for (let i = 0; i < 36; i++) res[i] = hex[res[i]]
+  //
+  //   res[8] = res[13] = res[18] = res[23] = '-'
+  //
+  //   return 'oryx_' + res.join('')
+  // }
 
   /**
    * When working with Ext, conditionally the window needs to be resized. To do
@@ -1729,21 +1607,20 @@ export default class Editor {
    * performed.
    */
   resizeFix () {
-    if (!ORYX.Editor._resizeFixTimeout) {
-      ORYX.Editor._resizeFixTimeout = window.setTimeout(function () {
+    if (!ORYX_Editor._resizeFixTimeout) {
+      ORYX_Editor._resizeFixTimeout = window.setTimeout(function () {
         window.resizeBy(1, 1)
         window.resizeBy(-1, -1)
-        ORYX.Editor._resizefixTimeout = null
+        ORYX_Editor._resizefixTimeout = null
       }, 100)
     }
   }
 
   setMissingClasses () {
-
     try {
       SVGElement
     } catch (e) {
-      ORYX.Editor.SVGClassElementsAreAvailable = false
+      ORYX_Editor.SVGClassElementsAreAvailable = false
       SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg').toString()
       SVGGElement = document.createElementNS('http://www.w3.org/2000/svg', 'g').toString()
       SVGPathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path').toString()
@@ -1762,33 +1639,14 @@ export default class Editor {
   }
 
   checkClassType (classInst, classType) {
-    if (ORYX.Editor.SVGClassElementsAreAvailable) {
+    if (ORYX_Editor.SVGClassElementsAreAvailable) {
       return classInst instanceof classType
     } else {
       return classInst == classType
     }
   }
 
-  /**
-   * Provides an uniq id
-   * @overwrite
-   * @return {String}
-   *
-   */
-  provideId () {
-    var res = [], hex = '0123456789ABCDEF'
 
-    for (var i = 0; i < 36; i++) res[i] = Math.floor(Math.random() * 0x10)
-
-    res[14] = 4
-    res[19] = (res[19] & 0x3) | 0x8
-
-    for (var i = 0; i < 36; i++) res[i] = hex[res[i]]
-
-    res[8] = res[13] = res[18] = res[23] = '-'
-
-    return 'sid-' + res.join('')
-  }
 }
 
 

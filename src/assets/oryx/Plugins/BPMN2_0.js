@@ -1,20 +1,22 @@
 import AbstractPlugin from './AbstractPlugin'
+import ORYX_Config from '../CONFIG'
 import Command from '../core/Command'
+import ORYX_MoveDockersCommand from '../core/MoveDockersCommand'
+import ORYX_Edge from '../core/Edge'
+import ORYX_Node from '../core/Node'
+import ORYX_Canvas from '../core/Canvas'
 
 class ResizeLanesCommand extends Command {
   constructor (shape, parent, pool, plugin) {
     super()
-    this.facade = plugin.facade;
-    this.plugin = plugin;
-    this.shape = shape;
-    this.changes;
+    this.facade = plugin.facade
+    this.plugin = plugin
+    this.shape = shape
+    this.changes
 
-    this.pool = pool;
-
-    this.parent = parent;
-
-
-    this.shapeChildren = [];
+    this.pool = pool
+    this.parent = parent
+    this.shapeChildren = []
 
     /*
      * The Bounds have to be stored
@@ -34,10 +36,10 @@ class ResizeLanesCommand extends Command {
             y: childShape.bounds.b.y
           }
         }
-      });
-    }.bind(this));
+      })
+    }.bind(this))
 
-    this.shapeUpperLeft = this.shape.bounds.upperLeft();
+    this.shapeUpperLeft = this.shape.bounds.upperLeft()
 
     // If there is no parent,
     // correct the abs position with the parents abs.
@@ -46,22 +48,20 @@ class ResizeLanesCommand extends Command {
      this.shapeUpperLeft.x += pAbs.x;
      this.shapeUpperLeft.y += pAbs.y;
      }*/
-    this.parentHeight = this.parent.bounds.height();
+    this.parentHeight = this.parent.bounds.height()
 
   }
 
   getLeafLanes (lane) {
-    var childLanes = this.plugin.getLanes(lane).map(function (child) {
-      return this.getLeafLanes(child);
-    }.bind(this)).flatten();
-    return childLanes.length > 0 ? childLanes : [lane];
+    let childLanes = this.plugin.getLanes(lane).map(function (child) {
+      return this.getLeafLanes(child)
+    }.bind(this)).flatten()
+    return childLanes.length > 0 ? childLanes : [lane]
   }
 
   findNewLane () {
-
-    var lanes = this.plugin.getLanes(this.parent);
-
-    var leafLanes = this.getLeafLanes(this.parent);
+    let lanes = this.plugin.getLanes(this.parent)
+    let leafLanes = this.getLeafLanes(this.parent)
     /*leafLanes = leafLanes.sort(function(a,b){
      var aupl = a.absoluteXY().y;
      var bupl = b.absoluteXY().y;
@@ -69,15 +69,14 @@ class ResizeLanesCommand extends Command {
      })*/
     this.lane = leafLanes.find(function (l) {
       return l.bounds.upperLeft().y >= this.shapeUpperLeft.y
-    }.bind(this)) || leafLanes.last();
-    this.laneUpperLeft = this.lane.bounds.upperLeft();
+    }.bind(this)) || leafLanes.last()
+    this.laneUpperLeft = this.lane.bounds.upperLeft()
   }
 
   execute () {
-
     if (this.changes) {
-      this.executeAgain();
-      return;
+      this.executeAgain()
+      return
     }
 
     /*
@@ -87,17 +86,14 @@ class ResizeLanesCommand extends Command {
      */
 
     if (!this.lane) {
-      this.findNewLane();
+      this.findNewLane()
     }
 
     if (this.lane) {
-
-      var laUpL = this.laneUpperLeft;
-      var shUpL = this.shapeUpperLeft;
-
-      var depthChange = this.plugin.getDepth(this.lane, this.parent) - 1;
-
-      this.changes = $H({});
+      let laUpL = this.laneUpperLeft
+      let shUpL = this.shapeUpperLeft
+      let depthChange = this.plugin.getDepth(this.lane, this.parent) - 1
+      this.changes = $H({})
 
       // Selected lane is BELOW the removed lane
       if (laUpL.y >= shUpL.y) {
@@ -107,50 +103,47 @@ class ResizeLanesCommand extends Command {
            * Cache the changes for rollback
            */
           if (!this.changes[childShape.getId()]) {
-            this.changes[childShape.getId()] = this.computeChanges(childShape, this.lane, this.lane, this.shape.bounds.height());
+            this.changes[childShape.getId()] = this.computeChanges(childShape, this.lane, this.lane, this.shape.bounds.height())
           }
 
-          childShape.bounds.moveBy(0, this.shape.bounds.height());
-        }.bind(this));
+          childShape.bounds.moveBy(0, this.shape.bounds.height())
+        }.bind(this))
 
-        this.plugin.hashChildShapes(this.lane);
-
+        this.plugin.hashChildShapes(this.lane)
         this.shapeChildren.each(function (shapeChild) {
-          shapeChild.shape.bounds.set(shapeChild.bounds);
-          shapeChild.shape.bounds.moveBy((shUpL.x - 30) - (depthChange * 30), 0);
+          shapeChild.shape.bounds.set(shapeChild.bounds)
+          shapeChild.shape.bounds.moveBy((shUpL.x - 30) - (depthChange * 30), 0)
 
           /*
            * Cache the changes for rollback
            */
           if (!this.changes[shapeChild.shape.getId()]) {
-            this.changes[shapeChild.shape.getId()] = this.computeChanges(shapeChild.shape, this.shape, this.lane, 0);
+            this.changes[shapeChild.shape.getId()] = this.computeChanges(shapeChild.shape, this.shape, this.lane, 0)
           }
 
-          this.lane.add(shapeChild.shape);
+          this.lane.add(shapeChild.shape)
 
-        }.bind(this));
+        }.bind(this))
 
-        this.lane.bounds.moveBy(0, shUpL.y - laUpL.y);
+        this.lane.bounds.moveBy(0, shUpL.y - laUpL.y)
 
         // Selected lane is ABOVE the removed lane
       } else if (shUpL.y > laUpL.y) {
-
         this.shapeChildren.each(function (shapeChild) {
-          shapeChild.shape.bounds.set(shapeChild.bounds);
-          shapeChild.shape.bounds.moveBy((shUpL.x - 30) - (depthChange * 30), this.lane.bounds.height());
+          shapeChild.shape.bounds.set(shapeChild.bounds)
+          shapeChild.shape.bounds.moveBy((shUpL.x - 30) - (depthChange * 30), this.lane.bounds.height())
 
           /*
            * Cache the changes for rollback
            */
           if (!this.changes[shapeChild.shape.getId()]) {
-            this.changes[shapeChild.shape.getId()] = this.computeChanges(shapeChild.shape, this.shape, this.lane, 0);
+            this.changes[shapeChild.shape.getId()] = this.computeChanges(shapeChild.shape, this.shape, this.lane, 0)
           }
 
-          this.lane.add(shapeChild.shape);
+          this.lane.add(shapeChild.shape)
 
-        }.bind(this));
+        }.bind(this))
       }
-
 
     }
 
@@ -158,86 +151,83 @@ class ResizeLanesCommand extends Command {
      * Adjust the height of the lanes
      */
     // Get the height values
-    var oldHeight = this.lane.bounds.height();
-    var newHeight = this.lane.length === 1 ? this.parentHeight : this.lane.bounds.height() + this.shape.bounds.height();
+    let oldHeight = this.lane.bounds.height()
+    let newHeight = this.lane.length === 1 ? this.parentHeight : this.lane.bounds.height() + this.shape.bounds.height()
 
     // Set height
-    this.setHeight(newHeight, oldHeight, this.parent, this.parentHeight, true);
+    this.setHeight(newHeight, oldHeight, this.parent, this.parentHeight, true)
 
     // Cache all sibling lanes
     //this.changes[this.shape.getId()] = this.computeChanges(this.shape, this.parent, this.parent, 0);
     this.plugin.getLanes(this.parent).each(function (childLane) {
       if (!this.changes[childLane.getId()] && childLane !== this.lane && childLane !== this.shape) {
-        this.changes[childLane.getId()] = this.computeChanges(childLane, this.parent, this.parent, 0);
+        this.changes[childLane.getId()] = this.computeChanges(childLane, this.parent, this.parent, 0)
       }
     }.bind(this))
 
     // Update
-    this.update();
+    this.update()
   }
 
   setHeight (newHeight, oldHeight, parent, parentHeight, store) {
-
     // Set heigh of the lane
-    this.plugin.setDimensions(this.lane, this.lane.bounds.width(), newHeight);
-    this.plugin.hashedBounds[this.pool.id][this.lane.id] = this.lane.absoluteBounds();
+    this.plugin.setDimensions(this.lane, this.lane.bounds.width(), newHeight)
+    this.plugin.hashedBounds[this.pool.id][this.lane.id] = this.lane.absoluteBounds()
 
     // Adjust child lanes
-    this.plugin.adjustHeight(this.plugin.getLanes(parent), this.lane);
+    this.plugin.adjustHeight(this.plugin.getLanes(parent), this.lane)
 
     if (store === true) {
       // Store changes
-      this.changes[this.shape.getId()] = this.computeChanges(this.shape, parent, parent, 0, oldHeight, newHeight);
+      this.changes[this.shape.getId()] = this.computeChanges(this.shape, parent, parent, 0, oldHeight, newHeight)
     }
 
     // Set parents height
-    this.plugin.setDimensions(parent, parent.bounds.width(), parentHeight);
+    this.plugin.setDimensions(parent, parent.bounds.width(), parentHeight)
 
     if (parent !== this.pool) {
-      this.plugin.setDimensions(this.pool, this.pool.bounds.width(), this.pool.bounds.height() + (newHeight - oldHeight));
+      this.plugin.setDimensions(this.pool, this.pool.bounds.width(), this.pool.bounds.height() + (newHeight - oldHeight))
     }
   }
 
   update () {
 
     // Hack to prevent the updating of the dockers
-    this.plugin.hashedBounds[this.pool.id]["REMOVED"] = true;
+    this.plugin.hashedBounds[this.pool.id]['REMOVED'] = true
     // Update
     //this.facade.getCanvas().update();
   }
 
   rollback () {
-
-    var laUpL = this.laneUpperLeft;
-    var shUpL = this.shapeUpperLeft;
+    let laUpL = this.laneUpperLeft
+    let shUpL = this.shapeUpperLeft
 
     this.changes.each(function (pair) {
-
-      var parent = pair.value.oldParent;
-      var shape = pair.value.shape;
-      var parentHeight = pair.value.parentHeight;
-      var oldHeight = pair.value.oldHeight;
-      var newHeight = pair.value.newHeight;
+      let parent = pair.value.oldParent
+      let shape = pair.value.shape
+      let parentHeight = pair.value.parentHeight
+      let oldHeight = pair.value.oldHeight
+      let newHeight = pair.value.newHeight
 
       // Move siblings
-      if (shape.getStencil().id().endsWith("Lane")) {
-        shape.bounds.moveTo(pair.value.oldPosition);
+      if (shape.getStencil().id().endsWith('Lane')) {
+        shape.bounds.moveTo(pair.value.oldPosition)
       }
 
       // If lane
       if (oldHeight) {
-        this.setHeight(oldHeight, newHeight, parent, parent.bounds.height() + (oldHeight - newHeight));
+        this.setHeight(oldHeight, newHeight, parent, parent.bounds.height() + (oldHeight - newHeight))
         if (laUpL.y >= shUpL.y) {
-          this.lane.bounds.moveBy(0, this.shape.bounds.height() - 1);
+          this.lane.bounds.moveBy(0, this.shape.bounds.height() - 1)
         }
       } else {
-        parent.add(shape);
-        shape.bounds.moveTo(pair.value.oldPosition);
+        parent.add(shape)
+        shape.bounds.moveTo(pair.value.oldPosition)
 
       }
 
 
-    }.bind(this));
+    }.bind(this))
 
     // Update
     //this.update();
@@ -245,43 +235,42 @@ class ResizeLanesCommand extends Command {
   }
 
   executeAgain () {
-
     this.changes.each(function (pair) {
-      var parent = pair.value.newParent;
-      var shape = pair.value.shape;
-      var newHeight = pair.value.newHeight;
-      var oldHeight = pair.value.oldHeight;
+      let parent = pair.value.newParent
+      let shape = pair.value.shape
+      let newHeight = pair.value.newHeight
+      let oldHeight = pair.value.oldHeight
 
       // If lane
       if (newHeight) {
-        var laUpL = this.laneUpperLeft.y;
-        var shUpL = this.shapeUpperLeft.y;
+        let laUpL = this.laneUpperLeft.y
+        let shUpL = this.shapeUpperLeft.y
 
         if (laUpL >= shUpL) {
-          this.lane.bounds.moveBy(0, shUpL - laUpL);
+          this.lane.bounds.moveBy(0, shUpL - laUpL)
         }
-        this.setHeight(newHeight, oldHeight, parent, parent.bounds.height() + (newHeight - oldHeight));
+        this.setHeight(newHeight, oldHeight, parent, parent.bounds.height() + (newHeight - oldHeight))
       } else {
-        parent.add(shape);
-        shape.bounds.moveTo(pair.value.newPosition);
+        parent.add(shape)
+        shape.bounds.moveTo(pair.value.newPosition)
       }
 
-    }.bind(this));
+    }.bind(this))
 
     // Update
-    this.update();
+    this.update()
   }
 
   computeChanges (shape, oldParent, parent, yOffset, oldHeight, newHeight) {
 
-    oldParent = this.changes[shape.getId()] ? this.changes[shape.getId()].oldParent : oldParent;
-    var oldPosition = this.changes[shape.getId()] ? this.changes[shape.getId()].oldPosition : shape.bounds.upperLeft();
+    oldParent = this.changes[shape.getId()] ? this.changes[shape.getId()].oldParent : oldParent
+    let oldPosition = this.changes[shape.getId()] ? this.changes[shape.getId()].oldPosition : shape.bounds.upperLeft()
 
-    var sUl = shape.bounds.upperLeft();
+    let sUl = shape.bounds.upperLeft()
 
-    var pos = {x: sUl.x, y: sUl.y + yOffset};
+    let pos = { x: sUl.x, y: sUl.y + yOffset }
 
-    var changes = {
+    let changes = {
       shape: shape,
       parentHeight: oldParent.bounds.height(),
       oldParent: oldParent,
@@ -290,17 +279,16 @@ class ResizeLanesCommand extends Command {
       newParent: parent,
       newPosition: pos,
       newHeight: newHeight
-    };
+    }
 
-    return changes;
+    return changes
   }
 
 }
 
 export default class BPMN2_0 extends AbstractPlugin {
-
   hashedPoolPositions = {}
-  hashedLaneDepth =  {}
+  hashedLaneDepth = {}
   hashedBounds = {}
   hashedPositions = {}
   hashedSubProcesses = {}
@@ -311,18 +299,18 @@ export default class BPMN2_0 extends AbstractPlugin {
    */
   constructor (facade) {
     super()
-    this.facade = facade;
+    this.facade = facade
 
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DRAGDOCKER_DOCKED, this.handleDockerDocked.bind(this));
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_PROPWINDOW_PROP_CHANGED, this.handlePropertyChanged.bind(this));
-    this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this));
-    this.facade.registerOnEvent('layout.bpmn2_0.subprocess', this.handleSubProcess.bind(this));
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this));
+    this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDOCKER_DOCKED, this.handleDockerDocked.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_PROPWINDOW_PROP_CHANGED, this.handlePropertyChanged.bind(this))
+    this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
+    this.facade.registerOnEvent('layout.bpmn2_0.subprocess', this.handleSubProcess.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this))
 
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_LOADED, this.afterLoad.bind(this));
+    this.facade.registerOnEvent(ORYX_Config.EVENT_LOADED, this.afterLoad.bind(this))
 
 
-    this.namespace = undefined;
+    this.namespace = undefined
   }
 
   /**
@@ -330,10 +318,10 @@ export default class BPMN2_0 extends AbstractPlugin {
    */
   afterLoad () {
     this.facade.getCanvas().getChildNodes().each(function (shape) {
-      if (shape.getStencil().id().endsWith("Pool")) {
+      if (shape.getStencil().id().endsWith('Pool')) {
         this.handleLayoutPool({
           shape: shape
-        });
+        })
       }
     }.bind(this))
   }
@@ -343,107 +331,104 @@ export default class BPMN2_0 extends AbstractPlugin {
    * a lane is created automagically
    */
   onSelectionChanged (event) {
-    var selection = event.elements;
+    let selection = event.elements
 
     if (selection && selection.length === 1) {
-      var namespace = this.getNamespace();
-      var shape = selection[0];
-      if (shape.getStencil().idWithoutNs() === "Pool") {
+      let namespace = this.getNamespace()
+      let shape = selection[0]
+      if (shape.getStencil().idWithoutNs() === 'Pool') {
         if (shape.getChildNodes().length === 0) {
           // create a lane inside the selected pool
-          var option = {
-            type: namespace + "Lane",
-            position: {x: 0, y: 0},
+          let option = {
+            type: namespace + 'Lane',
+            position: { x: 0, y: 0 },
             namespace: shape.getStencil().namespace(),
             parent: shape
-          };
-          this.facade.createShape(option);
-          this.facade.getCanvas().update();
-          this.facade.setSelection([shape]);
+          }
+          this.facade.createShape(option)
+          this.facade.getCanvas().update()
+          this.facade.setSelection([shape])
         }
       }
     }
 
     // Preventing selection of all lanes but not the pool
     if (selection.any(function (s) {
-      return s instanceof ORYX.Core.Node && s.getStencil().id().endsWith("Lane")
+      return s instanceof ORYX_Node && s.getStencil().id().endsWith('Lane')
     })) {
-      var lanes = selection.findAll(function (s) {
-        return s instanceof ORYX.Core.Node && s.getStencil().id().endsWith("Lane")
-      });
+      let lanes = selection.findAll(function (s) {
+        return s instanceof ORYX_Node && s.getStencil().id().endsWith('Lane')
+      })
 
-      var pools = [];
-      var unselectLanes = [];
+      let pools = []
+      let unselectLanes = []
       lanes.each(function (lane) {
         pools.push(this.getParentPool(lane))
-      }.bind(this));
+      }.bind(this))
 
       pools = pools.uniq().findAll(function (pool) {
-        var childLanes = this.getLanes(pool, true);
+        let childLanes = this.getLanes(pool, true)
         if (childLanes.all(function (lane) {
           return lanes.include(lane)
         })) {
-          unselectLanes = unselectLanes.concat(childLanes);
-          return true;
+          unselectLanes = unselectLanes.concat(childLanes)
+          return true
         } else if (selection.include(pool) && childLanes.any(function (lane) {
           return lanes.include(lane)
         })) {
-          unselectLanes = unselectLanes.concat(childLanes);
-          return true;
+          unselectLanes = unselectLanes.concat(childLanes)
+          return true
         } else {
-          return false;
+          return false
         }
       }.bind(this))
 
       if (unselectLanes.length > 0 && pools.length > 0) {
-        selection = selection.without.apply(selection, unselectLanes);
-        selection = selection.concat(pools);
-        this.facade.setSelection(selection.uniq());
+        selection = selection.without.apply(selection, unselectLanes)
+        selection = selection.concat(pools)
+        this.facade.setSelection(selection.uniq())
       }
     }
   }
 
   handleShapeRemove (option) {
 
-    var sh = option.shape;
-    var parent = option.parent;
+    let sh = option.shape
+    let parent = option.parent
 
-    if (sh instanceof ORYX.Core.Node && sh.getStencil().idWithoutNs() === "Lane" && this.facade.isExecutingCommands()) {
-
-      var pool = this.getParentPool(parent);
+    if (sh instanceof ORYX_Node && sh.getStencil().idWithoutNs() === 'Lane' && this.facade.isExecutingCommands()) {
+      let pool = this.getParentPool(parent)
       if (pool && pool.parent) {
 
-        var isLeafFn = function (leaf) {
+        let isLeafFn = function (leaf) {
           return !leaf.getChildNodes().any(function (r) {
-            return r.getStencil().idWithoutNs() === "Lane"
-          });
+            return r.getStencil().idWithoutNs() === 'Lane'
+          })
         }
 
-        var isLeaf = isLeafFn(sh);
-        var parentHasMoreLanes = parent.getChildNodes().any(function (r) {
-          return r.getStencil().idWithoutNs() === "Lane"
-        });
+        let isLeaf = isLeafFn(sh)
+        let parentHasMoreLanes = parent.getChildNodes().any(function (r) {
+          return r.getStencil().idWithoutNs() === 'Lane'
+        })
 
         if (isLeaf && parentHasMoreLanes) {
-
-          var command = new ResizeLanesCommand(sh, parent, pool, this);
-          this.facade.executeCommands([command]);
-
+          let command = new ResizeLanesCommand(sh, parent, pool, this)
+          this.facade.executeCommands([command])
         } else if (!isLeaf &&
           !this.facade.getSelection().any(function (select) { // Find one of the selection, which is a lane and child of "sh" and is a leaf lane
-            return select instanceof ORYX.Core.Node && select.getStencil().idWithoutNs() === "Lane" &&
-              select.isParent(sh) && isLeafFn(select);
+            return select instanceof ORYX_Node && select.getStencil().idWithoutNs() === 'Lane' &&
+              select.isParent(sh) && isLeafFn(select)
           })) {
 
-          var Command = ORYX.Core.Command.extend({
+          const Command = Command.extend({
             construct: function (shape, facade) {
-              this.children = shape.getChildNodes(true);
-              this.facade = facade;
+              this.children = shape.getChildNodes(true)
+              this.facade = facade
             },
             execute: function () {
               this.children.each(function (child) {
                 child.bounds.moveBy(30, 0)
-              });
+              })
               //this.facade.getCanvas().update();
             },
             rollback: function () {
@@ -452,11 +437,11 @@ export default class BPMN2_0 extends AbstractPlugin {
               })
               //this.facade.getCanvas().update();
             }
-          });
-          this.facade.executeCommands([new Command(sh, this.facade)]);
+          })
+          this.facade.executeCommands([new Command(sh, this.facade)])
 
         } else if (isLeaf && !parentHasMoreLanes && parent == pool) {
-          parent.add(sh);
+          parent.add(sh)
         }
       }
 
@@ -465,18 +450,16 @@ export default class BPMN2_0 extends AbstractPlugin {
   }
 
 
-
-
-  hashChildShapes(shape) {
-    var children = shape.getChildNodes();
+  hashChildShapes (shape) {
+    let children = shape.getChildNodes()
     children.each(function (child) {
       if (this.hashedSubProcesses[child.id]) {
-        this.hashedSubProcesses[child.id] = child.absoluteXY();
-        this.hashedSubProcesses[child.id].width = child.bounds.width();
-        this.hashedSubProcesses[child.id].height = child.bounds.height();
-        this.hashChildShapes(child);
+        this.hashedSubProcesses[child.id] = child.absoluteXY()
+        this.hashedSubProcesses[child.id].width = child.bounds.width()
+        this.hashedSubProcesses[child.id].height = child.bounds.height()
+        this.hashChildShapes(child)
       }
-    }.bind(this));
+    }.bind(this))
   }
 
   /**
@@ -485,44 +468,41 @@ export default class BPMN2_0 extends AbstractPlugin {
    *
    */
   handleSubProcess (option) {
-
-    var sh = option.shape;
-
+    let sh = option.shape
     if (!this.hashedSubProcesses[sh.id]) {
-      this.hashedSubProcesses[sh.id] = sh.absoluteXY();
-      this.hashedSubProcesses[sh.id].width = sh.bounds.width();
-      this.hashedSubProcesses[sh.id].height = sh.bounds.height();
-      return;
+      this.hashedSubProcesses[sh.id] = sh.absoluteXY()
+      this.hashedSubProcesses[sh.id].width = sh.bounds.width()
+      this.hashedSubProcesses[sh.id].height = sh.bounds.height()
+      return
     }
 
-    var offset = sh.absoluteXY();
-    offset.x -= this.hashedSubProcesses[sh.id].x;
-    offset.y -= this.hashedSubProcesses[sh.id].y;
+    let offset = sh.absoluteXY()
+    offset.x -= this.hashedSubProcesses[sh.id].x
+    offset.y -= this.hashedSubProcesses[sh.id].y
 
-    var resized = this.hashedSubProcesses[sh.id].width !== sh.bounds.width() || this.hashedSubProcesses[sh.id].height !== sh.bounds.height();
+    let resized = this.hashedSubProcesses[sh.id].width !== sh.bounds.width() || this.hashedSubProcesses[sh.id].height !== sh.bounds.height()
 
-    this.hashedSubProcesses[sh.id] = sh.absoluteXY();
-    this.hashedSubProcesses[sh.id].width = sh.bounds.width();
-    this.hashedSubProcesses[sh.id].height = sh.bounds.height();
-    this.hashChildShapes(sh);
+    this.hashedSubProcesses[sh.id] = sh.absoluteXY()
+    this.hashedSubProcesses[sh.id].width = sh.bounds.width()
+    this.hashedSubProcesses[sh.id].height = sh.bounds.height()
+    this.hashChildShapes(sh)
 
 
     // Move dockers only if currently is not resizing
     if (this.facade.isExecutingCommands() && !resized) {
-      this.moveChildDockers(sh, offset);
+      this.moveChildDockers(sh, offset)
     }
   }
 
-  moveChildDockers(shape, offset) {
-
+  moveChildDockers (shape, offset) {
     if (!offset.x && !offset.y) {
-      return;
+      return
     }
 
-    var children = shape.getChildNodes(true);
+    let children = shape.getChildNodes(true)
 
     // Get all nodes
-    var dockers = children
+    let dockers = children
     // Get all incoming and outgoing edges
       .map(function (node) {
         return [].concat(node.getIncomingShapes())
@@ -536,45 +516,45 @@ export default class BPMN2_0 extends AbstractPlugin {
       .map(function (edge) {
         return edge.dockers.length > 2 ?
           edge.dockers.slice(1, edge.dockers.length - 1) :
-          [];
+          []
       })
       // Flatten the dockers lists
-      .flatten();
+      .flatten()
 
-    var abs = shape.absoluteBounds();
+    let abs = shape.absoluteBounds()
     abs.moveBy(-offset.x, -offset.y)
-    var obj = {};
+    let obj = {}
     dockers.each(function (docker) {
 
       if (docker.isChanged) {
-        return;
+        return
       }
 
-      var off = Object.clone(offset);
+      let off = Object.clone(offset)
 
       if (!abs.isIncluded(docker.bounds.center())) {
-        var index = docker.parent.dockers.indexOf(docker);
-        var size = docker.parent.dockers.length;
-        var from = docker.parent.getSource();
-        var to = docker.parent.getTarget();
+        let index = docker.parent.dockers.indexOf(docker)
+        let size = docker.parent.dockers.length
+        let from = docker.parent.getSource()
+        let to = docker.parent.getTarget()
 
-        var bothAreIncluded = children.include(from) && children.include(to);
+        let bothAreIncluded = children.include(from) && children.include(to)
 
         if (!bothAreIncluded) {
-          var previousIsOver = index !== 0 ? abs.isIncluded(docker.parent.dockers[index - 1].bounds.center()) : false;
-          var nextIsOver = index !== size - 1 ? abs.isIncluded(docker.parent.dockers[index + 1].bounds.center()) : false;
+          let previousIsOver = index !== 0 ? abs.isIncluded(docker.parent.dockers[index - 1].bounds.center()) : false
+          let nextIsOver = index !== size - 1 ? abs.isIncluded(docker.parent.dockers[index + 1].bounds.center()) : false
 
           if (!previousIsOver && !nextIsOver) {
-            return;
+            return
           }
 
-          var ref = docker.parent.dockers[previousIsOver ? index - 1 : index + 1];
+          let ref = docker.parent.dockers[previousIsOver ? index - 1 : index + 1]
           if (Math.abs(-Math.abs(ref.bounds.center().x - docker.bounds.center().x)) < 2) {
-            off.y = 0;
+            off.y = 0
           } else if (Math.abs(-Math.abs(ref.bounds.center().y - docker.bounds.center().y)) < 2) {
-            off.x = 0;
+            off.x = 0
           } else {
-            return;
+            return
           }
         }
 
@@ -587,7 +567,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     })
 
     // Set dockers
-    this.facade.executeCommands([new ORYX.Core.MoveDockersCommand(obj)]);
+    this.facade.executeCommands([new ORYX_MoveDockersCommand(obj)])
 
   }
 
@@ -595,28 +575,27 @@ export default class BPMN2_0 extends AbstractPlugin {
    * DragDocker.Docked Handler
    *
    */
-  handleDockerDocked(options) {
-    var namespace = this.getNamespace();
+  handleDockerDocked (options) {
+    let namespace = this.getNamespace()
+    let edge = options.parent
+    let edgeSource = options.target
 
-    var edge = options.parent;
-    var edgeSource = options.target;
-
-    if (edge.getStencil().id() === namespace + "SequenceFlow") {
-      var isGateway = edgeSource.getStencil().groups().find(function (group) {
-        if (group == "Gateways")
-          return group;
-      });
-      if (!isGateway && (edge.properties["oryx-conditiontype"] == "Expression"))
+    if (edge.getStencil().id() === namespace + 'SequenceFlow') {
+      let isGateway = edgeSource.getStencil().groups().find(function (group) {
+        if (group == 'Gateways')
+          return group
+      })
+      if (!isGateway && (edge.properties['oryx-conditiontype'] == 'Expression'))
       // show diamond on edge source
-        edge.setProperty("oryx-showdiamondmarker", true);
+        edge.setProperty('oryx-showdiamondmarker', true)
       else
       // do not show diamond on edge source
-        edge.setProperty("oryx-showdiamondmarker", false);
+        edge.setProperty('oryx-showdiamondmarker', false)
 
       // update edge rendering
       //edge.update();
 
-      this.facade.getCanvas().update();
+      this.facade.getCanvas().update()
     }
   }
 
@@ -624,54 +603,53 @@ export default class BPMN2_0 extends AbstractPlugin {
    * PropertyWindow.PropertyChanged Handler
    */
   handlePropertyChanged (option) {
-    var namespace = this.getNamespace();
+    let namespace = this.getNamespace()
 
-    var shapes = option.elements;
-    var propertyKey = option.key;
-    var propertyValue = option.value;
+    let shapes = option.elements
+    let propertyKey = option.key
+    let propertyValue = option.value
 
-    var changed = false;
+    let changed = false
     shapes.each(function (shape) {
-      if ((shape.getStencil().id() === namespace + "SequenceFlow") &&
-        (propertyKey === "oryx-conditiontype")) {
+      if ((shape.getStencil().id() === namespace + 'SequenceFlow') &&
+        (propertyKey === 'oryx-conditiontype')) {
 
-        if (propertyValue != "Expression")
+        if (propertyValue != 'Expression')
         // Do not show the Diamond
-          shape.setProperty("oryx-showdiamondmarker", false);
+          shape.setProperty('oryx-showdiamondmarker', false)
         else {
-          var incomingShapes = shape.getIncomingShapes();
+          let incomingShapes = shape.getIncomingShapes()
 
           if (!incomingShapes) {
-            shape.setProperty("oryx-showdiamondmarker", true);
+            shape.setProperty('oryx-showdiamondmarker', true)
           }
 
-          var incomingGateway = incomingShapes.find(function (aShape) {
-            var foundGateway = aShape.getStencil().groups().find(function (group) {
-              if (group == "Gateways")
-                return group;
-            });
+          let incomingGateway = incomingShapes.find(function (aShape) {
+            let foundGateway = aShape.getStencil().groups().find(function (group) {
+              if (group == 'Gateways')
+                return group
+            })
             if (foundGateway)
-              return foundGateway;
-          });
+              return foundGateway
+          })
 
           if (!incomingGateway)
           // show diamond on edge source
-            shape.setProperty("oryx-showdiamondmarker", true);
+            shape.setProperty('oryx-showdiamondmarker', true)
           else
           // do not show diamond
-            shape.setProperty("oryx-showdiamondmarker", false);
+            shape.setProperty('oryx-showdiamondmarker', false)
         }
 
-        changed = true;
+        changed = true
       }
-    }.bind(this));
+    }.bind(this))
 
     if (changed) {
-      this.facade.getCanvas().update();
+      this.facade.getCanvas().update()
     }
 
   }
-
 
 
   /**
@@ -679,67 +657,62 @@ export default class BPMN2_0 extends AbstractPlugin {
    * @param {Object} event
    */
   handleLayoutPool (event) {
+    let pool = event.shape
+    let selection = this.facade.getSelection()
+    let currentShape = selection.include(pool) ? pool : selection.first()
 
+    currentShape = currentShape || pool
 
-    var pool = event.shape;
-    var selection = this.facade.getSelection();
-    var currentShape = selection.include(pool) ? pool : selection.first();
-
-    currentShape = currentShape || pool;
-
-    this.currentPool = pool;
+    this.currentPool = pool
 
     // Check if it is a pool or a lane
-    if (!(currentShape.getStencil().id().endsWith("Pool") || currentShape.getStencil().id().endsWith("Lane"))) {
-      return;
+    if (!(currentShape.getStencil().id().endsWith('Pool') || currentShape.getStencil().id().endsWith('Lane'))) {
+      return
     }
 
     // Check if the lane is within the pool and is not removed lately
     if (currentShape !== pool && !currentShape.isParent(pool) && !this.hashedBounds[pool.id][currentShape.id]) {
-      return;
+      return
     }
 
-
     if (!this.hashedBounds[pool.id]) {
-      this.hashedBounds[pool.id] = {};
+      this.hashedBounds[pool.id] = {}
     }
 
     // Find all child lanes
-    var lanes = this.getLanes(pool);
-
+    let lanes = this.getLanes(pool)
     if (lanes.length <= 0) {
       return
     }
 
-    var allLanes = this.getLanes(pool, true), hp;
-    var considerForDockers = allLanes.clone();
+    let allLanes = this.getLanes(pool, true), hp
+    let considerForDockers = allLanes.clone()
 
-    var hashedPositions = new Hash();
+    let hashedPositions = new Hash()
     allLanes.each(function (lane) {
-      hashedPositions.set(lane.id, lane.bounds.upperLeft());
+      hashedPositions.set(lane.id, lane.bounds.upperLeft())
     })
-
 
     // Show/hide caption regarding the number of lanes
     if (lanes.length === 1 && this.getLanes(lanes.first()).length <= 0) {
       // TRUE if there is a caption
-      var caption = lanes.first().properties.get("oryx-name").trim().length > 0;
-      lanes.first().setProperty("oryx-showcaption", caption);
-      var rect = lanes.first().node.getElementsByTagName("rect");
-      rect[0].setAttributeNS(null, "display", "none");
+      let caption = lanes.first().properties.get('oryx-name').trim().length > 0
+      lanes.first().setProperty('oryx-showcaption', caption)
+      let rect = lanes.first().node.getElementsByTagName('rect')
+      rect[0].setAttributeNS(null, 'display', 'none')
     } else {
-      allLanes.invoke("setProperty", "oryx-showcaption", true);
+      allLanes.invoke('setProperty', 'oryx-showcaption', true)
       allLanes.each(function (lane) {
-        var rect = lane.node.getElementsByTagName("rect");
-        rect[0].removeAttributeNS(null, "display");
+        let rect = lane.node.getElementsByTagName('rect')
+        rect[0].removeAttributeNS(null, 'display')
       })
     }
 
-    var deletedLanes = [];
-    var addedLanes = [];
+    let deletedLanes = []
+    let addedLanes = []
 
     // Get all new lanes
-    var i = -1;
+    let i = -1
     while (++i < allLanes.length) {
       if (!this.hashedBounds[pool.id][allLanes[i].id]) {
         addedLanes.push(allLanes[i])
@@ -747,180 +720,173 @@ export default class BPMN2_0 extends AbstractPlugin {
     }
 
     if (addedLanes.length > 0) {
-      currentShape = addedLanes.first();
+      currentShape = addedLanes.first()
     }
 
 
     // Get all deleted lanes
-    var resourceIds = $H(this.hashedBounds[pool.id]).keys();
-    var i = -1;
+    let resourceIds = $H(this.hashedBounds[pool.id]).keys()
+    i = -1
     while (++i < resourceIds.length) {
       if (!allLanes.any(function (lane) {
         return lane.id == resourceIds[i]
       })) {
-        deletedLanes.push(this.hashedBounds[pool.id][resourceIds[i]]);
+        deletedLanes.push(this.hashedBounds[pool.id][resourceIds[i]])
         selection = selection.without(function (r) {
           return r.id == resourceIds[i]
-        });
+        })
       }
     }
 
-    var height, width, x, y;
+    let height, width, x, y
 
     if (deletedLanes.length > 0 || addedLanes.length > 0) {
-
       if (addedLanes.length === 1 && this.getLanes(addedLanes[0].parent).length === 1) {
         // Set height from the pool
-        height = this.adjustHeight(lanes, addedLanes[0].parent);
+        height = this.adjustHeight(lanes, addedLanes[0].parent)
       } else {
         // Set height from the pool
-        height = this.updateHeight(pool);
+        height = this.updateHeight(pool)
       }
       // Set width from the pool
-      width = this.adjustWidth(lanes, pool.bounds.width());
+      width = this.adjustWidth(lanes, pool.bounds.width())
 
-      pool.update();
-    }
-
-    /**
-     * Set width/height depending on the pool
-     */
-    else if (pool == currentShape) {
-
+      pool.update()
+    } else if (pool == currentShape) {
+      /**
+       * Set width/height depending on the pool
+       */
       if (selection.length === 1 && this.isResized(pool, this.hashedPoolPositions[pool.id])) {
-        var oldXY = this.hashedPoolPositions[pool.id].upperLeft();
-        var xy = pool.bounds.upperLeft();
-        var scale = 0;
+        let oldXY = this.hashedPoolPositions[pool.id].upperLeft()
+        let xy = pool.bounds.upperLeft()
+        let scale = 0
         if (this.shouldScale(pool)) {
-          var old = this.hashedPoolPositions[pool.id];
-          scale = old.height() / pool.bounds.height();
+          let old = this.hashedPoolPositions[pool.id]
+          scale = old.height() / pool.bounds.height()
         }
 
-        this.adjustLanes(pool, allLanes, oldXY.x - xy.x, oldXY.y - xy.y, scale);
+        this.adjustLanes(pool, allLanes, oldXY.x - xy.x, oldXY.y - xy.y, scale)
       }
 
       // Set height from the pool
-      height = this.adjustHeight(lanes, undefined, pool.bounds.height());
+      height = this.adjustHeight(lanes, undefined, pool.bounds.height())
       // Set width from the pool
-      width = this.adjustWidth(lanes, pool.bounds.width());
-    }
-
-    /**‚
-     * Set width/height depending on containing lanes
-     */
-    else {
-
+      width = this.adjustWidth(lanes, pool.bounds.width())
+    } else {
+      /**‚
+       * Set width/height depending on containing lanes
+       */
       // Reposition the pool if one shape is selected and the upperleft has changed
       if (selection.length === 1 && this.isResized(currentShape, this.hashedBounds[pool.id][currentShape.id])) {
-        var oldXY = this.hashedBounds[pool.id][currentShape.id].upperLeft();
-        var xy = currentShape.absoluteXY();
-        x = oldXY.x - xy.x;
-        y = oldXY.y - xy.y;
+        let oldXY = this.hashedBounds[pool.id][currentShape.id].upperLeft()
+        let xy = currentShape.absoluteXY()
+        x = oldXY.x - xy.x
+        y = oldXY.y - xy.y
 
         // Adjust all other lanes beneath this lane
         if (x || y) {
-          considerForDockers = considerForDockers.without(currentShape);
-          this.adjustLanes(pool, this.getAllExcludedLanes(pool, currentShape), x, 0);
+          considerForDockers = considerForDockers.without(currentShape)
+          this.adjustLanes(pool, this.getAllExcludedLanes(pool, currentShape), x, 0)
         }
 
         // Adjust all child lanes
-        var childLanes = this.getLanes(currentShape, true);
+        let childLanes = this.getLanes(currentShape, true)
         if (childLanes.length > 0) {
           if (this.shouldScale(currentShape)) {
-            var old = this.hashedBounds[pool.id][currentShape.id];
-            var scale = old.height() / currentShape.bounds.height();
-            this.adjustLanes(pool, childLanes, x, y, scale);
+            let old = this.hashedBounds[pool.id][currentShape.id]
+            let scale = old.height() / currentShape.bounds.height()
+            this.adjustLanes(pool, childLanes, x, y, scale)
           } else {
-            this.adjustLanes(pool, childLanes, x, y, 0);
+            this.adjustLanes(pool, childLanes, x, y, 0)
           }
         }
       }
 
       // Cache all bounds
-      var changes = allLanes.map(function (lane) {
+      let changes = allLanes.map(function (lane) {
         return {
           shape: lane,
           bounds: lane.bounds.clone()
         }
-      });
+      })
 
       // Get height and adjust child heights
-      height = this.adjustHeight(lanes, currentShape);
+      height = this.adjustHeight(lanes, currentShape)
       // Check if something has changed and maybe create a command
-      this.checkForChanges(allLanes, changes);
+      this.checkForChanges(allLanes, changes)
 
       // Set width from the current shape
-      width = this.adjustWidth(lanes, currentShape.bounds.width() + (this.getDepth(currentShape, pool) * 30));
+      width = this.adjustWidth(lanes, currentShape.bounds.width() + (this.getDepth(currentShape, pool) * 30))
     }
 
-    this.setDimensions(pool, width, height, x, y);
+    this.setDimensions(pool, width, height, x, y)
 
 
     if (this.facade.isExecutingCommands() && (deletedLanes.length === 0 || addedLanes.length !== 0)) {
       // Update all dockers
-      this.updateDockers(considerForDockers, pool);
+      this.updateDockers(considerForDockers, pool)
 
       // Check if the order has changed
-      var poolHashedPositions = this.hashedPositions[pool.id];
+      let poolHashedPositions = this.hashedPositions[pool.id]
       if (poolHashedPositions && poolHashedPositions.keys().any(function (key, i) {
-        return (allLanes[i] || {}).id !== key;
+        return (allLanes[i] || {}).id !== key
       })) {
 
-        var LanesHasBeenReordered = ORYX.Core.Command.extend({
+        let LanesHasBeenReordered = Command.extend({
           construct: function (originPosition, newPosition, lanes, plugin, poolId) {
-            this.originPosition = Object.clone(originPosition);
-            this.newPosition = Object.clone(newPosition);
-            this.lanes = lanes;
-            this.plugin = plugin;
-            this.pool = poolId;
+            this.originPosition = Object.clone(originPosition)
+            this.newPosition = Object.clone(newPosition)
+            this.lanes = lanes
+            this.plugin = plugin
+            this.pool = poolId
           },
           execute: function () {
             if (!this.executed) {
-              this.executed = true;
+              this.executed = true
               this.lanes.each(function (lane) {
                 if (this.newPosition[lane.id])
                   lane.bounds.moveTo(this.newPosition[lane.id])
-              }.bind(this));
-              this.plugin.hashedPositions[this.pool] = Object.clone(this.newPosition);
+              }.bind(this))
+              this.plugin.hashedPositions[this.pool] = Object.clone(this.newPosition)
             }
           },
           rollback: function () {
             this.lanes.each(function (lane) {
               if (this.originPosition[lane.id])
                 lane.bounds.moveTo(this.originPosition[lane.id])
-            }.bind(this));
-            this.plugin.hashedPositions[this.pool] = Object.clone(this.originPosition);
+            }.bind(this))
+            this.plugin.hashedPositions[this.pool] = Object.clone(this.originPosition)
           }
-        });
-
-        var hp2 = new Hash();
-        allLanes.each(function (lane) {
-          hp2.set(lane.id, lane.bounds.upperLeft());
         })
 
-        var command = new LanesHasBeenReordered(hashedPositions, hp2, allLanes, this, pool.id);
-        this.facade.executeCommands([command]);
+        let hp2 = new Hash()
+        allLanes.each(function (lane) {
+          hp2.set(lane.id, lane.bounds.upperLeft())
+        })
+
+        let command = new LanesHasBeenReordered(hashedPositions, hp2, allLanes, this, pool.id)
+        this.facade.executeCommands([command])
 
       }
     }
 
-    this.hashedBounds[pool.id] = {};
-    this.hashedPositions[pool.id] = hashedPositions;
+    this.hashedBounds[pool.id] = {}
+    this.hashedPositions[pool.id] = hashedPositions
 
-    var i = -1;
+    i = -1
     while (++i < allLanes.length) {
       // Cache positions
-      this.hashedBounds[pool.id][allLanes[i].id] = allLanes[i].absoluteBounds();
+      this.hashedBounds[pool.id][allLanes[i].id] = allLanes[i].absoluteBounds()
 
       // Cache also the bounds of child shapes, mainly for child subprocesses
-      this.hashChildShapes(allLanes[i]);
+      this.hashChildShapes(allLanes[i])
 
-      this.hashedLaneDepth[allLanes[i].id] = this.getDepth(allLanes[i], pool);
+      this.hashedLaneDepth[allLanes[i].id] = this.getDepth(allLanes[i], pool)
 
-      this.forceToUpdateLane(allLanes[i]);
+      this.forceToUpdateLane(allLanes[i])
     }
 
-    this.hashedPoolPositions[pool.id] = pool.bounds.clone();
+    this.hashedPoolPositions[pool.id] = pool.bounds.clone()
 
 
     // Update selection
@@ -928,8 +894,8 @@ export default class BPMN2_0 extends AbstractPlugin {
   }
 
   shouldScale (element) {
-    var childLanes = element.getChildNodes().findAll(function (shape) {
-      return shape.getStencil().id().endsWith("Lane")
+    let childLanes = element.getChildNodes().findAll(function (shape) {
+      return shape.getStencil().id().endsWith('Lane')
     })
     return childLanes.length > 1 || childLanes.any(function (lane) {
       return this.shouldScale(lane)
@@ -941,111 +907,105 @@ export default class BPMN2_0 extends AbstractPlugin {
    * @param {Object} lanes
    * @param {Object} changes
    */
-  checkForChanges(lanes, changes) {
+  checkForChanges (lanes, changes) {
     // Check if something has changed
     if (this.facade.isExecutingCommands() && changes.any(function (change) {
-      return change.shape.bounds.toString() !== change.bounds.toString();
+      return change.shape.bounds.toString() !== change.bounds.toString()
     })) {
 
-      var Command = ORYX.Core.Command.extend({
+      let Command = Command.extend({
         construct: function (changes) {
-          this.oldState = changes;
+          this.oldState = changes
           this.newState = changes.map(function (s) {
-            return {shape: s.shape, bounds: s.bounds.clone()}
-          });
+            return { shape: s.shape, bounds: s.bounds.clone() }
+          })
         },
         execute: function () {
           if (this.executed) {
-            this.applyState(this.newState);
+            this.applyState(this.newState)
           }
-          this.executed = true;
+          this.executed = true
         },
         rollback: function () {
-          this.applyState(this.oldState);
+          this.applyState(this.oldState)
         },
         applyState: function (state) {
           state.each(function (s) {
-            s.shape.bounds.set(s.bounds.upperLeft(), s.bounds.lowerRight());
+            s.shape.bounds.set(s.bounds.upperLeft(), s.bounds.lowerRight())
           })
         }
-      });
+      })
 
-      this.facade.executeCommands([new Command(changes)]);
+      this.facade.executeCommands([new Command(changes)])
     }
   }
 
-  isResized(shape, bounds) {
-
+  isResized (shape, bounds) {
     if (!bounds || !shape) {
-      return false;
+      return false
     }
 
-    var oldB = bounds;
+    let oldB = bounds
     //var oldXY = oldB.upperLeft();
     //var xy = shape.absoluteXY();
     return Math.round(oldB.width() - shape.bounds.width()) !== 0 || Math.round(oldB.height() - shape.bounds.height()) !== 0
   }
 
   adjustLanes (pool, lanes, x, y, scale) {
-
-    scale = scale || 0;
+    scale = scale || 0
 
     // For every lane, adjust the child nodes with the offset
     lanes.each(function (l) {
       l.getChildNodes().each(function (child) {
-        if (!child.getStencil().id().endsWith("Lane")) {
-          var cy = scale ? child.bounds.center().y - (child.bounds.center().y / scale) : -y;
-          child.bounds.moveBy((x || 0), -cy);
+        if (!child.getStencil().id().endsWith('Lane')) {
+          let cy = scale ? child.bounds.center().y - (child.bounds.center().y / scale) : -y
+          child.bounds.moveBy((x || 0), -cy)
 
-          if (scale && child.getStencil().id().endsWith("Subprocess")) {
-            this.moveChildDockers(child, {x: (0), y: -cy});
+          if (scale && child.getStencil().id().endsWith('Subprocess')) {
+            this.moveChildDockers(child, { x: (0), y: -cy })
           }
 
         }
-      }.bind(this));
-      this.hashedBounds[pool.id][l.id].moveBy(-(x || 0), !scale ? -y : 0);
+      }.bind(this))
+      this.hashedBounds[pool.id][l.id].moveBy(-(x || 0), !scale ? -y : 0)
       if (scale) {
-        l.isScaled = true;
+        l.isScaled = true
       }
     }.bind(this))
 
   }
 
   getAllExcludedLanes (parent, lane) {
-    var lanes = [];
+    let lanes = []
     parent.getChildNodes().each(function (shape) {
-      if ((!lane || shape !== lane) && shape.getStencil().id().endsWith("Lane")) {
-        lanes.push(shape);
-        lanes = lanes.concat(this.getAllExcludedLanes(shape, lane));
+      if ((!lane || shape !== lane) && shape.getStencil().id().endsWith('Lane')) {
+        lanes.push(shape)
+        lanes = lanes.concat(this.getAllExcludedLanes(shape, lane))
       }
-    }.bind(this));
-    return lanes;
+    }.bind(this))
+    return lanes
   }
 
 
   forceToUpdateLane (lane) {
-
     if (lane.bounds.height() !== lane._svgShapes[0].height) {
-      lane.isChanged = true;
-      lane.isResized = true;
-      lane._update();
+      lane.isChanged = true
+      lane.isResized = true
+      lane._update()
     }
   }
 
-  getDepth(child, parent) {
-
-    var i = 0;
+  getDepth (child, parent) {
+    let i = 0
     while (child && child.parent && child !== parent) {
-      child = child.parent;
+      child = child.parent
       ++i
     }
-    return i;
+    return i
   }
 
   updateDepth (lane, fromDepth, toDepth) {
-
-    var xOffset = (fromDepth - toDepth) * 30;
-
+    let xOffset = (fromDepth - toDepth) * 30
     lane.getChildNodes().each(function (shape) {
       shape.bounds.moveBy(xOffset, 0);
 
@@ -1057,109 +1017,100 @@ export default class BPMN2_0 extends AbstractPlugin {
   }
 
   setDimensions (shape, width, height, x, y) {
-    var isLane = shape.getStencil().id().endsWith("Lane");
+    let isLane = shape.getStencil().id().endsWith('Lane')
     // Set the bounds
     shape.bounds.set(
       isLane ? 30 : (shape.bounds.a.x - (x || 0)),
       isLane ? shape.bounds.a.y : (shape.bounds.a.y - (y || 0)),
       width ? shape.bounds.a.x + width - (isLane ? 30 : (x || 0)) : shape.bounds.b.x,
       height ? shape.bounds.a.y + height - (isLane ? 0 : (y || 0)) : shape.bounds.b.y
-    );
+    )
   }
 
   setLanePosition (shape, y) {
-
-    shape.bounds.moveTo(30, y);
-
+    shape.bounds.moveTo(30, y)
   }
 
   adjustWidth (lanes, width) {
-
     // Set width to each lane
     (lanes || []).each(function (lane) {
-      this.setDimensions(lane, width);
-      this.adjustWidth(this.getLanes(lane), width - 30);
-    }.bind(this));
+      this.setDimensions(lane, width)
+      this.adjustWidth(this.getLanes(lane), width - 30)
+    }.bind(this))
 
-    return width;
+    return width
   }
 
 
-  adjustHeight(lanes, changedLane, propagateHeight) {
-
-    var oldHeight = 0;
+  adjustHeight (lanes, changedLane, propagateHeight) {
+    let oldHeight = 0
     if (!changedLane && propagateHeight) {
-      var i = -1;
+      let i = -1
       while (++i < lanes.length) {
-        oldHeight += lanes[i].bounds.height();
+        oldHeight += lanes[i].bounds.height()
       }
     }
 
-    var i = -1;
-    var height = 0;
+    let i = -1
+    let height = 0
 
     // Iterate trough every lane
     while (++i < lanes.length) {
-
       if (lanes[i] === changedLane) {
         // Propagate new height down to the children
-        this.adjustHeight(this.getLanes(lanes[i]), undefined, lanes[i].bounds.height());
+        this.adjustHeight(this.getLanes(lanes[i]), undefined, lanes[i].bounds.height())
 
-        lanes[i].bounds.set({x: 30, y: height}, {
+        lanes[i].bounds.set({ x: 30, y: height }, {
           x: lanes[i].bounds.width() + 30,
           y: lanes[i].bounds.height() + height
         })
 
       } else if (!changedLane && propagateHeight) {
-
-        var tempHeight = (lanes[i].bounds.height() * propagateHeight) / oldHeight;
+        let tempHeight = (lanes[i].bounds.height() * propagateHeight) / oldHeight
         // Propagate height
-        this.adjustHeight(this.getLanes(lanes[i]), undefined, tempHeight);
+        this.adjustHeight(this.getLanes(lanes[i]), undefined, tempHeight)
         // Set height propotional to the propagated and old height
-        this.setDimensions(lanes[i], null, tempHeight);
-        this.setLanePosition(lanes[i], height);
+        this.setDimensions(lanes[i], null, tempHeight)
+        this.setLanePosition(lanes[i], height)
       } else {
         // Get height from children
-        var tempHeight = this.adjustHeight(this.getLanes(lanes[i]), changedLane, propagateHeight);
+        let tempHeight = this.adjustHeight(this.getLanes(lanes[i]), changedLane, propagateHeight)
         if (!tempHeight) {
-          tempHeight = lanes[i].bounds.height();
+          tempHeight = lanes[i].bounds.height()
         }
-        this.setDimensions(lanes[i], null, tempHeight);
-        this.setLanePosition(lanes[i], height);
+        this.setDimensions(lanes[i], null, tempHeight)
+        this.setLanePosition(lanes[i], height)
       }
 
-      height += lanes[i].bounds.height();
+      height += lanes[i].bounds.height()
     }
 
-    return height;
+    return height
 
   }
 
 
-  updateHeight(root) {
-
-    var lanes = this.getLanes(root);
+  updateHeight (root) {
+    let lanes = this.getLanes(root)
 
     if (lanes.length == 0) {
-      return root.bounds.height();
+      return root.bounds.height()
     }
 
-    var height = 0;
-    var i = -1;
+    let height = 0
+    let i = -1
     while (++i < lanes.length) {
-      this.setLanePosition(lanes[i], height);
-      height += this.updateHeight(lanes[i]);
+      this.setLanePosition(lanes[i], height)
+      height += this.updateHeight(lanes[i])
     }
 
-    this.setDimensions(root, null, height);
+    this.setDimensions(root, null, height)
 
-    return height;
+    return height
   }
 
   getOffset (lane, includePool, pool) {
-
-    var offset = {x: 0, y: 0};
-
+    let offset = { x: 0, y: 0 }
 
     /*var parent = lane;
      while(parent) {
@@ -1180,126 +1131,119 @@ export default class BPMN2_0 extends AbstractPlugin {
      parent = parent.parent;
      }       */
 
-    var offset = lane.absoluteXY();
-
-    var hashed = this.hashedBounds[pool.id][lane.id] || (includePool === true ? this.hashedPoolPositions[lane.id] : undefined);
+    offset = lane.absoluteXY()
+    let hashed = this.hashedBounds[pool.id][lane.id] || (includePool === true ? this.hashedPoolPositions[lane.id] : undefined)
     if (hashed) {
-      offset.x -= hashed.upperLeft().x;
-      offset.y -= hashed.upperLeft().y;
+      offset.x -= hashed.upperLeft().x
+      offset.y -= hashed.upperLeft().y
     } else {
-      return {x: 0, y: 0}
+      return { x: 0, y: 0 }
     }
-    return offset;
+    return offset
   }
 
   getNextLane (shape) {
-    while (shape && !shape.getStencil().id().endsWith("Lane")) {
-      if (shape instanceof ORYX.Core.Canvas) {
-        return null;
+    while (shape && !shape.getStencil().id().endsWith('Lane')) {
+      if (shape instanceof ORYX_Canvas) {
+        return null
       }
-      shape = shape.parent;
+      shape = shape.parent
     }
-    return shape;
+    return shape
   }
 
   getParentPool (shape) {
-    while (shape && !shape.getStencil().id().endsWith("Pool")) {
-      if (shape instanceof ORYX.Core.Canvas) {
-        return null;
+    while (shape && !shape.getStencil().id().endsWith('Pool')) {
+      if (shape instanceof ORYX_Canvas) {
+        return null
       }
-      shape = shape.parent;
+      shape = shape.parent
     }
-    return shape;
+    return shape
   }
 
   updateDockers (lanes, pool) {
+    let absPool = pool.absoluteBounds(), movedShapes = []
+    let oldPool = (this.hashedPoolPositions[pool.id] || absPool).clone()
 
-    var absPool = pool.absoluteBounds(), movedShapes = [];
-    var oldPool = (this.hashedPoolPositions[pool.id] || absPool).clone();
-
-    var i = -1, j = -1, k = -1, l = -1, docker;
-    var dockers = {};
+    let i = -1, j = -1, k = -1, l = -1, docker
+    let dockers = {}
 
     while (++i < lanes.length) {
-
       if (!this.hashedBounds[pool.id][lanes[i].id]) {
-        continue;
+        continue
       }
 
-      var isScaled = lanes[i].isScaled;
-      delete lanes[i].isScaled;
-      var children = lanes[i].getChildNodes();
-      var absBounds = lanes[i].absoluteBounds();
-      var oldBounds = (this.hashedBounds[pool.id][lanes[i].id] || absBounds);
-      //oldBounds.moveBy((absBounds.upperLeft().x-lanes[i].bounds.upperLeft().x), (absBounds.upperLeft().y-lanes[i].bounds.upperLeft().y));
-      var offset = this.getOffset(lanes[i], true, pool);
-      var xOffsetDepth = 0;
+      let isScaled = lanes[i].isScaled
+      delete lanes[i].isScaled
+      let children = lanes[i].getChildNodes()
+      let absBounds = lanes[i].absoluteBounds()
+      let oldBounds = (this.hashedBounds[pool.id][lanes[i].id] || absBounds)
+      //oldBounds.moveBy((absBounds.upperLeft().x-lanes[i].bounds.upperLeft().x),
+      // (absBounds.upperLeft().y-lanes[i].bounds.upperLeft().y));
+      let offset = this.getOffset(lanes[i], true, pool)
+      let xOffsetDepth = 0
 
-      var depth = this.getDepth(lanes[i], pool);
+      let depth = this.getDepth(lanes[i], pool)
       if (this.hashedLaneDepth[lanes[i].id] !== undefined && this.hashedLaneDepth[lanes[i].id] !== depth) {
-        xOffsetDepth = (this.hashedLaneDepth[lanes[i].id] - depth) * 30;
-        offset.x += xOffsetDepth;
+        xOffsetDepth = (this.hashedLaneDepth[lanes[i].id] - depth) * 30
+        offset.x += xOffsetDepth
       }
 
-      j = -1;
+      j = -1
 
       while (++j < children.length) {
-
-        if (xOffsetDepth && !children[j].getStencil().id().endsWith("Lane")) {
-          movedShapes.push({xOffset: xOffsetDepth, shape: children[j]});
-          children[j].bounds.moveBy(xOffsetDepth, 0);
+        if (xOffsetDepth && !children[j].getStencil().id().endsWith('Lane')) {
+          movedShapes.push({ xOffset: xOffsetDepth, shape: children[j] })
+          children[j].bounds.moveBy(xOffsetDepth, 0)
         }
 
-        if (children[j].getStencil().id().endsWith("Subprocess")) {
-          this.moveChildDockers(children[j], offset);
+        if (children[j].getStencil().id().endsWith('Subprocess')) {
+          this.moveChildDockers(children[j], offset)
         }
 
-        var edges = [].concat(children[j].getIncomingShapes())
+        let edges = [].concat(children[j].getIncomingShapes())
           .concat(children[j].getOutgoingShapes())
           // Remove all edges which are included in the selection from the list
           .findAll(function (r) {
-            return r instanceof ORYX.Core.Edge
+            return r instanceof ORYX_Edge
           })
 
-        k = -1;
+        k = -1
         while (++k < edges.length) {
-
-          if (edges[k].getStencil().id().endsWith("MessageFlow")) {
-            this.layoutEdges(children[j], [edges[k]], offset);
-            continue;
+          if (edges[k].getStencil().id().endsWith('MessageFlow')) {
+            this.layoutEdges(children[j], [edges[k]], offset)
+            continue
           }
 
-          l = -1;
+          l = -1
           while (++l < edges[k].dockers.length) {
-
-            docker = edges[k].dockers[l];
-
+            docker = edges[k].dockers[l]
             if (docker.getDockedShape() || docker.isChanged) {
-              continue;
+              continue
             }
 
-
-            pos = docker.bounds.center();
+            let pos = docker.bounds.center()
 
             // Check if the modified center included the new position
-            var isOverLane = oldBounds.isIncluded(pos);
+            let isOverLane = oldBounds.isIncluded(pos)
             // Check if the original center is over the pool
-            var isOutSidePool = !oldPool.isIncluded(pos);
-            var previousIsOverLane = l == 0 ? isOverLane : oldBounds.isIncluded(edges[k].dockers[l - 1].bounds.center());
-            var nextIsOverLane = l == edges[k].dockers.length - 1 ? isOverLane : oldBounds.isIncluded(edges[k].dockers[l + 1].bounds.center());
-            var off = Object.clone(offset);
+            let isOutSidePool = !oldPool.isIncluded(pos)
+            let previousIsOverLane = l == 0 ? isOverLane : oldBounds.isIncluded(edges[k].dockers[l - 1].bounds.center())
+            let nextIsOverLane = l == edges[k].dockers.length - 1 ? isOverLane : oldBounds.isIncluded(edges[k].dockers[l + 1].bounds.center())
+            let off = Object.clone(offset)
 
             // If the
             if (isScaled && isOverLane && this.isResized(lanes[i], this.hashedBounds[pool.id][lanes[i].id])) {
-              var relY = (pos.y - absBounds.upperLeft().y + off.y);
-              off.y -= (relY - (relY * (absBounds.height() / oldBounds.height())));
+              let relY = (pos.y - absBounds.upperLeft().y + off.y)
+              off.y -= (relY - (relY * (absBounds.height() / oldBounds.height())))
             }
 
             // Check if the previous dockers docked shape is from this lane
             // Otherwise, check if the docker is over the lane OR is outside the lane
             // but the previous/next was over this lane
             if (isOverLane) {
-              dockers[docker.id] = {docker: docker, offset: off};
+              dockers[docker.id] = { docker: docker, offset: off }
             }
             /*else if (l == 1 && edges[k].dockers.length>2 && edges[k].dockers[l-1].isDocked()){
              var dockedLane = this.getNextLane(edges[k].dockers[l-1].getDockedShape());
@@ -1327,112 +1271,112 @@ export default class BPMN2_0 extends AbstractPlugin {
     }
 
     // Move the moved children
-    var MoveChildCommand = ORYX.Core.Command.extend({
+    const MoveChildCommand = Command.extend({
       construct: function (state) {
-        this.state = state;
+        this.state = state
       },
       execute: function () {
         if (this.executed) {
           this.state.each(function (s) {
-            s.shape.bounds.moveBy(s.xOffset, 0);
-          });
+            s.shape.bounds.moveBy(s.xOffset, 0)
+          })
         }
-        this.executed = true;
+        this.executed = true
       },
       rollback: function () {
         this.state.each(function (s) {
-          s.shape.bounds.moveBy(-s.xOffset, 0);
-        });
+          s.shape.bounds.moveBy(-s.xOffset, 0)
+        })
       }
     })
 
 
     // Set dockers
-    this.facade.executeCommands([new ORYX.Core.MoveDockersCommand(dockers), new MoveChildCommand(movedShapes)]);
+    this.facade.executeCommands([new ORYX_MoveDockersCommand(dockers), new MoveChildCommand(movedShapes)])
 
   }
 
   moveBy (pos, offset) {
-    pos.x += offset.x;
-    pos.y += offset.y;
-    return pos;
+    pos.x += offset.x
+    pos.y += offset.y
+    return pos
   }
 
   getHashedBounds (shape) {
-    return this.currentPool && this.hashedBounds[this.currentPool.id][shape.id] ? this.hashedBounds[this.currentPool.id][shape.id] : shape.absoluteBounds();
+    return this.currentPool && this.hashedBounds[this.currentPool.id][shape.id] ? this.hashedBounds[this.currentPool.id][shape.id] : shape.absoluteBounds()
   }
 
   /**
-   * Returns a set on all child lanes for the given Shape. If recursive is TRUE, also indirect children will be returned (default is FALSE)
-   * The set is sorted with first child the lowest y-coordinate and the last one the highest.
+   * Returns a set on all child lanes for the given Shape. If recursive is TRUE, also indirect children will be
+   * returned (default is FALSE) The set is sorted with first child the lowest y-coordinate and the last one the
+   * highest.
    * @param {ORYX.Core.Shape} shape
    * @param {boolean} recursive
    */
   getLanes (shape, recursive) {
-    var namespace = this.getNamespace();
+    let namespace = this.getNamespace()
 
     // Get all the child lanes
-    var lanes = shape.getChildNodes(recursive || false).findAll(function (node) {
-      return (node.getStencil().id() === namespace + "Lane");
-    });
+    let lanes = shape.getChildNodes(recursive || false).findAll(function (node) {
+      return (node.getStencil().id() === namespace + 'Lane')
+    })
 
     // Sort all lanes by there y coordinate
     lanes = lanes.sort(function (a, b) {
-
       // Get y coordinates for upper left and lower right
-      var auy = Math.round(a.bounds.upperLeft().y);
-      var buy = Math.round(b.bounds.upperLeft().y);
-      var aly = Math.round(a.bounds.lowerRight().y);
-      var bly = Math.round(b.bounds.lowerRight().y);
+      let auy = Math.round(a.bounds.upperLeft().y)
+      let buy = Math.round(b.bounds.upperLeft().y)
+      let aly = Math.round(a.bounds.lowerRight().y)
+      let bly = Math.round(b.bounds.lowerRight().y)
 
-      var ha = this.getHashedBounds(a);
-      var hb = this.getHashedBounds(b);
+      let ha = this.getHashedBounds(a)
+      let hb = this.getHashedBounds(b)
 
       // Get the old y coordinates
-      var oauy = Math.round(ha.upperLeft().y);
-      var obuy = Math.round(hb.upperLeft().y);
-      var oaly = Math.round(ha.lowerRight().y);
-      var obly = Math.round(hb.lowerRight().y);
+      let oauy = Math.round(ha.upperLeft().y)
+      let obuy = Math.round(hb.upperLeft().y)
+      let oaly = Math.round(ha.lowerRight().y)
+      let obly = Math.round(hb.lowerRight().y)
 
       // If equal, than use the old one
       if (auy == buy && aly == bly) {
-        auy = oauy;
-        buy = obuy;
-        aly = oaly;
-        bly = obly;
+        auy = oauy
+        buy = obuy
+        aly = oaly
+        bly = obly
       }
 
       if (Math.round(a.bounds.height() - ha.height()) === 0 && Math.round(b.bounds.height() - hb.height()) === 0) {
-        return auy < buy ? -1 : (auy > buy ? 1 : 0);
+        return auy < buy ? -1 : (auy > buy ? 1 : 0)
       }
 
       // Check if upper left and lower right is completely above/below
-      var above = auy < buy && aly < bly;
-      var below = auy > buy && aly > bly;
+      let above = auy < buy && aly < bly
+      let below = auy > buy && aly > bly
       // Check if a is above b including the old values
-      var slightlyAboveBottom = auy < buy && aly >= bly && oaly < obly;
-      var slightlyAboveTop = auy >= buy && aly < bly && oauy < obuy;
+      let slightlyAboveBottom = auy < buy && aly >= bly && oaly < obly
+      let slightlyAboveTop = auy >= buy && aly < bly && oauy < obuy
       // Check if a is below b including the old values
-      var slightlyBelowBottom = auy > buy && aly <= bly && oaly > obly;
-      var slightlyBelowTop = auy <= buy && aly > bly && oauy > obuy;
+      let slightlyBelowBottom = auy > buy && aly <= bly && oaly > obly
+      let slightlyBelowTop = auy <= buy && aly > bly && oauy > obuy
 
       // Return -1 if a is above b, 1 if b is above a, or 0 otherwise
       return (above || slightlyAboveBottom || slightlyAboveTop ? -1 : (below || slightlyBelowBottom || slightlyBelowTop ? 1 : 0))
-    }.bind(this));
+    }.bind(this))
 
     // Return lanes
-    return lanes;
+    return lanes
   }
 
   getNamespace () {
     if (!this.namespace) {
-      var stencilsets = this.facade.getStencilSets();
+      let stencilsets = this.facade.getStencilSets()
       if (stencilsets.keys()) {
-        this.namespace = stencilsets.keys()[0];
+        this.namespace = stencilsets.keys()[0]
       } else {
-        return undefined;
+        return undefined
       }
     }
-    return this.namespace;
+    return this.namespace
   }
 }

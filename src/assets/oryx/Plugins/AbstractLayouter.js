@@ -1,4 +1,6 @@
 import AbstractPlugin from './AbstractPlugin'
+import ORYX_Config from '../CONFIG'
+
 
 /**
  This abstract plugin implements the core behaviour of layout
@@ -27,7 +29,7 @@ export default class AbstractLayouter extends AbstractPlugin {
     // arguments.callee.$.construct.apply(this, arguments);
     super(facade);
     this.layouted = []
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_LAYOUT, this._initLayout.bind(this));
+    this.facade.registerOnEvent(ORYX_Config.EVENT_LAYOUT, this._initLayout.bind(this));
   }
 
   /**
@@ -64,12 +66,11 @@ export default class AbstractLayouter extends AbstractPlugin {
    * @memberOf ORYX.Plugins.AbstractLayouter.prototype
    */
   _initLayout(event) {
-
     // Get the shapes
-    var shapes = [event.shapes].flatten().compact();
+    let shapes = [event.shapes].flatten().compact();
 
     // Find all shapes which should be layouted
-    var toLayout = shapes.findAll(function (shape) {
+    let toLayout = shapes.findAll(function (shape) {
       return this.isIncludedInLayout(shape)
     }.bind(this))
 

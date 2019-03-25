@@ -77,6 +77,7 @@ const LIBS_PATH = 'libs'
 const SERVER_HANDLER_ROOT = 'service'
 
 const ORYX_CONFIG = {
+  PATH: 'editor/',
   /**
    * This file contains URI constants that may be used for XMLHTTPRequests.
    * 此文件包含可用于xmlhttpRequests的uri常量

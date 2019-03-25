@@ -1,4 +1,10 @@
 import Shape from './Shape'
+import ORYX_Bounds from './Bounds'
+import ORYX_SVG from './SVG'
+import ORYX_Edge from './Edge'
+import ORYX_Controls from './Controls'
+import ORYX_Config from '../CONFIG'
+import ORYX_Log from '../Log'
 
 /**
  * @classDescription Abstract base class for all Nodes.
@@ -18,7 +24,7 @@ export default class Node extends Shape {
     this._dockerUpdated = false
     this.facade = facade
 
-    this._oldBounds = new ORYX.Core.Bounds() // init bounds with undefined values
+    this._oldBounds = new ORYX_Bounds() // init bounds with undefined values
     this._svgShapes = [] // array of all SVGShape objects of
     // SVG representation
 
@@ -44,12 +50,12 @@ export default class Node extends Shape {
   _update () {
     this.dockers.invoke('update')
     if (this.isChanged) {
-      var bounds = this.bounds
-      var oldBounds = this._oldBounds
+      let bounds = this.bounds
+      let oldBounds = this._oldBounds
 
       if (this.isResized) {
-        var widthDelta = bounds.width() / oldBounds.width()
-        var heightDelta = bounds.height() / oldBounds.height()
+        let widthDelta = bounds.width() / oldBounds.width()
+        let heightDelta = bounds.height() / oldBounds.height()
 
         // iterate over all relevant svg elements and resize them
         this._svgShapes.each(function (svgShape) {
@@ -63,9 +69,9 @@ export default class Node extends Shape {
           }
 
           //check, if anchors are set
-          var anchorOffset
-          var leftIncluded = svgShape.anchorLeft
-          var rightIncluded = svgShape.anchorRight
+          let anchorOffset
+          let leftIncluded = svgShape.anchorLeft
+          let rightIncluded = svgShape.anchorRight
 
           if (rightIncluded) {
             anchorOffset = oldBounds.width() - (svgShape.oldX + svgShape.oldWidth)
@@ -81,8 +87,8 @@ export default class Node extends Shape {
             }
           }
 
-          var topIncluded = svgShape.anchorTop
-          var bottomIncluded = svgShape.anchorBottom
+          let topIncluded = svgShape.anchorTop
+          let bottomIncluded = svgShape.anchorBottom
 
           if (bottomIncluded) {
             anchorOffset = oldBounds.height() - (svgShape.oldY + svgShape.oldHeight)
@@ -103,7 +109,7 @@ export default class Node extends Shape {
         })
 
         //check, if the current bounds is unallowed horizontally or vertically resized
-        var p = {
+        let p = {
           x: 0,
           y: 0
         }
@@ -122,10 +128,9 @@ export default class Node extends Shape {
           x: 0,
           y: 0
         }
-        var widthDifference, heightDifference
+        let widthDifference, heightDifference
         if (this.minimumSize) {
-
-          ORYX.Log.debug('Shape (%0)\'s min size: (%1x%2)', this, this.minimumSize.width, this.minimumSize.height)
+          ORYX_Log.debug('Shape (%0)\'s min size: (%1x%2)', this, this.minimumSize.width, this.minimumSize.height)
           widthDifference = this.minimumSize.width - bounds.width()
           if (widthDifference > 0) {
             p.x += widthDifference
@@ -136,8 +141,7 @@ export default class Node extends Shape {
           }
         }
         if (this.maximumSize) {
-
-          ORYX.Log.debug('Shape (%0)\'s max size: (%1x%2)', this, this.maximumSize.width, this.maximumSize.height)
+          ORYX_Log.debug('Shape (%0)\'s max size: (%1x%2)', this, this.maximumSize.width, this.maximumSize.height)
           widthDifference = bounds.width() - this.maximumSize.width
           if (widthDifference > 0) {
             p.x -= widthDifference
@@ -151,7 +155,7 @@ export default class Node extends Shape {
           bounds.extend(p)
         }
 
-        var leftIncluded, rightIncluded, topIncluded, bottomIncluded, center, newX, newY
+        let leftIncluded, rightIncluded, topIncluded, bottomIncluded, center, newX, newY
 
         this.magnets.each(function (magnet) {
           leftIncluded = magnet.anchorLeft
@@ -221,7 +225,7 @@ export default class Node extends Shape {
         })
 
         //update docker
-        var docker = this.dockers[0]
+        let docker = this.dockers[0]
         if (docker) {
           docker.bounds.unregisterCallback(this._dockerChangedCallback)
           if (!this._dockerUpdated) {
@@ -243,7 +247,7 @@ export default class Node extends Shape {
     }
 
     this.children.each(function (value) {
-      if (!(value instanceof ORYX.Core.Controls.Docker)) {
+      if (!(value instanceof ORYX_Controls.Docker)) {
         value._update()
       }
     })
@@ -270,11 +274,12 @@ export default class Node extends Shape {
    * of the shape.
    */
   refresh () {
-    arguments.callee.$.refresh.apply(this, arguments)
+    // arguments.callee.$.refresh.apply(this, arguments)
+    super.refresh()
 
     /** Movement */
-    var x = this.bounds.upperLeft().x
-    var y = this.bounds.upperLeft().y
+    let x = this.bounds.upperLeft().x
+    let y = this.bounds.upperLeft().y
 
     // Move owner element
     this.node.firstChild.setAttributeNS(null, 'transform', 'translate(' + x + ', ' + y + ')')
@@ -290,7 +295,7 @@ export default class Node extends Shape {
   }
 
   _dockerChanged () {
-    var docker = this.dockers[0]
+    let docker = this.dockers[0]
 
     //set the bounds of the the association
     this.bounds.centerMoveTo(docker.bounds.center())
@@ -308,9 +313,9 @@ export default class Node extends Shape {
    * @return {Array} Array of SVGShape objects
    */
   _initSVGShapes (svgNode) {
-    var svgShapes = []
+    let svgShapes = []
     try {
-      var svgShape = new ORYX.Core.SVG.SVGShape(svgNode)
+      let svgShape = new ORYX_SVG.SVGShape(svgNode)
       svgShapes.push(svgShape)
     }
     catch (e) {
@@ -318,7 +323,7 @@ export default class Node extends Shape {
     }
 
     if (svgNode.hasChildNodes()) {
-      for (var i = 0; i < svgNode.childNodes.length; i++) {
+      for (let i = 0; i < svgNode.childNodes.length; i++) {
         svgShapes = svgShapes.concat(this._initSVGShapes(svgNode.childNodes[i]))
       }
     }
@@ -334,7 +339,7 @@ export default class Node extends Shape {
    */
   isPointIncluded (pointX, pointY, absoluteBounds) {
     // If there is an arguments with the absoluteBounds
-    var absBounds = absoluteBounds && absoluteBounds instanceof ORYX.Core.Bounds ? absoluteBounds : this.absoluteBounds()
+    let absBounds = absoluteBounds && absoluteBounds instanceof ORYX_Bounds ? absoluteBounds : this.absoluteBounds()
 
     if (!absBounds.isIncluded(pointX, pointY)) {
       return false
@@ -343,14 +348,14 @@ export default class Node extends Shape {
     }
 
 
-    //point = Object.clone(point);
-    var ul = absBounds.upperLeft()
-    var x = pointX - ul.x
-    var y = pointY - ul.y
+    // point = Object.clone(point);
+    let ul = absBounds.upperLeft()
+    let x = pointX - ul.x
+    let y = pointY - ul.y
 
-    var i = 0
+    let i = 0
     do {
-      var isPointIncluded = this._svgShapes[i++].isPointIncluded(x, y)
+      let isPointIncluded = this._svgShapes[i++].isPointIncluded(x, y)
     } while (!isPointIncluded && i < this._svgShapes.length)
 
     return isPointIncluded
@@ -365,13 +370,13 @@ export default class Node extends Shape {
    * @param {Point}
    */
   isPointOverOffset (pointX, pointY) {
-    var isOverEl = arguments.callee.$.isPointOverOffset.apply(this, arguments)
+    // var isOverEl = arguments.callee.$.isPointOverOffset.apply(this, arguments)
+    let isOverEl = super.isPointOverOffset.apply(pointX, pointY)
 
     if (isOverEl) {
-
       // If there is an arguments with the absoluteBounds
-      var absBounds = this.absoluteBounds()
-      absBounds.widen(-ORYX.CONFIG.BORDER_OFFSET)
+      let absBounds = this.absoluteBounds()
+      absBounds.widen(ORYX_Config.BORDER_OFFSET)
 
       if (!absBounds.isIncluded(pointX, pointY)) {
         return true
@@ -383,13 +388,14 @@ export default class Node extends Shape {
   }
 
   serialize () {
-    var result = arguments.callee.$.serialize.apply(this)
+    // var result = arguments.callee.$.serialize.apply(this)
+    let result = super.serialize()
 
     // Add the docker's bounds
     // nodes only have at most one docker!
     this.dockers.each((function (docker) {
       if (docker.getDockedShape()) {
-        var center = docker.referencePoint
+        let center = docker.referencePoint
         center = center ? center : docker.bounds.center()
         result.push({
           name: 'docker',
@@ -404,7 +410,7 @@ export default class Node extends Shape {
     try {
       //result = this.getStencil().serialize(this, result);
 
-      var serializeEvent = this.getStencil().serialize()
+      let serializeEvent = this.getStencil().serialize()
 
       /*
        * call serialize callback by reference, result should be found
@@ -429,9 +435,10 @@ export default class Node extends Shape {
   }
 
   deserialize (data) {
-    arguments.callee.$.deserialize.apply(this, arguments)
+    // arguments.callee.$.deserialize.apply(this, arguments)
+    super.deserialize(data)
     try {
-      var deserializeEvent = this.getStencil().deserialize()
+      let deserializeEvent = this.getStencil().deserialize()
       /*
        * call serialize callback by reference, result should be found
        * in serializeEventInfo.result
@@ -452,7 +459,7 @@ export default class Node extends Shape {
     }
 
     // Set the outgoing shapes
-    var outgoing = data.findAll(function (ser) {
+    let outgoing = data.findAll(function (ser) {
       return (ser.prefix + '-' + ser.name) == 'raziel-outgoing'
     })
     outgoing.each((function (obj) {
@@ -462,10 +469,10 @@ export default class Node extends Shape {
       }
 
       // Set outgoing Shape
-      var next = this.getCanvas().getChildShapeByResourceId(obj.value)
+      let next = this.getCanvas().getChildShapeByResourceId(obj.value)
 
       if (next) {
-        if (next instanceof ORYX.Core.Edge) {
+        if (next instanceof ORYX_Edge) {
           //Set the first docker of the next shape
           next.dockers.first().setDockedShape(this)
           next.dockers.first().setReferencePoint(next.dockers.first().bounds.center())
@@ -478,20 +485,19 @@ export default class Node extends Shape {
     }).bind(this))
 
     if (this.dockers.length === 1) {
-      var dockerPos
+      let dockerPos
       dockerPos = data.find(function (entry) {
         return (entry.prefix + '-' + entry.name === 'oryx-dockers')
       })
 
       if (dockerPos) {
-        var points = dockerPos.value.replace(/,/g, ' ').split(' ').without('').without('#')
+        let points = dockerPos.value.replace(/,/g, ' ').split(' ').without('').without('#')
         if (points.length === 2 && this.dockers[0].getDockedShape()) {
           this.dockers[0].setReferencePoint({
             x: parseFloat(points[0]),
             y: parseFloat(points[1])
           })
-        }
-        else {
+        } else {
           this.dockers[0].bounds.centerMoveTo(parseFloat(points[0]), parseFloat(points[1]))
         }
       }
@@ -507,30 +513,29 @@ export default class Node extends Shape {
    * @param {SVGDocument} svgDocument
    */
   _init (svgDocument) {
-    arguments.callee.$._init.apply(this, arguments)
-    var svgNode = svgDocument.getElementsByTagName('g')[0] //outer most g node
+    // arguments.callee.$._init.apply(this, arguments)
+    super._init(svgDocument)
+    let svgNode = svgDocument.getElementsByTagName('g')[0] //outer most g node
     // set all required attributes
-    var attributeTitle = svgDocument.ownerDocument.createAttribute('title')
+    let attributeTitle = svgDocument.ownerDocument.createAttribute('title')
     attributeTitle.nodeValue = this.getStencil().title()
     svgNode.setAttributeNode(attributeTitle)
 
-    var attributeId = svgDocument.ownerDocument.createAttribute('id')
+    let attributeId = svgDocument.ownerDocument.createAttribute('id')
     attributeId.nodeValue = this.id
     svgNode.setAttributeNode(attributeId)
 
-
-    //
-    var stencilTargetNode = this.node.childNodes[0].childNodes[0] //<g class=me>"
+    let stencilTargetNode = this.node.childNodes[0].childNodes[0] //<g class=me>"
     svgNode = stencilTargetNode.appendChild(svgNode)
 
     // Add to the EventHandler
     this.addEventHandlers(svgNode.parentNode)
 
     /**set minimum and maximum size*/
-    var minSizeAttr = svgNode.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'minimumSize')
+    let minSizeAttr = svgNode.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'minimumSize')
     if (minSizeAttr) {
       minSizeAttr = minSizeAttr.replace('/,/g', ' ')
-      var minSizeValues = minSizeAttr.split(' ')
+      let minSizeValues = minSizeAttr.split(' ')
       minSizeValues = minSizeValues.without('')
 
       if (minSizeValues.length > 1) {
@@ -548,10 +553,10 @@ export default class Node extends Shape {
       }
     }
 
-    var maxSizeAttr = svgNode.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'maximumSize')
+    let maxSizeAttr = svgNode.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'maximumSize')
     if (maxSizeAttr) {
       maxSizeAttr = maxSizeAttr.replace('/,/g', ' ')
-      var maxSizeValues = maxSizeAttr.split(' ')
+      let maxSizeValues = maxSizeAttr.split(' ')
       maxSizeValues = maxSizeValues.without('')
 
       if (maxSizeValues.length > 1) {
@@ -575,15 +580,15 @@ export default class Node extends Shape {
     this._svgShapes = this._initSVGShapes(svgNode)
 
     // get upperLeft and lowerRight of stencil
-    var upperLeft = {
+    let upperLeft = {
       x: undefined,
       y: undefined
     }
-    var lowerRight = {
+    let lowerRight = {
       x: undefined,
       y: undefined
     }
-    var me = this
+    const me = this
     this._svgShapes.each(function (svgShape) {
       upperLeft.x = (upperLeft.x !== undefined) ? Math.min(upperLeft.x, svgShape.x) : svgShape.x
       upperLeft.y = (upperLeft.y !== undefined) ? Math.min(upperLeft.y, svgShape.y) : svgShape.y
@@ -619,8 +624,8 @@ export default class Node extends Shape {
 
     // set bounds of shape
     // the offsets are also needed for positioning the magnets and the docker
-    var offsetX = upperLeft.x
-    var offsetY = upperLeft.y
+    let offsetX = upperLeft.x
+    let offsetY = upperLeft.y
 
     lowerRight.x -= offsetX
     lowerRight.y -= offsetY
@@ -640,30 +645,30 @@ export default class Node extends Shape {
 
     /**initialize magnets */
 
-    var magnets = svgDocument.getElementsByTagNameNS(ORYX.CONFIG.NAMESPACE_ORYX, 'magnets')
+    let magnets = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_ORYX, 'magnets')
 
     if (magnets && magnets.length > 0) {
 
-      magnets = $A(magnets[0].getElementsByTagNameNS(ORYX.CONFIG.NAMESPACE_ORYX, 'magnet'))
+      magnets = $A(magnets[0].getElementsByTagNameNS(ORYX_Config.NAMESPACE_ORYX, 'magnet'))
 
-      var me = this
+      const me = this
       magnets.each(function (magnetElem) {
-        var magnet = new ORYX.Core.Controls.Magnet({
+        let magnet = new ORYX_Controls.Magnet({
           eventHandlerCallback: me.eventHandlerCallback
         })
-        var cx = parseFloat(magnetElem.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'cx'))
-        var cy = parseFloat(magnetElem.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'cy'))
+        let cx = parseFloat(magnetElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'cx'))
+        let cy = parseFloat(magnetElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'cy'))
         magnet.bounds.centerMoveTo({
           x: cx - offsetX,
           y: cy - offsetY
         })
 
         //get anchors
-        var anchors = magnetElem.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'anchors')
+        let anchors = magnetElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'anchors')
         if (anchors) {
           anchors = anchors.replace('/,/g', ' ')
           anchors = anchors.split(' ').without('')
-          for (var i = 0; i < anchors.length; i++) {
+          for (let i = 0; i < anchors.length; i++) {
             switch (anchors[i].toLowerCase()) {
               case 'left':
                 magnet.anchorLeft = true
@@ -685,7 +690,7 @@ export default class Node extends Shape {
 
         //check, if magnet is default magnet
         if (!this._defaultMagnet) {
-          var defaultAttr = magnetElem.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'default')
+          let defaultAttr = magnetElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'default')
           if (defaultAttr && defaultAttr.toLowerCase() === 'yes') {
             me._defaultMagnet = magnet
           }
@@ -693,31 +698,31 @@ export default class Node extends Shape {
       })
     } else {
       // Add a Magnet in the Center of Shape
-      var magnet = new ORYX.Core.Controls.Magnet()
+      let magnet = new ORYX_Controls.Magnet()
       magnet.bounds.centerMoveTo(this.bounds.width() / 2, this.bounds.height() / 2)
       this.add(magnet)
     }
 
     /**initialize docker */
-    var dockerElem = svgDocument.getElementsByTagNameNS(ORYX.CONFIG.NAMESPACE_ORYX, 'docker')
+    let dockerElem = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_ORYX, 'docker')
 
     if (dockerElem && dockerElem.length > 0) {
       dockerElem = dockerElem[0]
-      var docker = this.createDocker()
-      var cx = parseFloat(dockerElem.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'cx'))
-      var cy = parseFloat(dockerElem.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'cy'))
+      let docker = this.createDocker()
+      let cx = parseFloat(dockerElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'cx'))
+      let cy = parseFloat(dockerElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'cy'))
       docker.bounds.centerMoveTo({
         x: cx - offsetX,
         y: cy - offsetY
       })
 
-      //get anchors
-      var anchors = dockerElem.getAttributeNS(ORYX.CONFIG.NAMESPACE_ORYX, 'anchors')
+      // get anchors
+      let anchors = dockerElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'anchors')
       if (anchors) {
         anchors = anchors.replace('/,/g', ' ')
         anchors = anchors.split(' ').without('')
 
-        for (var i = 0; i < anchors.length; i++) {
+        for (let i = 0; i < anchors.length; i++) {
           switch (anchors[i].toLowerCase()) {
             case 'left':
               docker.anchorLeft = true
@@ -737,9 +742,9 @@ export default class Node extends Shape {
     }
 
     /**initialize labels*/
-    var textElems = svgNode.getElementsByTagNameNS(ORYX.CONFIG.NAMESPACE_SVG, 'text')
+    let textElems = svgNode.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text')
     $A(textElems).each((function (textElem) {
-      var label = new ORYX.Core.SVG.Label({
+      let label = new ORYX_SVG.Label({
         textElement: textElem,
         shapeId: this.id
       })
@@ -750,7 +755,7 @@ export default class Node extends Shape {
       label.registerOnChange(this.layout.bind(this))
 
       // Only apply fitting on form-components
-      if (this._stencil.id().indexOf(ORYX.CONFIG.FORM_ELEMENT_ID_PREFIX) == 0) {
+      if (this._stencil.id().indexOf(ORYX_Config.FORM_ELEMENT_ID_PREFIX) == 0) {
         label.registerOnChange(this.fitToLabels.bind(this))
       }
 
@@ -758,21 +763,20 @@ export default class Node extends Shape {
   }
 
   fitToLabels () {
-    var y = 0
-
+    let y = 0
     this.getLabels().each(function (label) {
-      var lr = label.getY() + label.getHeight()
+      let lr = label.getY() + label.getHeight()
       if (lr > y) {
         y = lr
       }
     })
 
-    var bounds = this.bounds
-    var boundsChanged = false
+    let bounds = this.bounds
+    let boundsChanged = false
 
     if (this.minimumSize) {
       // Check if y-value exceeds the min-value. If not, stick to this value.
-      var minHeight = this.minimumSize.height
+      let minHeight = this.minimumSize.height
       if (y < minHeight && bounds.height() > minHeight && minHeight > this.forcedHeight) {
         bounds.set(bounds.upperLeft().x, bounds.upperLeft().y, bounds.lowerRight().x, bounds.upperLeft().y + minHeight)
         boundsChanged = true
@@ -793,7 +797,7 @@ export default class Node extends Shape {
 
       // Re-select if needed to force the select
       if (this.facade.getSelection().member(this)) {
-        var selectedNow = this.facade.getSelection()
+        let selectedNow = this.facade.getSelection()
         this.facade.setSelection([])
         this.facade.setSelection(selectedNow)
       }
@@ -805,7 +809,7 @@ export default class Node extends Shape {
    *
    */
   createDocker () {
-    var docker = new ORYX.Core.Controls.Docker({ eventHandlerCallback: this.eventHandlerCallback })
+    let docker = new ORYX_Controls.Docker({ eventHandlerCallback: this.eventHandlerCallback })
     docker.bounds.registerCallback(this._dockerChangedCallback)
 
     this.dockers.push(docker)

@@ -1,3 +1,9 @@
+import ORYX_Command from '../core/Command'
+import ORYX_Config from '../CONFIG'
+import ORYX_Log from '../Log'
+import ORYX_Editor from '../Editor'
+import { DataManager } from '../Kickstart'
+
 /**
  This abstract plugin class can be used to build plugins on.
  It provides some more basic functionality like registering events (on*-handlers)...
@@ -26,7 +32,7 @@ export default class AbstractPlugin {
 
   constructor (facade) {
     this.facade = facade
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_LOADED, this.onLoaded.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_LOADED, this.onLoaded.bind(this))
   }
 
   /**
@@ -71,7 +77,7 @@ export default class AbstractPlugin {
 
     // Define Shapes
     shapes = shapes.map(function (shape) {
-      var el = shape
+      let el = shape
       if (typeof shape == 'string') {
         el = this.facade.getCanvas().getChildShapeByResourceId(shape)
         el = el || this.facade.getCanvas().getChildById(shape, true)
@@ -81,11 +87,11 @@ export default class AbstractPlugin {
 
     // Define unified id
     if (!this.overlayID) {
-      this.overlayID = this.type + ORYX.Editor.provideId()
+      this.overlayID = this.type + ORYX_Editor.provideId()
     }
 
     this.facade.raiseEvent({
-      type: ORYX.CONFIG.EVENT_OVERLAY_SHOW,
+      type: ORYX_Config.EVENT_OVERLAY_SHOW,
       id: this.overlayID,
       shapes: shapes,
       attributes: attributes,
@@ -101,7 +107,7 @@ export default class AbstractPlugin {
    */
   hideOverlay () {
     this.facade.raiseEvent({
-      type: ORYX.CONFIG.EVENT_OVERLAY_HIDE,
+      type: ORYX_Config.EVENT_OVERLAY_HIDE,
       id: this.overlayID
     })
   }
@@ -118,9 +124,10 @@ export default class AbstractPlugin {
       return ''
     }
 
-    var parser = new DOMParser()
-    var parsedData = parser.parseFromString(data, 'text/xml')
-    source = stylesheet
+    let parser = new DOMParser()
+    let parsedData = parser.parseFromString(data, 'text/xml')
+    let source = stylesheet
+    let xsl
     new Ajax.Request(source, {
       asynchronous: false,
       method: 'get',
@@ -128,18 +135,17 @@ export default class AbstractPlugin {
         xsl = transport.responseText
       }.bind(this),
       onFailure: (function (transport) {
-        ORYX.Log.error('XSL load failed' + transport)
+        ORYX_Log.error('XSL load failed' + transport)
       }).bind(this)
     })
-    var xsltProcessor = new XSLTProcessor()
-    var domParser = new DOMParser()
-    var xslObject = domParser.parseFromString(xsl, 'text/xml')
+    let xsltProcessor = new XSLTProcessor()
+    let domParser = new DOMParser()
+    let xslObject = domParser.parseFromString(xsl, 'text/xml')
     xsltProcessor.importStylesheet(xslObject)
 
     try {
-
-      var newData = xsltProcessor.transformToFragment(parsedData, document)
-      var serializedData = (new XMLSerializer()).serializeToString(newData)
+      let newData = xsltProcessor.transformToFragment(parsedData, document)
+      let serializedData = (new XMLSerializer()).serializeToString(newData)
 
       /* Firefox 2 to 3 problem?! */
       serializedData = !serializedData.startsWith('<?xml') ? '<?xml version="1.0" encoding="UTF-8"?>' + serializedData : serializedData
@@ -160,7 +166,7 @@ export default class AbstractPlugin {
    * openDownloadWindow( "my.xml", "<exampleXML />" );
    */
   openXMLWindow (content) {
-    var win = window.open(
+    let win = window.open(
       'data:application/xml,' + encodeURIComponent(
       content
       ),
@@ -175,15 +181,15 @@ export default class AbstractPlugin {
    * @param {String} content The content to download
    */
   openDownloadWindow (filename, content) {
-    var win = window.open('')
+    let win = window.open('')
     if (win != null) {
       win.document.open()
       win.document.write('<html><body>')
-      var submitForm = win.document.createElement('form')
+      let submitForm = win.document.createElement('form')
       win.document.body.appendChild(submitForm)
 
-      var createHiddenElement = function (name, value) {
-        var newElement = document.createElement('input')
+      let createHiddenElement = function (name, value) {
+        let newElement = document.createElement('input')
         newElement.name = name
         newElement.type = 'hidden'
         newElement.value = value
@@ -197,7 +203,7 @@ export default class AbstractPlugin {
       submitForm.method = 'POST'
       win.document.write('</body></html>')
       win.document.close()
-      submitForm.action = ORYX.PATH + '/download'
+      submitForm.action = ORYX_Config.PATH + '/download'
       submitForm.submit()
     }
   }
@@ -209,9 +215,9 @@ export default class AbstractPlugin {
    */
   getSerializedDOM () {
     // Force to set all resource IDs
-    var serializedDOM = DataManager.serializeDOM(this.facade)
+    let serializedDOM = DataManager.serializeDOM(this.facade)
 
-    //add namespaces
+    // add namespaces
     serializedDOM = '<?xml version="1.0" encoding="utf-8"?>' +
       '<html xmlns="http://www.w3.org/1999/xhtml" ' +
       'xmlns:b3mn="http://b3mn.org/2007/b3mn" ' +
@@ -241,7 +247,7 @@ export default class AbstractPlugin {
    */
   enableReadOnlyMode () {
     //Edges cannot be moved anymore
-    this.facade.disableEvent(ORYX.CONFIG.EVENT_MOUSEDOWN)
+    this.facade.disableEvent(ORYX_Config.EVENT_MOUSEDOWN)
 
     // Stop the user from editing the diagram while the plugin is active
     this._stopSelectionChange = function () {
@@ -249,7 +255,7 @@ export default class AbstractPlugin {
         this.facade.setSelection([])
       }
     }
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, this._stopSelectionChange.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_SELECTION_CHANGED, this._stopSelectionChange.bind(this))
   }
 
   /**
@@ -259,10 +265,10 @@ export default class AbstractPlugin {
    */
   disableReadOnlyMode () {
     // Edges can be moved now again
-    this.facade.enableEvent(ORYX.CONFIG.EVENT_MOUSEDOWN)
+    this.facade.enableEvent(ORYX_Config.EVENT_MOUSEDOWN)
 
     if (this._stopSelectionChange) {
-      this.facade.unregisterOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, this._stopSelectionChange.bind(this))
+      this.facade.unregisterOnEvent(ORYX_Config.EVENT_SELECTION_CHANGED, this._stopSelectionChange.bind(this))
       this._stopSelectionChange = undefined
     }
   }
@@ -275,8 +281,8 @@ export default class AbstractPlugin {
   getRDFFromDOM () {
     //convert to RDF
     try {
-      var xsl = ''
-      source = ORYX.PATH + 'lib/extract-rdf.xsl'
+      let xsl = ''
+      let source = ORYX_Config.PATH + 'lib/extract-rdf.xsl'
       new Ajax.Request(source, {
         asynchronous: false,
         method: 'get',
@@ -284,26 +290,23 @@ export default class AbstractPlugin {
           xsl = transport.responseText
         }.bind(this),
         onFailure: (function (transport) {
-          ORYX.Log.error('XSL load failed' + transport)
+          ORYX_Log.error('XSL load failed' + transport)
         }).bind(this)
       })
 
-      var domParser = new DOMParser()
-      var xmlObject = domParser.parseFromString(this.getSerializedDOM(), 'text/xml')
-      var xslObject = domParser.parseFromString(xsl, 'text/xml')
-      var xsltProcessor = new XSLTProcessor()
+      let domParser = new DOMParser()
+      let xmlObject = domParser.parseFromString(this.getSerializedDOM(), 'text/xml')
+      let xslObject = domParser.parseFromString(xsl, 'text/xml')
+      let xsltProcessor = new XSLTProcessor()
       xsltProcessor.importStylesheet(xslObject)
-      var result = xsltProcessor.transformToFragment(xmlObject, document)
-
-      var serializer = new XMLSerializer()
+      let result = xsltProcessor.transformToFragment(xmlObject, document)
+      let serializer = new XMLSerializer()
 
       return serializer.serializeToString(result)
     } catch (e) {
       console.log('error serializing ' + e)
       return ''
     }
-
-
   }
 
   /**
@@ -333,13 +336,12 @@ export default class AbstractPlugin {
     // Raises a do layout event
     if (this.facade.raiseEvent) {
       this.facade.raiseEvent({
-        type: ORYX.CONFIG.EVENT_LAYOUT,
+        type: ORYX_Config.EVENT_LAYOUT,
         shapes: shapes
       })
-    }
-    else {
+    } else {
       this.facade.handleEvents({
-        type: ORYX.CONFIG.EVENT_LAYOUT,
+        type: ORYX_Config.EVENT_LAYOUT,
         shapes: shapes
       })
     }
@@ -354,12 +356,11 @@ export default class AbstractPlugin {
    * @param {Array} edges
    */
   layoutEdges (node, allEdges, offset) {
-
     if (!this.facade.isExecutingCommands()) {
       return
     }
 
-    var Command = ORYX.Core.Command.extend({
+    let Command = ORYX_Command.extend({
       construct: function (edges, node, offset, plugin) {
         this.edges = edges
         this.node = node
@@ -367,13 +368,10 @@ export default class AbstractPlugin {
         this.offset = offset
 
         // Get the new absolute center
-        var center = node.absoluteXY()
+        let center = node.absoluteXY()
         this.ulo = { x: center.x - offset.x, y: center.y - offset.y }
-
-
       },
       execute: function () {
-
         if (this.changes) {
           this.executeAgain()
           return
@@ -450,11 +448,9 @@ export default class AbstractPlugin {
        * @params {Object} bounds2
        */
       align: function (bounds, refDocker) {
-
-        var abRef = refDocker.getAbsoluteReferencePoint() || refDocker.bounds.center()
-
-        var xdif = bounds.center().x - abRef.x
-        var ydif = bounds.center().y - abRef.y
+        let abRef = refDocker.getAbsoluteReferencePoint() || refDocker.bounds.center()
+        let xdif = bounds.center().x - abRef.x
+        let ydif = bounds.center().y - abRef.y
         if (Math.abs(-Math.abs(xdif) + Math.abs(this.offset.x)) < 3 && this.offset.xs === undefined) {
           bounds.moveBy({ x: -xdif, y: 0 })
         }
@@ -463,7 +459,7 @@ export default class AbstractPlugin {
         }
 
         if (this.offset.xs !== undefined || this.offset.ys !== undefined) {
-          var absPXY = refDocker.getDockedShape().absoluteXY()
+          let absPXY = refDocker.getDockedShape().absoluteXY()
           xdif = bounds.center().x - (absPXY.x + ((abRef.x - absPXY.x) / this.offset.xs))
           ydif = bounds.center().y - (absPXY.y + ((abRef.y - absPXY.y) / this.offset.ys))
 
@@ -482,8 +478,8 @@ export default class AbstractPlugin {
        */
       isBendPointIncluded: function (edge) {
         // Get absolute bounds
-        var ab = edge.dockers.first().getDockedShape()
-        var bb = edge.dockers.last().getDockedShape()
+        let ab = edge.dockers.first().getDockedShape()
+        let bb = edge.dockers.last().getDockedShape()
 
         if (ab) {
           ab = ab.absoluteBounds()
@@ -497,7 +493,7 @@ export default class AbstractPlugin {
 
         return edge.dockers
           .any(function (docker, i) {
-            var c = docker.bounds.center()
+            let c = docker.bounds.center()
             // Dont count first and last
             return i != 0 && i != edge.dockers.length - 1 &&
               // Check if the point is included to the absolute bounds
@@ -518,7 +514,7 @@ export default class AbstractPlugin {
             if (i == 0 || i == change.dockerPositions.length - 1) {
               return
             }
-            var docker = change.edge.createDocker(undefined, pos)
+            let docker = change.edge.createDocker(undefined, pos)
             docker.bounds.centerMoveTo(pos)
             docker.update()
           }.bind(this))
@@ -533,7 +529,7 @@ export default class AbstractPlugin {
             if (i == 0 || i == change.oldDockerPositions.length - 1) {
               return
             }
-            var docker = change.edge.createDocker(undefined, pos)
+            let docker = change.edge.createDocker(undefined, pos)
             docker.bounds.centerMoveTo(pos)
             docker.update()
           }.bind(this))
@@ -543,6 +539,5 @@ export default class AbstractPlugin {
     })
 
     this.facade.executeCommands([new Command(allEdges, node, offset, this)])
-
   }
 }

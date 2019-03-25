@@ -1,19 +1,8 @@
-import UIObject from './UIObject'
-import ORYX_Editor from '../Editor'
-import Node from './Node'
-import ORYX_Config from '../CONFIG'
-import Edge from './Edge'
-
-/**
- * @classDescription Abstract base class for all Controls.
- */
-
-class Control extends UIObject {
-  toString () {
-    return 'Control ' + this.id
-  }
-}
-
+import Control from './Control'
+import ORYX_Config from '../../CONFIG'
+import ORYX_Utils from '../../Utils'
+// import Node from '../Node'
+// import Edge from '../Edge'
 
 /**
  * @classDescription Represents a movable docker that can be bound to a shape. Dockers are used
@@ -22,7 +11,7 @@ class Control extends UIObject {
  *
  * TODO absoluteXY und absoluteCenterXY von einem Docker liefern falsche Werte!!!
  */
-class Docker extends Control {
+export default class Docker extends Control {
   constructor () {
     // arguments.callee.$.construct.apply(this, arguments);
     super()
@@ -40,10 +29,10 @@ class Docker extends Control {
     this.anchorTop = null
     this.anchorBottom = null
 
-    this.node = ORYX_Editor.graft('http://www.w3.org/2000/svg', null, ['g'])
+    this.node = ORYX_Utils.graft('http://www.w3.org/2000/svg', null, ['g'])
 
     // The DockerNode reprasentation
-    this._dockerNode = ORYX_Editor.graft('http://www.w3.org/2000/svg',
+    this._dockerNode = ORYX_Utils.graft('http://www.w3.org/2000/svg',
       this.node,
       ['g', { 'pointer-events': 'all' },
         ['circle', { cx: '8', cy: '8', r: '8', stroke: 'none', fill: 'none' }],
@@ -51,7 +40,7 @@ class Docker extends Control {
       ])
 
     // The ReferenzNode reprasentation
-    this._referencePointNode = ORYX_Editor.graft('http://www.w3.org/2000/svg',
+    this._referencePointNode = ORYX_Utils.graft('http://www.w3.org/2000/svg',
       this.node,
       ['g', { 'pointer-events': 'none' },
         ['circle', {
@@ -75,30 +64,31 @@ class Docker extends Control {
   update () {
     // If there have an DockedShape
     if (this._dockedShape) {
-      if (this._dockedShapeBounds && this._dockedShape instanceof Node) {
-        // Calc the delta of width and height of the lastBounds and the current Bounds
-        let dswidth = this._dockedShapeBounds.width()
-        let dsheight = this._dockedShapeBounds.height()
-        if (!dswidth) {
-          dswidth = 1
-        }
-        if (!dsheight) {
-          dsheight = 1
-        }
-
-        let widthDelta = this._dockedShape.bounds.width() / dswidth
-        let heightDelta = this._dockedShape.bounds.height() / dsheight
-
-        // If there is an different
-        if (widthDelta !== 1.0 || heightDelta !== 1.0) {
-          // Set the delta
-          this.referencePoint.x *= widthDelta
-          this.referencePoint.y *= heightDelta
-        }
-
-        // Clone these bounds
-        this._dockedShapeBounds = this._dockedShape.bounds.clone()
-      }
+      //todo open
+      // if (this._dockedShapeBounds && this._dockedShape instanceof Node) {
+      //   // Calc the delta of width and height of the lastBounds and the current Bounds
+      //   let dswidth = this._dockedShapeBounds.width()
+      //   let dsheight = this._dockedShapeBounds.height()
+      //   if (!dswidth) {
+      //     dswidth = 1
+      //   }
+      //   if (!dsheight) {
+      //     dsheight = 1
+      //   }
+      //
+      //   let widthDelta = this._dockedShape.bounds.width() / dswidth
+      //   let heightDelta = this._dockedShape.bounds.height() / dsheight
+      //
+      //   // If there is an different
+      //   if (widthDelta !== 1.0 || heightDelta !== 1.0) {
+      //     // Set the delta
+      //     this.referencePoint.x *= widthDelta
+      //     this.referencePoint.y *= heightDelta
+      //   }
+      //
+      //   // Clone these bounds
+      //   this._dockedShapeBounds = this._dockedShape.bounds.clone()
+      // }
 
       // Get the first and the last Docker of the parent Shape
       let dockerIndex = this.parent.dockers.indexOf(this)
@@ -187,11 +177,12 @@ class Docker extends Control {
 
     if (p && this._dockedShape) {
       let upL
-      if (this.parent instanceof ORYX.Core.Edge) {
-        upL = this._dockedShape.absoluteXY()
-      } else {
-        upL = this._dockedShape.bounds.upperLeft()
-      }
+      // todo open
+      // if (this.parent instanceof Edge) {
+      //   upL = this._dockedShape.absoluteXY()
+      // } else {
+      //   upL = this._dockedShape.bounds.upperLeft()
+      // }
       p.x += upL.x
       p.y += upL.y
     } else {
@@ -256,7 +247,7 @@ class Docker extends Control {
     // Set the new Shape
     this._dockedShape = shape
     this._dockedShapeBounds = undefined
-    var referencePoint = undefined
+    let referencePoint = undefined
 
     // If there is an Shape, register the updateCallback if there are changes in the shape bounds
     if (this._dockedShape) {
@@ -350,11 +341,12 @@ class Docker extends Control {
     this.node.setAttributeNS(null, 'visibility', 'visible')
 
     // Hide reference point if the connected shape is an edge
-    if (this.getDockedShape() instanceof Edge) {
-      this._referencePointNode.setAttributeNS(null, 'visibility', 'hidden')
-    } else {
-      this._referencePointNode.setAttributeNS(null, 'visibility', 'visible')
-    }
+    // todo open
+    // if (this.getDockedShape() instanceof Edge) {
+    //   this._referencePointNode.setAttributeNS(null, 'visibility', 'hidden')
+    // } else {
+    //   this._referencePointNode.setAttributeNS(null, 'visibility', 'visible')
+    // }
 
     this.children.each(function (uiObj) {
       uiObj.show()
@@ -364,70 +356,3 @@ class Docker extends Control {
     return 'Docker ' + this.id
   }
 }
-
-/**
- * @classDescription Represents a magnet that is part of another shape and can
- * be attached to dockers. Magnets are used for linking edge objects
- * to other Shape objects.
- * @extends {Control}
- */
-class Magnet extends Control {
-  constructor() {
-    // arguments.callee.$.construct.apply(this, arguments)
-    super()
-    //this.anchors = [];
-    this.anchorLeft = null
-    this.anchorRight = null
-    this.anchorTop = null
-    this.anchorBottom = null
-
-    this.bounds.set(0, 0, 16, 16)
-
-    // graft magnet's root node into owner's control group.
-    this.node = ORYX_Editor.graft('http://www.w3.org/2000/svg',
-      null,
-      ['g', { 'pointer-events': 'all' },
-        ['circle', { cx: '8', cy: '8', r: '4', stroke: 'none', fill: 'red', 'fill-opacity': '0.3' }]
-      ])
-
-    this.hide()
-  }
-  update() {
-    // arguments.callee.$.update.apply(this, arguments)
-    super.update()
-    //this.isChanged = true;
-  }
-  _update() {
-    // arguments.callee.$.update.apply(this, arguments)
-    super.update()
-    //this.isChanged = true;
-  }
-  refresh () {
-    // arguments.callee.$.refresh.apply(this, arguments)
-    super.refresh()
-    let p = this.bounds.upperLeft()
-    /*if(this.parent) {
-     var parentPos = this.parent.bounds.upperLeft();
-     p.x += parentPos.x;
-     p.y += parentPos.y;
-     }*/
-
-    this.node.setAttributeNS(null, 'transform', 'translate(' + p.x + ', ' + p.y + ')')
-  }
-  show () {
-    //this.refresh();
-    // arguments.callee.$.show.apply(this, arguments)
-    super.show()
-  }
-  toString() {
-    return 'Magnet ' + this.id
-  }
-}
-
-const Controls = {
-  Control: Control,
-  Docker: Docker,
-  Magnet: Magnet
-}
-
-export default Controls

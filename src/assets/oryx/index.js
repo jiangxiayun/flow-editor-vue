@@ -8,17 +8,18 @@ import Shape from './core/Shape'
 import Node from './core/Node'
 import Edge from './core/Edge'
 import Move from './core/Move'
-import Controls from './core/Controls'
+import Controls from './core/Controls/index'
 import Math from './core/Math'
 
 import StencilSet from './core/StencilSet/index'
 import SVG from './core/SVG'
+import { UIEnableDrag, UIDragCallback, UIDisableDrag } from './core/UIEnableDrag'
 
 import Editor from './Editor'
 import Plugins from './Plugins'
 import Utils from './Utils'
 import CONFIG from './CONFIG'
-
+import Log from './Log'
 
 const ORYX = {
   //set the path in the config.js file!!!!
@@ -233,6 +234,8 @@ const ORYX = {
 }
 
 ORYX.CONFIG = CONFIG
+ORYX.Log = Log
+
 ORYX.Core = {}
 ORYX.Core.Command = Command
 ORYX.Core.Bounds = Bounds
@@ -244,75 +247,10 @@ ORYX.Core.Shape = Shape
 ORYX.Core.Node = Node
 ORYX.Core.Edge = Edge
 ORYX.Core.Move = Move
-
-
-
-ORYX.Core.UIEnableDrag = function (event, uiObj, option) {
-
-  this.uiObj = uiObj;
-  var upL = uiObj.bounds.upperLeft();
-
-  var a = uiObj.node.getScreenCTM();
-  this.faktorXY = {x: a.a, y: a.d};
-
-  this.scrollNode = uiObj.node.ownerSVGElement.parentNode.parentNode;
-
-  this.offSetPosition = {
-    x: Event.pointerX(event) - (upL.x * this.faktorXY.x),
-    y: Event.pointerY(event) - (upL.y * this.faktorXY.y)
-  };
-
-  this.offsetScroll = {x: this.scrollNode.scrollLeft, y: this.scrollNode.scrollTop};
-
-  this.dragCallback = ORYX.Core.UIDragCallback.bind(this);
-  this.disableCallback = ORYX.Core.UIDisableDrag.bind(this);
-
-  this.movedCallback = option ? option.movedCallback : undefined;
-  this.upCallback = option ? option.upCallback : undefined;
-
-  document.documentElement.addEventListener(ORYX.CONFIG.EVENT_MOUSEUP, this.disableCallback, true);
-  document.documentElement.addEventListener(ORYX.CONFIG.EVENT_MOUSEMOVE, this.dragCallback, false);
-
-};
-
-ORYX.Core.UIDragCallback = function (event) {
-
-  var position = {
-    x: Event.pointerX(event) - this.offSetPosition.x,
-    y: Event.pointerY(event) - this.offSetPosition.y
-  }
-
-  position.x -= this.offsetScroll.x - this.scrollNode.scrollLeft;
-  position.y -= this.offsetScroll.y - this.scrollNode.scrollTop;
-
-  position.x /= this.faktorXY.x;
-  position.y /= this.faktorXY.y;
-
-  this.uiObj.bounds.moveTo(position);
-  //this.uiObj.update();
-
-  if (this.movedCallback)
-    this.movedCallback(event);
-
-  //Event.stop(event);
-
-};
-
-ORYX.Core.UIDisableDrag = function (event) {
-  document.documentElement.removeEventListener(ORYX.CONFIG.EVENT_MOUSEMOVE, this.dragCallback, false);
-  document.documentElement.removeEventListener(ORYX.CONFIG.EVENT_MOUSEUP, this.disableCallback, true);
-
-  if (this.upCallback)
-    this.upCallback(event);
-
-  this.upCallback = undefined;
-  this.movedCallback = undefined;
-
-  Event.stop(event);
-};
-
-
-ORYX.Core.Controls = Controls
+ORYX.Core.UIEnableDrag = UIEnableDrag
+ORYX.Core.UIDragCallback = UIDragCallback
+ORYX.Core.UIDisableDrag = UIDisableDrag
+ORYX.Core.Index = Controls
 ORYX.Core.Math = Math
 ORYX.Core.Index = StencilSet
 ORYX.Core.SVG = SVG
@@ -321,5 +259,26 @@ ORYX.Core.SVG = SVG
 ORYX.Editor = Editor
 ORYX.Plugins = Plugins
 ORYX.Utils = Utils
+
+/**
+ * Main initialization method. To be called when loading
+ * of the document, including all scripts, is completed.
+ */
+
+
+function init() {
+  ORYX.Log.debug("Querying editor instances");
+  // Hack for WebKit to set the SVGElement-Classes
+  ORYX.Editor.setMissingClasses();
+  // If someone wants to create the editor instance himself
+  if (window.onOryxResourcesLoaded) {
+    window.onOryxResourcesLoaded();
+  } else {
+    // Else fetch the model from server and display editor
+    let modelId = window.location.search.substring(4);
+    let modelUrl = "./service/model/" + modelId + "/json";
+    ORYX.Editor.createByUrl(modelUrl);
+  }
+}
 
 export default ORYX

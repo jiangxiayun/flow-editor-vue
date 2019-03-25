@@ -1,24 +1,19 @@
+import ORYX_Config from '../CONFIG'
+import ORYX_Edge from '../core/Edge'
+import ORYX_Node from '../core/Node'
+import ORYX_Shape from '../core/Shape'
 
 export default class Overlay {
-
-  facade =  undefined
-
-  styleNode =  undefined
-
-  constructor(facade) {
-
-    this.facade = facade;
-
-    this.changes = [];
-
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_OVERLAY_SHOW, this.show.bind(this));
-    this.facade.registerOnEvent(ORYX.CONFIG.EVENT_OVERLAY_HIDE, this.hide.bind(this));
+  constructor (facade) {
+    this.facade = facade
+    this.changes = []
+    this.facade.registerOnEvent(ORYX_Config.EVENT_OVERLAY_SHOW, this.show.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_OVERLAY_HIDE, this.hide.bind(this))
 
     this.styleNode = document.createElement('style')
     this.styleNode.setAttributeNS(null, 'type', 'text/css')
 
     document.getElementsByTagName('head')[0].appendChild(this.styleNode)
-
   }
 
   /**
@@ -32,14 +27,11 @@ export default class Overlay {
    *
    */
   show (options) {
-
     // Checks if all arguments are available
     if (!options ||
       !options.shapes || !options.shapes instanceof Array ||
       !options.id || !options.id instanceof String || options.id.length == 0) {
-
       return
-
     }
 
     //if( this.changes[options.id]){
@@ -54,7 +46,7 @@ export default class Overlay {
       options.shapes.each(function (el) {
 
         // Checks if the node is a Shape
-        if (!el instanceof ORYX.Core.Shape) {
+        if (!el instanceof ORYX_Shape) {
           return
         }
 
@@ -66,48 +58,48 @@ export default class Overlay {
 
     var isSVG = true
     try {
-      isSVG = options.node && options.node instanceof SVGElement;
+      isSVG = options.node && options.node instanceof SVGElement
     } catch (e) {
     }
 
     // Checks if node is setted and if this is an SVGElement
     if (options.node && isSVG) {
 
-      options["_temps"] = []
+      options['_temps'] = []
 
       // FOR EACH - Node
       options.shapes.each(function (el, index) {
 
         // Checks if the node is a Shape
-        if (!el instanceof ORYX.Core.Shape) {
+        if (!el instanceof ORYX_Shape) {
           return
         }
 
         var _temp = {}
-        _temp.svg = options.dontCloneNode ? options.node : options.node.cloneNode(true);
+        _temp.svg = options.dontCloneNode ? options.node : options.node.cloneNode(true)
 
         // Add the svg node to the ORYX-Shape
         el.node.firstChild.appendChild(_temp.svg)
 
         // If
-        if (el instanceof ORYX.Core.Edge && !options.nodePosition) {
-          options['nodePosition'] = "START"
+        if (el instanceof ORYX_Edge && !options.nodePosition) {
+          options['nodePosition'] = 'START'
         }
 
         // If the node position is setted, it has to be transformed
         if (options.nodePosition) {
 
-          var b = el.bounds;
-          var p = options.nodePosition.toUpperCase();
+          var b = el.bounds
+          var p = options.nodePosition.toUpperCase()
 
           // Check the values of START and END
-          if (el instanceof ORYX.Core.Node && p == "START") {
-            p = "NW";
-          } else if (el instanceof ORYX.Core.Node && p == "END") {
-            p = "SE";
-          } else if (el instanceof ORYX.Core.Edge && p == "START") {
+          if (el instanceof ORYX_Node && p == 'START') {
+            p = 'NW'
+          } else if (el instanceof ORYX_Node && p == 'END') {
+            p = 'SE'
+          } else if (el instanceof ORYX_Edge && p == 'START') {
             b = el.getDockers().first().bounds
-          } else if (el instanceof ORYX.Core.Edge && p == "END") {
+          } else if (el instanceof ORYX_Edge && p == 'END') {
             b = el.getDockers().last().bounds
           }
 
@@ -115,48 +107,48 @@ export default class Overlay {
           // depending on the position string
           _temp.callback = function () {
 
-            var x = 0;
-            var y = 0;
+            var x = 0
+            var y = 0
 
-            if (p == "NW") {
+            if (p == 'NW') {
               // Do Nothing
-            } else if (p == "N") {
-              x = b.width() / 2;
-            } else if (p == "NE") {
-              x = b.width();
-            } else if (p == "E") {
-              x = b.width();
-              y = b.height() / 2;
-            } else if (p == "SE") {
-              x = b.width();
-              y = b.height();
-            } else if (p == "S") {
-              x = b.width() / 2;
-              y = b.height();
-            } else if (p == "SW") {
-              y = b.height();
-            } else if (p == "W") {
-              y = b.height() / 2;
-            } else if (p == "START" || p == "END") {
-              x = b.width() / 2;
-              y = b.height() / 2;
+            } else if (p == 'N') {
+              x = b.width() / 2
+            } else if (p == 'NE') {
+              x = b.width()
+            } else if (p == 'E') {
+              x = b.width()
+              y = b.height() / 2
+            } else if (p == 'SE') {
+              x = b.width()
+              y = b.height()
+            } else if (p == 'S') {
+              x = b.width() / 2
+              y = b.height()
+            } else if (p == 'SW') {
+              y = b.height()
+            } else if (p == 'W') {
+              y = b.height() / 2
+            } else if (p == 'START' || p == 'END') {
+              x = b.width() / 2
+              y = b.height() / 2
             } else {
               return
             }
 
-            if (el instanceof ORYX.Core.Edge) {
-              x += b.upperLeft().x;
-              y += b.upperLeft().y;
+            if (el instanceof ORYX_Edge) {
+              x += b.upperLeft().x
+              y += b.upperLeft().y
             }
 
-            _temp.svg.setAttributeNS(null, "transform", "translate(" + x + ", " + y + ")")
+            _temp.svg.setAttributeNS(null, 'transform', 'translate(' + x + ', ' + y + ')')
 
           }.bind(this)
 
-          _temp.element = el;
-          _temp.callback();
+          _temp.element = el
+          _temp.callback()
 
-          b.registerCallback(_temp.callback);
+          b.registerCallback(_temp.callback)
 
         }
 
@@ -171,25 +163,23 @@ export default class Overlay {
 
     // Store the changes
     if (!this.changes[options.id]) {
-      this.changes[options.id] = [];
+      this.changes[options.id] = []
     }
 
-    this.changes[options.id].push(options);
+    this.changes[options.id].push(options)
 
   }
+
   /**
    * Hide the overlay with the spefic id
    * @param {Object} options
    */
   hide (options) {
-
     // Checks if all arguments are available
     if (!options ||
       !options.id || !options.id instanceof String || options.id.length == 0 ||
       !this.changes[options.id]) {
-
       return
-
     }
 
 
@@ -200,13 +190,13 @@ export default class Overlay {
       option.shapes.each(function (el, index) {
 
         // Checks if the node is a Shape
-        if (!el instanceof ORYX.Core.Shape) {
+        if (!el instanceof ORYX_Shape) {
           return
         }
 
         this.deleteAttributes(el.node)
 
-      }.bind(this));
+      }.bind(this))
 
 
       if (option._temps) {
@@ -228,14 +218,13 @@ export default class Overlay {
       }
 
 
-    }.bind(this));
+    }.bind(this))
 
 
-    this.changes[options.id] = null;
+    this.changes[options.id] = null
 
 
   }
-
 
   /**
    * Set the given css attributes to that node
@@ -243,12 +232,9 @@ export default class Overlay {
    * @param {Object} attributes
    */
   setAttributes (node, attributes) {
-
-
     // Get all the childs from ME
-    var childs = this.getAllChilds(node.firstChild.firstChild)
-
-    var ids = []
+    let childs = this.getAllChilds(node.firstChild.firstChild)
+    let ids = []
 
     // Add all Attributes which have relation to another node in this document and concate the pure id out of it
     // This is for example important for the markers of a edge
@@ -257,10 +243,10 @@ export default class Overlay {
         return attr.nodeValue.startsWith('url(#')
       }))
     })
-    ids = ids.flatten().compact();
+    ids = ids.flatten().compact()
     ids = ids.collect(function (s) {
       return s.nodeValue
-    }).uniq();
+    }).uniq()
     ids = ids.collect(function (s) {
       return s.slice(5, s.length - 1)
     })
@@ -268,28 +254,26 @@ export default class Overlay {
     // Add the node ID to the id
     ids.unshift(node.id + ' .me')
 
-    var attr = $H(attributes);
-    var attrValue = attr.toJSON().gsub(',', ';').gsub('"', '');
-    var attrMarkerValue = attributes.stroke ? attrValue.slice(0, attrValue.length - 1) + "; fill:" + attributes.stroke + ";}" : attrValue;
-    var attrTextValue;
+    let attr = $H(attributes)
+    let attrValue = attr.toJSON().gsub(',', ';').gsub('"', '')
+    let attrMarkerValue = attributes.stroke ? attrValue.slice(0, attrValue.length - 1) + '; fill:' + attributes.stroke + ';}' : attrValue
+    let attrTextValue
     if (attributes.fill) {
-      var copyAttr = Object.clone(attributes);
-      copyAttr.fill = "black";
-      attrTextValue = $H(copyAttr).toJSON().gsub(',', ';').gsub('"', '');
+      let copyAttr = Object.clone(attributes)
+      copyAttr.fill = 'black'
+      attrTextValue = $H(copyAttr).toJSON().gsub(',', ';').gsub('"', '')
     }
 
     // Create the CSS-Tags Style out of the ids and the attributes
-    csstags = ids.collect(function (s, i) {
-      return "#" + s + " * " + (!i ? attrValue : attrMarkerValue) + "" + (attrTextValue ? " #" + s + " text * " + attrTextValue : "")
+    let csstags = ids.collect(function (s, i) {
+      return '#' + s + ' * ' + (!i ? attrValue : attrMarkerValue) + '' + (attrTextValue ? ' #' + s + ' text * ' + attrTextValue : '')
     })
 
     // Join all the tags
-    var s = csstags.join(" ") + "\n"
+    let s = csstags.join(' ') + '\n'
 
     // And add to the end of the style tag
-    this.styleNode.appendChild(document.createTextNode(s));
-
-
+    this.styleNode.appendChild(document.createTextNode(s))
   }
 
   /**
@@ -297,29 +281,27 @@ export default class Overlay {
    * added in a special style sheet for that node
    * @param {HTMLElement} node
    */
-  deleteAttributes(node) {
-
+  deleteAttributes (node) {
     // Get all children which contains the node id
-    var delEl = $A(this.styleNode.childNodes)
+    let delEl = $A(this.styleNode.childNodes)
       .findAll(function (e) {
         return e.textContent.include('#' + node.id)
-      });
+      })
 
     // Remove all of them
     delEl.each(function (el) {
-      el.parentNode.removeChild(el);
-    });
+      el.parentNode.removeChild(el)
+    })
   }
 
   getAllChilds (node) {
-
-    var childs = $A(node.childNodes)
+    let childs = $A(node.childNodes)
 
     $A(node.childNodes).each(function (e) {
       childs.push(this.getAllChilds(e))
     }.bind(this))
 
-    return childs.flatten();
+    return childs.flatten()
   }
 
 }

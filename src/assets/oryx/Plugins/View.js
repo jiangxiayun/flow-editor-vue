@@ -1,3 +1,4 @@
+import ORYX_Config from '../CONFIG'
 
 /**
  * The view plugin offers all of zooming functionality accessible over the
@@ -8,94 +9,104 @@
  * @param {Object} facade The editor facade for plugins.
  */
 export default class View {
+  I18N = {
+    View: {
+      group: 'Zoom',
+      zoomIn: 'Zoom In',
+      zoomInDesc: 'Zoom into the model',
+      zoomOut: 'Zoom Out',
+      zoomOutDesc: 'Zoom out of the model',
+      zoomStandard: 'Zoom Standard',
+      zoomStandardDesc: 'Zoom to the standard level',
+      zoomFitToModel: 'Zoom fit to model',
+      zoomFitToModelDesc: 'Zoom to fit the model size',
+    }
+  }
   /** @lends ORYX.Plugins.View.prototype */
-  facade = undefined
-
   constructor (facade, ownPluginData) {
-    this.facade = facade;
+    this.facade = facade
     //Standard Values
-    this.zoomLevel = 1.0;
-    this.maxFitToScreenLevel = 1.5;
-    this.minZoomLevel = 0.1;
-    this.maxZoomLevel = 2.5;
-    this.diff = 5; //difference between canvas and view port, s.th. like toolbar??
+    this.zoomLevel = 1.0
+    this.maxFitToScreenLevel = 1.5
+    this.minZoomLevel = 0.1
+    this.maxZoomLevel = 2.5
+    this.diff = 5 //difference between canvas and view port, s.th. like toolbar??
 
     //Read properties
     if (ownPluginData !== undefined && ownPluginData !== null) {
       ownPluginData.get('properties').each(function (property) {
         if (property.zoomLevel) {
-          this.zoomLevel = Number(1.0);
+          this.zoomLevel = Number(1.0)
         }
         if (property.maxFitToScreenLevel) {
-          this.maxFitToScreenLevel = Number(property.maxFitToScreenLevel);
+          this.maxFitToScreenLevel = Number(property.maxFitToScreenLevel)
         }
         if (property.minZoomLevel) {
-          this.minZoomLevel = Number(property.minZoomLevel);
+          this.minZoomLevel = Number(property.minZoomLevel)
         }
         if (property.maxZoomLevel) {
-          this.maxZoomLevel = Number(property.maxZoomLevel);
+          this.maxZoomLevel = Number(property.maxZoomLevel)
         }
-      }.bind(this));
+      }.bind(this))
     }
-
 
     /* Register zoom in */
     this.facade.offer({
-      'name': ORYX.I18N.View.zoomIn,
-      'functionality': this.zoom.bind(this, [1.0 + ORYX.CONFIG.ZOOM_OFFSET]),
-      'group': ORYX.I18N.View.group,
-      'icon': ORYX.PATH + "images/magnifier_zoom_in.png",
-      'description': ORYX.I18N.View.zoomInDesc,
+      'name': this.I18N.View.zoomIn,
+      'functionality': this.zoom.bind(this, [1.0 + ORYX_Config.ZOOM_OFFSET]),
+      'group': this.I18N.View.group,
+      'icon': ORYX_Config.PATH + 'images/magnifier_zoom_in.png',
+      'description': this.I18N.View.zoomInDesc,
       'index': 1,
       'minShape': 0,
       'maxShape': 0,
       'isEnabled': function () {
         return this.zoomLevel < this.maxZoomLevel
       }.bind(this)
-    });
+    })
 
     /* Register zoom out */
     this.facade.offer({
-      'name': ORYX.I18N.View.zoomOut,
-      'functionality': this.zoom.bind(this, [1.0 - ORYX.CONFIG.ZOOM_OFFSET]),
-      'group': ORYX.I18N.View.group,
-      'icon': ORYX.PATH + "images/magnifier_zoom_out.png",
-      'description': ORYX.I18N.View.zoomOutDesc,
+      'name': this.I18N.View.zoomOut,
+      'functionality': this.zoom.bind(this, [1.0 - ORYX_Config.ZOOM_OFFSET]),
+      'group': this.I18N.View.group,
+      'icon': ORYX_Config.PATH + 'images/magnifier_zoom_out.png',
+      'description': this.I18N.View.zoomOutDesc,
       'index': 2,
       'minShape': 0,
       'maxShape': 0,
       'isEnabled': function () {
         return this._checkSize()
       }.bind(this)
-    });
+    })
 
     /* Register zoom standard */
     this.facade.offer({
-      'name': ORYX.I18N.View.zoomStandard,
+      'name': this.I18N.View.zoomStandard,
       'functionality': this.setAFixZoomLevel.bind(this, 1),
-      'group': ORYX.I18N.View.group,
-      'icon': ORYX.PATH + "images/zoom_standard.png",
+      'group': this.I18N.View.group,
+      'icon': ORYX_Config.PATH + 'images/zoom_standard.png',
       'cls': 'icon-large',
-      'description': ORYX.I18N.View.zoomStandardDesc,
+      'description': this.I18N.View.zoomStandardDesc,
       'index': 3,
       'minShape': 0,
       'maxShape': 0,
       'isEnabled': function () {
         return this.zoomLevel != 1
       }.bind(this)
-    });
+    })
 
     /* Register zoom fit to model */
     this.facade.offer({
-      'name': ORYX.I18N.View.zoomFitToModel,
+      'name': this.I18N.View.zoomFitToModel,
       'functionality': this.zoomFitToModel.bind(this),
-      'group': ORYX.I18N.View.group,
-      'icon': ORYX.PATH + "images/image.png",
-      'description': ORYX.I18N.View.zoomFitToModelDesc,
+      'group': this.I18N.View.group,
+      'icon': ORYX_Config.PATH + 'images/image.png',
+      'description': this.I18N.View.zoomFitToModelDesc,
       'index': 4,
       'minShape': 0,
       'maxShape': 0
-    });
+    })
   }
 
   /**
@@ -105,9 +116,9 @@ export default class View {
    *      the zoom level
    */
   setAFixZoomLevel (zoomLevel) {
-    this.zoomLevel = zoomLevel;
-    this._checkZoomLevelRange();
-    this.zoom(1);
+    this.zoomLevel = zoomLevel
+    this._checkZoomLevelRange()
+    this.zoom(1)
   }
 
   /**
@@ -120,36 +131,36 @@ export default class View {
   zoom (factor) {
     // TODO: Zoomen auf allen Objekten im SVG-DOM
 
-    this.zoomLevel *= factor;
-    var scrollNode = this.facade.getCanvas().getHTMLContainer().parentNode.parentNode;
-    var canvas = this.facade.getCanvas();
-    var newWidth = canvas.bounds.width() * this.zoomLevel;
-    var newHeight = canvas.bounds.height() * this.zoomLevel;
+    this.zoomLevel *= factor
+    let scrollNode = this.facade.getCanvas().getHTMLContainer().parentNode.parentNode
+    let canvas = this.facade.getCanvas()
+    let newWidth = canvas.bounds.width() * this.zoomLevel
+    let newHeight = canvas.bounds.height() * this.zoomLevel
 
     /* Set new top offset */
-    var offsetTop = (canvas.node.parentNode.parentNode.parentNode.offsetHeight - newHeight) / 2.0;
-    offsetTop = offsetTop > 20 ? offsetTop - 20 : 0;
-    canvas.node.parentNode.parentNode.style.marginTop = offsetTop + "px";
-    offsetTop += 5;
-    canvas.getHTMLContainer().style.top = offsetTop + "px";
+    let offsetTop = (canvas.node.parentNode.parentNode.parentNode.offsetHeight - newHeight) / 2.0
+    offsetTop = offsetTop > 20 ? offsetTop - 20 : 0
+    canvas.node.parentNode.parentNode.style.marginTop = offsetTop + 'px'
+    offsetTop += 5
+    canvas.getHTMLContainer().style.top = offsetTop + 'px'
 
     /*readjust scrollbar*/
-    var newScrollTop = scrollNode.scrollTop - Math.round((canvas.getHTMLContainer().parentNode.getHeight() - newHeight) / 2) + this.diff;
-    var newScrollLeft = scrollNode.scrollLeft - Math.round((canvas.getHTMLContainer().parentNode.getWidth() - newWidth) / 2) + this.diff;
+    let newScrollTop = scrollNode.scrollTop - Math.round((canvas.getHTMLContainer().parentNode.getHeight() - newHeight) / 2) + this.diff
+    let newScrollLeft = scrollNode.scrollLeft - Math.round((canvas.getHTMLContainer().parentNode.getWidth() - newWidth) / 2) + this.diff
 
     /* Set new Zoom-Level */
-    canvas.setSize({width: newWidth, height: newHeight}, true);
+    canvas.setSize({ width: newWidth, height: newHeight }, true)
 
     /* Set Scale-Factor */
-    canvas.node.setAttributeNS(null, "transform", "scale(" + this.zoomLevel + ")");
+    canvas.node.setAttributeNS(null, 'transform', 'scale(' + this.zoomLevel + ')')
 
     /* Refresh the Selection */
-    this.facade.updateSelection();
-    scrollNode.scrollTop = newScrollTop;
-    scrollNode.scrollLeft = newScrollLeft;
+    this.facade.updateSelection()
+    scrollNode.scrollTop = newScrollTop
+    scrollNode.scrollLeft = newScrollLeft
 
     /* Update the zoom-level*/
-    canvas.zoomLevel = this.zoomLevel;
+    canvas.zoomLevel = this.zoomLevel
   }
 
   /**
@@ -159,43 +170,39 @@ export default class View {
    *
    */
   zoomFitToModel () {
-
     /* Get the size of the visible area of the canvas */
-    var scrollNode = this.facade.getCanvas().getHTMLContainer().parentNode.parentNode;
-    var visibleHeight = scrollNode.getHeight() - 30;
-    var visibleWidth = scrollNode.getWidth() - 30;
-
-    var nodes = this.facade.getCanvas().getChildShapes();
+    let scrollNode = this.facade.getCanvas().getHTMLContainer().parentNode.parentNode
+    let visibleHeight = scrollNode.getHeight() - 30
+    let visibleWidth = scrollNode.getWidth() - 30
+    let nodes = this.facade.getCanvas().getChildShapes()
 
     if (!nodes || nodes.length < 1) {
-      return false;
+      return false
     }
 
     /* Calculate size of canvas to fit the model */
-    var bounds = nodes[0].absoluteBounds().clone();
+    let bounds = nodes[0].absoluteBounds().clone()
     nodes.each(function (node) {
-      bounds.include(node.absoluteBounds().clone());
-    });
-
+      bounds.include(node.absoluteBounds().clone())
+    })
 
     /* Set new Zoom Level */
-    var scaleFactorWidth = visibleWidth / bounds.width();
-    var scaleFactorHeight = visibleHeight / bounds.height();
+    let scaleFactorWidth = visibleWidth / bounds.width()
+    let scaleFactorHeight = visibleHeight / bounds.height()
 
     /* Choose the smaller zoom level to fit the whole model */
-    var zoomFactor = scaleFactorHeight < scaleFactorWidth ? scaleFactorHeight : scaleFactorWidth;
+    let zoomFactor = scaleFactorHeight < scaleFactorWidth ? scaleFactorHeight : scaleFactorWidth
 
     /*Test if maximum zoom is reached*/
     if (zoomFactor > this.maxFitToScreenLevel) {
       zoomFactor = this.maxFitToScreenLevel
     }
     /* Do zooming */
-    this.setAFixZoomLevel(zoomFactor);
+    this.setAFixZoomLevel(zoomFactor)
 
     /* Set scroll bar position */
-    scrollNode.scrollTop = Math.round(bounds.upperLeft().y * this.zoomLevel) - 5;
-    scrollNode.scrollLeft = Math.round(bounds.upperLeft().x * this.zoomLevel) - 5;
-
+    scrollNode.scrollTop = Math.round(bounds.upperLeft().y * this.zoomLevel) - 5
+    scrollNode.scrollLeft = Math.round(bounds.upperLeft().x * this.zoomLevel) - 5
   }
 
   /**
@@ -205,11 +212,11 @@ export default class View {
    * @private
    */
   _checkSize () {
-    var canvasParent = this.facade.getCanvas().getHTMLContainer().parentNode;
-    var minForCanvas = Math.min((canvasParent.parentNode.getWidth() / canvasParent.getWidth()), (canvasParent.parentNode.getHeight() / canvasParent.getHeight()));
-    return 1.05 > minForCanvas;
-
+    let canvasParent = this.facade.getCanvas().getHTMLContainer().parentNode
+    let minForCanvas = Math.min((canvasParent.parentNode.getWidth() / canvasParent.getWidth()), (canvasParent.parentNode.getHeight() / canvasParent.getHeight()))
+    return 1.05 > minForCanvas
   }
+
   /**
    * It checks if the zoom level is included in the definined zoom
    * level range.
@@ -223,11 +230,11 @@ export default class View {
      this.zoomLevel = maxForCanvas;
      }*/
     if (this.zoomLevel < this.minZoomLevel) {
-      this.zoomLevel = this.minZoomLevel;
+      this.zoomLevel = this.minZoomLevel
     }
 
     if (this.zoomLevel > this.maxZoomLevel) {
-      this.zoomLevel = this.maxZoomLevel;
+      this.zoomLevel = this.maxZoomLevel
     }
   }
 }

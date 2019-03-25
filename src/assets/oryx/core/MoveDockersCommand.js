@@ -24,7 +24,7 @@ export default class MoveDockersCommand extends Command {
     }
 
     this.dockers.values().each(function (docker) {
-      var edge = docker.docker.parent
+      let edge = docker.docker.parent
       if (!edge) {
         return
       }
@@ -63,7 +63,7 @@ export default class MoveDockersCommand extends Command {
         if (i == 0 || i == change.dockerPositions.length - 1) {
           return
         }
-        var docker = change.edge.createDocker(undefined, pos)
+        let docker = change.edge.createDocker(undefined, pos)
         docker.bounds.centerMoveTo(pos)
         docker.update()
       }.bind(this))
@@ -79,7 +79,7 @@ export default class MoveDockersCommand extends Command {
         if (i == 0 || i == change.oldDockerPositions.length - 1) {
           return
         }
-        var docker = change.edge.createDocker(undefined, pos)
+        let docker = change.edge.createDocker(undefined, pos)
         docker.bounds.centerMoveTo(pos)
         docker.update()
       }.bind(this))

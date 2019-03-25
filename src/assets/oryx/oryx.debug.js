@@ -1,16 +1,3 @@
-
-XMLNS = {
-  ATOM: "http://www.w3.org/2005/Atom",
-  XHTML: "http://www.w3.org/1999/xhtml",
-  ERDF: "http://purl.org/NET/erdf/profile",
-  RDFS: "http://www.w3.org/2000/01/rdf-schema#",
-  RDF: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  RAZIEL: "http://b3mn.org/Raziel",
-
-  SCHEMA: ""
-};
-
-
 function assert(expr, m) {
   if (!expr) throw m;
 };
@@ -537,26 +524,5 @@ function printf() {
 var idCounter = 0;
 var ID_PREFIX = "resource";
 
-/**
- * Main initialization method. To be called when loading
- * of the document, including all scripts, is completed.
- */
-function init() {
 
-  ORYX.Log.debug("Querying editor instances");
-
-  // Hack for WebKit to set the SVGElement-Classes
-  ORYX.Editor.setMissingClasses();
-
-  // If someone wants to create the editor instance himself
-  if (window.onOryxResourcesLoaded) {
-    window.onOryxResourcesLoaded();
-  } else {
-    // Else fetch the model from server and display editor
-    var modelId = window.location.search.substring(4);
-    var modelUrl = "./service/model/" + modelId + "/json";
-
-    ORYX.Editor.createByUrl(modelUrl);
-  }
-}
 
