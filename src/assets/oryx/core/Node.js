@@ -18,7 +18,7 @@ export default class Node extends Shape {
    */
   constructor (options, stencil, facade) {
     // arguments.callee.$.construct.apply(this, arguments);
-    super(options)
+    super(...arguments)
     this.isSelectable = true
     this.isMovable = true
     this._dockerUpdated = false
@@ -689,7 +689,7 @@ export default class Node extends Shape {
         me.add(magnet)
 
         //check, if magnet is default magnet
-        if (!this._defaultMagnet) {
+        if (!me._defaultMagnet) {
           let defaultAttr = magnetElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'default')
           if (defaultAttr && defaultAttr.toLowerCase() === 'yes') {
             me._defaultMagnet = magnet

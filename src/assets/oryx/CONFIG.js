@@ -3,36 +3,10 @@ const ORYX_CONFIGURATION_DELAY = 100
 const ORYX_CONFIGURATION_WAIT_ATTEMPTS = 10
 
 /*
- * Save and triple generation behaviour. Use this area to configure
- * data management to your needs.
- */
-const USE_ASYNCHRONOUS_REQUESTS = true
-const DISCARD_UNUSED_TRIPLES = true
-const PREFER_SPANS_OVER_DIVS = true
-const PREFER_TITLE_OVER_TEXTNODE = false
-const RESOURCE_ID_PREFIX = 'resource'
-
-const SHOW_DEBUG_ALERTS_WHEN_SAVING = false
-const SHOW_EXTENDED_DEBUG_INFORMATION = false
-
-/*
- * Back end specific workarounds.
- */
-
-const USE_ARESS_WORKAROUNDS = true
-
-/*
  * Data management constants. Do not change these, as they are used
  * both internally and externally to communicate on events and to identify
  * command object actions in triple production and embedding rules.
  */
-
-// Resource constants
-const RESOURCE_CREATED = 0x01
-const RESOURCE_REMOVED = 0x02
-const RESOURCE_SAVED = 0x04
-const RESOURCE_RELOADED = 0x08
-const RESOURCE_SYNCHRONIZED = 0x10
 
 // Triple constants
 const TRIPLE_REMOVE = 0x01
@@ -40,7 +14,6 @@ const TRIPLE_ADD = 0x02
 const TRIPLE_RELOAD = 0x04
 const TRIPLE_SAVE = 0x08
 
-const PROCESSDATA_REF = 'processdata'
 
 // HTTP status code constants
 //
@@ -364,7 +337,17 @@ const ORYX_CONFIG = {
   FORM_ELEMENT_TYPE_ROOT: 'http://b3mn.org/stencilset/xforms#XForm',
   FORM_ELEMENT_TYPE_GROUP: 'http://b3mn.org/stencilset/xforms#Group',
   FORM_ELEMENT_TYPE_REPEATING_GROUP: 'http://b3mn.org/stencilset/xforms#RepeatingGroup',
-  FORM_ELEMENT_TYPE_LABEL_FIELD: 'http://b3mn.org/stencilset/xforms#LabelField'
+  FORM_ELEMENT_TYPE_LABEL_FIELD: 'http://b3mn.org/stencilset/xforms#LabelField',
+
+  XMLNS: {
+    ATOM: "http://www.w3.org/2005/Atom",
+    XHTML: "http://www.w3.org/1999/xhtml",
+    ERDF: "http://purl.org/NET/erdf/profile",
+    RDFS: "http://www.w3.org/2000/01/rdf-schema#",
+    RDF: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    RAZIEL: "http://b3mn.org/Raziel",
+    SCHEMA: ""
+  }
 }
 
 export default ORYX_CONFIG

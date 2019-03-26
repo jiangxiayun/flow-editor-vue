@@ -1,5 +1,5 @@
 import ORYX_CONFIG from '../../CONFIG'
-import ORYX_Editor from '../../Editor'
+import ORYX_Utils from '../../Utils'
 import ORYX_Log from '../../Log'
 /**
  * @classDescription Class for adding text to a shape.
@@ -8,7 +8,6 @@ import ORYX_Log from '../../Log'
 
 
 export default class Label {
-
   _characterSets = [
     '%W',
     '@',
@@ -34,7 +33,7 @@ export default class Label {
 
     if (!options.textElement) {
       throw 'Label: No parameter textElement.'
-    } else if (!ORYX_Editor.checkClassType(options.textElement, SVGTextElement)) {
+    } else if (!ORYX_Utils.checkClassType(options.textElement, SVGTextElement)) {
       throw 'Label: Parameter textElement is not an SVGTextElement.'
     }
 
@@ -230,7 +229,7 @@ export default class Label {
     return this.anchorTop || false
   }
 
-  isAnchorBottomn () {
+  isAnchorBottom () {
     return this.anchorBottom || false
   }
 
@@ -682,7 +681,7 @@ export default class Label {
               break
             case 'middle':
               dy = -(length / 2.0 - index - 1) * (fontSize)
-              dy -= ORYX.CONFIG.LABEL_LINE_DISTANCE / 2
+              dy -= ORYX_CONFIG.LABEL_LINE_DISTANCE / 2
               break
             case 'top':
               dy = index * (fontSize)
@@ -941,7 +940,7 @@ export default class Label {
     let attr = node.getAttributeNS(null, 'font-size')
     if (attr) {
       return parseFloat(attr)
-    } else if (!ORYX_Editor.checkClassType(node, SVGSVGElement)) {
+    } else if (!ORYX_Utils.checkClassType(node, SVGSVGElement)) {
       return this.getInheritedFontSize(node.parentNode)
     }
   }
@@ -1005,7 +1004,7 @@ export default class Label {
    * positioned over the edge
    * @return {int}
    */
-  getOffsetTo () {
+  getOffsetTop () {
     return this.offsetTop
   }
 

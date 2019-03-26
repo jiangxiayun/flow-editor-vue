@@ -37,8 +37,8 @@ export default class Editor {
     this.loadedPlugins = []
     this.pluginsData = []
 
-    //meta data about the model for the signavio warehouse
-    //directory, new, name, description, revision, model (the model data)
+    // meta data about the model for the signavio warehouse
+    // directory, new, name, description, revision, model (the model data)
 
     let model = config
     this.id = model.modelId
@@ -86,6 +86,7 @@ export default class Editor {
     // LOAD the content of the current editor instance
     window.setTimeout(function () {
       this.loadSerialized(model, true) // Request the meta data as well
+      console.log(444444, model)
       this.getCanvas().update()
       loadContentFinished = true
       initFinished()
@@ -113,14 +114,12 @@ export default class Editor {
 
         }.bind(this), (interval || 10000) / 1000)
       },
-
       stop: function () {
         if (this.pe) {
           this.pe.stop()
           this.pe = null
         }
       },
-
       getParams: function () {
         let res = {}
         let p = document.cookie
@@ -129,7 +128,6 @@ export default class Editor {
         })
         return res
       },
-
       toString: function () {
         return document.cookie
       }
@@ -182,7 +180,7 @@ export default class Editor {
   }
 
   getAvailablePlugins () {
-    let curAvailablePlugins = ORYX.availablePlugins.clone()
+    let curAvailablePlugins = ORYX_Utils.availablePlugins.clone()
     curAvailablePlugins.each(function (plugin) {
       if (this.loadedPlugins.find(function (loadedPlugin) {
         return loadedPlugin.type == this.name
@@ -323,9 +321,8 @@ export default class Editor {
     //   })
     // }
 
-
     //todo availablePlugins
-    ORYX.availablePlugins.each(function (value) {
+    ORYX_Utils.availablePlugins.each(function (value) {
       ORYX_Log.debug('Initializing plugin \'%0\'', value.get('name'))
 
       if ((!value.get('requires') || !value.get('requires').namespaces || value.get('requires').namespaces.any(function (req) {
@@ -391,8 +388,9 @@ export default class Editor {
     // get the stencil associated with the type
     let canvasStencil = ORYX_StencilSet.stencil(stencilType)
 
-    if (!canvasStencil)
+    if (!canvasStencil) {
       ORYX_Log.fatal('Initialisation failed, because the stencil with the type %0 is not part of one of the loaded stencil sets.', stencilType)
+    }
 
     // create all dom
     // TODO fix border, so the visible canvas has a double border and some spacing to the scrollbars
@@ -733,7 +731,6 @@ export default class Editor {
    */
   loadSerialized (model, requestMeta) {
     let canvas = this.getCanvas()
-
     // Bugfix (cf. http://code.google.com/p/oryx-editor/issues/detail?id=240)
     // Deserialize the canvas' stencil set extensions properties first!
     this.loadSSExtensions(model.ssextensions)
@@ -746,7 +743,6 @@ export default class Editor {
         this.loadSSExtension(metaDataExtension)
       }
     }
-
     let shapes = this.getCanvas().addShapeObjects(model.childShapes, this.handleEvents.bind(this))
 
     if (model.properties) {
@@ -1615,37 +1611,6 @@ export default class Editor {
       }, 100)
     }
   }
-
-  setMissingClasses () {
-    try {
-      SVGElement
-    } catch (e) {
-      ORYX_Editor.SVGClassElementsAreAvailable = false
-      SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg').toString()
-      SVGGElement = document.createElementNS('http://www.w3.org/2000/svg', 'g').toString()
-      SVGPathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path').toString()
-      SVGTextElement = document.createElementNS('http://www.w3.org/2000/svg', 'text').toString()
-      //SVGMarkerElement 	= document.createElementNS('http://www.w3.org/2000/svg', 'marker').toString();
-      SVGRectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect').toString()
-      SVGImageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image').toString()
-      SVGCircleElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle').toString()
-      SVGEllipseElement = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse').toString()
-      SVGLineElement = document.createElementNS('http://www.w3.org/2000/svg', 'line').toString()
-      SVGPolylineElement = document.createElementNS('http://www.w3.org/2000/svg', 'polyline').toString()
-      SVGPolygonElement = document.createElementNS('http://www.w3.org/2000/svg', 'polygon').toString()
-
-    }
-
-  }
-
-  checkClassType (classInst, classType) {
-    if (ORYX_Editor.SVGClassElementsAreAvailable) {
-      return classInst instanceof classType
-    } else {
-      return classInst == classType
-    }
-  }
-
 
 }
 

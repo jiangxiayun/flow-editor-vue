@@ -36,10 +36,9 @@ export default class EditorManager {
       type: 'GET',
       url: 'flowable/editor-app/plugins.xml',
       success: function (data, textStatus, jqXHR) {
-        ORYX._loadPlugins(data)
+        ORYX.Utils._loadPlugins(data)
       }
     })
-
     // 拖拽功能辅助变量
     this.dragCurrentParent = undefined
     this.dragCurrentParentId = undefined
@@ -53,13 +52,16 @@ export default class EditorManager {
   }
 
   getSelectedItem () { return this.selectedItem }
+
   getSelectedShape () { return this.selectedShape }
+
   getContainmentRules () { return this.containmentRules }
 
   getToolbarItems () { return this.toolbarItems }
+
   setToolbarItems () {
     let items = []
-    const toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items;
+    const toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items
     for (let i = 0; i < toolbarItems.length; i++) {
       if (this.modelData.model.modelType === 'form') {
         if (!toolbarItems[i].disableInForm) {
@@ -81,11 +83,11 @@ export default class EditorManager {
   getModel () {
     this.syncCanvasTracker()
 
-    var modelMetaData = this.getBaseModelData()
+    let modelMetaData = this.getBaseModelData()
 
-    var stencilId = undefined
-    var stencilSetNamespace = undefined
-    var stencilSetUrl = undefined
+    let stencilId = undefined
+    let stencilSetNamespace = undefined
+    let stencilSetUrl = undefined
     if (modelMetaData.model.stencilset.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
       stencilId = 'CMMNDiagram'
       stencilSetNamespace = 'http://b3mn.org/stencilset/cmmn1.1#'
@@ -96,10 +98,10 @@ export default class EditorManager {
       stencilSetUrl = '../editor/stencilsets/bpmn2.0/bpmn2.0.json'
     }
 
-    //this is an object.
-    var editorConfig = this.editor.getJSON()
+    // this is an object.
+    let editorConfig = this.editor.getJSON()
     console.log(222, this.modelId)
-    var model = {
+    let model = {
       modelId: this.modelId,
       bounds: editorConfig.bounds,
       properties: editorConfig.properties,
@@ -133,29 +135,31 @@ export default class EditorManager {
     //we don't want a references!
     this.stencilData = jQuery.extend(true, {}, stencilData)
   }
+
   getShowStencilData () {
     return this.showStencilData
   }
+
   setShowStencilData () {
-    let quickMenuDefinition = undefined;
-    let ignoreForPaletteDefinition = undefined;
+    let quickMenuDefinition = undefined
+    let ignoreForPaletteDefinition = undefined
     const data = this.stencilData
     if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
-      quickMenuDefinition = ['HumanTask', 'Association'];
-      ignoreForPaletteDefinition = ['CasePlanModel'];
+      quickMenuDefinition = ['HumanTask', 'Association']
+      ignoreForPaletteDefinition = ['CasePlanModel']
     } else {
       quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway',
         'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
-        'SequenceFlow', 'Association'];
-      ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask'];
+        'SequenceFlow', 'Association']
+      ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask']
     }
 
-    let quickMenuItems = [];
-    let morphRoles = [];
+    let quickMenuItems = []
+    let morphRoles = []
     for (let i = 0; i < data.rules.morphingRules.length; i++) {
-      let role = data.rules.morphingRules[i].role;
-      let roleItem = {'role': role, 'morphOptions': []};
-      morphRoles.push(roleItem);
+      let role = data.rules.morphingRules[i].role
+      let roleItem = { 'role': role, 'morphOptions': [] }
+      morphRoles.push(roleItem)
     }
 
     let stencilItemGroups_ary = []
@@ -163,36 +167,36 @@ export default class EditorManager {
     // Check all received items
     for (let stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) {
       // Check if the root group is the 'diagram' group. If so, this item should not be shown.
-      let currentGroupName = data.stencils[stencilIndex].groups[0];
+      let currentGroupName = data.stencils[stencilIndex].groups[0]
       if (currentGroupName === 'Diagram' || currentGroupName === 'Form') {
-        continue;  // go to next item
+        continue  // go to next item
       }
 
-      let removed = false;
+      let removed = false
       if (data.stencils[stencilIndex].removed) {
-        removed = true;
+        removed = true
       }
 
-      let currentGroup = undefined;
+      let currentGroup = undefined
       if (!removed) {
         // Check if this group already exists. If not, we create a new one
         if (currentGroupName !== null && currentGroupName !== undefined && currentGroupName.length > 0) {
-          currentGroup = findGroup(currentGroupName, stencilItemGroups_ary); // Find group in root groups array
+          currentGroup = findGroup(currentGroupName, stencilItemGroups_ary) // Find group in root groups array
           if (currentGroup === null) {
-            currentGroup = addGroup(currentGroupName, stencilItemGroups_ary);
+            currentGroup = addGroup(currentGroupName, stencilItemGroups_ary)
           }
 
           // Add all child groups (if any)
           for (let groupIndex = 1; groupIndex < data.stencils[stencilIndex].groups.length; groupIndex++) {
-            var childGroupName = data.stencils[stencilIndex].groups[groupIndex];
-            var childGroup = findGroup(childGroupName, currentGroup.groups);
+            let childGroupName = data.stencils[stencilIndex].groups[groupIndex]
+            let childGroup = findGroup(childGroupName, currentGroup.groups)
             if (childGroup === null) {
-              childGroup = addGroup(childGroupName, currentGroup.groups);
+              childGroup = addGroup(childGroupName, currentGroup.groups)
             }
 
             // The current group variable holds the parent of the next group (if any),
             // and is basically the last element in the array of groups defined in the stencil item
-            currentGroup = childGroup;
+            currentGroup = childGroup
           }
         }
       }
@@ -210,93 +214,92 @@ export default class EditorManager {
         'canConnect': false,
         'canConnectTo': false,
         'canConnectAssociation': false
-      };
+      }
 
       if (data.stencils[stencilIndex].customIconId && data.stencils[stencilIndex].customIconId > 0) {
-        stencilItem.customIcon = true;
-        stencilItem.icon = data.stencils[stencilIndex].customIconId;
+        stencilItem.customIcon = true
+        stencilItem.icon = data.stencils[stencilIndex].customIconId
       }
 
       if (!removed) {
         if (quickMenuDefinition.indexOf(stencilItem.id) >= 0) {
-          quickMenuItems[quickMenuDefinition.indexOf(stencilItem.id)] = stencilItem;
+          quickMenuItems[quickMenuDefinition.indexOf(stencilItem.id)] = stencilItem
         }
       }
 
       if (stencilItem.id === 'TextAnnotation' || stencilItem.id === 'BoundaryCompensationEvent') {
-        stencilItem.canConnectAssociation = true;
+        stencilItem.canConnectAssociation = true
       }
 
       for (let i = 0; i < data.stencils[stencilIndex].roles.length; i++) {
-        let stencilRole = data.stencils[stencilIndex].roles[i];
+        let stencilRole = data.stencils[stencilIndex].roles[i]
         if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
           if (stencilRole === 'association_start') {
-            stencilItem.canConnect = true;
+            stencilItem.canConnect = true
           } else if (stencilRole === 'association_end') {
-            stencilItem.canConnectTo = true;
+            stencilItem.canConnectTo = true
           }
         } else {
           if (stencilRole === 'sequence_start') {
-            stencilItem.canConnect = true;
+            stencilItem.canConnect = true
           } else if (stencilRole === 'sequence_end') {
-            stencilItem.canConnectTo = true;
+            stencilItem.canConnectTo = true
           }
         }
 
         for (let j = 0; j < morphRoles.length; j++) {
           if (stencilRole === morphRoles[j].role) {
             if (!removed) {
-              morphRoles[j].morphOptions.push(stencilItem);
+              morphRoles[j].morphOptions.push(stencilItem)
             }
-            stencilItem.morphRole = morphRoles[j].role;
-            break;
+            stencilItem.morphRole = morphRoles[j].role
+            break
           }
         }
       }
 
-
       if (currentGroup) {
         // Add the stencil item to the correct group
-        currentGroup.items.push(stencilItem);
+        currentGroup.items.push(stencilItem)
         if (ignoreForPaletteDefinition.indexOf(stencilItem.id) < 0) {
-          currentGroup.paletteItems.push(stencilItem);
+          currentGroup.paletteItems.push(stencilItem)
         }
       } else {
         // It's a root stencil element
         if (!removed) {
-          stencilItemGroups_ary.push(stencilItem);
+          stencilItemGroups_ary.push(stencilItem)
         }
       }
 
     }
 
-    for (let i = 0; i < stencilItemGroups_ary.length; i++)  {
+    for (let i = 0; i < stencilItemGroups_ary.length; i++) {
       if (stencilItemGroups_ary[i].paletteItems && stencilItemGroups_ary[i].paletteItems.length == 0) {
-        stencilItemGroups_ary[i].visible = false;
+        stencilItemGroups_ary[i].visible = false
       }
     }
 
     this.showStencilData = stencilItemGroups_ary
     // this.UPDATE_stencilItemGroups(stencilItemGroups_ary)
 
-    let containmentRules = [];
+    let containmentRules = []
     for (let i = 0; i < data.rules.containmentRules.length; i++) {
-      let rule = data.rules.containmentRules[i];
-      containmentRules.push(rule);
+      let rule = data.rules.containmentRules[i]
+      containmentRules.push(rule)
     }
-    this.containmentRules = containmentRules;
+    this.containmentRules = containmentRules
 
     // remove quick menu items which are not available anymore due to custom pallette
-    let availableQuickMenuItems = [];
+    let availableQuickMenuItems = []
     for (let i = 0; i < quickMenuItems.length; i++) {
       if (quickMenuItems[i]) {
-        availableQuickMenuItems[availableQuickMenuItems.length] = quickMenuItems[i];
+        availableQuickMenuItems[availableQuickMenuItems.length] = quickMenuItems[i]
       }
     }
 
     // this.UPDATE_quickMenuItems(availableQuickMenuItems)
     this.quickMenuItems = availableQuickMenuItems
-    this.morphRoles = morphRoles;
+    this.morphRoles = morphRoles
     // console.log('availableQuickMenuItems', availableQuickMenuItems)
     // console.log('morphRoles', morphRoles)
   }
@@ -313,11 +316,10 @@ export default class EditorManager {
 
   bootEditor () {
     //TODO: populate the canvas with correct json sections.
-    //resetting the state
     this.canvasTracker = new Hash()
 
     // 第一个参数boolean代表是否进行深度拷贝
-    var config = jQuery.extend(true, {}, this.modelData)
+    let config = jQuery.extend(true, {}, this.modelData)
 
     if (!config.model.childShapes) {
       config.model.childShapes = []
@@ -328,11 +330,10 @@ export default class EditorManager {
 
     // this will be overwritten almost instantly.
     this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes))
-
     this.editor = new ORYX.Editor(config)
+
     this.current = this.editor.id
     this.loading = false
-
 
     FLOWABLE.eventBus.editor = this.editor
     FLOWABLE.eventBus.dispatch('ORYX-EDITOR-LOADED', {})
@@ -360,51 +361,50 @@ export default class EditorManager {
       })
     })
 
-
     // if an element is added te properties will catch this event.
-    FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.filterEvent.bind(this));
-    FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED, this.filterEvent.bind(this));
-    FLOWABLE.eventBus.addListener("EDITORMANAGER-EDIT-ACTION", function() {
-      this.renderProcessHierarchy();
-    });
+    FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.filterEvent.bind(this))
+    FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED, this.filterEvent.bind(this))
+    FLOWABLE.eventBus.addListener('EDITORMANAGER-EDIT-ACTION', function () {
+      this.renderProcessHierarchy()
+    })
 
     FLOWABLE_eventBus_initAddListener()
     this.initRegisterOnEvent()
   }
 
-  renderProcessHierarchy(){
+  renderProcessHierarchy () {
     //only start calculating when the editor has done all his constructor work.
-    if(!this.isEditorReady){
-      return false;
+    if (!this.isEditorReady) {
+      return false
     }
 
-    if (!this.isLoading()){
+    if (!this.isLoading()) {
       //the current implementation of has a lot of eventlisteners. when calling getTree() it could manipulate
       //the canvastracker while the canvas is stille loading stuff.
       //TODO: check if its possible to trigger the re-rendering by a single event instead of registering on 10 events...
-      this.treeview = this.getTree();
+      this.treeview = this.getTree()
     }
 
   }
 
   filterEvent (event) {
     // this event is fired when the user changes a property by the property editor.
-    if(event.type === "event-type-property-value-changed"){
-      if(event.property.key === "oryx-overrideid" || event.property.key === "oryx-name"){
+    if (event.type === 'event-type-property-value-changed') {
+      if (event.property.key === 'oryx-overrideid' || event.property.key === 'oryx-name') {
         this.renderProcessHierarchy()
       }
       //this event is fired when the stencil / shape's text is changed / updated.
-    }else if(event.type === "propertyChanged"){
-      if(event.name === "oryx-overrideid" || event.name === "oryx-name"){
+    } else if (event.type === 'propertyChanged') {
+      if (event.name === 'oryx-overrideid' || event.name === 'oryx-name') {
 
-        this.renderProcessHierarchy();
+        this.renderProcessHierarchy()
       }
-    }else if(event.type === ORYX.CONFIG.ACTION_DELETE_COMPLETED){
-      this.renderProcessHierarchy();
+    } else if (event.type === ORYX.CONFIG.ACTION_DELETE_COMPLETED) {
+      this.renderProcessHierarchy()
       //for some reason the new tree does not trigger an ui update.
       //$scope.$apply();
-    }else if(event.type === "event-type-item-dropped"){
-      this.renderProcessHierarchy();
+    } else if (event.type === 'event-type-item-dropped') {
+      this.renderProcessHierarchy()
     }
   }
 
@@ -414,48 +414,49 @@ export default class EditorManager {
    */
   getStencilItemById (stencilItemId) {
     for (let i = 0; i < this.showStencilData.length; i++) {
-      var element = this.showStencilData[i];
+      var element = this.showStencilData[i]
 
       // Real group
       if (element.items !== null && element.items !== undefined) {
-        var item = this.findStencilItemInGroup(stencilItemId, element);
+        var item = this.findStencilItemInGroup(stencilItemId, element)
         if (item) {
-          return item;
+          return item
         }
       } else { // Root stencil item
         if (element.id === stencilItemId) {
-          return element;
+          return element
         }
       }
     }
-    return undefined;
+    return undefined
   }
+
   /**
    * Helper method that searches a group for an item with the given id.
    * If not found, will return undefined.
    */
-  findStencilItemInGroup  (stencilItemId, group) {
-    var item;
+  findStencilItemInGroup (stencilItemId, group) {
+    var item
 
     // Check all items directly in this group
     for (var j = 0; j < group.items.length; j++) {
-      item = group.items[j];
+      item = group.items[j]
       if (item.id === stencilItemId) {
-        return item;
+        return item
       }
     }
 
     // Check the child groups
     if (group.groups && group.groups.length > 0) {
       for (var k = 0; k < group.groups.length; k++) {
-        item = this.findStencilItemInGroup(stencilItemId, group.groups[k]);
+        item = this.findStencilItemInGroup(stencilItemId, group.groups[k])
         if (item) {
-          return item;
+          return item
         }
       }
     }
 
-    return undefined;
+    return undefined
   }
 
   initRegisterOnEvent () {

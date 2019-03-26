@@ -1,4 +1,4 @@
-import ORYX_Editor from '../../Editor'
+import ORYX_Utils from '../../Utils'
 import ORYX_Config from '../../CONFIG'
 import Property from './Property'
 
@@ -110,7 +110,7 @@ export default class Stencil {
       let xml = parser.parseFromString(this._jsonStencil.view, 'text/xml')
 
       // check if result is a SVG document
-      if (ORYX_Editor.checkClassType(xml.documentElement, SVGSVGElement)) {
+      if (ORYX_Utils.checkClassType(xml.documentElement, SVGSVGElement)) {
         this._view = xml.documentElement
       } else {
         throw 'ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a valid SVG document.'
@@ -303,7 +303,7 @@ export default class Stencil {
     xml = result.responseXML
 
     // check if result is a SVG document
-    if (ORYX_Editor.checkClassType(xml.documentElement, SVGSVGElement)) {
+    if (ORYX_Utils.checkClassType(xml.documentElement, SVGSVGElement)) {
       this._view = xml.documentElement
     } else {
       throw 'ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a SVG document.'

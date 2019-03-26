@@ -1,7 +1,7 @@
 import AbstractShape from './AbstractShape'
 import UIObject from './UIObject'
 import ORYX_Log from '../Log'
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 import ORYX_Config from '../CONFIG'
 import Shape from './Shape'
 import Node from './Node'
@@ -27,7 +27,7 @@ export default class Canvas extends AbstractShape {
    */
   constructor (options, stencil, facade) {
     // arguments.callee.$.construct.apply(this, arguments);
-    super(options)
+    super(...arguments)
 
     if (!(options && options.width && options.height)) {
       ORYX_Log.fatal('Canvas is missing mandatory parameters options.width and options.height.')
@@ -43,8 +43,8 @@ export default class Canvas extends AbstractShape {
     this.colHighlightState = 0
     this.colHighlightEnabled = false
 
-    //init svg document
-    this.rootNode = ORYX_Editor.graft('http://www.w3.org/2000/svg', options.parentNode,
+    // init svg document
+    this.rootNode = ORYX_Utils.graft('http://www.w3.org/2000/svg', options.parentNode,
       ['svg', { id: this.id, width: options.width, height: options.height },
         ['defs', {}]
       ])
@@ -52,15 +52,15 @@ export default class Canvas extends AbstractShape {
     this.rootNode.setAttribute('xmlns:xlink', 'http://www.w3.org/1999/xlink')
     this.rootNode.setAttribute('xmlns:svg', 'http://www.w3.org/2000/svg')
 
-    this._htmlContainer = ORYX_Editor.graft('http://www.w3.org/1999/xhtml', options.parentNode,
+    this._htmlContainer = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', options.parentNode,
       ['div', { id: 'oryx_canvas_htmlContainer', style: 'position:absolute; top:5px' }])
 
     // Additional SVG-node BELOW the stencils to allow underlays (if that is even a word) by plugins
-    this.underlayNode = ORYX_Editor.graft('http://www.w3.org/2000/svg', this.rootNode,
+    this.underlayNode = ORYX_Utils.graft('http://www.w3.org/2000/svg', this.rootNode,
       ['svg', { id: 'underlay-container' }])
 
     // Create 2 svg-elements in the svg-container
-    this.columnHightlight1 = ORYX_Editor.graft('http://www.w3.org/2000/svg', this.underlayNode,
+    this.columnHightlight1 = ORYX_Utils.graft('http://www.w3.org/2000/svg', this.underlayNode,
       ['rect', {
         x: 0,
         width: ORYX_Config.FORM_ROW_WIDTH + 35,
@@ -69,7 +69,7 @@ export default class Canvas extends AbstractShape {
         visibility: 'hidden'
       }])
 
-    this.columnHightlight2 = ORYX_Editor.graft('http://www.w3.org/2000/svg', this.underlayNode,
+    this.columnHightlight2 = ORYX_Utils.graft('http://www.w3.org/2000/svg', this.underlayNode,
       ['rect', {
         x: ORYX_Config.FORM_ROW_WIDTH + 35,
         width: ORYX_Config.FORM_ROW_WIDTH + 25,
@@ -78,7 +78,7 @@ export default class Canvas extends AbstractShape {
         visibility: 'hidden'
       }])
 
-    this.node = ORYX_Editor.graft('http://www.w3.org/2000/svg', this.rootNode,
+    this.node = ORYX_Utils.graft('http://www.w3.org/2000/svg', this.rootNode,
       ['g', {},
         ['g', { 'class': 'stencils' },
           ['g', { 'class': 'me' }],
@@ -122,14 +122,12 @@ export default class Canvas extends AbstractShape {
     this.node.setAttributeNS(null, 'font-variant', 'normal')
     this.node.setAttributeNS(null, 'font-weight', 'normal')
     this.node.setAttributeNS(null, 'line-heigth', 'normal')
-
     this.node.setAttributeNS(null, 'font-size', ORYX_Config.LABEL_DEFAULT_LINE_HEIGHT)
-
     this.bounds.set(0, 0, options.width, options.height)
 
     this.addEventHandlers(this.rootNode.parentNode)
 
-    //disable context menu
+    // disable context menu
     this.rootNode.oncontextmenu = function () {
       return false
     }
@@ -429,7 +427,6 @@ export default class Canvas extends AbstractShape {
       resourceId: this.resourceId
     })
 
-
     // prepare deserialisation parameter
     shapes.each(function (shape) {
         let properties = []
@@ -511,6 +508,7 @@ export default class Canvas extends AbstractShape {
         shape.object.deserialize(shape.__properties, shape.json)
         shape.object._oldBounds = shape.object.bounds.clone()
         shape.object._update()
+        console.log(7777, shape)
       }
     })
 

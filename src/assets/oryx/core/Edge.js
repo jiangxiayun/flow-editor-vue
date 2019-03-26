@@ -1,7 +1,7 @@
 import Shape from './Shape'
 import ORYX_SVG from './SVG'
 import ORYX_Math from './Math'
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 import ORYX_Config from '../CONFIG'
 import ORYX_Controls from './Controls'
 import ERDF from '../ERDF'
@@ -27,7 +27,7 @@ export default class Edge extends Shape {
    */
   constructor (options, stencil, facade) {
     // arguments.callee.$.construct.apply(this, arguments);
-    super(options)
+    super(...arguments)
     this.isMovable = true
     this.isSelectable = true
 
@@ -44,7 +44,7 @@ export default class Edge extends Shape {
 
     //TODO was muss hier initial erzeugt werden?
     let stencilNode = this.node.childNodes[0].childNodes[0]
-    stencilNode = ORYX_Editor.graft('http://www.w3.org/2000/svg', stencilNode, ['g', {
+    stencilNode = ORYX_Utils.graft('http://www.w3.org/2000/svg', stencilNode, ['g', {
       'pointer-events': 'painted'
     }])
 
@@ -53,7 +53,7 @@ export default class Edge extends Shape {
 
     this._oldBounds = this.bounds.clone()
 
-    //load stencil
+    // load stencil
     this._init(this._stencil.view())
 
     if (stencil instanceof Array) {
@@ -133,7 +133,7 @@ export default class Edge extends Shape {
       diffX = upL.x - oldUpL.x
       diffY = upL.y - oldUpL.y
 
-      //reposition labels
+      // reposition labels
       this.getLabels().each(function (label) {
         if (label.getReferencePoint()) {
           let ref = label.getReferencePoint()
@@ -1269,7 +1269,7 @@ export default class Edge extends Shape {
     let isFirst = true
 
     $A(g.childNodes).each((function (path, index) {
-      if (ORYX_Editor.checkClassType(path, SVGPathElement)) {
+      if (ORYX_Utils.checkClassType(path, SVGPathElement)) {
         path = path.cloneNode(false)
 
         let pathId = this.id + '_' + index
@@ -1601,8 +1601,7 @@ export default class Edge extends Shape {
 
   deserialize (data) {
     try {
-      //data = this.getStencil().deserialize(this, data);
-
+      // data = this.getStencil().deserialize(this, data);
       let deserializeEvent = this.getStencil().deserialize()
 
       /*
@@ -1640,7 +1639,6 @@ export default class Edge extends Shape {
       if (!this.parent) {
         return
       }
-
 
       // Set outgoing Shape
       let next = this.getCanvas().getChildShapeByResourceId(obj.value)
@@ -1692,9 +1690,9 @@ export default class Edge extends Shape {
             let dockersByPath = this._dockersByPath.get(path.id)
 
             if (index === 0) {
-              //set position of first docker
-              var x = parseFloat(values.shift())
-              var y = parseFloat(values.shift())
+              // set position of first docker
+              let x = parseFloat(values.shift())
+              let y = parseFloat(values.shift())
 
               if (dockersByPath.first().getDockedShape()) {
                 dockersByPath.first().setReferencePoint({
@@ -1706,9 +1704,9 @@ export default class Edge extends Shape {
               }
             }
 
-            //set position of last docker
-            y = parseFloat(values.pop())
-            x = parseFloat(values.pop())
+            // set position of last docker
+            let y = parseFloat(values.pop())
+            let x = parseFloat(values.pop())
 
             if (dockersByPath.last().getDockedShape()) {
               dockersByPath.last().setReferencePoint({
@@ -1719,7 +1717,7 @@ export default class Edge extends Shape {
               dockersByPath.last().bounds.centerMoveTo(x, y)
             }
 
-            //add additional dockers
+            // add additional dockers
             for (let i = 0; i < values.length; i++) {
               x = parseFloat(values[i])
               y = parseFloat(values[++i])
@@ -1739,7 +1737,7 @@ export default class Edge extends Shape {
     }
 
     // arguments.callee.$.deserialize.apply(this, arguments)
-    super.deserialize(data)
+    super.deserialize(...arguments)
     this._changed()
   }
 

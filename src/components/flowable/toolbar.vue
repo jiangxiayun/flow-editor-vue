@@ -163,6 +163,7 @@
 
 <script>
   import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
+  import ORYX_CONFIG from '@/assets/oryx/CONFIG'
 
   export default {
     name: 'toolbar',
@@ -280,7 +281,7 @@
       },
       registerOnEvent () {
         // 捕获所有执行的命令并将它们存储在各自的堆栈上
-        this.editorManager.registerOnEvent(ORYX.CONFIG.EVENT_EXECUTE_COMMANDS, (evt) => {
+        this.editorManager.registerOnEvent(ORYX_CONFIG.EVENT_EXECUTE_COMMANDS, (evt) => {
           // If the event has commands
           if (!evt.commands) return
 
@@ -369,7 +370,7 @@
         // })
         //   .success(function (data, status, headers, config) {
         //     this.editorManager.handleEvents({
-        //       type: ORYX.CONFIG.EVENT_SAVED
+        //       type: ORYX_CONFIG.EVENT_SAVED
         //     })
         //     this.modelData.name = this.saveDialog.name
         //     this.modelData.key = this.saveDialog.key

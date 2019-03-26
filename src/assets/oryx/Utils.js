@@ -1,4 +1,5 @@
 import ORYX_CONFIG from './CONFIG'
+import ORYX_Log from './Log'
 
 const Utils = {
   /**
@@ -126,14 +127,171 @@ const Utils = {
     res[8] = res[13] = res[18] = res[23] = '-'
 
     return 'sid-' + res.join('')
-  }
+  },
   /**
    * Workaround for SAFARI/Webkit, because
    * when trying to check SVGSVGElement of instanceof there is
    * raising an error
    *
    */
-  SVGClassElementsAreAvailable: true
+  SVGClassElementsAreAvailable: true,
+  checkClassType: function (classInst, classType) {
+    if (this.SVGClassElementsAreAvailable) {
+      return classInst instanceof classType
+    } else {
+      return classInst == classType
+    }
+  },
+  setMissingClasses: function () {
+    try {
+      SVGElement
+    } catch (e) {
+      this.SVGClassElementsAreAvailable = false
+      let SVGSVGElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg').toString()
+      let SVGGElement = document.createElementNS('http://www.w3.org/2000/svg', 'g').toString()
+      let SVGPathElement = document.createElementNS('http://www.w3.org/2000/svg', 'path').toString()
+      let SVGTextElement = document.createElementNS('http://www.w3.org/2000/svg', 'text').toString()
+      //SVGMarkerElement 	= document.createElementNS('http://www.w3.org/2000/svg', 'marker').toString();
+      let SVGRectElement = document.createElementNS('http://www.w3.org/2000/svg', 'rect').toString()
+      let SVGImageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image').toString()
+      let SVGCircleElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle').toString()
+      let SVGEllipseElement = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse').toString()
+      let SVGLineElement = document.createElementNS('http://www.w3.org/2000/svg', 'line').toString()
+      let SVGPolylineElement = document.createElementNS('http://www.w3.org/2000/svg', 'polyline').toString()
+      let SVGPolygonElement = document.createElementNS('http://www.w3.org/2000/svg', 'polygon').toString()
+    }
+
+  },
+  availablePlugins: [],
+  _loadPlugins: function (plugins) {
+    this.availablePlugins.length = 0
+    let resultXml = plugins
+    // get plugins.xml content
+    // var resultXml = jQuery.parseXML(plugins); //jquery parser
+
+    // TODO: Describe how properties are handled.
+    // Get the globale Properties
+    let globalProperties = []
+    let preferences = $A(resultXml.getElementsByTagName('properties'))
+    preferences.each(function (p) {
+      let props = $A(p.childNodes)
+      props.each(function (prop) {
+        let property = new Hash()
+
+        // get all attributes from the node and set to global properties
+        let attributes = $A(prop.attributes)
+        attributes.each(function (attr) {
+          property.set(attr.nodeName, attr.nodeValue)
+        })
+        if (attributes.length > 0) {
+          globalProperties.push(property)
+        }
+      })
+    })
+
+    // TODO Why are we using XML if we don't respect structure anyway?
+    // for each plugin element in the configuration..
+    let plugin = resultXml.getElementsByTagName('plugin')
+    const me = this
+    $A(plugin).each(function (node) {
+      // get all element's attributes.
+      // TODO: What about: var pluginData = $H(node.attributes) !?
+      let pluginData = new Hash()
+      $A(node.attributes).each(function (attr) {
+        pluginData.set(attr.nodeName, attr.nodeValue)
+      })
+
+      // ensure there's a name attribute.
+      if (!pluginData.get('name')) {
+        ORYX_Log.error('A plugin is not providing a name. Ingnoring this plugin.')
+        return
+      }
+
+      // ensure there's a source attribute.
+      if (!pluginData.get('source')) {
+        ORYX_Log.error('Plugin with name \'%0\' doesn\'t provide a source attribute.', pluginData.get('name'))
+        return
+      }
+
+      // Get all private Properties
+      let propertyNodes = node.getElementsByTagName('property')
+      let properties = []
+      $A(propertyNodes).each(function (prop) {
+        let property = new Hash()
+
+        // Get all Attributes from the Node
+        let attributes = $A(prop.attributes)
+        attributes.each(function (attr) {
+          property.set(attr.nodeName, attr.nodeValue)
+        })
+
+        if (attributes.length > 0) {
+          properties.push(property)
+        }
+      })
+
+      // Set all Global-Properties to the Properties
+      properties = properties.concat(globalProperties)
+
+      // Set Properties to Plugin-Data
+      pluginData.set('properties', properties)
+
+      // Get the RequieredNodes
+      let requireNodes = node.getElementsByTagName('requires')
+      let requires
+      $A(requireNodes).each(function (req) {
+        let namespace = $A(req.attributes).find(function (attr) {
+          return attr.name == 'namespace'
+        })
+        if (namespace && namespace.nodeValue) {
+          if (!requires) {
+            requires = { namespaces: [] }
+          }
+
+          requires.namespaces.push(namespace.nodeValue)
+        }
+      })
+
+      // Set Requires to the Plugin-Data, if there is one
+      if (requires) {
+        pluginData.set('requires', requires)
+      }
+
+      // Get the RequieredNodes
+      let notUsesInNodes = node.getElementsByTagName('notUsesIn')
+      let notUsesIn
+      $A(notUsesInNodes).each(function (not) {
+        let namespace = $A(not.attributes).find(function (attr) {
+          return attr.name == 'namespace'
+        })
+        if (namespace && namespace.nodeValue) {
+          if (!notUsesIn) {
+            notUsesIn = { namespaces: [] }
+          }
+
+          notUsesIn.namespaces.push(namespace.nodeValue)
+        }
+      })
+
+      // Set Requires to the Plugin-Data, if there is one
+      if (notUsesIn) {
+        pluginData.set('notUsesIn', notUsesIn)
+      }
+
+      let url = ORYX_CONFIG.PATH + ORYX_CONFIG.PLUGINS_FOLDER + pluginData.get('source')
+
+      ORYX_Log.debug('Requireing \'%0\'', url)
+
+      // Add the Script-Tag to the Site
+      //Kickstart.require(url);
+
+      // 加载成功log
+      // ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
+
+      // Add the Plugin-Data to all available Plugins
+      me.availablePlugins.push(pluginData)
+    })
+  },
 }
 
 export default Utils

@@ -76,6 +76,8 @@ export default class AbstractShape extends UIObject {
   }
 
   constructor (options, stencil, facade) {
+    // console.log('options', options)
+    // console.log('stencil', stencil)
     super(options)
     // arguments.callee.$.construct.apply(this, arguments);
 
@@ -437,7 +439,6 @@ export default class AbstractShape extends UIObject {
           if (parent) {
             parent.add(this)
           }
-
           break
         default:
           // If list, eval as an array

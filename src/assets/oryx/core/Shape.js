@@ -5,7 +5,6 @@ import UIObject from './UIObject'
 import ORYX_Canvas from './Canvas'
 import ORYX_Controls from './Controls'
 
-import ORYX_Editor from '../Editor'
 import ERDF from '../ERDF'
 import ORYX_Utils from '../Utils'
 import ORYX_Log from '../Log'
@@ -24,7 +23,7 @@ export default class Shape extends AbstractShape {
   constructor (options, stencil, facade) {
     // call base class constructor
     // arguments.callee.$.construct.apply(this, arguments);
-    super(options)
+    super(...arguments)
     this.facade = facade
     this.dockers = []
     this.magnets = []
@@ -42,7 +41,7 @@ export default class Shape extends AbstractShape {
     this._labels = new Hash()
 
     // create SVG node
-    this.node = ORYX_Editor.graft('http://www.w3.org/2000/svg',
+    this.node = ORYX_Utils.graft('http://www.w3.org/2000/svg',
       null,
       ['g', { id: 'svg-' + this.resourceId },
         ['g', { 'class': 'stencils' },
@@ -95,7 +94,7 @@ export default class Shape extends AbstractShape {
             console.log('property', propChanged.key)
             console.log('property.type', property.type())
             // handle choice properties
-            if (property.type() == ORYX.CONFIG.TYPE_CHOICE) {
+            if (property.type() == ORYX_Config.TYPE_CHOICE) {
               //iterate all references to SVG elements
               property.refToView().each((function (ref) {
                 //if property is referencing a label, update the label
@@ -130,7 +129,7 @@ export default class Shape extends AbstractShape {
                   }
 
                   // Reload the href if there is an image-tag
-                  if (ORYX_Editor.checkClassType(svgElem, SVGImageElement)) {
+                  if (ORYX_Utils.checkClassType(svgElem, SVGImageElement)) {
                     svgElem.setAttributeNS('http://www.w3.org/1999/xlink', 'href', svgElem.getAttributeNS('http://www.w3.org/1999/xlink', 'href'))
                   }
                 }).bind(this))
@@ -831,7 +830,7 @@ export default class Shape extends AbstractShape {
 
   deserialize (serialize, json) {
     // arguments.callee.$.deserialize.apply(this, arguments);
-    super.deserialize()
+    super.deserialize(serialize, json)
     // Set the Bounds
     let bounds = serialize.find(function (ser) {
       return 'oryx-bounds' === (ser.prefix + '-' + ser.name)

@@ -1,13 +1,4 @@
-const XMLNS = {
-  ATOM: "http://www.w3.org/2005/Atom",
-  XHTML: "http://www.w3.org/1999/xhtml",
-  ERDF: "http://purl.org/NET/erdf/profile",
-  RDFS: "http://www.w3.org/2000/01/rdf-schema#",
-  RDF: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  RAZIEL: "http://b3mn.org/Raziel",
-  SCHEMA: ""
-}
-
+import ORYX_CONFIG from './CONFIG'
 
 const ERDF = {
   LITERAL: 0x01,
@@ -32,8 +23,8 @@ const ERDF = {
 
     // register callbacks and default schemas.
     ERDF.callback = callback
-    ERDF.registerSchema('schema', XMLNS.SCHEMA)
-    ERDF.registerSchema('rdfs', XMLNS.RDFS)
+    ERDF.registerSchema('schema', ORYX_CONFIG.XMLNS.SCHEMA)
+    ERDF.registerSchema('rdfs', ORYX_CONFIG.XMLNS.RDFS)
   },
 
   run: function () {
@@ -51,7 +42,7 @@ const ERDF = {
     // time measuring
     ERDF.__startTime = new Date()
 
-    var bodies = document.getElementsByTagNameNS(XMLNS.XHTML, 'body')
+    var bodies = document.getElementsByTagNameNS(ORYX_CONFIG.XMLNS.XHTML, 'body')
     var subject = { type: ERDF.RESOURCE, value: '' }
 
     var result = ERDF._parseDocumentMetadata() &&
@@ -69,9 +60,9 @@ const ERDF = {
   _parseDocumentMetadata: function () {
 
     // get links from head element.
-    var heads = document.getElementsByTagNameNS(XMLNS.XHTML, 'head')
-    var links = heads[0].getElementsByTagNameNS(XMLNS.XHTML, 'link')
-    var metas = heads[0].getElementsByTagNameNS(XMLNS.XHTML, 'meta')
+    var heads = document.getElementsByTagNameNS(ORYX_CONFIG.XMLNS.XHTML, 'head')
+    var links = heads[0].getElementsByTagNameNS(ORYX_CONFIG.XMLNS.XHTML, 'link')
+    var metas = heads[0].getElementsByTagNameNS(ORYX_CONFIG.XMLNS.XHTML, 'meta')
 
     // process links first, since they could contain schema definitions.
     $A(links).each(function (link) {
@@ -107,7 +98,7 @@ const ERDF = {
   _parseFromTag: function (node, subject, depth) {
 
     // avoid parsing non-xhtml content.
-    if (!node || !node.namespaceURI || node.namespaceURI != XMLNS.XHTML) {
+    if (!node || !node.namespaceURI || node.namespaceURI != ORYX_CONFIG.XMLNS.XHTML) {
       return
     }
 
@@ -269,16 +260,16 @@ const ERDF = {
   _checkProfile: function () {
 
     // get profiles from head element.
-    var heads = document.getElementsByTagNameNS(XMLNS.XHTML, 'head')
+    var heads = document.getElementsByTagNameNS(ORYX_CONFIG.XMLNS.XHTML, 'head')
     var profiles = heads[0].getAttribute('profile')
     var found = false
 
     // if erdf profile is contained.
-    if (profiles && profiles.split(' ').member(XMLNS.ERDF)) {
+    if (profiles && profiles.split(' ').member(ORYX_CONFIG.XMLNS.ERDF)) {
 
       // pass check.
       //if(ERDF.log.isTraceEnabled())
-      //	ERDF.log.trace("Found ERDF profile " + XMLNS.ERDF);
+      //	ERDF.log.trace("Found ERDF profile " + ORYX_CONFIG.XMLNS.ERDF);
       return true
 
     } else {
@@ -395,3 +386,4 @@ const ERDF = {
   }
 }
 
+export default ERDF
