@@ -508,7 +508,6 @@ export default class Canvas extends AbstractShape {
         shape.object.deserialize(shape.__properties, shape.json)
         shape.object._oldBounds = shape.object.bounds.clone()
         shape.object._update()
-        console.log(7777, shape)
       }
     })
 

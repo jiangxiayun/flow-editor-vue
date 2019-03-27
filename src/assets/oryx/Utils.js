@@ -156,7 +156,7 @@ const Utils = {
       let SVGImageElement = document.createElementNS('http://www.w3.org/2000/svg', 'image').toString()
       let SVGCircleElement = document.createElementNS('http://www.w3.org/2000/svg', 'circle').toString()
       let SVGEllipseElement = document.createElementNS('http://www.w3.org/2000/svg', 'ellipse').toString()
-      let SVGLineElement = document.createElementNS('http://www.w3.org/2000/svg', 'line').toString()
+      let SVGLieElement = document.createElementNS('http://www.w3.org/2000/svg', 'line').toString()
       let SVGPolylineElement = document.createElementNS('http://www.w3.org/2000/svg', 'polyline').toString()
       let SVGPolygonElement = document.createElementNS('http://www.w3.org/2000/svg', 'polygon').toString()
     }
@@ -247,7 +247,6 @@ const Utils = {
           if (!requires) {
             requires = { namespaces: [] }
           }
-
           requires.namespaces.push(namespace.nodeValue)
         }
       })
@@ -286,12 +285,69 @@ const Utils = {
       //Kickstart.require(url);
 
       // 加载成功log
-      // ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
+      // ORYX_Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
 
       // Add the Plugin-Data to all available Plugins
       me.availablePlugins.push(pluginData)
     })
   },
+  /**
+   * @namespace Collection of methods which can be used on a shape json object (ORYX.Core.AbstractShape#toJSON()).
+   * @example
+   * jQuery.extend(shapeAsJson, ORYX.Core.AbstractShape.JSONHelper);
+   */
+  JSONHelper: {
+    /**
+     * Iterates over each child shape.
+     * @param {Object} iterator Iterator function getting a child shape and his parent as arguments.
+     * @param {boolean} [deep=false] Iterate recursively (childShapes of childShapes)
+     * @param {boolean} [modify=false] If true, the result of the iterator function is taken as new shape, return false
+     *   to delete it. This enables modifying the object while iterating through the child shapes.
+     * @example
+     * // Increases the lowerRight x value of each direct child shape by one.
+     * myShapeAsJson.eachChild(function(shape, parentShape){
+     *     shape.bounds.lowerRight.x = shape.bounds.lowerRight.x + 1;
+     *     return shape;
+     * }, false, true);
+     */
+    eachChild: function (iterator, deep, modify) {
+      if (!this.childShapes) return
+
+      let newChildShapes = [] //needed if modify = true
+      this.childShapes.each(function (shape) {
+        if (!(shape.eachChild instanceof Function)) {
+          jQuery.extend(shape, this.JSONHelper)
+        }
+        let res = iterator(shape, this)
+        if (res) newChildShapes.push(res) //if false is returned, and modify = true, current shape is deleted.
+
+        if (deep) shape.eachChild(iterator, deep, modify)
+      }.bind(this))
+      if (modify) this.childShapes = newChildShapes
+    },
+    getShape: function () {
+      return null
+    },
+    getChildShapes: function (deep) {
+      let allShapes = this.childShapes
+      if (deep) {
+        this.eachChild(function (shape) {
+          if (!(shape.getChildShapes instanceof Function)) {
+            jQuery.extend(shape, this.JSONHelper)
+          }
+          allShapes = allShapes.concat(shape.getChildShapes(deep))
+        }, true)
+      }
+
+      return allShapes
+    },
+    /**
+     * @return {String} Serialized JSON object
+     */
+    serialize: function () {
+      return JSON.stringify(this)
+    }
+  }
 }
 
 export default Utils

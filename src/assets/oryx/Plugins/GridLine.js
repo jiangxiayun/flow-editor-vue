@@ -1,4 +1,4 @@
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 
 export default class GridLine {
   DIR_HORIZONTAL = 'hor'
@@ -11,10 +11,10 @@ export default class GridLine {
 
     this.parent = $(parentId)
     this.direction = direction
-    this.node = ORYX_Editor.graft('http://www.w3.org/2000/svg', this.parent,
+    this.node = ORYX_Utils.graft('http://www.w3.org/2000/svg', this.parent,
       ['g'])
 
-    this.line = ORYX_Editor.graft('http://www.w3.org/2000/svg', this.node,
+    this.line = ORYX_Utils.graft('http://www.w3.org/2000/svg', this.node,
       ['path', {
         'stroke-width': 1, stroke: 'silver', fill: 'none',
         'stroke-dasharray': '5,5',

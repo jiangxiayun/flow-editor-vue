@@ -1,5 +1,5 @@
 import ORYX_Config from '../CONFIG'
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 import ORYX_Edge from '../core/Edge'
 
 
@@ -7,7 +7,7 @@ export default class ShapeHighlighting {
   constructor (facade) {
     this.parentNode = facade.getCanvas().getSvgContainer()
     // The parent Node
-    this.node = ORYX_Editor.graft('http://www.w3.org/2000/svg', this.parentNode,
+    this.node = ORYX_Utils.graft('http://www.w3.org/2000/svg', this.parentNode,
       ['g'])
 
     this.highlightNodes = {}
@@ -20,7 +20,7 @@ export default class ShapeHighlighting {
       let node = this.highlightNodes[options.highlightId]
 
       if (!node) {
-        node = ORYX_Editor.graft('http://www.w3.org/2000/svg', this.node,
+        node = ORYX_Utils.graft('http://www.w3.org/2000/svg', this.node,
           ['path', {
             'stroke-width': 2.0, 'fill': 'none'
           }])

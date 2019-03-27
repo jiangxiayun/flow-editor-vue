@@ -1032,7 +1032,7 @@ const DataManager = {
     } else if (t.constructor == String) {
       e = doc.createTextNode(t)
     } else {
-      for (var i = 0; i < t.length; i++) {
+      for (let i = 0; i < t.length; i++) {
         if (i === 0 && t[i].constructor == String) {
           var snared = t[i].match(/^([a-z][a-z0-9]*)\.([^\s\.]+)$/i)
           if (snared) {

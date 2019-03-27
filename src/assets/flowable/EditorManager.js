@@ -330,6 +330,7 @@ export default class EditorManager {
 
     // this will be overwritten almost instantly.
     this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes))
+    console.log('new ORYX.Editor', config)
     this.editor = new ORYX.Editor(config)
 
     this.current = this.editor.id
@@ -730,7 +731,6 @@ export default class EditorManager {
         }
       }
     })
-
   }
 
   handleEvents (events) {

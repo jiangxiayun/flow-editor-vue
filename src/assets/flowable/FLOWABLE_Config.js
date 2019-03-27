@@ -815,8 +815,8 @@ export const FLOWABLE = {
        * if not on the scope, it is created and put on the scope for further use.
        */
       _getOryxViewPlugin: function (services) {
-        var $scope = services.$scope
-        var editorManager = services.editorManager
+        let $scope = services.$scope
+        let editorManager = services.editorManager
         if ($scope.oryxViewPlugin === undefined || $scope.oryxViewPlugin === null) {
           $scope.oryxViewPlugin = new ORYX.Plugins.View(editorManager.getEditor())
         }

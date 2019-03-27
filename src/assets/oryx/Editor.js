@@ -2,6 +2,7 @@ import ORYX_Log from './Log'
 import ORYX_Config from './CONFIG'
 import ORYX_Editor from './Editor'
 import ORYX_Utils from './Utils'
+import Plugins from './Plugins'
 import ORYX_Edge from './core/Edge'
 import ORYX_Node from './core/Node'
 import ORYX_Shape from './core/Shape'
@@ -11,6 +12,9 @@ import ORYX_StencilSet from './core/StencilSet'
 import ORYX_Command from './core/Command'
 import ORYX_Controls_Docker from './core/Controls/Docker'
 
+const PluginsList = {
+  Plugins
+}
 /**
  * The Editor class.
  * @class ORYX.Editor
@@ -60,9 +64,10 @@ export default class Editor {
     // Initialize the eventlistener
     this._initEventListener()
 
+    console.log('_createCanvas', model)
     // CREATES the canvas
     this._createCanvas(model.stencil ? model.stencil.id : null, model.properties)
-
+    console.log('_createCanvas-------done')
     // 生成整个 EXT.VIEWPORT
     this._generateGUI()
 
@@ -86,7 +91,6 @@ export default class Editor {
     // LOAD the content of the current editor instance
     window.setTimeout(function () {
       this.loadSerialized(model, true) // Request the meta data as well
-      console.log(444444, model)
       this.getCanvas().update()
       loadContentFinished = true
       initFinished()
@@ -295,7 +299,6 @@ export default class Editor {
 
     const me = this
     let newPlugins = []
-
     let loadedStencilSetsNamespaces = this.getStencilSets().keys()
 
     // Available Plugins will be initalize
@@ -330,14 +333,25 @@ export default class Editor {
         })) &&
         (!value.get('notUsesIn') || !value.get('notUsesIn').namespaces || !value.get('notUsesIn').namespaces.any(function (req) {
           return loadedStencilSetsNamespaces.indexOf(req) >= 0
-        })) &&
+        })) && (value.get('engaged') || (value.get('engaged') === undefined))) {
         /*only load activated plugins or undefined */
-        (value.get('engaged') || (value.get('engaged') === undefined))) {
-
+        // console.log(333, Plugins.Loading)
+        // console.log(eval(value.get('name')))
         try {
-          var className = eval(value.get('name')) // wow funcky code here!
+          // wow funcky code here!
+          // var className 	= eval(value.get("name"));
+          let className = eval(PluginsList[value.get('name')])
+          console.log('name', value.get('name'))
+          let a = 'Plugins.Loading'
+          console.log(11, eval('Plugins.Loading'))
+          console.log(22, PluginsList[a])
+          console.log(33, PluginsList.Plugins.Loading)
+          console.log(PluginsList[value.get('name')])
+          console.log('className', className)
+          console.log('PluginsList', PluginsList)
+          // let className = value.get('name')
           if (className) {
-            var plugin = new className(facade, value)
+            let plugin = new className(facade, value)
             plugin.type = value.get('name')
             newPlugins.push(plugin)
             plugin.engaged = true
@@ -384,7 +398,7 @@ export default class Editor {
       // Get any root stencil type
       stencilType = this.getStencilSets().values()[0].findRootStencilName()
     }
-
+    console.log('stencilType:', stencilType)
     // get the stencil associated with the type
     let canvasStencil = ORYX_StencilSet.stencil(stencilType)
 
@@ -566,8 +580,9 @@ export default class Editor {
       // alert(String.format(ORYX.I18N.JSONImport.wrongSS, jsonObject.stencilset.namespace, this.getCanvas().getStencil().stencilSet().namespace()))
       return null
     } else {
-      const commandClass = ORYX_Command.extend({
-        construct: function (jsonObject, loadSerializedCB, noSelectionAfterImport, facade) {
+      class commandClass extends ORYX_Command {
+        constructor (jsonObject, loadSerializedCB, noSelectionAfterImport, facade) {
+          super()
           this.jsonObject = jsonObject
           this.noSelection = noSelectionAfterImport
           this.facade = facade
@@ -576,8 +591,8 @@ export default class Editor {
           this.parents = new Hash()
           this.selection = this.facade.getSelection()
           this.loadSerialized = loadSerializedCB
-        },
-        execute: function () {
+        }
+        execute () {
           if (!this.shapes) {
             // Import the shapes out of the serialization
             this.shapes = this.loadSerialized(this.jsonObject)
@@ -622,8 +637,8 @@ export default class Editor {
           // are not yet initialized properly
           this.facade.getCanvas().updateSize()
 
-        },
-        rollback: function () {
+        }
+        rollback () {
           let selection = this.facade.getSelection()
           this.shapes.each(function (shape) {
             selection = selection.without(shape)
@@ -638,8 +653,7 @@ export default class Editor {
           this.facade.getCanvas().update()
           this.facade.setSelection(selection)
         }
-      })
-
+      }
       const command = new commandClass(jsonObject,
         this.loadSerialized.bind(this),
         noSelectionAfterImport,
@@ -755,7 +769,6 @@ export default class Editor {
         this.getCanvas().setProperty('oryx-' + key, value)
       }
     }
-
 
     this.getCanvas().updateSize()
 
@@ -1315,8 +1328,9 @@ export default class Editor {
       return
     }
     /* Assure we have the current event. */
-    if (!event)
+    if (!event) {
       event = window.event
+    }
 
     /* Fixed in FF3 */
     // This is a mac-specific fix. The mozilla event object has no knowledge
@@ -1404,15 +1418,12 @@ export default class Editor {
     // Rule #1: When there is nothing selected, select the clicked object.
     if (currentIsSelectable && noObjectsSelected) {
       this.setSelection([elementController])
-
       ORYX_Log.trace('Rule #1 applied for mouse down on %0', element.id)
 
       // Rule #3: When at least one element is selected, and there is no
       // control key pressed, and the clicked object is not selected, select
       // the clicked object.
-    } else if (currentIsSelectable && !noObjectsSelected &&
-      !modifierKeyPressed && !currentIsSelected) {
-
+    } else if (currentIsSelectable && !noObjectsSelected && !modifierKeyPressed && !currentIsSelected) {
       this.setSelection([elementController])
       //var objectType = elementController.readAttributes();
       //alert(objectType[0] + ": " + objectType[1]);
@@ -1421,19 +1432,14 @@ export default class Editor {
 
       // Rule #4: When the control key is pressed, and the current object is
       // not selected, add it to the selection.
-    } else if (currentIsSelectable && modifierKeyPressed
-      && !currentIsSelected) {
-
+    } else if (currentIsSelectable && modifierKeyPressed && !currentIsSelected) {
       let newSelection = this.selection.clone()
       newSelection.push(elementController)
       this.setSelection(newSelection)
 
       ORYX_Log.trace('Rule #4 applied for mouse down on %0', element.id)
-
       // Rule #6
-    } else if (currentIsSelectable && currentIsSelected &&
-      modifierKeyPressed) {
-
+    } else if (currentIsSelectable && currentIsSelected && modifierKeyPressed) {
       let newSelection = this.selection.clone()
       this.setSelection(newSelection.without(elementController))
 
@@ -1472,7 +1478,6 @@ export default class Editor {
       this.setSelection(this.selection, this._subSelection)
       ORYX_Log.trace('Rule #8 applied for mouse down on %0', element.id)
     }
-
 
     // prevent event from bubbling, return.
     //Event.stop(event);

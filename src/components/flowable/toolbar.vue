@@ -217,7 +217,7 @@
         // Default behaviour
         let buttonClicked = this.items[buttonIndex]
         let services = {
-          'this': this,
+          '$scope': this,
           '$rootScope': this.$parent,
           // '$http' : $http,
           // '$modal' : $modal,

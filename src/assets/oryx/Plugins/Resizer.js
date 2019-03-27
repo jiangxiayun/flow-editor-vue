@@ -1,5 +1,5 @@
 import ORYX_Config from '../CONFIG'
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 
 // 拖拽改变尺寸
 export default class Resizer {
@@ -8,7 +8,7 @@ export default class Resizer {
     this.orientation = orientation
     this.facade = facade
 
-    this.node = ORYX_Editor.graft('http://www.w3.org/1999/xhtml', $('canvasSection'),
+    this.node = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', $('canvasSection'),
       ['div', { 'class': 'resizer_' + this.orientation, style: 'left:0px; top:0px;position:absolute;' }])
 
     this.node.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this), true)

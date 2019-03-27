@@ -16,6 +16,7 @@ export default class DragDropResize extends AbstractPlugin {
    *  @param {Object} Facade: The Facade of the Editor
    */
   constructor (facade) {
+    console.log(777788)
     super()
     this.facade = facade
     // Initialize variables
@@ -40,6 +41,7 @@ export default class DragDropResize extends AbstractPlugin {
     var containerNode = this.facade.getCanvas().getSvgContainer()
 
     // Create the Selected Rectangle in the SVG
+    console.log(999999)
     this.selectedRect = new SelectedRect(containerNode)
 
     // Show grid line if enabled

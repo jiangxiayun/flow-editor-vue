@@ -1,5 +1,5 @@
 import ORYX_Config from '../CONFIG'
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 
 import ORYX_Node from '../core/Node'
 /**
@@ -43,7 +43,7 @@ export default class ProcessLink {
    */
   show (shape, url) {
     // Generate the svg-representation of a link
-    let link = ORYX_Editor.graft("http://www.w3.org/2000/svg", null,
+    let link = ORYX_Utils.graft("http://www.w3.org/2000/svg", null,
       ['a',
         {'target': '_blank'},
         ['path',
@@ -57,7 +57,7 @@ export default class ProcessLink {
         ]
       ]);
 
-     link = ORYX_Editor.graft("http://www.w3.org/2000/svg", null,
+     link = ORYX_Utils.graft("http://www.w3.org/2000/svg", null,
       ['a',
         {'target': '_blank'},
         ['path', {

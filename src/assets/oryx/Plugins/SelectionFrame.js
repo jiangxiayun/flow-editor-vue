@@ -1,5 +1,5 @@
 import ORYX_Config from '../CONFIG'
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 
 import ORYX_Canvas from '../core/Canvas'
 
@@ -21,7 +21,7 @@ export default class SelectionFrame {
     this.moveCallback = undefined
     this.offsetScroll = { x: 0, y: 0 }
     // HTML-Node of Selection-Frame
-    this.node = ORYX_Editor.graft('http://www.w3.org/1999/xhtml', $('canvasSection'),
+    this.node = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', $('canvasSection'),
       ['div', { 'class': 'Oryx_SelectionFrame' }])
 
     this.hide()

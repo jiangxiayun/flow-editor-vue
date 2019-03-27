@@ -32,12 +32,10 @@ export default class Shape extends AbstractShape {
 
     this.incoming = []
     this.outgoing = []
-
     this.nodes = []
-
     this._dockerChangedCallback = this._dockerChanged.bind(this)
 
-    //Hash map for all labels. Labels are not treated as children of shapes.
+    // Hash map for all labels. Labels are not treated as children of shapes.
     this._labels = new Hash()
 
     // create SVG node
@@ -91,8 +89,8 @@ export default class Shape extends AbstractShape {
           if (property != undefined) {
             this.propertiesChanged.set(propChanged.key, false)
 
-            console.log('property', propChanged.key)
-            console.log('property.type', property.type())
+            // console.log('property', propChanged.key)
+            // console.log('property.type', property.type())
             // handle choice properties
             if (property.type() == ORYX_Config.TYPE_CHOICE) {
               //iterate all references to SVG elements
@@ -139,7 +137,7 @@ export default class Shape extends AbstractShape {
               // handle properties that are not of type choice
               // iterate all references to SVG elements
               property.refToView().each((function (ref) {
-                console.log('ref==========', ref)
+                // console.log('ref==========', ref)
                 //if the property does not reference an SVG element,
                 // do nothing
                 if (ref === '') {
@@ -213,6 +211,7 @@ export default class Shape extends AbstractShape {
 
                 if (property.complexAttributeToView()) {
                   let label = this._labels.get(refId)
+
                   if (label) {
                     try {
                       let propJson = prop.evalJSON()
@@ -334,7 +333,6 @@ export default class Shape extends AbstractShape {
               }).bind(this))
             }
           }
-          console.log('=====================')
         }
       }).bind(this))
 
@@ -558,7 +556,8 @@ export default class Shape extends AbstractShape {
           if (uiObject instanceof ORYX_Controls.Docker) {
             parent = ctrls.childNodes[0]
             if (this.dockers.length >= 2) {
-              this.dockers.splice(index !== undefined ? Math.min(index, this.dockers.length - 1) : this.dockers.length - 1, 0, uiObject)
+              this.dockers.splice(index !== undefined ? Math.min(index, this.dockers.length - 1) :
+                this.dockers.length - 1, 0, uiObject)
             } else {
               this.dockers.push(uiObject)
             }
@@ -890,11 +889,9 @@ export default class Shape extends AbstractShape {
    * @param {SVGDocument} svgDocument
    */
   _init (svgDocument) {
-    //adjust ids
+    // adjust ids
     this._adjustIds(svgDocument, 0)
   }
-
-
 
   _adjustIds(element, idIndex) {
     if (element instanceof Element) {
@@ -921,7 +918,6 @@ export default class Shape extends AbstractShape {
     }
     return idIndex
   }
-
 
   toString() {
     return 'ORYX.Core.Shape ' + this.getId()

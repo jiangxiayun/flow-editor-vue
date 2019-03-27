@@ -6,14 +6,6 @@ import ORYX_Utils from '../Utils'
 // import Node from './Node'
 // import Edge from './Edge'
 
-
-/**
- * @namespace Collection of methods which can be used on a shape json object (ORYX.Core.AbstractShape#toJSON()).
- * @example
- * jQuery.extend(shapeAsJson, ORYX.Core.AbstractShape.JSONHelper);
- */
-
-
 /**
  * Top Level uiobject.
  * @class ORYX.Core.AbstractShape
@@ -21,60 +13,6 @@ import ORYX_Utils from '../Utils'
  */
 
 export default class AbstractShape extends UIObject {
-  JSONHelper = {
-    /**
-     * Iterates over each child shape.
-     * @param {Object} iterator Iterator function getting a child shape and his parent as arguments.
-     * @param {boolean} [deep=false] Iterate recursively (childShapes of childShapes)
-     * @param {boolean} [modify=false] If true, the result of the iterator function is taken as new shape, return false
-     *   to delete it. This enables modifying the object while iterating through the child shapes.
-     * @example
-     * // Increases the lowerRight x value of each direct child shape by one.
-     * myShapeAsJson.eachChild(function(shape, parentShape){
-     *     shape.bounds.lowerRight.x = shape.bounds.lowerRight.x + 1;
-     *     return shape;
-     * }, false, true);
-     */
-    eachChild: function (iterator, deep, modify) {
-      if (!this.childShapes) return
-
-      let newChildShapes = [] //needed if modify = true
-      this.childShapes.each(function (shape) {
-        if (!(shape.eachChild instanceof Function)) {
-          jQuery.extend(shape, AbstractShape.JSONHelper)
-        }
-        let res = iterator(shape, this)
-        if (res) newChildShapes.push(res) //if false is returned, and modify = true, current shape is deleted.
-
-        if (deep) shape.eachChild(iterator, deep, modify)
-      }.bind(this))
-      if (modify) this.childShapes = newChildShapes
-    },
-    getShape: function () {
-      return null
-    },
-    getChildShapes: function (deep) {
-      let allShapes = this.childShapes
-      if (deep) {
-        this.eachChild(function (shape) {
-          if (!(shape.getChildShapes instanceof Function)) {
-            jQuery.extend(shape, AbstractShape.JSONHelper)
-          }
-          allShapes = allShapes.concat(shape.getChildShapes(deep))
-        }, true)
-      }
-
-      return allShapes
-    },
-
-    /**
-     * @return {String} Serialized JSON object
-     */
-    serialize: function () {
-      return JSON.stringify(this)
-    }
-  }
-
   constructor (options, stencil, facade) {
     // console.log('options', options)
     // console.log('stencil', stencil)
@@ -132,7 +70,6 @@ export default class AbstractShape extends UIObject {
 
       }).bind(this))
     }
-
   }
 
   layout () {
@@ -207,11 +144,11 @@ export default class AbstractShape extends UIObject {
       //   }
       //   result.push(uiObject)
       // }
-      if (uiObject instanceof Shape) {
-        if (deep) {
-          result = result.concat(uiObject.getChildNodes(deep, iterator))
-        }
-      }
+      // if (uiObject instanceof Shape) {
+      //   if (deep) {
+      //     result = result.concat(uiObject.getChildNodes(deep, iterator))
+      //   }
+      // }
     })
 
     return result
@@ -264,7 +201,6 @@ export default class AbstractShape extends UIObject {
     }
 
     if (this.isPointIncluded(x, y)) {
-
       let result = []
       result.push(this)
 
@@ -313,11 +249,10 @@ export default class AbstractShape extends UIObject {
       this._changed()
 
       // Raise an event, to show that the property has changed
-      //window.setTimeout( function(){
+      // window.setTimeout( function(){
 
       if (!this._isInSetProperty) {
         this._isInSetProperty = true
-
         this._delegateEvent({
           type: ORYX_Config.EVENT_PROPERTY_CHANGED,
           elements: [this],
@@ -366,7 +301,6 @@ export default class AbstractShape extends UIObject {
   isPointIncluded (pointX, pointY, absoluteBounds) {
     let absBounds = absoluteBounds ? absoluteBounds : this.absoluteBounds()
     return absBounds.isIncluded(pointX, pointY)
-
   }
 
   /**
@@ -536,7 +470,7 @@ export default class AbstractShape extends UIObject {
       })
     }
 
-    jQuery.extend(json, this.JSONHelper)
+    jQuery.extend(json, ORYX_Utils.JSONHelper)
 
     // do not pollute the json attributes (for serialization), so put the corresponding
     // shape is encapsulated in a method

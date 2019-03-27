@@ -395,7 +395,6 @@ export default class Edge extends Shape {
       this._oldBounds = this.bounds.clone()
     }
 
-
     // IE10 specific fix, start and end-markes get left behind when moving path
     let userAgent = navigator.userAgent
     if (navigator.appVersion.indexOf('MSIE 10') !== -1 || (userAgent.indexOf('Trident') !== -1 && userAgent.indexOf('rv:11') !== -1)) {
@@ -1239,7 +1238,7 @@ export default class Edge extends Shape {
       defs = defs[0]
       let markerElements = $A(defs.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'marker'))
       let marker
-      let me = this
+      const me = this
       markerElements.each(function (markerElement) {
         try {
           marker = new ORYX_SVG.SVGMarker(markerElement.cloneNode(true))
@@ -1251,13 +1250,13 @@ export default class Edge extends Shape {
               textElement: textElement,
               shapeId: this.id
             })
+
             me._labels.set(label.id, label)
           })
         }
         catch (e) {}
       })
     }
-
 
     let gs = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'g')
     if (gs.length <= 0) {
@@ -1276,7 +1275,7 @@ export default class Edge extends Shape {
         path.setAttributeNS(null, 'id', pathId)
         this._paths.push(path)
 
-        //check, if markers are set and update the id
+        // check, if markers are set and update the id
         let markersByThisPath = []
         let markerUrl = path.getAttributeNS(null, 'marker-start')
 
@@ -1314,7 +1313,7 @@ export default class Edge extends Shape {
 
         this._markersByPath[pathId] = markersByThisPath
 
-        //init dockers
+        // init dockers
         let parser = new PathParser()
         let handler = new ORYX_SVG.PointsPathHandler()
         parser.setHandler(handler)
@@ -1383,7 +1382,7 @@ export default class Edge extends Shape {
 
     this._oldBounds = this.bounds.clone()
 
-    //add paths to this.node
+    // add paths to this.node
     this._paths.reverse()
     let paths = []
     this._paths.each((function (path) {
@@ -1392,7 +1391,7 @@ export default class Edge extends Shape {
 
     this._paths = paths
 
-    //init interaction path
+    // init interaction path
     this._paths.each((function (path) {
       let iPath = path.cloneNode(false)
       iPath.setAttributeNS(null, 'id', undefined)
@@ -1412,7 +1411,7 @@ export default class Edge extends Shape {
     let textElems = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text')
 
     $A(textElems).each((function (textElem) {
-      var label = new ORYX_SVG.Label({
+      let label = new ORYX_SVG.Label({
         textElement: textElem,
         shapeId: this.id
       })
@@ -1422,11 +1421,9 @@ export default class Edge extends Shape {
       label.registerOnChange(this.layout.bind(this))
     }).bind(this))
 
-
     this.propertiesChanged.each(function (pair) {
       pair.value = true
     })
-
 
     //if(this.dockers.length == 2) {
 
@@ -1483,10 +1480,8 @@ export default class Edge extends Shape {
    * Calls when a docker has changed
    */
   _dockerChanged () {
-
     //this._update(true);
     this._dockerUpdated = true
-
   }
 
   serialize () {

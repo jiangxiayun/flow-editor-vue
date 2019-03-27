@@ -1,8 +1,8 @@
 import Command from '../core/Command'
 import ORYX_Config from '../CONFIG'
+import ORYX_Utils from '../Utils'
 import ORYX_Edge from '../core/Edge'
 import ORYX_Node from '../core/Node'
-import ORYX_AbstractShape from '../core/AbstractShape'
 
 class ClipBoard {
   constructor () {
@@ -359,7 +359,7 @@ export default class Edit {
       }
     }
     // Apply json helper to iterate over json object
-    jQuery.extend(canvas, ORYX_AbstractShape.JSONHelper)
+    jQuery.extend(canvas, ORYX_Utils.JSONHelper)
 
     let childShapeResourceIds = canvas.getChildShapes(true).pluck('resourceId')
     let outgoings = {}

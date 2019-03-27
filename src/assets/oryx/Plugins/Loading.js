@@ -1,5 +1,5 @@
 import ORYX_Config from '../CONFIG'
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 
 /**
  * This plugin is responsible for displaying loading indicators and to prevent
@@ -13,7 +13,7 @@ export default class Loading {
     this.facade = facade
 
     // The parent Node
-    this.node = ORYX_Editor.graft('http://www.w3.org/1999/xhtml', this.facade.getCanvas().getHTMLContainer().parentNode, ['div', {
+    this.node = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', this.facade.getCanvas().getHTMLContainer().parentNode, ['div', {
       'class': 'LoadingIndicator'
     }, ''])
 

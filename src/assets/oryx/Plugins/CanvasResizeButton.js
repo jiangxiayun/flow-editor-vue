@@ -1,4 +1,4 @@
-import ORYX_Editor from '../Editor'
+import ORYX_Utils from '../Utils'
 import ORYX_Config from '../CONFIG'
 
 export default class CanvasResizeButton {
@@ -44,14 +44,14 @@ export default class CanvasResizeButton {
     let idGrow = 'canvas-shrink-' + position
     let idShrink = 'canvas-grow-' + position
 
-    const buttonGrow = ORYX_Editor.graft('http://www.w3.org/1999/xhtml', parentNode, ['div', {
+    const buttonGrow = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', parentNode, ['div', {
       'class': 'canvas_resize_indicator canvas_resize_indicator_grow' + ' ' + position,
       'id': idGrow,
       'title': this.I18N.RESIZE.tipGrow + this.I18N.RESIZE[position]
     },
       ['i', { 'class': iconClass }]
     ])
-    const buttonShrink = ORYX_Editor.graft('http://www.w3.org/1999/xhtml', parentNode, ['div', {
+    const buttonShrink = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', parentNode, ['div', {
       'class': 'canvas_resize_indicator canvas_resize_indicator_shrink' + ' ' + position,
       'id': idShrink,
       'title': this.I18N.RESIZE.tipGrow + this.I18N.RESIZE[position]

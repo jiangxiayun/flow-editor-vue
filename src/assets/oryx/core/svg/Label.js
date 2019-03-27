@@ -24,9 +24,7 @@ export default class Label {
   ]
   _characterSetValues = [15, 14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3]
   /**
-   * Constructor
    * @param options {Object} : textElement
-   *
    */
   constructor (options) {
     // arguments.callee.$.construct.apply(this, arguments)
@@ -43,7 +41,6 @@ export default class Label {
     this.node.setAttributeNS(null, 'letter-spacing', '0px')
 
     this.shapeId = options.shapeId
-
     // if the text element already has an id, don't change it.
     let _id = this.node.getAttributeNS(null, 'id')
     if (_id) {
@@ -65,14 +62,13 @@ export default class Label {
     this._rotate = null
     this._rotationPoint = null
 
-    //this.anchors = [];
+    // this.anchors = [];
     this.anchorLeft = null
     this.anchorRight = null
     this.anchorTop = null
     this.anchorBottom = null
 
     this._isChanged = true
-
 
     // set referenced element the text is fit to
     this.fitToElemId = this.node.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'fittoelem')
@@ -107,7 +103,7 @@ export default class Label {
       }).bind(this))
     }
 
-    //set edge position (only in case the label belongs to an edge)
+    // set edge position (only in case the label belongs to an edge)
     this.edgePosition = this.node.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'edgePosition')
     if (this.edgePosition) {
       this.originEdgePosition = this.edgePosition = this.edgePosition.toLowerCase()
@@ -654,6 +650,7 @@ export default class Label {
       let fontSize = this.getFontSize(this.node)
       let invalidTSpans = []
       let x = this.x, y = this.y
+
       if (this.position) {
         x = this.position.x
         y = this.position.y

@@ -38,7 +38,6 @@ export default class Node extends Shape {
     this.isVerticallyResizable = false
 
     this.dataId = undefined
-
     this._init(this._stencil.view())
     this.forcedHeight = -1
   }
@@ -319,7 +318,7 @@ export default class Node extends Shape {
       svgShapes.push(svgShape)
     }
     catch (e) {
-      //do nothing
+
     }
 
     if (svgNode.hasChildNodes()) {
@@ -515,7 +514,9 @@ export default class Node extends Shape {
   _init (svgDocument) {
     // arguments.callee.$._init.apply(this, arguments)
     super._init(svgDocument)
-    let svgNode = svgDocument.getElementsByTagName('g')[0] //outer most g node
+    //outer most g node
+    let svgNode = svgDocument.getElementsByTagName('g')[0]
+
     // set all required attributes
     let attributeTitle = svgDocument.ownerDocument.createAttribute('title')
     attributeTitle.nodeValue = this.getStencil().title()
@@ -570,7 +571,6 @@ export default class Node extends Shape {
     if (this.minimumSize && this.maximumSize &&
       (this.minimumSize.width > this.maximumSize.width ||
         this.minimumSize.height > this.maximumSize.height)) {
-
       //TODO wird verschluckt!!!
       throw this + ': Minimum Size must be greater than maxiumSize.'
     }
@@ -644,13 +644,9 @@ export default class Node extends Shape {
     this.bounds.set(upperLeft, lowerRight)
 
     /**initialize magnets */
-
     let magnets = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_ORYX, 'magnets')
-
     if (magnets && magnets.length > 0) {
-
       magnets = $A(magnets[0].getElementsByTagNameNS(ORYX_Config.NAMESPACE_ORYX, 'magnet'))
-
       const me = this
       magnets.each(function (magnetElem) {
         let magnet = new ORYX_Controls.Magnet({
@@ -663,7 +659,7 @@ export default class Node extends Shape {
           y: cy - offsetY
         })
 
-        //get anchors
+        // get anchors
         let anchors = magnetElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'anchors')
         if (anchors) {
           anchors = anchors.replace('/,/g', ' ')
@@ -688,7 +684,7 @@ export default class Node extends Shape {
 
         me.add(magnet)
 
-        //check, if magnet is default magnet
+        // check, if magnet is default magnet
         if (!me._defaultMagnet) {
           let defaultAttr = magnetElem.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'default')
           if (defaultAttr && defaultAttr.toLowerCase() === 'yes') {
@@ -743,6 +739,7 @@ export default class Node extends Shape {
 
     /**initialize labels*/
     let textElems = svgNode.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text')
+
     $A(textElems).each((function (textElem) {
       let label = new ORYX_SVG.Label({
         textElement: textElem,
@@ -751,14 +748,12 @@ export default class Node extends Shape {
       label.x -= offsetX
       label.y -= offsetY
       this._labels.set(label.id, label)
-
       label.registerOnChange(this.layout.bind(this))
 
       // Only apply fitting on form-components
       if (this._stencil.id().indexOf(ORYX_Config.FORM_ELEMENT_ID_PREFIX) == 0) {
         label.registerOnChange(this.fitToLabels.bind(this))
       }
-
     }).bind(this))
   }
 

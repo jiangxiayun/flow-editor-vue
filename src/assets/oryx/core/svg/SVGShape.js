@@ -1,5 +1,5 @@
 import ORYX_CONFIG from '../../CONFIG'
-import ORYX_Editor from '../../Editor'
+import ORYX_Utils from '../../Utils'
 import ORYX_Math from '../Math'
 import EditPathHandler from './EditPathHandler'
 import MinMaxPathHandler from './MinMaxPathHandler'
@@ -54,8 +54,8 @@ export default class SVGShape {
    */
   init () {
     /**initialize position and size*/
-    if (ORYX_Editor.checkClassType(this.element, SVGRectElement) ||
-      ORYX_Editor.checkClassType(this.element, SVGImageElement)) {
+    if (ORYX_Utils.checkClassType(this.element, SVGRectElement) ||
+      ORYX_Utils.checkClassType(this.element, SVGImageElement)) {
       this.type = 'Rect'
 
       const xAttr = this.element.getAttributeNS(null, 'x')
@@ -83,7 +83,7 @@ export default class SVGShape {
         throw 'Missing attribute in element ' + this.element
       }
 
-    } else if (ORYX_Editor.checkClassType(this.element, SVGCircleElement)) {
+    } else if (ORYX_Utils.checkClassType(this.element, SVGCircleElement)) {
       this.type = 'Circle'
 
       let cx = undefined
@@ -114,7 +114,7 @@ export default class SVGShape {
       this.oldWidth = 2 * this.radiusX
       this.oldHeight = 2 * this.radiusX
 
-    } else if (ORYX_Editor.checkClassType(this.element, SVGEllipseElement)) {
+    } else if (ORYX_Utils.checkClassType(this.element, SVGEllipseElement)) {
       this.type = 'Ellipse'
 
       let cx = undefined
@@ -148,7 +148,7 @@ export default class SVGShape {
       this.oldWidth = 2 * this.radiusX
       this.oldHeight = 2 * this.radiusY
 
-    } else if (ORYX_Editor.checkClassType(this.element, SVGLineElement)) {
+    } else if (ORYX_Utils.checkClassType(this.element, SVGLineElement)) {
       this.type = 'Line'
 
       let x1 = undefined
@@ -184,8 +184,8 @@ export default class SVGShape {
       this.oldWidth = Math.abs(x1 - x2)
       this.oldHeight = Math.abs(y1 - y2)
 
-    } else if (ORYX_Editor.checkClassType(this.element, SVGPolylineElement) ||
-      ORYX_Editor.checkClassType(this.element, SVGPolygonElement)) {
+    } else if (ORYX_Utils.checkClassType(this.element, SVGPolylineElement) ||
+      ORYX_Utils.checkClassType(this.element, SVGPolygonElement)) {
       this.type = 'Polyline'
 
       let pointsArray = []
@@ -227,7 +227,7 @@ export default class SVGShape {
         throw 'Missing attribute in element ' + this.element
       }
 
-    } else if (ORYX_Editor.checkClassType(this.element, SVGPathElement)) {
+    } else if (ORYX_Utils.checkClassType(this.element, SVGPathElement)) {
       this.type = 'Path'
 
       this.editPathParser = new PathParser()
@@ -295,7 +295,7 @@ export default class SVGShape {
     }
 
     // allowDockers and resizeMarkerMid
-    if (ORYX_Editor.checkClassType(this.element, SVGPathElement)) {
+    if (ORYX_Utils.checkClassType(this.element, SVGPathElement)) {
       const allowDockersAttr = this.element.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'allowDockers')
       if (allowDockersAttr) {
         if (allowDockersAttr.toLowerCase() === 'no') {
@@ -499,7 +499,7 @@ export default class SVGShape {
     // Is SVG context
     if (hasOwnerSVG) {
       // IF G-Element
-      if (ORYX_Editor.checkClassType(elem, SVGGElement)) {
+      if (ORYX_Utils.checkClassType(elem, SVGGElement)) {
         if (elem.className && elem.className.baseVal == 'me') {
           this.visible = true
           return this.visible
