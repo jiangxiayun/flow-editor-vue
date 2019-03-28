@@ -250,31 +250,31 @@
       MousetrapBind () {
         /* Key bindings */
         Mousetrap.bind('mod+z', () => {
-          const services = { 'this': this, 'editorManager': this.editorManager }
+          const services = { '$scope': this, 'editorManager': this.editorManager }
           FLOWABLE.TOOLBAR.ACTIONS.undo(services)
           return false
         })
 
         Mousetrap.bind('mod+y', () => {
-          const services = { 'this': this, 'editorManager': this.editorManager }
+          const services = { '$scope': this, 'editorManager': this.editorManager }
           FLOWABLE.TOOLBAR.ACTIONS.redo(services)
           return false
         })
 
         Mousetrap.bind('mod+c', () => {
-          const services = { 'this': this, 'editorManager': this.editorManager }
+          const services = { '$scope': this, 'editorManager': this.editorManager }
           FLOWABLE.TOOLBAR.ACTIONS.copy(services)
           return false
         })
 
         Mousetrap.bind('mod+v', () => {
-          const services = { 'this': this, 'editorManager': this.editorManager }
+          const services = { '$scope': this, 'editorManager': this.editorManager }
           FLOWABLE.TOOLBAR.ACTIONS.paste(services)
           return false
         })
 
         Mousetrap.bind(['del'], () => {
-          const services = { 'this': this, 'editorManager': this.editorManager }
+          const services = { '$scope': this, 'editorManager': this.editorManager }
           FLOWABLE.TOOLBAR.ACTIONS.deleteItem(services)
           return false
         })

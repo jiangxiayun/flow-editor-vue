@@ -1,13 +1,10 @@
 import ORYX_Config from '../CONFIG'
 import ORYX_Utils from '../Utils'
-
 import ORYX_Canvas from '../core/Canvas'
 
 export default class SelectionFrame {
-
   constructor (facade) {
     this.facade = facade
-
     // Register on MouseEvents
     this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this))
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUp.bind(this), true)

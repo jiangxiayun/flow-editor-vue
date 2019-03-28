@@ -1,7 +1,5 @@
 import AbstractShape from './AbstractShape'
 import UIObject from './UIObject'
-// import ORYX_Node from './Node'
-// import ORYX_Edge from './Edge'
 import ORYX_Canvas from './Canvas'
 import ORYX_Controls from './Controls'
 
@@ -9,8 +7,6 @@ import ERDF from '../ERDF'
 import ORYX_Utils from '../Utils'
 import ORYX_Log from '../Log'
 import ORYX_Config from '../CONFIG'
-
-
 
 /**
  * @classDescription Base class for Shapes.
@@ -445,9 +441,7 @@ export default class Shape extends AbstractShape {
 
   getIncomingNodes (iterator) {
     return this.incoming.select(function (incoming) {
-      //todo open
-      // let isNode = (incoming instanceof ORYX_Node)
-      let isNode = null
+      let isNode = incoming.getInstanceofType().includes('Node')
       if (isNode && iterator) iterator(incoming)
       return isNode
     })
@@ -463,9 +457,7 @@ export default class Shape extends AbstractShape {
 
   getOutgoingNodes (iterator) {
     return this.outgoing.select(function (out) {
-      // todo open
-      // let isNode = (out instanceof ORYX_Node)
-      let isNode = null
+      let isNode = out.getInstanceofType().includes('Node')
       if (isNode && iterator) iterator(out)
       return isNode
     })
@@ -523,11 +515,10 @@ export default class Shape extends AbstractShape {
    * @param {Number} index
    */
   add (uiObject, index, silent) {
-    //parameter has to be an UIObject, but
+    // parameter has to be an UIObject, but
     // must not be an Edge.
 
-    // todo open   && !(uiObject instanceof ORYX_Edge)
-    if (uiObject instanceof UIObject) {
+    if (uiObject instanceof UIObject && !(uiObject.getInstanceofType().includes('Edge'))) {
 
       if (!(this.children.member(uiObject))) {
         //if uiObject is child of another parent, remove it from that parent.
@@ -546,12 +537,11 @@ export default class Shape extends AbstractShape {
 
         //add uiObject.node to this.node depending on the type of uiObject
         let parent
-        // todo open
-        // if (uiObject instanceof ORYX_Node) {
-        //   parent = this.node.childNodes[0].childNodes[1]
-        //   this.nodes.push(uiObject)
-        // } else
-          if (uiObject instanceof ORYX_Controls.Control) {
+        let type = uiObject.getInstanceofType()
+        if (type.includes('Node')) {
+          parent = this.node.childNodes[0].childNodes[1]
+          this.nodes.push(uiObject)
+        } else if (uiObject instanceof ORYX_Controls.Control) {
           let ctrls = this.node.childNodes[1]
           if (uiObject instanceof ORYX_Controls.Docker) {
             parent = ctrls.childNodes[0]
@@ -608,12 +598,11 @@ export default class Shape extends AbstractShape {
 
       //delete uiObject.node from this.node
       if (uiObject instanceof Shape) {
-        // todo open
-        // if (uiObject instanceof ORYX_Edge) {
-        //   uiObject.removeMarkers()
-        //   uiObject.node = this.node.childNodes[0].childNodes[2].removeChild(uiObject.node)
-        // } else
-          {
+        let type = uiObject.getInstanceofType()
+        if (type.includes('Edge')) {
+          uiObject.removeMarkers()
+          uiObject.node = this.node.childNodes[0].childNodes[2].removeChild(uiObject.node)
+        } else {
           uiObject.node = this.node.childNodes[0].childNodes[1].removeChild(uiObject.node)
           this.nodes = this.nodes.without(uiObject)
         }
@@ -836,14 +825,13 @@ export default class Shape extends AbstractShape {
     })
     if (bounds) {
       let b = bounds.value.replace(/,/g, ' ').split(' ').without('')
-      // todo open
-      // if (this instanceof ORYX_Edge) {
-      //   if (!this.dockers.first().isChanged)
-      //     this.dockers.first().bounds.centerMoveTo(parseFloat(b[0]), parseFloat(b[1]))
-      //   if (!this.dockers.last().isChanged)
-      //     this.dockers.last().bounds.centerMoveTo(parseFloat(b[2]), parseFloat(b[3]))
-      // } else
-        {
+      let type = this.getInstanceofType()
+      if (type.includes('Edge')) {
+        if (!this.dockers.first().isChanged)
+          this.dockers.first().bounds.centerMoveTo(parseFloat(b[0]), parseFloat(b[1]))
+        if (!this.dockers.last().isChanged)
+          this.dockers.last().bounds.centerMoveTo(parseFloat(b[2]), parseFloat(b[3]))
+      } else {
         this.bounds.set(parseFloat(b[0]), parseFloat(b[1]), parseFloat(b[2]), parseFloat(b[3]))
       }
     }
@@ -921,6 +909,9 @@ export default class Shape extends AbstractShape {
 
   toString() {
     return 'ORYX.Core.Shape ' + this.getId()
+  }
+  getInstanceofType () {
+    return 'Shape'
   }
 }
 

@@ -298,7 +298,7 @@ export default class BPMN2_0 extends AbstractPlugin {
    *  @param {Object} Facade: The Facade of the Editor
    */
   constructor (facade) {
-    super()
+    super(facade)
     this.facade = facade
 
     this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDOCKER_DOCKED, this.handleDockerDocked.bind(this))
@@ -420,25 +420,26 @@ export default class BPMN2_0 extends AbstractPlugin {
               select.isParent(sh) && isLeafFn(select)
           })) {
 
-          const Command = Command.extend({
-            construct: function (shape, facade) {
+          class CommandB extends Command{
+            constructor (shape, facade) {
+              super()
               this.children = shape.getChildNodes(true)
               this.facade = facade
-            },
-            execute: function () {
+            }
+            execute () {
               this.children.each(function (child) {
                 child.bounds.moveBy(30, 0)
               })
               //this.facade.getCanvas().update();
-            },
-            rollback: function () {
+            }
+            rollback () {
               this.children.each(function (child) {
                 child.bounds.moveBy(-30, 0)
               })
               //this.facade.getCanvas().update();
             }
-          })
-          this.facade.executeCommands([new Command(sh, this.facade)])
+          }
+          this.facade.executeCommands([new CommandB(sh, this.facade)])
 
         } else if (isLeaf && !parentHasMoreLanes && parent == pool) {
           parent.add(sh)
@@ -832,15 +833,16 @@ export default class BPMN2_0 extends AbstractPlugin {
         return (allLanes[i] || {}).id !== key
       })) {
 
-        let LanesHasBeenReordered = Command.extend({
-          construct: function (originPosition, newPosition, lanes, plugin, poolId) {
+        class LanesHasBeenReordered extends Command{
+          constructor (originPosition, newPosition, lanes, plugin, poolId) {
+            super()
             this.originPosition = Object.clone(originPosition)
             this.newPosition = Object.clone(newPosition)
             this.lanes = lanes
             this.plugin = plugin
             this.pool = poolId
-          },
-          execute: function () {
+          }
+          execute () {
             if (!this.executed) {
               this.executed = true
               this.lanes.each(function (lane) {
@@ -849,15 +851,15 @@ export default class BPMN2_0 extends AbstractPlugin {
               }.bind(this))
               this.plugin.hashedPositions[this.pool] = Object.clone(this.newPosition)
             }
-          },
-          rollback: function () {
+          }
+          rollback () {
             this.lanes.each(function (lane) {
               if (this.originPosition[lane.id])
                 lane.bounds.moveTo(this.originPosition[lane.id])
             }.bind(this))
             this.plugin.hashedPositions[this.pool] = Object.clone(this.originPosition)
           }
-        })
+        }
 
         let hp2 = new Hash()
         allLanes.each(function (lane) {
@@ -913,30 +915,31 @@ export default class BPMN2_0 extends AbstractPlugin {
       return change.shape.bounds.toString() !== change.bounds.toString()
     })) {
 
-      let Command = Command.extend({
-        construct: function (changes) {
+      class CommandB extends Command{
+        constructor (changes) {
+          super()
           this.oldState = changes
           this.newState = changes.map(function (s) {
             return { shape: s.shape, bounds: s.bounds.clone() }
           })
-        },
-        execute: function () {
+        }
+        execute () {
           if (this.executed) {
             this.applyState(this.newState)
           }
           this.executed = true
-        },
-        rollback: function () {
+        }
+        rollback() {
           this.applyState(this.oldState)
-        },
-        applyState: function (state) {
+        }
+        applyState (state) {
           state.each(function (s) {
             s.shape.bounds.set(s.bounds.upperLeft(), s.bounds.lowerRight())
           })
         }
-      })
+      }
 
-      this.facade.executeCommands([new Command(changes)])
+      this.facade.executeCommands([new CommandB(changes)])
     }
   }
 
@@ -1271,29 +1274,28 @@ export default class BPMN2_0 extends AbstractPlugin {
     }
 
     // Move the moved children
-    const MoveChildCommand = Command.extend({
-      construct: function (state) {
+    class MoveChildCommand extends Command{
+      constructor (state) {
+        super()
         this.state = state
-      },
-      execute: function () {
+      }
+      execute () {
         if (this.executed) {
           this.state.each(function (s) {
             s.shape.bounds.moveBy(s.xOffset, 0)
           })
         }
         this.executed = true
-      },
-      rollback: function () {
+      }
+      rollback () {
         this.state.each(function (s) {
           s.shape.bounds.moveBy(-s.xOffset, 0)
         })
       }
-    })
-
+    }
 
     // Set dockers
     this.facade.executeCommands([new ORYX_MoveDockersCommand(dockers), new MoveChildCommand(movedShapes)])
-
   }
 
   moveBy (pos, offset) {

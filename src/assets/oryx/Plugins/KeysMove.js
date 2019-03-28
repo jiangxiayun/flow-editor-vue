@@ -7,7 +7,7 @@ import ORYX_Controls from '../core/Controls/index'
 
 export default class KeysMove extends AbstractPlugin {
   constructor (facade) {
-    super()
+    super(facade)
     this.facade = facade
     this.copyElements = []
 
@@ -236,8 +236,9 @@ export default class KeysMove extends AbstractPlugin {
   }
 
   getUndockedCommant (shapes) {
-    const undockEdgeCommand = ORYX_Command.extend({
-      construct: function (moveShapes) {
+    class undockEdgeCommand extends ORYX_Command{
+      constructor (moveShapes) {
+        super()
         this.dockers = moveShapes.collect(function (shape) {
           return shape instanceof ORYX_Controls.Docker ? {
             docker: shape,
@@ -245,20 +246,20 @@ export default class KeysMove extends AbstractPlugin {
             refPoint: shape.referencePoint
           } : undefined
         }).compact()
-      },
-      execute: function () {
+      }
+      execute () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(undefined)
         })
-      },
-      rollback: function () {
+      }
+      rollback () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(el.dockedShape)
           el.docker.setReferencePoint(el.refPoint)
           //el.docker.update();
         })
       }
-    })
+    }
 
     command = new undockEdgeCommand(shapes)
     command.execute()

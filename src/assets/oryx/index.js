@@ -132,8 +132,7 @@ ORYX.Utils = Utils
 function init () {
   ORYX.Log.debug('Querying editor instances')
   // Hack for WebKit to set the SVGElement-Classes
-  // todo open
-  // ORYX.Utils.setMissingClasses();
+  ORYX.Utils.setMissingClasses();
   // If someone wants to create the editor instance himself
   if (window.onOryxResourcesLoaded) {
     window.onOryxResourcesLoaded()

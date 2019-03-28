@@ -58,4 +58,7 @@ export default class Magnet extends Control {
   toString() {
     return 'Magnet ' + this.id
   }
+  getInstanceofType () {
+    return 'Magent'
+  }
 }

@@ -2,9 +2,6 @@ import UIObject from './UIObject'
 import ERDF from '../ERDF'
 import ORYX_Config from '../CONFIG'
 import ORYX_Utils from '../Utils'
-// import Shape from './Shape'
-// import Node from './Node'
-// import Edge from './Edge'
 
 /**
  * Top Level uiobject.
@@ -14,8 +11,6 @@ import ORYX_Utils from '../Utils'
 
 export default class AbstractShape extends UIObject {
   constructor (options, stencil, facade) {
-    // console.log('options', options)
-    // console.log('stencil', stencil)
     super(options)
     // arguments.callee.$.construct.apply(this, arguments);
 
@@ -101,20 +96,18 @@ export default class AbstractShape extends UIObject {
    */
   getChildShapes (deep, iterator) {
     let result = []
-
-    // todo open
-    // this.children.each(function (uiObject) {
-    //   if (uiObject instanceof Shape && uiObject.isVisible) {
-    //     if (iterator) {
-    //       iterator(uiObject)
-    //     }
-    //     result.push(uiObject)
-    //     if (deep) {
-    //       result = result.concat(uiObject.getChildShapes(deep, iterator))
-    //     }
-    //   }
-    // })
-
+    this.children.each(function (uiObject) {
+      let type = uiObject.getInstanceofType()
+      if (type.includes('Shape') && uiObject.isVisible) {
+        if (iterator) {
+          iterator(uiObject)
+        }
+        result.push(uiObject)
+        if (deep) {
+          result = result.concat(uiObject.getChildShapes(deep, iterator))
+        }
+      }
+    })
     return result
   }
 
@@ -135,20 +128,19 @@ export default class AbstractShape extends UIObject {
    */
   getChildNodes (deep, iterator) {
     let result = []
-
     this.children.each(function (uiObject) {
-      // todo open
-      // if (uiObject instanceof Node && uiObject.isVisible) {
-      //   if (iterator) {
-      //     iterator(uiObject)
-      //   }
-      //   result.push(uiObject)
-      // }
-      // if (uiObject instanceof Shape) {
-      //   if (deep) {
-      //     result = result.concat(uiObject.getChildNodes(deep, iterator))
-      //   }
-      // }
+      let type = uiObject.getInstanceofType()
+      if (type.includes('Node') && uiObject.isVisible) {
+        if (iterator) {
+          iterator(uiObject)
+        }
+        result.push(uiObject)
+      }
+      if (type === 'Shape') {
+        if (deep) {
+          result = result.concat(uiObject.getChildNodes(deep, iterator))
+        }
+      }
     })
 
     return result
@@ -161,20 +153,19 @@ export default class AbstractShape extends UIObject {
    */
   getChildEdges (deep, iterator) {
     let result = []
-
     this.children.each(function (uiObject) {
-      // todo open
-      // if (uiObject instanceof Edge && uiObject.isVisible) {
-      //   if (iterator) {
-      //     iterator(uiObject)
-      //   }
-      //   result.push(uiObject)
-      // }
-      // if (uiObject instanceof Shape) {
-      //   if (deep) {
-      //     result = result.concat(uiObject.getChildEdges(deep, iterator))
-      //   }
-      // }
+      let type = uiObject.getInstanceofType()
+      if (type.includes('Edge') && uiObject.isVisible) {
+        if (iterator) {
+          iterator(uiObject)
+        }
+        result.push(uiObject)
+      }
+      if (type === 'Shape') {
+        if (deep) {
+          result = result.concat(uiObject.getChildEdges(deep, iterator))
+        }
+      }
     })
 
     return result

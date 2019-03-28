@@ -19,9 +19,8 @@ Array.prototype.insertFrom = function (from, to) {
   return newA
 }
 export default class Arrangement extends AbstractPlugin {
-
   constructor (facade) {
-    super()
+    super(facade)
     this.facade = facade
 
     // Z-Ordering
@@ -162,9 +161,10 @@ export default class Arrangement extends AbstractPlugin {
   }
 
   setZLevel (callback, event) {
-    //Command-Pattern for dragging one docker
-    let zLevelCommand = ORYX_Command.extend({
-      construct: function (callback, elements, facade) {
+    // Command-Pattern for dragging one docker
+    class zLevelCommand extends ORYX_Command{
+      constructor (callback, elements, facade) {
+        super()
         this.callback = callback
         this.elements = elements
         // For redo, the previous elements get stored
@@ -172,13 +172,13 @@ export default class Arrangement extends AbstractPlugin {
           return { el: el, previous: el.parent.children[el.parent.children.indexOf(el) - 1] }
         })
         this.facade = facade
-      },
-      execute: function () {
+      }
+      execute () {
         // Call the defined z-order callback with the elements
         this.callback(this.elements)
         this.facade.setSelection(this.elements)
-      },
-      rollback: function () {
+      }
+      rollback() {
         // Sort all elements on the index of there containment
         let sortedEl = this.elAndIndex.sortBy(function (el) {
           let value = el.el
@@ -200,7 +200,7 @@ export default class Arrangement extends AbstractPlugin {
         // Reset the selection
         this.facade.setSelection(this.elements)
       }
-    })
+    }
 
     // Instanziate the dockCommand
     let command = new zLevelCommand(callback, this.facade.getSelection(), this.facade)
@@ -343,8 +343,9 @@ export default class Arrangement extends AbstractPlugin {
       maxHeight = Math.max(shape.bounds.height(), maxHeight)
     })
 
-    const commandClass = ORYX_Command.extend({
-      construct: function (elements, bounds, maxHeight, maxWidth, way, plugin) {
+    class commandClass extends ORYX_Command{
+      constructor (elements, bounds, maxHeight, maxWidth, way, plugin) {
+        super()
         this.elements = elements
         this.bounds = bounds
         this.maxHeight = maxHeight
@@ -353,8 +354,8 @@ export default class Arrangement extends AbstractPlugin {
         this.facade = plugin.facade
         this.plugin = plugin
         this.orgPos = []
-      },
-      setBounds: function (shape, maxSize) {
+      }
+      setBounds (shape, maxSize) {
         if (!maxSize)
           maxSize = { width: ORYX_Config.MAXIMUM_SIZE, height: ORYX_Config.MAXIMUM_SIZE }
         if (!shape.bounds) {
@@ -391,8 +392,8 @@ export default class Arrangement extends AbstractPlugin {
         /* set bounds of shape */
         shape.bounds.set(newBounds)
 
-      },
-      execute: function () {
+      }
+      execute () {
         // align each shape according to the way that was specified.
         this.elements.each(function (shape, index) {
           this.orgPos[index] = shape.bounds.upperLeft()
@@ -412,42 +413,36 @@ export default class Arrangement extends AbstractPlugin {
                 y: relBounds.b.y - shape.bounds.height()
               }
               break
-
             case ORYX_Config.EDITOR_ALIGN_MIDDLE:
               newCoordinates = {
                 x: shape.bounds.upperLeft().x,
                 y: (relBounds.a.y + relBounds.b.y - shape.bounds.height()) / 2
               }
               break
-
             case ORYX_Config.EDITOR_ALIGN_TOP:
               newCoordinates = {
                 x: shape.bounds.upperLeft().x,
                 y: relBounds.a.y
               }
               break
-
             case ORYX_Config.EDITOR_ALIGN_LEFT:
               newCoordinates = {
                 x: relBounds.a.x,
                 y: shape.bounds.upperLeft().y
               }
               break
-
             case ORYX_Config.EDITOR_ALIGN_CENTER:
               newCoordinates = {
                 x: (relBounds.a.x + relBounds.b.x - shape.bounds.width()) / 2,
                 y: shape.bounds.upperLeft().y
               }
               break
-
             case ORYX_Config.EDITOR_ALIGN_RIGHT:
               newCoordinates = {
                 x: relBounds.b.x - shape.bounds.width(),
                 y: shape.bounds.upperLeft().y
               }
               break
-
             case ORYX_Config.EDITOR_ALIGN_SIZE:
               if (shape.isResizable) {
                 this.orgPos[index] = { a: shape.bounds.upperLeft(), b: shape.bounds.lowerRight() }
@@ -467,11 +462,10 @@ export default class Arrangement extends AbstractPlugin {
             //shape.update()
           }
         }.bind(this))
-
         //this.facade.getCanvas().update();
         //this.facade.updateSelection();
-      },
-      rollback: function () {
+      }
+      rollback () {
         this.elements.each(function (shape, index) {
           if (this.way == ORYX_Config.EDITOR_ALIGN_SIZE) {
             if (shape.isResizable) {
@@ -481,14 +475,12 @@ export default class Arrangement extends AbstractPlugin {
             shape.bounds.moveTo(this.orgPos[index])
           }
         }.bind(this))
-
         //this.facade.getCanvas().update();
         //this.facade.updateSelection();
       }
-    })
+    }
 
     const command = new commandClass(elements, bounds, maxHeight, maxWidth, parseInt(way), this)
-
     this.facade.executeCommands([command])
   }
 }

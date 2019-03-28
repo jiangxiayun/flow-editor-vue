@@ -361,7 +361,8 @@ export default class Edit {
     // Apply json helper to iterate over json object
     jQuery.extend(canvas, ORYX_Utils.JSONHelper)
 
-    let childShapeResourceIds = canvas.getChildShapes(true).pluck('resourceId')
+    // let childShapeResourceIds = canvas.getChildShapes(true).pluck('resourceId')
+    let childShapeResourceIds = getChildShapes.getChildShapes(canvas, true).pluck('resourceId')
     let outgoings = {}
     // Iterate over all shapes
     canvas.eachChild(function (shape, parent) {

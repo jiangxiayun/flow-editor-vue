@@ -8,7 +8,6 @@ const Kickstart = {
   callbacks: [],
   alreadyLoaded: [],
   PATH: '',
-
   load: function () {
     Kickstart.kick()
   },
@@ -635,14 +634,10 @@ const DataManager = {
   },
 
   __persistDOM: function (facade) {
-
     // getChildShapes gets all shapes (nodes AND edges), deep flag
     // makes it return a flattened child hierarchy.
-
-    var canvas = facade.getCanvas()
-    var shapes = canvas.getChildShapes(true)
-    var result = ''
-
+    const shapes = facade.getCanvas().getChildShapes(true)
+    let result = ''
     // persist all shapes.
     shapes.each(function (shape) {
       DataManager.__forceExistance(shape)
@@ -660,23 +655,18 @@ const DataManager = {
         $(ERDF.__stripHashes(shape.resourceId)), true)
     })
 
-    //result += DataManager.__renderCanvas(facade);
-
+    // result += DataManager.__renderCanvas(facade);
     return result
   },
 
   __renderCanvas: function (facade) {
-
-    var canvas = facade.getCanvas()
-    var stencilSets = facade.getStencilSets()
-    var shapes = canvas.getChildShapes(true)
+    const canvas = facade.getCanvas()
+    const stencilSets = facade.getStencilSets()
+    const shapes = canvas.getChildShapes(true)
 
     DataManager.__forceExistance(canvas)
-
     DataManager.__persistShape(canvas)
-
-    var shapeResource = new ERDF.Resource(canvas.resourceId)
-
+    const shapeResource = new ERDF.Resource(canvas.resourceId)
     // remove all triples for this particular shape's resource
     DataManager.removeTriples(DataManager.query(
       shapeResource, undefined, undefined))
@@ -751,12 +741,10 @@ const DataManager = {
    * resource representations as shapes.
    */
   __syncglobal: function (facade) {
-
     // getChildShapes gets all shapes (nodes AND edges), deep flag
     // makes it return a flattened child hierarchy.
-
-    var canvas = facade.getCanvas()
-    var shapes = canvas.getChildShapes(true)
+    const canvas = facade.getCanvas()
+    const shapes = canvas.getChildShapes(true)
 
     // create dummy resource representations in the dom
     // for all shapes that were newly created.

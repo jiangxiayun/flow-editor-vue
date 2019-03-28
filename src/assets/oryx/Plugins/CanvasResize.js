@@ -7,34 +7,40 @@ import ORYX_Config from '../CONFIG'
  * @param {Object} facade The editor plugin facade to register enhancements with.
  */
 export default class CanvasResize {
-  constructor(facade) {
-    this.facade = facade;
-    new CanvasResizeButton(this.facade.getCanvas(), "N", this.resize.bind(this));
-    new CanvasResizeButton(this.facade.getCanvas(), "W", this.resize.bind(this));
-    new CanvasResizeButton(this.facade.getCanvas(), "E", this.resize.bind(this));
-    new CanvasResizeButton(this.facade.getCanvas(), "S", this.resize.bind(this));
+  constructor (facade) {
+    this.facade = facade
+    new CanvasResizeButton(this.facade.getCanvas(), 'N', this.resize.bind(this))
+    new CanvasResizeButton(this.facade.getCanvas(), 'W', this.resize.bind(this))
+    new CanvasResizeButton(this.facade.getCanvas(), 'E', this.resize.bind(this))
+    new CanvasResizeButton(this.facade.getCanvas(), 'S', this.resize.bind(this))
 
     window.setTimeout(function () {
-      jQuery(window).trigger('resize');
-    });
+      jQuery(window).trigger('resize')
+    })
 
   }
 
-  resize(position, shrink) {
+  resize (position, shrink) {
     let resizeCanvas = function (position, extentionSize, facade) {
-      let canvas = facade.getCanvas();
-      let b = canvas.bounds;
-      let scrollNode = facade.getCanvas().getHTMLContainer().parentNode.parentNode;
+      let canvas = facade.getCanvas()
+      let b = canvas.bounds
+      let scrollNode = facade.getCanvas().getHTMLContainer().parentNode.parentNode
 
-      if (position == "E" || position == "W") {
-        canvas.setSize({width: (b.width() + extentionSize) * canvas.zoomLevel, height: (b.height()) * canvas.zoomLevel})
+      if (position == 'E' || position == 'W') {
+        canvas.setSize({
+          width: (b.width() + extentionSize) * canvas.zoomLevel,
+          height: (b.height()) * canvas.zoomLevel
+        })
 
-      } else if (position == "S" || position == "N") {
-        canvas.setSize({width: (b.width()) * canvas.zoomLevel, height: (b.height() + extentionSize) * canvas.zoomLevel})
+      } else if (position == 'S' || position == 'N') {
+        canvas.setSize({
+          width: (b.width()) * canvas.zoomLevel,
+          height: (b.height() + extentionSize) * canvas.zoomLevel
+        })
       }
 
-      if (position == "N" || position == "W") {
-        let move = position == "N" ? {x: 0, y: extentionSize} : {x: extentionSize, y: 0};
+      if (position == 'N' || position == 'W') {
+        let move = position == 'N' ? { x: 0, y: extentionSize } : { x: extentionSize, y: 0 }
 
         // Move all children
         canvas.getChildNodes(false, function (shape) {
@@ -48,43 +54,47 @@ export default class CanvasResize {
           return edge.dockers.findAll(function (docker) {
             return !docker.getDockedShape()
           })
-        }).flatten();
+        }).flatten()
         dockers.each(function (docker) {
           docker.bounds.moveBy(move)
         })
-      } else if (position == "S") {
-        scrollNode.scrollTop += extentionSize;
-      } else if (position == "E") {
-        scrollNode.scrollLeft += extentionSize;
+      } else if (position == 'S') {
+        scrollNode.scrollTop += extentionSize
+      } else if (position == 'E') {
+        scrollNode.scrollLeft += extentionSize
       }
 
-      jQuery(window).trigger('resize');
+      jQuery(window).trigger('resize')
 
-      canvas.update();
-      facade.updateSelection();
+      canvas.update()
+      facade.updateSelection()
     }
 
-    const commandClass = ORYX_Command.extend({
-      construct: function (position, extentionSize, facade) {
-        this.position = position;
-        this.extentionSize = extentionSize;
-        this.facade = facade;
-      },
-      execute: function () {
-        resizeCanvas(this.position, this.extentionSize, this.facade);
-      },
-      rollback: function () {
-        resizeCanvas(this.position, -this.extentionSize, this.facade);
-      },
-      update: function () {
+    class commandClass extends ORYX_Command {
+      constructor (position, extentionSize, facade) {
+        super()
+        this.position = position
+        this.extentionSize = extentionSize
+        this.facade = facade
       }
-    });
 
-    let extentionSize = ORYX_Config.CANVAS_RESIZE_INTERVAL;
-    if (shrink) extentionSize = -extentionSize;
-    const command = new commandClass(position, extentionSize, this.facade);
+      execute () {
+        resizeCanvas(this.position, this.extentionSize, this.facade)
+      }
 
-    this.facade.executeCommands([command]);
+      rollback () {
+        resizeCanvas(this.position, -this.extentionSize, this.facade)
+      }
+
+      update () {
+      }
+    }
+
+    let extentionSize = ORYX_Config.CANVAS_RESIZE_INTERVAL
+    if (shrink) extentionSize = -extentionSize
+    const command = new commandClass(position, extentionSize, this.facade)
+
+    this.facade.executeCommands([command])
   }
 }
 

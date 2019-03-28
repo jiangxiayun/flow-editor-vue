@@ -8,12 +8,12 @@ import ORYX_Utils from '../Utils'
  * @param {Object} facade The editor plugin facade to register enhancements with.
  */
 export default class Loading {
-
   constructor (facade) {
     this.facade = facade
 
     // The parent Node
-    this.node = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', this.facade.getCanvas().getHTMLContainer().parentNode, ['div', {
+    this.node = ORYX_Utils.graft('http://www.w3.org/1999/xhtml',
+      this.facade.getCanvas().getHTMLContainer().parentNode, ['div', {
       'class': 'LoadingIndicator'
     }, ''])
 

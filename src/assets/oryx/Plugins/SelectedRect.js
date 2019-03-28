@@ -3,7 +3,6 @@ import ORYX_Config from '../CONFIG'
 
 export default class SelectedRect {
   constructor (parentId) {
-    console.log(99999)
     this.parentId = parentId
     this.node = ORYX_Utils.graft('http://www.w3.org/2000/svg', $(parentId),
       ['g'])

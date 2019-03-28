@@ -423,9 +423,10 @@ export default class DragDocker {
       shapes = shapeWithoutEdges.length ? shapeWithoutEdges : shapes
       this.facade.setSelection(shapes)
     } else {
-      //Command-Pattern for dragging one docker
-      const dragDockerCommand = ORYX_Command.extend({
-        construct: function (docker, newPos, oldPos, newDockedShape, oldDockedShape, facade) {
+      // Command-Pattern for dragging one docker
+      class dragDockerCommand extends ORYX_Command{
+        constructor (docker, newPos, oldPos, newDockedShape, oldDockedShape, facade) {
+          super()
           this.docker = docker
           this.index = docker.parent.dockers.indexOf(docker)
           this.newPosition = newPos
@@ -435,25 +436,24 @@ export default class DragDocker {
           this.facade = facade
           this.index = docker.parent.dockers.indexOf(docker)
           this.shape = docker.parent
-
-        },
-        execute: function () {
+        }
+        execute () {
           if (!this.docker.parent) {
             this.docker = this.shape.dockers[this.index]
           }
           this.dock(this.newDockedShape, this.newPosition)
           this.removedDockers = this.shape.removeUnusedDockers()
           this.facade.updateSelection()
-        },
-        rollback: function () {
+        }
+        rollback () {
           this.dock(this.oldDockedShape, this.oldPosition);
           (this.removedDockers || $H({})).each(function (d) {
             this.shape.add(d.value, Number(d.key))
             this.shape._update(true)
           }.bind(this))
           this.facade.updateSelection()
-        },
-        dock: function (toDockShape, pos) {
+        }
+        dock (toDockShape, pos) {
           // Set the Docker to the new Shape
           this.docker.setDockedShape(undefined)
           if (toDockShape) {
@@ -464,11 +464,9 @@ export default class DragDocker {
           } else {
             this.docker.bounds.centerMoveTo(pos)
           }
-
           this.facade.getCanvas().update()
         }
-      })
-
+      }
 
       if (this.docker.parent) {
         // Instanziate the dockCommand

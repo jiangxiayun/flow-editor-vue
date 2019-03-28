@@ -24,8 +24,8 @@ class EdgeLayouter extends AbstractLayouter {
     'http://www.signavio.com/stencilsets/processmap#ProcessLink',
     'http://www.signavio.com/stencilsets/organigram#connection']
 
-  constructor () {
-    super()
+  constructor (facade) {
+    super(facade)
   }
 
   /**

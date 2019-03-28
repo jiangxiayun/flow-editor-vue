@@ -4,8 +4,10 @@ import ORYX_Config from '../CONFIG'
 export default class CanvasResizeButton {
   I18N = {
     RESIZE: {
-      tipGrow: 'Increase canvas size:',
-      tipShrink: 'Decrease canvas size:',
+      // tipGrow: 'Increase canvas size:',
+      // tipShrink: 'Decrease canvas size:',
+      tipGrow: '增加画布尺寸:',
+      tipShrink: '减小画布尺寸:',
       N: 'Top',
       W: 'Left',
       S: 'Down',
@@ -54,7 +56,7 @@ export default class CanvasResizeButton {
     const buttonShrink = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', parentNode, ['div', {
       'class': 'canvas_resize_indicator canvas_resize_indicator_shrink' + ' ' + position,
       'id': idShrink,
-      'title': this.I18N.RESIZE.tipGrow + this.I18N.RESIZE[position]
+      'title': this.I18N.RESIZE.tipShrink + this.I18N.RESIZE[position]
     },
       ['i', { 'class': iconClassShrink }]
     ])

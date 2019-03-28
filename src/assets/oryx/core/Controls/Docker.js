@@ -1,8 +1,6 @@
 import Control from './Control'
 import ORYX_Config from '../../CONFIG'
 import ORYX_Utils from '../../Utils'
-// import Node from '../Node'
-// import Edge from '../Edge'
 
 /**
  * @classDescription Represents a movable docker that can be bound to a shape. Dockers are used
@@ -60,35 +58,34 @@ export default class Docker extends Control {
     // Buffer the Update Callback for un-/register on Event-Handler
     this._updateCallback = this._changed.bind(this)
   }
-
   update () {
     // If there have an DockedShape
     if (this._dockedShape) {
-      //todo open
-      // if (this._dockedShapeBounds && this._dockedShape instanceof Node) {
-      //   // Calc the delta of width and height of the lastBounds and the current Bounds
-      //   let dswidth = this._dockedShapeBounds.width()
-      //   let dsheight = this._dockedShapeBounds.height()
-      //   if (!dswidth) {
-      //     dswidth = 1
-      //   }
-      //   if (!dsheight) {
-      //     dsheight = 1
-      //   }
-      //
-      //   let widthDelta = this._dockedShape.bounds.width() / dswidth
-      //   let heightDelta = this._dockedShape.bounds.height() / dsheight
-      //
-      //   // If there is an different
-      //   if (widthDelta !== 1.0 || heightDelta !== 1.0) {
-      //     // Set the delta
-      //     this.referencePoint.x *= widthDelta
-      //     this.referencePoint.y *= heightDelta
-      //   }
-      //
-      //   // Clone these bounds
-      //   this._dockedShapeBounds = this._dockedShape.bounds.clone()
-      // }
+      let type = this._dockedShape.getInstanceofType()
+      if (this._dockedShapeBounds && type.includes('Node')) {
+        // Calc the delta of width and height of the lastBounds and the current Bounds
+        let dswidth = this._dockedShapeBounds.width()
+        let dsheight = this._dockedShapeBounds.height()
+        if (!dswidth) {
+          dswidth = 1
+        }
+        if (!dsheight) {
+          dsheight = 1
+        }
+
+        let widthDelta = this._dockedShape.bounds.width() / dswidth
+        let heightDelta = this._dockedShape.bounds.height() / dsheight
+
+        // If there is an different
+        if (widthDelta !== 1.0 || heightDelta !== 1.0) {
+          // Set the delta
+          this.referencePoint.x *= widthDelta
+          this.referencePoint.y *= heightDelta
+        }
+
+        // Clone these bounds
+        this._dockedShapeBounds = this._dockedShape.bounds.clone()
+      }
 
       // Get the first and the last Docker of the parent Shape
       let dockerIndex = this.parent.dockers.indexOf(this)
@@ -161,7 +158,6 @@ export default class Docker extends Control {
     super.update()
     // arguments.callee.$.update.apply(this, arguments)
   }
-
   /**
    * Calls the super class refresh method and updates the view of the docker.
    */
@@ -177,12 +173,12 @@ export default class Docker extends Control {
 
     if (p && this._dockedShape) {
       let upL
-      // todo open
-      // if (this.parent instanceof Edge) {
-      //   upL = this._dockedShape.absoluteXY()
-      // } else {
-      //   upL = this._dockedShape.bounds.upperLeft()
-      // }
+      let type = this.parent.getInstanceofType()
+      if (type.includes('Edge')) {
+        upL = this._dockedShape.absoluteXY()
+      } else {
+        upL = this._dockedShape.bounds.upperLeft()
+      }
       p.x += upL.x
       p.y += upL.y
     } else {
@@ -305,7 +301,6 @@ export default class Docker extends Control {
   isDocked() {
     return !!this._dockedShape
   }
-
   /**
    * Set the Color of the Docker
    * @param {Object} color
@@ -313,7 +308,6 @@ export default class Docker extends Control {
   setDockerColor(color) {
     this._dockerNode.lastChild.setAttributeNS(null, 'fill', color)
   }
-
   preventHiding(prevent) {
     this._preventHiding = Math.max(0, (this._preventHiding || 0) + (prevent ? 1 : -1))
   }
@@ -341,12 +335,13 @@ export default class Docker extends Control {
     this.node.setAttributeNS(null, 'visibility', 'visible')
 
     // Hide reference point if the connected shape is an edge
-    // todo open
-    // if (this.getDockedShape() instanceof Edge) {
-    //   this._referencePointNode.setAttributeNS(null, 'visibility', 'hidden')
-    // } else {
-    //   this._referencePointNode.setAttributeNS(null, 'visibility', 'visible')
-    // }
+    console.log(222, this.getDockedShape())
+    let type = this.getDockedShape().getInstanceofType()
+    if (type.includes('Edge')) {
+      this._referencePointNode.setAttributeNS(null, 'visibility', 'hidden')
+    } else {
+      this._referencePointNode.setAttributeNS(null, 'visibility', 'visible')
+    }
 
     this.children.each(function (uiObj) {
       uiObj.show()
@@ -354,5 +349,8 @@ export default class Docker extends Control {
   }
   toString() {
     return 'Docker ' + this.id
+  }
+  getInstanceofType () {
+    return 'Docker'
   }
 }

@@ -7,17 +7,16 @@ import ORYX_Node from '../core/Node'
 import ORYX_Shape from '../core/Shape'
 import ORYX_Canvas from '../core/Canvas'
 import ORYX_Command from '../core/Command'
+import ORYX_Command_Move from '../core/Move'
 import ORYX_Controls from '../core/Controls/index'
 import ORYX_Config from '../CONFIG'
 
 export default class DragDropResize extends AbstractPlugin {
   /**
-   *  Constructor
    *  @param {Object} Facade: The Facade of the Editor
    */
   constructor (facade) {
-    console.log(777788)
-    super()
+    super(facade)
     this.facade = facade
     // Initialize variables
     this.currentShapes = []			// Current selected Shapes
@@ -38,10 +37,8 @@ export default class DragDropResize extends AbstractPlugin {
     this.callbackMouseUp = this.handleMouseUp.bind(this)
 
     // Get the SVG-Containernode
-    var containerNode = this.facade.getCanvas().getSvgContainer()
-
+    let containerNode = this.facade.getCanvas().getSvgContainer()
     // Create the Selected Rectangle in the SVG
-    console.log(999999)
     this.selectedRect = new SelectedRect(containerNode)
 
     // Show grid line if enabled
@@ -74,7 +71,6 @@ export default class DragDropResize extends AbstractPlugin {
 
   /**
    * On Mouse Down
-   *
    */
   handleMouseDown (event, uiObj) {
     // If the selection Bounds not intialized and the uiObj is not member of current selectio
@@ -82,7 +78,6 @@ export default class DragDropResize extends AbstractPlugin {
     if (!this.dragBounds || !this.currentShapes.member(uiObj) || !this.toMoveShapes.length) {
       return
     }
-
 
     // Start Dragging
     this.dragEnable = true
@@ -150,9 +145,10 @@ export default class DragDropResize extends AbstractPlugin {
           let docker = this.toMoveShapes[0].dockers[0]
 
 
-          //Command-Pattern for dragging several Shapes
-          const dockCommand = ORYX_Command.extend({
-            construct: function (docker, position, newDockedShape, facade) {
+          // Command-Pattern for dragging several Shapes
+          class dockCommand extends ORYX_Command{
+            constructor (docker, position, newDockedShape, facade) {
+              super()
               this.docker = docker
               this.newPosition = position
               this.newDockedShape = newDockedShape
@@ -166,16 +162,16 @@ export default class DragDropResize extends AbstractPlugin {
                 this.oldPosition = docker.parent.absoluteBounds().center()
               }
 
-            },
-            execute: function () {
+            }
+            execute() {
               this.dock(this.newDockedShape, this.newParent, this.newPosition)
               // Raise Event for having the docked shape on top of the other shape
               this.facade.raiseEvent({ type: ORYX_Config.EVENT_ARRANGEMENT_TOP, excludeCommand: true })
-            },
-            rollback: function () {
+            }
+            rollback () {
               this.dock(this.oldDockedShape, this.oldParent, this.oldPosition)
-            },
-            dock: function (toDockShape, parent, pos) {
+            }
+            dock (toDockShape, parent, pos) {
               // Add to the same parent Shape
               parent.add(this.docker.parent)
               // Set the Docker to the new Shape
@@ -188,8 +184,7 @@ export default class DragDropResize extends AbstractPlugin {
               this.facade.getCanvas().update()
               this.facade.updateSelection()
             }
-          })
-
+          }
           // Instanziate the dockCommand
           const commands = [new dockCommand(docker, position, this.containmentParentNode, this.facade)]
           this.facade.executeCommands(commands)
@@ -487,7 +482,9 @@ export default class DragDropResize extends AbstractPlugin {
     }
 
     // Instanciate the dragCommand
-    const commands = [new ORYX_Command.Move(this.toMoveShapes, offset, this.containmentParentNode, this.currentShapes, this)]
+    const commands = [new ORYX_Command_Move(
+      this.toMoveShapes, offset, this.containmentParentNode, this.currentShapes, this
+    )]
     // If the undocked edges command is setted, add this command
     if (this._undockedEdgesCommand instanceof ORYX_Command) {
       commands.unshift(this._undockedEdgesCommand)
@@ -529,30 +526,31 @@ export default class DragDropResize extends AbstractPlugin {
 
     // If Resizing finished, the Shapes will be resize
     if (this.isResizing) {
-      const commandClass = ORYX_Command.extend({
-        construct: function (shape, newBounds, plugin) {
+      class commandClass extends ORYX_Command{
+        constructor (shape, newBounds, plugin) {
+          super()
           this.shape = shape
           this.oldBounds = shape.bounds.clone()
           this.newBounds = newBounds
           this.plugin = plugin
-        },
-        execute: function () {
+        }
+        execute () {
           this.shape.bounds.set(this.newBounds.a, this.newBounds.b)
           this.update(this.getOffset(this.oldBounds, this.newBounds))
-        },
-        rollback: function () {
+        }
+        rollback () {
           this.shape.bounds.set(this.oldBounds.a, this.oldBounds.b)
           this.update(this.getOffset(this.newBounds, this.oldBounds))
-        },
-        getOffset: function (b1, b2) {
+        }
+        getOffset(b1, b2) {
           return {
             x: b2.a.x - b1.a.x,
             y: b2.a.y - b1.a.y,
             xs: b2.width() / b1.width(),
             ys: b2.height() / b1.height()
           }
-        },
-        update: function (offset) {
+        }
+        update (offset) {
           this.shape.getLabels().each(function (label) {
             label.changed()
           })
@@ -570,7 +568,7 @@ export default class DragDropResize extends AbstractPlugin {
           this.plugin.facade.getCanvas().update()
           this.plugin.facade.updateSelection()
         }
-      })
+      }
 
       let bounds = this.dragBounds.clone()
       let shape = this.currentShapes[0]
@@ -596,8 +594,9 @@ export default class DragDropResize extends AbstractPlugin {
    *
    */
   beforeDrag () {
-    const undockEdgeCommand = ORYX_Command.extend({
-      construct: function (moveShapes) {
+    class undockEdgeCommand extends ORYX_Command{
+      constructor (moveShapes) {
+        super()
         this.dockers = moveShapes.collect(function (shape) {
           return shape instanceof ORYX_Controls.Docker ? {
             docker: shape,
@@ -605,20 +604,20 @@ export default class DragDropResize extends AbstractPlugin {
             refPoint: shape.referencePoint
           } : undefined
         }).compact()
-      },
-      execute: function () {
+      }
+      execute () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(undefined)
         })
-      },
-      rollback: function () {
+      }
+      rollback () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(el.dockedShape)
           el.docker.setReferencePoint(el.refPoint)
           //el.docker.update();
         })
       }
-    })
+    }
 
     this._undockedEdgesCommand = new undockEdgeCommand(this.toMoveShapes)
     this._undockedEdgesCommand.execute()

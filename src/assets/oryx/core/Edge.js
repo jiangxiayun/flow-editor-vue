@@ -768,9 +768,13 @@ export default class Edge extends Shape {
    * (0 - 359.99999999)
    */
   _getAngle (docker1, docker2) {
-    let p1 = docker1 instanceof ORYX_Controls.Docker ? docker1.absoluteCenterXY() : docker1
-    let p2 = docker2 instanceof ORYX_Controls.Docker ? docker2.absoluteCenterXY() : docker2
-
+    let p1 = docker1
+    let p2 = docker2
+    return ORYX_Math.getAngle(p1, p2)
+  }
+  _getAngleByDocker (docker1, docker2) {
+    let p1 = docker1.absoluteCenterXY()
+    let p2 = docker2.absoluteCenterXY()
     return ORYX_Math.getAngle(p1, p2)
   }
 
@@ -1333,6 +1337,7 @@ export default class Edge extends Shape {
             let docker = new ORYX_Controls.Docker({
               eventHandlerCallback: this.eventHandlerCallback
             })
+
             docker.bounds.centerMoveTo(x, y)
             docker.bounds.registerCallback(this._dockerChangedCallback)
             this.add(docker, this.dockers.length)
@@ -1784,5 +1789,9 @@ export default class Edge extends Shape {
     }
 
     return json
+  }
+
+  getInstanceofType () {
+    return 'Edge, Shape'
   }
 }

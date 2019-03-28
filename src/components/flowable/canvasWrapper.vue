@@ -67,6 +67,7 @@
   import { mapState, mapMutations } from 'vuex'
   import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
   import { getAdditionalIEZoom } from '@/assets/Util'
+  import ORYX from '@/assets/oryx'
 
   export default {
     name: 'canvasWrapper',
@@ -122,13 +123,14 @@
       },
       // 切换元素类型
       handleCommand (item) {
-        const MorphTo = ORYX.Core.Command.extend({
-          construct: function (shape, stencil, facade) {
+        class MorphTo extends ORYX.Core.Command{
+          constructor (shape, stencil, facade) {
+            super()
             this.shape = shape
             this.stencil = stencil
             this.facade = facade
-          },
-          execute: function () {
+          }
+          execute () {
             var shape = this.shape
             var stencil = this.stencil
             var resourceId = shape.resourceId
@@ -262,8 +264,8 @@
             this.facade.setSelection([this.newShape])
             this.facade.getCanvas().update()
             this.facade.updateSelection()
-          },
-          rollback: function () {
+          }
+          rollback () {
             if (!this.shape || !this.newShape || !this.newShape.parent) {
               return
             }
@@ -278,13 +280,13 @@
             // Update
             this.facade.getCanvas().update()
             this.facade.updateSelection()
-          },
+          }
           /**
            * Set all incoming and outgoing edges from the shape to the new shape
            * @param {Shape} shape
            * @param {Shape} newShape
            */
-          setRelatedDockers: function (shape, newShape) {
+          setRelatedDockers (shape, newShape) {
             if (shape.getStencil().type() === 'node') {
 
               (shape.incoming || []).concat(shape.outgoing || [])
@@ -326,7 +328,7 @@
               newShape.dockers.last().setReferencePoint(shape.dockers.last().referencePoint)
             }
           }
-        })
+        }
 
         let stencil = undefined
         const stencilSets = this.editorManager.getStencilSets().values()

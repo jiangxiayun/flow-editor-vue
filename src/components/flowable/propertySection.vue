@@ -1,7 +1,7 @@
 <template>
   <!--表单信息区域-->
   <div id="propertiesHelpWrapper" class="col-xs-12">
-
+{{selectedShape}}
     <div class="propertySection" id="propertySection"
          :class="{collapsed: propertyWindowState.collapsed}">
       <div class="selected-item-section">
@@ -67,6 +67,7 @@
 </template>
 
 <script>
+  import ORYX from '@/assets/oryx'
   import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
   import defaultValueDisplayTemplate from '@/components/propertyForm/default-value-display-template'
   import stringPropertyWriteModeTemplate from '@/components/propertyForm/string-property-write-mode-template'
@@ -225,25 +226,26 @@
 
         const _this = this
         if (newValue != oldValue) {
-          const commandClass = ORYX.Core.Command.extend({
-            construct: function () {
+          class commandClass extends ORYX.Core.Command{
+            constructor () {
+              super()
               this.key = key
               this.oldValue = oldValue
               this.newValue = newValue
               this.shape = shape
               this.facade = _this.editorManager.getEditor()
-            },
-            execute: function () {
+            }
+            execute () {
               this.shape.setProperty(this.key, this.newValue)
               this.facade.getCanvas().update()
               this.facade.updateSelection()
-            },
-            rollback: function () {
+            }
+            rollback () {
               this.shape.setProperty(this.key, this.oldValue)
               this.facade.getCanvas().update()
               this.facade.updateSelection()
             }
-          })
+          }
           // Instantiate the class
           var command = new commandClass()
 

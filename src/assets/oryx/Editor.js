@@ -2,7 +2,7 @@ import ORYX_Log from './Log'
 import ORYX_Config from './CONFIG'
 import ORYX_Editor from './Editor'
 import ORYX_Utils from './Utils'
-import Plugins from './Plugins'
+import Plugins_s from './Plugins'
 import ORYX_Edge from './core/Edge'
 import ORYX_Node from './core/Node'
 import ORYX_Shape from './core/Shape'
@@ -12,9 +12,7 @@ import ORYX_StencilSet from './core/StencilSet'
 import ORYX_Command from './core/Command'
 import ORYX_Controls_Docker from './core/Controls/Docker'
 
-const PluginsList = {
-  Plugins
-}
+const Plugins = Plugins_s
 /**
  * The Editor class.
  * @class ORYX.Editor
@@ -279,7 +277,6 @@ export default class Editor {
         ORYX_Log.info('Plugin need a stencilset which is not loaded\'', match.name)
       }
 
-
     } else {
       callback(false, match ? 'NOTFOUND' : 'YETACTIVATED')
       //TODO error handling
@@ -336,19 +333,13 @@ export default class Editor {
         })) && (value.get('engaged') || (value.get('engaged') === undefined))) {
         /*only load activated plugins or undefined */
         // console.log(333, Plugins.Loading)
-        // console.log(eval(value.get('name')))
+        // console.log(PluginsList['Plugins']['Loading'])
+        // let a = eval('Plugins.Loading')()
+        // let a = new Plugins.Loading()
+        // eval('new Plugins.Loading(facade, value)')
         try {
           // wow funcky code here!
-          // var className 	= eval(value.get("name"));
-          let className = eval(PluginsList[value.get('name')])
-          console.log('name', value.get('name'))
-          let a = 'Plugins.Loading'
-          console.log(11, eval('Plugins.Loading'))
-          console.log(22, PluginsList[a])
-          console.log(33, PluginsList.Plugins.Loading)
-          console.log(PluginsList[value.get('name')])
-          console.log('className', className)
-          console.log('PluginsList', PluginsList)
+          let className = eval(value.get('name'))
           // let className = value.get('name')
           if (className) {
             let plugin = new className(facade, value)

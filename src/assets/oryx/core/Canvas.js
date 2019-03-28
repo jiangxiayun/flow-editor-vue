@@ -8,7 +8,6 @@ import Node from './Node'
 import Edge from './Edge'
 import StencilSet from './StencilSet/index'
 
-
 /**
  * @class Oryx canvas.
  * @extends ORYX.Core.AbstractShape
@@ -132,7 +131,6 @@ export default class Canvas extends AbstractShape {
       return false
     }
   }
-
   focus () {
 
   }
@@ -226,7 +224,7 @@ export default class Canvas extends AbstractShape {
         }
         result.push(uiObject)
 
-        if (deep && uiObject instanceof ORYX.Core.Shape) {
+        if (deep && uiObject instanceof Shape) {
           result = result.concat(uiObject.getChildNodes(deep, iterator))
         }
       })
@@ -611,9 +609,9 @@ export default class Canvas extends AbstractShape {
 
     let x1, y1, x2, y2
     this.getChildShapes(true).each(function (shape) {
-      var absBounds = shape.absoluteBounds()
-      var ul = absBounds.upperLeft()
-      var lr = absBounds.lowerRight()
+      let absBounds = shape.absoluteBounds()
+      let ul = absBounds.upperLeft()
+      let lr = absBounds.lowerRight()
       if (x1 == undefined) {
         x1 = ul.x
         y1 = ul.y
@@ -771,5 +769,9 @@ export default class Canvas extends AbstractShape {
     //		}
 
     return json
+  }
+
+  getInstanceofType () {
+    return 'Canvas'
   }
 }

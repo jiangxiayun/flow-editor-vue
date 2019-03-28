@@ -338,7 +338,6 @@ const Utils = {
           allShapes = allShapes.concat(shape.getChildShapes(deep))
         }, true)
       }
-
       return allShapes
     },
     /**

@@ -2,6 +2,7 @@ import ORYX_Config from '../CONFIG'
 import ORYX_Utils from '../Utils'
 
 import ORYX_Node from '../core/Node'
+
 /**
  * Supports EPCs by offering a syntax check and export and import ability..
  *
@@ -13,9 +14,8 @@ export default class ProcessLink {
    *
    */
   constructor (facade) {
-    this.facade = facade;
-    this.facade.registerOnEvent(ORYX_Config.EVENT_PROPERTY_CHANGED, this.propertyChanged.bind(this));
-
+    this.facade = facade
+    this.facade.registerOnEvent(ORYX_Config.EVENT_PROPERTY_CHANGED, this.propertyChanged.bind(this))
   }
 
 
@@ -24,14 +24,14 @@ export default class ProcessLink {
    * @param {Object} option
    */
   propertyChanged (option, node) {
-    if (option.name !== "oryx-refuri" || !node instanceof ORYX_Node) {
+    if (option.name !== 'oryx-refuri' || !node instanceof ORYX_Node) {
       return
     }
 
-    if (option.value && option.value.length > 0 && option.value != "undefined") {
-      this.show(node, option.value);
+    if (option.value && option.value.length > 0 && option.value != 'undefined') {
+      this.show(node, option.value)
     } else {
-      this.hide(node);
+      this.hide(node)
     }
   }
 
@@ -43,38 +43,38 @@ export default class ProcessLink {
    */
   show (shape, url) {
     // Generate the svg-representation of a link
-    let link = ORYX_Utils.graft("http://www.w3.org/2000/svg", null,
+    let link = ORYX_Utils.graft('http://www.w3.org/2000/svg', null,
       ['a',
-        {'target': '_blank'},
+        { 'target': '_blank' },
         ['path',
           {
-            "stroke-width": 1.0,
-            "stroke": "#00DD00",
-            "fill": "#00AA00",
-            "d": "M3,3 l0,-2.5 l7.5,0 l0,-2.5 l7.5,4.5 l-7.5,3.5 l0,-2.5 l-8,0",
-            "line-captions": "round"
+            'stroke-width': 1.0,
+            'stroke': '#00DD00',
+            'fill': '#00AA00',
+            'd': 'M3,3 l0,-2.5 l7.5,0 l0,-2.5 l7.5,4.5 l-7.5,3.5 l0,-2.5 l-8,0',
+            'line-captions': 'round'
           }
         ]
-      ]);
+      ])
 
-     link = ORYX_Utils.graft("http://www.w3.org/2000/svg", null,
+    link = ORYX_Utils.graft('http://www.w3.org/2000/svg', null,
       ['a',
-        {'target': '_blank'},
+        { 'target': '_blank' },
         ['path', {
-          "style": "fill:#92BFFC;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.72",
-          "d": "M0 1.44 L0 15.05 L11.91 15.05 L11.91 5.98 L7.37 1.44 L0 1.44 Z"
+          'style': 'fill:#92BFFC;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.72',
+          'd': 'M0 1.44 L0 15.05 L11.91 15.05 L11.91 5.98 L7.37 1.44 L0 1.44 Z'
         }],
         ['path', {
-          "style": "stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.72;fill:none;",
-          "transform": "translate(7.5, -8.5)",
-          "d": "M0 10.51 L0 15.05 L4.54 15.05"
+          'style': 'stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.72;fill:none;',
+          'transform': 'translate(7.5, -8.5)',
+          'd': 'M0 10.51 L0 15.05 L4.54 15.05'
         }],
         ['path', {
-          "style": "fill:#f28226;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.72",
-          "transform": "translate(-3, -1)",
-          "d": "M0 8.81 L0 13.06 L5.95 13.06 L5.95 15.05 A50.2313 50.2313 -175.57 0 0 10.77 11.08 A49.9128 49.9128 -1.28 0 0 5.95 6.54 L5.95 8.81 L0 8.81 Z"
-        }],
-      ]);
+          'style': 'fill:#f28226;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-width:0.72',
+          'transform': 'translate(-3, -1)',
+          'd': 'M0 8.81 L0 13.06 L5.95 13.06 L5.95 15.05 A50.2313 50.2313 -175.57 0 0 10.77 11.08 A49.9128 49.9128 -1.28 0 0 5.95 6.54 L5.95 8.81 L0 8.81 Z'
+        }]
+      ])
 
     /*
      *
@@ -92,17 +92,17 @@ export default class ProcessLink {
      */
 
     // Set the link with the special namespace
-    link.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", url);
+    link.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', url)
 
 
     // Shows the link in the overlay
     this.facade.raiseEvent({
       type: ORYX_Config.EVENT_OVERLAY_SHOW,
-      id: "arissupport.urlref_" + shape.id,
+      id: 'arissupport.urlref_' + shape.id,
       shapes: [shape],
       node: link,
-      nodePosition: "SE"
-    });
+      nodePosition: 'SE'
+    })
 
   }
 
@@ -111,12 +111,12 @@ export default class ProcessLink {
    *
    * @param {Object} shape
    */
-  hide(shape) {
+  hide (shape) {
 
     this.facade.raiseEvent({
       type: ORYX_Config.EVENT_OVERLAY_HIDE,
-      id: "arissupport.urlref_" + shape.id
-    });
+      id: 'arissupport.urlref_' + shape.id
+    })
 
   }
 }

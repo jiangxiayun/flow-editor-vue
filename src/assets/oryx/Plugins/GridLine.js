@@ -52,6 +52,4 @@ export default class GridLine {
     }
     this.show()
   }
-
-
 }

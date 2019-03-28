@@ -512,7 +512,7 @@ export default class EditorManager {
         }
 
         // Gather properties of selected item 获取选中元素的属性
-        var properties = stencil.properties()
+        let properties = stencil.properties()
         for (let i = 0; i < properties.length; i++) {
           let property = properties[i]
           if (!property.popular()) continue

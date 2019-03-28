@@ -53,7 +53,8 @@ export default class Save {
   }
 
   _hasChanges () {
-    return this.changeDifference !== 0 || (this.facade.getModelMetaData()['new'] && this.facade.getCanvas().getChildShapes().size() > 0)
+    return this.changeDifference !== 0 ||
+      (this.facade.getModelMetaData()['new'] && this.facade.getCanvas().getChildShapes().size() > 0)
   }
 
   onUnLoad () {

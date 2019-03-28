@@ -149,29 +149,30 @@ export default class RenameShapes {
 
       if (oldValue != newValue) {
         // Implement the specific command for property change
-        const commandClass = ORYX_Command.extend({
-          construct: function () {
+        class commandClass extends ORYX_Command{
+          constructor () {
+            super()
             this.el = currentEl
             this.propId = propId
             this.oldValue = oldValue
             this.newValue = newValue
             this.facade = facade
-          },
-          execute: function () {
+          }
+          execute () {
             this.el.setProperty(this.propId, this.newValue)
             //this.el.update();
             this.facade.setSelection([this.el])
             this.facade.getCanvas().update()
             this.facade.updateSelection()
-          },
-          rollback: function () {
+          }
+          rollback () {
             this.el.setProperty(this.propId, this.oldValue)
             //this.el.update();
             this.facade.setSelection([this.el])
             this.facade.getCanvas().update()
             this.facade.updateSelection()
           }
-        })
+        }
         // Instantiated the class
         const command = new commandClass()
 

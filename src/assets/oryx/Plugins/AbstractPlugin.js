@@ -28,8 +28,6 @@ export default class AbstractPlugin {
    * @type Facade
    * @memberOf ORYX.Plugins.AbstractPlugin.prototype
    */
-
-
   constructor (facade) {
     this.facade = facade
     this.facade.registerOnEvent(ORYX_Config.EVENT_LOADED, this.onLoaded.bind(this))
@@ -360,8 +358,9 @@ export default class AbstractPlugin {
       return
     }
 
-    let Command = ORYX_Command.extend({
-      construct: function (edges, node, offset, plugin) {
+    class Command extends ORYX_Command{
+      constructor (edges, node, offset, plugin) {
+        super()
         this.edges = edges
         this.node = node
         this.plugin = plugin
@@ -370,8 +369,8 @@ export default class AbstractPlugin {
         // Get the new absolute center
         let center = node.absoluteXY()
         this.ulo = { x: center.x - offset.x, y: center.y - offset.y }
-      },
-      execute: function () {
+      }
+      execute () {
         if (this.changes) {
           this.executeAgain()
           return
@@ -440,14 +439,14 @@ export default class AbstractPlugin {
           })
         }.bind(this))
 
-      },
+      }
       /**
        * Align the bounds if the center is
        * the same than the old center
        * @params {Object} bounds
        * @params {Object} bounds2
        */
-      align: function (bounds, refDocker) {
+      align (bounds, refDocker) {
         let abRef = refDocker.getAbsoluteReferencePoint() || refDocker.bounds.center()
         let xdif = bounds.center().x - abRef.x
         let ydif = bounds.center().y - abRef.y
@@ -471,12 +470,11 @@ export default class AbstractPlugin {
             bounds.moveBy({ y: -(bounds.center().y - abRef.y), x: 0 })
           }
         }
-      },
-
+      }
       /**
        * Returns a TRUE if there are bend point which overlay the shape
        */
-      isBendPointIncluded: function (edge) {
+      isBendPointIncluded (edge) {
         // Get absolute bounds
         let ab = edge.dockers.first().getDockedShape()
         let bb = edge.dockers.last().getDockedShape()
@@ -499,14 +497,14 @@ export default class AbstractPlugin {
               // Check if the point is included to the absolute bounds
               ((ab && ab.isIncluded(c)) || (bb && bb.isIncluded(c)))
           })
-      },
+      }
 
-      removeAllDocker: function (edge) {
+      removeAllDocker(edge) {
         edge.dockers.slice(1, edge.dockers.length - 1).each(function (docker) {
           edge.removeDocker(docker)
         })
-      },
-      executeAgain: function () {
+      }
+      executeAgain () {
         this.changes.each(function (change) {
           // Reset the dockers
           this.removeAllDocker(change.edge)
@@ -520,8 +518,8 @@ export default class AbstractPlugin {
           }.bind(this))
           change.edge._update(true)
         }.bind(this))
-      },
-      rollback: function () {
+      }
+      rollback () {
         this.changes.each(function (change) {
           // Reset the dockers
           this.removeAllDocker(change.edge)
@@ -536,7 +534,7 @@ export default class AbstractPlugin {
           change.edge._update(true)
         }.bind(this))
       }
-    })
+    }
 
     this.facade.executeCommands([new Command(allEdges, node, offset, this)])
   }

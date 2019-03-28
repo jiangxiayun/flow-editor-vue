@@ -346,16 +346,19 @@ export default class Node extends Shape {
 
     }
 
-
     // point = Object.clone(point);
     let ul = absBounds.upperLeft()
     let x = pointX - ul.x
     let y = pointY - ul.y
 
     let i = 0
-    do {
-      let isPointIncluded = this._svgShapes[i++].isPointIncluded(x, y)
-    } while (!isPointIncluded && i < this._svgShapes.length)
+    let isPointIncluded
+    if (!isPointIncluded && i < this._svgShapes.length) {
+      isPointIncluded = this._svgShapes[i++].isPointIncluded(x, y)
+    }
+    // do {
+    //   let isPointIncluded = this._svgShapes[i++].isPointIncluded(x, y)
+    // } while (!isPointIncluded && i < this._svgShapes.length)
 
     return isPointIncluded
 
@@ -816,5 +819,8 @@ export default class Node extends Shape {
 
   toString () {
     return this._stencil.title() + ' ' + this.id
+  }
+  getInstanceofType () {
+    return 'Node, Shape'
   }
 }
