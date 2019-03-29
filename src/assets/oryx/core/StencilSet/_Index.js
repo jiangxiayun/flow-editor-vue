@@ -1,8 +1,11 @@
+import ORYX_Utils from '../../Utils'
 import ORYX_Log from '../../Log'
-import Stencil from './Stencil'
 
-export default class StencilSet {
+import StencilSet_Stencil from './Stencil'
+
+export default class _Index {
   /**
+   * Constructor
    * @param source {URL} A reference to the stencil set specification.
    *
    */
@@ -12,9 +15,9 @@ export default class StencilSet {
     this._jsonObject = {}
     this._stencils = new Hash()
     this._availableStencils = new Hash()
-
     this._init(data)
   }
+
   /**
    * Finds a root stencil in this stencil set. There may be many of these. If
    * there are, the first one found will be used. In Firefox, this is the
@@ -50,9 +53,10 @@ export default class StencilSet {
    */
   stencils (rootStencil, rules, sortByGroup) {
     if (rootStencil && rules) {
-      const stencils = this._availableStencils.values()
+      let stencils = this._availableStencils.values()
       let containers = [rootStencil]
       let checkedContainers = []
+
       let result = []
 
       while (containers.size() > 0) {
@@ -77,6 +81,7 @@ export default class StencilSet {
       result = result.sortBy(function (stencil) {
         return stencils.indexOf(stencil)
       })
+
 
       if (sortByGroup) {
         result = result.sortBy(function (stencil) {
@@ -115,16 +120,15 @@ export default class StencilSet {
   }
 
   stencil (id) {
-    console.log(9999999999990, this._stencils)
     return this._stencils.get(id)
   }
 
   title () {
-    return this._jsonObject.title
+    return ORYX_Utils.getTranslation(this._jsonObject, 'title')
   }
 
   description () {
-    return this._jsonObject.description
+    return ORYX_Utils.getTranslation(this._jsonObject, 'description')
   }
 
   namespace () {
@@ -162,12 +166,10 @@ export default class StencilSet {
 
   addExtensionDirectly (str) {
     try {
-      // eval('var jsonExtension = ' + str)
-      let jsonExtension = str
+      eval('var jsonExtension = ' + str)
 
-      if (!(jsonExtension['extends'].endsWith('#'))) {
+      if (!(jsonExtension['extends'].endsWith('#')))
         jsonExtension['extends'] += '#'
-      }
 
       if (jsonExtension['extends'] == this.namespace()) {
         this._extensions.set(jsonExtension.namespace, jsonExtension)
@@ -177,7 +179,7 @@ export default class StencilSet {
         if (jsonExtension.stencils) {
           $A(jsonExtension.stencils).each(function (stencil) {
             defaultPosition++
-            let oStencil = new Stencil(stencil, this.namespace(), this._baseUrl, this, undefined, defaultPosition)
+            var oStencil = new StencilSet_Stencil(stencil, this.namespace(), this._baseUrl, this, undefined, defaultPosition)
             this._stencils.set(oStencil.id(), oStencil)
             this._availableStencils.set(oStencil.id(), oStencil)
           }.bind(this))
@@ -186,6 +188,7 @@ export default class StencilSet {
         // load additional properties
         if (jsonExtension.properties) {
           let stencils = this._stencils.values()
+
           stencils.each(function (stencil) {
             let roles = stencil.roles()
 
@@ -196,10 +199,11 @@ export default class StencilSet {
                   prop.properties.each(function (property) {
                     stencil.addProperty(property, jsonExtension.namespace)
                   })
+
                   return true
-                }
-                else
+                } else {
                   return false
+                }
               })
             })
           }.bind(this))
@@ -232,10 +236,11 @@ export default class StencilSet {
   removeExtension (namespace) {
     let jsonExtension = this._extensions[namespace]
     if (jsonExtension) {
-      //unload extension's stencils
+
+      // unload extension's stencils
       if (jsonExtension.stencils) {
         $A(jsonExtension.stencils).each(function (stencil) {
-          let oStencil = new Stencil(stencil, this.namespace(), this._baseUrl, this)
+          let oStencil = new StencilSet_Stencil(stencil, this.namespace(), this._baseUrl, this)
           this._stencils.unset(oStencil.id())
           this._availableStencils.unset(oStencil.id())
         }.bind(this))
@@ -244,6 +249,7 @@ export default class StencilSet {
       // unload extension's properties
       if (jsonExtension.properties) {
         let stencils = this._stencils.values()
+
         stencils.each(function (stencil) {
           let roles = stencil.roles()
 
@@ -254,10 +260,12 @@ export default class StencilSet {
                 prop.properties.each(function (property) {
                   stencil.removeProperty(property.id)
                 })
+
                 return true
               }
-              else
+              else {
                 return false
+              }
             })
           })
         }.bind(this))
@@ -308,7 +316,7 @@ export default class StencilSet {
 
     // assert namespace ends with '#'.
     if (!this._jsonObject.namespace.endsWith('#'))
-      this._jsonObject.namespace = this._jsonObject.namespace + '#'
+      this._jsonObject.namespace += '#'
 
     // assert title and description are strings.
     if (!this._jsonObject.title) this._jsonObject.title = ''
@@ -335,12 +343,13 @@ export default class StencilSet {
     }
 
     let defaultPosition = 0
+
     // init each stencil
     $A(this._jsonObject.stencils).each((function (stencil) {
       defaultPosition++
 
       // instantiate normally.
-      let oStencil = new Stencil(stencil, this.namespace(), this._baseUrl, this, pps, defaultPosition)
+      let oStencil = new StencilSet_Stencil(stencil, this.namespace(), this._baseUrl, this, pps, defaultPosition)
       this._stencils.set(oStencil.id(), oStencil)
       this._availableStencils.set(oStencil.id(), oStencil)
     }).bind(this))

@@ -12,12 +12,13 @@ function UIDragCallback (event) {
   position.y /= this.faktorXY.y
 
   this.uiObj.bounds.moveTo(position)
-  //this.uiObj.update();
+  // this.uiObj.update();
 
-  if (this.movedCallback)
+  if (this.movedCallback) {
     this.movedCallback(event)
+  }
 
-  //Event.stop(event);
+  // Event.stop(event);
 }
 
 function UIDisableDrag (event) {

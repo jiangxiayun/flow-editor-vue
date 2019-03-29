@@ -352,12 +352,14 @@ export default class Bounds {
     let ul = this.upperLeft()
     let lr = this.lowerRight()
 
-    if (pointX >= ul.x - offset
-      && pointX <= lr.x + offset && pointY >= ul.y - offset
-      && pointY <= lr.y + offset)
+    if (pointX >= ul.x - offset &&
+      pointX <= lr.x + offset &&
+      pointY >= ul.y - offset &&
+      pointY <= lr.y + offset) {
       return true
-    else
+    } else {
       return false
+    }
   }
 
   /**

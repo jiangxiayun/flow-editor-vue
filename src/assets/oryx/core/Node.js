@@ -338,27 +338,22 @@ export default class Node extends Shape {
    */
   isPointIncluded (pointX, pointY, absoluteBounds) {
     // If there is an arguments with the absoluteBounds
-    let absBounds = absoluteBounds && absoluteBounds instanceof ORYX_Bounds ? absoluteBounds : this.absoluteBounds()
+    let absBounds = absoluteBounds && absoluteBounds instanceof ORYX_Bounds ?
+      absoluteBounds : this.absoluteBounds()
 
     if (!absBounds.isIncluded(pointX, pointY)) {
       return false
-    } else {
-
     }
-
     // point = Object.clone(point);
     let ul = absBounds.upperLeft()
     let x = pointX - ul.x
     let y = pointY - ul.y
 
     let i = 0
-    let isPointIncluded
-    if (!isPointIncluded && i < this._svgShapes.length) {
+    let isPointIncluded = false
+    do {
       isPointIncluded = this._svgShapes[i++].isPointIncluded(x, y)
-    }
-    // do {
-    //   let isPointIncluded = this._svgShapes[i++].isPointIncluded(x, y)
-    // } while (!isPointIncluded && i < this._svgShapes.length)
+    } while (!isPointIncluded && i < this._svgShapes.length)
 
     return isPointIncluded
 

@@ -393,8 +393,9 @@ export default class Editor {
     // get the stencil associated with the type
     let canvasStencil = ORYX_StencilSet.stencil(stencilType)
 
+    console.log(222222, canvasStencil)
     if (!canvasStencil) {
-      ORYX_Log.fatal('Initialisation failed, because the stencil with the type %0 is not part of one of the loaded stencil sets.', stencilType)
+      ORYX_Log.fatal('初始化失败, 因为类型为 %0 的模具不是加载的模具集的一部分。', stencilType)
     }
 
     // create all dom

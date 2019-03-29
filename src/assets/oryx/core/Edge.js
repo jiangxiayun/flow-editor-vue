@@ -726,10 +726,8 @@ export default class Edge extends Shape {
       } while (!isPointIncluded && i < this.dockers.length - 1)
 
     }
-
     return isPointIncluded
   }
-
 
   /**
    * Calculate if the point is over an special offset area

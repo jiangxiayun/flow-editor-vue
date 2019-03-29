@@ -116,14 +116,16 @@ const Utils = {
    * @return {String}
    *
    */
-  provideId: function  () {
+  provideId: function () {
     let res = [], hex = '0123456789ABCDEF'
     for (let i = 0; i < 36; i++) res[i] = Math.floor(Math.random() * 0x10)
 
     res[14] = 4
     res[19] = (res[19] & 0x3) | 0x8
 
-    for (let i = 0; i < 36; i++) { res[i] = hex[res[i]] }
+    for (let i = 0; i < 36; i++) {
+      res[i] = hex[res[i]]
+    }
     res[8] = res[13] = res[18] = res[23] = '-'
 
     return 'sid-' + res.join('')
@@ -347,12 +349,25 @@ const Utils = {
       return JSON.stringify(this)
     }
   },
-  ifIE10: function (){
+  ifIE10: function () {
     // IE10
     let userAgent = navigator.userAgent
     let a = navigator.appVersion.indexOf('MSIE 10') !== -1 ||
       (userAgent.indexOf('Trident') !== -1 && userAgent.indexOf('rv:11') !== -1)
     return a
+  },
+  getTranslation: function (jsonObject, name) {
+    // let lang = ORYX.I18N.Language.toLowerCase()
+    let lang = 'en_us'
+    let result = jsonObject[name + '_' + lang]
+    if (result) {
+      return result
+    }
+    result = jsonObject[name + '_' + lang.substr(0, 2)]
+    if (result) {
+      return result
+    }
+    return jsonObject[name]
   }
 }
 

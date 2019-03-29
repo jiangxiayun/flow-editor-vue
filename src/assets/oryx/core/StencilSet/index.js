@@ -9,6 +9,7 @@ import PropertyItem from './PropertyItem'
 import ComplexPropertyItem from './ComplexPropertyItem'
 import Rules from './Rules'
 import _StencilSet from './StencilSet'
+import _Index from './_Index'
 import ORYX_Log from '../../Log'
 
 
@@ -19,13 +20,14 @@ const StencilSet = {
   ComplexPropertyItem: ComplexPropertyItem,
   Rules: Rules,
   StencilSet: _StencilSet,
-  //storage for loaded stencil sets by namespace
+  Index: _Index,
+  // storage for loaded stencil sets by namespace
   _stencilSetsByNamespace: new Hash(),
-  //storage for stencil sets by url
+  // storage for stencil sets by url
   _stencilSetsByUrl: new Hash(),
-  //storage for stencil set namespaces by editor instances
+  // storage for stencil set namespaces by editor instances
   _StencilSetNSByEditorInstance: new Hash(),
-  //storage for rules by editor instances
+  // storage for rules by editor instances
   _rulesByEditorInstance: new Hash(),
 
   /**
@@ -45,6 +47,7 @@ const StencilSet = {
     let splitted = namespace.split('#', 1)
     if (splitted.length === 1) {
       ORYX_Log.trace('Getting stencil set %0', splitted[0])
+      console.log(88, this._stencilSetsByNamespace.get(splitted[0] + '#'))
       return this._stencilSetsByNamespace.get(splitted[0] + '#')
     } else {
       return undefined
@@ -70,9 +73,7 @@ const StencilSet = {
     return stencilSets
   },
   /**
-   *
    * @param {String} id
-   *
    * @return {ORYX.Core.StencilSet.Stencil} Returns the stencil specified by the id.
    *
    * The id must be unique and contains the namespace of the stencil's stencil set.
@@ -81,7 +82,9 @@ const StencilSet = {
   stencil:function (id) {
     ORYX_Log.trace('Getting stencil for %0', id)
     let ss = this.stencilSet(id)
+    console.log(666, ss)
     if (ss) {
+      console.log(777, ss.stencil(id))
       return ss.stencil(id)
     } else {
       ORYX_Log.trace('Cannot fild stencil for %0', id)
@@ -136,7 +139,6 @@ const StencilSet = {
       this._rulesByEditorInstance.set(editorId, rules)
     }
   }
-
 }
 
 export default StencilSet

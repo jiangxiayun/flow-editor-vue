@@ -183,7 +183,8 @@ export default class AbstractShape extends UIObject {
         x = arguments[0].x
         y = arguments[0].y
         break
-      case 2:	//two or more arguments
+      case 2:
+        //two or more arguments
         x = arguments[0]
         y = arguments[1]
         break
@@ -195,12 +196,12 @@ export default class AbstractShape extends UIObject {
       let result = []
       result.push(this)
 
-      //check, if one child is at that position
-
+      // check, if one child is at that position
       let childNodes = this.getChildNodes()
-      let childEdges = this.getChildEdges();
+      let childEdges = this.getChildEdges()
 
-      [childNodes, childEdges].each(function (ne) {
+      let ary = [childNodes, childEdges]
+      ary.each(function (ne) {
         let nodesAtPosition = new Hash()
 
         ne.each(function (node) {
@@ -221,7 +222,6 @@ export default class AbstractShape extends UIObject {
       })
 
       return result
-
     } else {
       return []
     }

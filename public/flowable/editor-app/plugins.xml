@@ -40,7 +40,7 @@
     <plugin source="shapeHighlighting.js" name="Plugins.HighlightingSelectedShapes" />
     <plugin source="dragDocker.js" name="Plugins.DragDocker">
       <notUsesIn namespace="http://b3mn.org/stencilset/xforms#" />
-    </plugin>   
+    </plugin>
     <plugin source="addDocker.js" name="Plugins.AddDocker">
       <notUsesIn namespace="http://b3mn.org/stencilset/xforms#" />
     </plugin>
@@ -55,7 +55,7 @@
     <!-- Begin: BPMN2.0 specific plugins -->
     <plugin source="bpmn2.0/bpmn2.0.js" name="Plugins.BPMN2_0">
       <requires namespace="http://b3mn.org/stencilset/bpmn2.0#" />
-    </plugin> 
+    </plugin>
     
     <!-- End: BPMN2.0 specific plugins -->
   </plugins>
