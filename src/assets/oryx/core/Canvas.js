@@ -377,7 +377,6 @@ export default class Canvas extends AbstractShape {
     const addShape = function (shape, parent) {
       // Create a new Stencil
       let stencil = StencilSet.stencil(this.getStencil().namespace() + shape.stencil.id)
-
       // Create a new Shape
       let ShapeClass = (stencil.type() == 'node') ? Node : Edge
       let newShape = new ShapeClass(
@@ -407,7 +406,6 @@ export default class Canvas extends AbstractShape {
      */
     const addChildShapesRecursively = function (shape) {
       let addedShapes = []
-
       if (shape.childShapes && shape.childShapes.constructor == String) {
         shape.childShapes = JSON.parse(shape.childShapes)
       }
@@ -424,7 +422,6 @@ export default class Canvas extends AbstractShape {
       childShapes: shapeObjects,
       resourceId: this.resourceId
     })
-
     // prepare deserialisation parameter
     shapes.each(function (shape) {
         let properties = []

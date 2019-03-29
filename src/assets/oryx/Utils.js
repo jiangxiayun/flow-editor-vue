@@ -346,6 +346,13 @@ const Utils = {
     serialize: function () {
       return JSON.stringify(this)
     }
+  },
+  ifIE10: function (){
+    // IE10
+    let userAgent = navigator.userAgent
+    let a = navigator.appVersion.indexOf('MSIE 10') !== -1 ||
+      (userAgent.indexOf('Trident') !== -1 && userAgent.indexOf('rv:11') !== -1)
+    return a
   }
 }
 

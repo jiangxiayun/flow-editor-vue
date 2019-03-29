@@ -6,6 +6,7 @@ import ORYX_Config from '../CONFIG'
 import ORYX_Controls from './Controls'
 import ERDF from '../ERDF'
 
+import ORYX_UIObject from '../core/UIObject'
 import ORYX_Node from '../core/Node'
 
 /**
@@ -30,9 +31,7 @@ export default class Edge extends Shape {
     super(...arguments)
     this.isMovable = true
     this.isSelectable = true
-
     this._dockerUpdated = false
-
     this._markers = new Hash() //a hash map of SVGMarker objects where keys are the marker ids
     this._paths = []
     this._interactionPaths = []
@@ -48,7 +47,7 @@ export default class Edge extends Shape {
       'pointer-events': 'painted'
     }])
 
-    //Add to the EventHandler
+    // Add to the EventHandler
     this.addEventHandlers(stencilNode.parentNode)
 
     this._oldBounds = this.bounds.clone()
@@ -59,25 +58,24 @@ export default class Edge extends Shape {
     if (stencil instanceof Array) {
       this.deserialize(stencil)
     }
-
   }
 
   _update (force) {
     if (this._dockerUpdated || this.isChanged || force) {
       this.dockers.invoke('update')
 
-      if (false && (this.bounds.width() === 0 || this.bounds.height() === 0)) {
-        let width = this.bounds.width()
-        let height = this.bounds.height()
-        this.bounds.extend({
-          x: width === 0 ? 2 : 0,
-          y: height === 0 ? 2 : 0
-        })
-        this.bounds.moveBy({
-          x: width === 0 ? -1 : 0,
-          y: height === 0 ? -1 : 0
-        })
-      }
+      // if (false && (this.bounds.width() === 0 || this.bounds.height() === 0)) {
+      //   let width = this.bounds.width()
+      //   let height = this.bounds.height()
+      //   this.bounds.extend({
+      //     x: width === 0 ? 2 : 0,
+      //     y: height === 0 ? 2 : 0
+      //   })
+      //   this.bounds.moveBy({
+      //     x: width === 0 ? -1 : 0,
+      //     y: height === 0 ? -1 : 0
+      //   })
+      // }
 
       // TODO: Bounds muss abhaengig des Eltern-Shapes gesetzt werden
       let upL = this.bounds.upperLeft()
@@ -396,8 +394,7 @@ export default class Edge extends Shape {
     }
 
     // IE10 specific fix, start and end-markes get left behind when moving path
-    let userAgent = navigator.userAgent
-    if (navigator.appVersion.indexOf('MSIE 10') !== -1 || (userAgent.indexOf('Trident') !== -1 && userAgent.indexOf('rv:11') !== -1)) {
+    if (ORYX_Utils.ifIE10()) {
       this.node.parentNode.insertBefore(this.node, this.node)
     }
   }
@@ -419,13 +416,13 @@ export default class Edge extends Shape {
    * Refreshes the visual representation of edge's attached nodes.
    */
   refreshAttachedNodes () {
-    this.attachedNodePositionData.values().each(function (nodeData) {
+    this.attachedNodePositionData.values().each((nodeData) => {
       let startPoint = nodeData.segment.docker1.bounds.center()
       let endPoint = nodeData.segment.docker2.bounds.center()
       this.relativizePoint(startPoint)
       this.relativizePoint(endPoint)
 
-      let newNodePosition = new Object()
+      let newNodePosition = {}
 
       /* Calculate new x-coordinate */
       newNodePosition.x = startPoint.x
@@ -443,8 +440,7 @@ export default class Edge extends Shape {
       /* Move node to its new position */
       nodeData.node.bounds.moveTo(newNodePosition)
       nodeData.node._update()
-
-    }.bind(this))
+    })
   }
 
   /**
@@ -458,21 +454,21 @@ export default class Edge extends Shape {
    */
   calculatePositionOfAttachedChildNode (node) {
     /* Initialize position */
-    let position = new Object()
-    position.x = 0
-    position.y = 0
+    let position = {
+      x: 0,
+      y: 0
+    }
 
     /* Case: Node was just added */
     if (!this.attachedNodePositionData.get(node.getId())) {
-      this.attachedNodePositionData.set(node.getId(), new Object())
+      this.attachedNodePositionData.set(node.getId(), {})
       this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 0
       this.attachedNodePositionData.get(node.getId()).node = node
-      this.attachedNodePositionData.get(node.getId()).segment = new Object()
+      this.attachedNodePositionData.get(node.getId()).segment = {}
       this.findEdgeSegmentForNode(node)
     } else if (node.isChanged) {
       this.findEdgeSegmentForNode(node)
     }
-
   }
 
   /**
@@ -493,7 +489,7 @@ export default class Edge extends Shape {
       this.relativizePoint(lineP2)
 
       let nodeCenterPoint = node.bounds.center()
-      let distance = ORYX.Core.Math.distancePointLinie(
+      let distance = ORYX_Math.distancePointLinie(
         lineP1,
         lineP2,
         nodeCenterPoint,
@@ -503,10 +499,8 @@ export default class Edge extends Shape {
         || distance < smallestDistance)) {
 
         smallestDistance = distance
-
         this.attachedNodePositionData.get(node.getId()).segment.docker1 = this.dockers[i - 1]
         this.attachedNodePositionData.get(node.getId()).segment.docker2 = this.dockers[i]
-
       }
 
       /* Either the distance does not match the segment or the distance
@@ -539,7 +533,6 @@ export default class Edge extends Shape {
     }
   }
 
-
   /**
    *
    * @param {ORYX.Core.Node|Object} node or position
@@ -549,12 +542,11 @@ export default class Edge extends Shape {
   findSegment (node) {
     let length = this.dockers.length
     let result
-    let nodeCenterPoint = node instanceof ORYX.Core.UIObject ? node.bounds.center() : node
+    let nodeCenterPoint = node instanceof ORYX_UIObject ? node.bounds.center() : node
 
     for (let i = 1; i < length; i++) {
       let lineP1 = this.dockers[i - 1].bounds.center()
       let lineP2 = this.dockers[i].bounds.center()
-
       let distance = ORYX_Math.distancePointLinie(lineP1, lineP2, nodeCenterPoint, true)
 
       if (typeof distance == 'number' && (result === undefined || distance < result.distance)) {
@@ -624,7 +616,7 @@ export default class Edge extends Shape {
    */
   optimizedUpdate () {
     let updateDocker = function (docker) {
-      if (!docker._dockedShape || !docker._dockedShapeBounds) return
+      if (!docker._dockedShape || !docker._dockedShapeBounds) { return }
       let off = {
         x: docker._dockedShape.bounds.a.x - docker._dockedShapeBounds.a.x,
         y: docker._dockedShape.bounds.a.y - docker._dockedShapeBounds.a.y
@@ -640,7 +632,7 @@ export default class Edge extends Shape {
   }
 
   refresh () {
-    //call base class refresh method
+    // call base class refresh method
     // arguments.callee.$.refresh.apply(this, arguments)
 
     super.refresh()
@@ -736,7 +728,6 @@ export default class Edge extends Shape {
     }
 
     return isPointIncluded
-
   }
 
 
@@ -756,8 +747,7 @@ export default class Edge extends Shape {
    *
    */
   containsNode (node) {
-    if (this._paths.include(node) ||
-      this._interactionPaths.include(node)) {
+    if (this._paths.include(node) || this._interactionPaths.include(node)) {
       return true
     }
     return false
@@ -768,13 +758,9 @@ export default class Edge extends Shape {
    * (0 - 359.99999999)
    */
   _getAngle (docker1, docker2) {
-    let p1 = docker1
-    let p2 = docker2
-    return ORYX_Math.getAngle(p1, p2)
-  }
-  _getAngleByDocker (docker1, docker2) {
-    let p1 = docker1.absoluteCenterXY()
-    let p2 = docker2.absoluteCenterXY()
+    let p1 = docker1 instanceof ORYX_Controls.Docker ? docker1.absoluteCenterXY() : docker1;
+    let p2 = docker2 instanceof ORYX_Controls.Docker ? docker2.absoluteCenterXY() : docker2;
+
     return ORYX_Math.getAngle(p1, p2)
   }
 
@@ -824,7 +810,7 @@ export default class Edge extends Shape {
    */
   handleChildShapesAfterAddDocker (docker) {
     /* Ensure type of Docker */
-    if (!docker instanceof ORYX_Controls.Docker) {
+    if (!(docker instanceof ORYX_Controls.Docker)) {
       return undefined
     }
 
@@ -839,8 +825,7 @@ export default class Edge extends Shape {
     let endDocker = this.dockers[index + 1]
 
     /* Adjust the position of edge's child nodes */
-    let segmentElements =
-      this.getAttachedNodePositionDataForSegment(startDocker, endDocker)
+    let segmentElements = this.getAttachedNodePositionDataForSegment(startDocker, endDocker)
 
     let lengthSegmentPart1 = ORYX_Math.getDistancePointToPoint(
       startDocker.bounds.center(),
@@ -1235,7 +1220,6 @@ export default class Edge extends Shape {
     super._init(svgDocument)
 
     let minPointX, minPointY, maxPointX, maxPointY
-
     // init markers
     let defs = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'defs')
     if (defs.length > 0) {
@@ -1330,7 +1314,7 @@ export default class Edge extends Shape {
         this._dockersByPath.set(pathId, [])
 
         for (let i = 0; i < handler.points.length; i += 2) {
-          //handler.points.each((function(point, pIndex){
+          // handler.points.each((function(point, pIndex){
           let x = handler.points[i]
           let y = handler.points[i + 1]
           if (isFirst || i > 0) {
@@ -1342,9 +1326,9 @@ export default class Edge extends Shape {
             docker.bounds.registerCallback(this._dockerChangedCallback)
             this.add(docker, this.dockers.length)
 
-            //this._dockersByPath[pathId].push(docker);
+            // this._dockersByPath[pathId].push(docker);
 
-            //calculate minPoint and maxPoint
+            // calculate minPoint and maxPoint
             if (minPointX) {
               minPointX = Math.min(x, minPointX)
               minPointY = Math.min(y, minPointY)
@@ -1649,7 +1633,7 @@ export default class Edge extends Shape {
           this.dockers.last().setDockedShape(next)
           this.dockers.last().setReferencePoint({ x: next.bounds.width() / 2.0, y: next.bounds.height() / 2.0 })
         } else if (next instanceof Edge) {
-          //Set the first docker of the next shape
+          // Set the first docker of the next shape
           next.dockers.first().setDockedShape(this)
           //next.dockers.first().setReferencePoint({x: this.bounds.width() / 2.0, y: this.bounds.height() / 2.0});
         }
@@ -1672,7 +1656,7 @@ export default class Edge extends Shape {
       dataByPath.each((function (data, index) {
         let values = data.replace(/,/g, ' ').split(' ').without('')
 
-        //for each docker two values must be defined
+        // for each docker two values must be defined
         if (values.length % 2 === 0) {
           let path = this._paths[index]
 

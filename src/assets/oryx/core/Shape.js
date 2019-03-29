@@ -517,7 +517,6 @@ export default class Shape extends AbstractShape {
   add (uiObject, index, silent) {
     // parameter has to be an UIObject, but
     // must not be an Edge.
-
     if (uiObject instanceof UIObject && !(uiObject.getInstanceofType().includes('Edge'))) {
 
       if (!(this.children.member(uiObject))) {
@@ -526,16 +525,17 @@ export default class Shape extends AbstractShape {
           uiObject.parent.remove(uiObject, true)
         }
 
-        //add uiObject to this Shape
-        if (index != undefined)
+        // add uiObject to this Shape
+        if (index != undefined) {
           this.children.splice(index, 0, uiObject)
-        else
+        } else {
           this.children.push(uiObject)
+        }
 
         //set parent reference
         uiObject.parent = this
 
-        //add uiObject.node to this.node depending on the type of uiObject
+        // add uiObject.node to this.node depending on the type of uiObject
         let parent
         let type = uiObject.getInstanceofType()
         if (type.includes('Node')) {
@@ -557,7 +557,7 @@ export default class Shape extends AbstractShape {
           } else {
             parent = ctrls
           }
-        } else {	//UIObject
+        } else {	// UIObject
           parent = this.node
         }
 
@@ -654,7 +654,6 @@ export default class Shape extends AbstractShape {
         throw 'getIntersectionPoints needs two or four arguments'
     }
 
-
     // Defined an include and exclude point
     let includePointX, includePointY, excludePointX, excludePointY
     let bounds = this.absoluteBounds()
@@ -683,17 +682,17 @@ export default class Shape extends AbstractShape {
     let midPointX = 0
     let midPointY = 0
     let refPointX, refPointY
-    let minDifferent = 1
     // Get the UpperLeft and LowerRight
     //var ul = bounds.upperLeft();
     //var lr = bounds.lowerRight();
 
-    let i = 0
 
     while (true) {
       // Calculate the midpoint of the current to points
-      let midPointX = Math.min(includePointX, excludePointX) + ((Math.max(includePointX, excludePointX) - Math.min(includePointX, excludePointX)) / 2.0)
-      let midPointY = Math.min(includePointY, excludePointY) + ((Math.max(includePointY, excludePointY) - Math.min(includePointY, excludePointY)) / 2.0)
+      let midPointX = Math.min(includePointX, excludePointX) +
+        ((Math.max(includePointX, excludePointX) - Math.min(includePointX, excludePointX)) / 2.0)
+      let midPointY = Math.min(includePointY, excludePointY) +
+        ((Math.max(includePointY, excludePointY) - Math.min(includePointY, excludePointY)) / 2.0)
 
       // Set the new midpoint by the means of the include of the bounds
       if (this.isPointIncluded(midPointX, midPointY, bounds)) {
@@ -707,9 +706,8 @@ export default class Shape extends AbstractShape {
       // Calc the length of the line
       let length = Math.sqrt(Math.pow(includePointX - excludePointX, 2) + Math.pow(includePointY - excludePointY, 2))
       // Calc a point one step from the include point
-      refPointX = includePointX + ((excludePointX - includePointX) / length),
-        refPointY = includePointY + ((excludePointY - includePointY) / length)
-
+      refPointX = includePointX + ((excludePointX - includePointX) / length)
+      refPointY = includePointY + ((excludePointY - includePointY) / length)
 
       // If the reference point not in the bounds, break
       if (!this.isPointIncluded(refPointX, refPointY, bounds)) {

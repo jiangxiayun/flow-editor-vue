@@ -1022,7 +1022,6 @@ export default class Editor {
     return this._canvas
   }
 
-
   /**
    *  option = {
    *		type: string,
@@ -1048,8 +1047,7 @@ export default class Editor {
       let type = option.serialize.find(function (obj) {
         return (obj.prefix + '-' + obj.name) == 'oryx-type'
       })
-      var stencil = ORYX_StencilSet.stencil(type.value)
-
+      let stencil = ORYX_StencilSet.stencil(type.value)
       if (stencil.type() == 'node') {
         newShapeObject = new ORYX_Node({ 'eventHandlerCallback': this.handleEvents.bind(this) }, stencil, this._getPluginFacade())
       } else {

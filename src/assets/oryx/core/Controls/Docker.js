@@ -12,7 +12,7 @@ import ORYX_Utils from '../../Utils'
 export default class Docker extends Control {
   constructor () {
     // arguments.callee.$.construct.apply(this, arguments);
-    super()
+    super(...arguments)
     this.isMovable = true				// Enables movability
     this.bounds.set(0, 0, 16, 16)		// Set the bounds
     this.referencePoint = undefined		// Refrenzpoint
@@ -21,7 +21,7 @@ export default class Docker extends Control {
     this._oldRefPoint1 = undefined
     this._oldRefPoint2 = undefined
 
-    //this.anchors = [];
+    // this.anchors = [];
     this.anchorLeft = null
     this.anchorRight = null
     this.anchorTop = null
@@ -52,7 +52,7 @@ export default class Docker extends Control {
     // Hide the Docker
     this.hide()
 
-    //Add to the EventHandler
+    // Add to the EventHandler
     this.addEventHandlers(this._dockerNode)
 
     // Buffer the Update Callback for un-/register on Event-Handler
@@ -119,8 +119,6 @@ export default class Docker extends Control {
         }
       }
 
-      let newPoint = undefined
-
       /*if (!this._oldRefPoint1 || !this._oldRefPoint2 ||
        absoluteReferenzPoint1.x !== this._oldRefPoint1.x ||
        absoluteReferenzPoint1.y !== this._oldRefPoint1.y ||
@@ -128,7 +126,7 @@ export default class Docker extends Control {
        absoluteReferenzPoint2.y !== this._oldRefPoint2.y) {*/
 
       // Get the new point for the Docker, calucalted by the intersection point of the Shape and the two points
-      newPoint = this._dockedShape.getIntersectionPoint(absoluteReferenzPoint1, absoluteReferenzPoint2)
+      let newPoint = this._dockedShape.getIntersectionPoint(absoluteReferenzPoint1, absoluteReferenzPoint2)
 
       // If there is new point, take the referencepoint as the new point
       if (!newPoint) {

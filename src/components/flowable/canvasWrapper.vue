@@ -478,8 +478,9 @@
             option['position'] = pos
             option['parent'] = this.editorManager.dragCurrentParent
 
-            let commandClass = ORYX.Core.Command.extend({
-              construct: function (option, dockedShape, canAttach, position, facade) {
+            class commandClass extends ORYX.Core.Command {
+              constructor (option, dockedShape, canAttach, position, facade) {
+                super()
                 this.option = option
                 this.docker = null
                 this.dockedShape = dockedShape
@@ -490,8 +491,8 @@
                 this.shape = null
                 this.parent = null
                 this.canAttach = canAttach
-              },
-              execute: function () {
+              }
+              execute() {
                 if (!this.shape) {
                   this.shape = this.facade.createShape(option)
                   this.parent = this.shape.parent
@@ -516,8 +517,8 @@
                 this.facade.getCanvas().update()
                 this.facade.updateSelection()
 
-              },
-              rollback: function () {
+              }
+              rollback() {
                 if (this.shape) {
                   this.facade.setSelection(this.selection.without(this.shape))
                   this.facade.deleteShape(this.shape)
@@ -529,8 +530,7 @@
                 this.facade.updateSelection()
 
               }
-            })
-
+            }
 
             // Update canvas
             let command = new commandClass(option, this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())

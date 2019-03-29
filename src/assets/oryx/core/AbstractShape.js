@@ -136,7 +136,7 @@ export default class AbstractShape extends UIObject {
         }
         result.push(uiObject)
       }
-      if (type === 'Shape') {
+      if (type.includes('Shape')) {
         if (deep) {
           result = result.concat(uiObject.getChildNodes(deep, iterator))
         }
@@ -161,7 +161,7 @@ export default class AbstractShape extends UIObject {
         }
         result.push(uiObject)
       }
-      if (type === 'Shape') {
+      if (type.includes('Shape')) {
         if (deep) {
           result = result.concat(uiObject.getChildEdges(deep, iterator))
         }

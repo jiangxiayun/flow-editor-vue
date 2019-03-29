@@ -1,5 +1,6 @@
 import ERDF from './ERDF'
 import ORYX_CONFIG from './CONFIG'
+import ORYX_Canvas from './core/Canvas'
 
 //TODO kann kickstart sich vielleicht auch um die erzeugung von paketen/
 // namespaces k�mmern? z.b. requireNamespace("ORYX.Core.SVG");
@@ -588,7 +589,7 @@ const DataManager = {
           'div', {
             'id': shape.resourceId,
             //This should be done in a more dynamic way!!!!!
-            'class': (shape instanceof ORYX.Core.Canvas) ? '-oryx-canvas' : undefined
+            'class': (shape instanceof ORYX_Canvas) ? '-oryx-canvas' : undefined
           }
         ])
 

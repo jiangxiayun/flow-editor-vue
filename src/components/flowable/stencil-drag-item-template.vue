@@ -13,6 +13,7 @@
 
 <script>
   import { mapState, mapMutations } from 'vuex'
+  import ORYX from '@/assets/oryx'
 
   export default {
     name: "stencil-drag-item-template",

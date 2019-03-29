@@ -96,16 +96,6 @@ if(chain.handle(command))
 
 
 
-
-function printf() {
-
-  var result = arguments[0];
-  for (var i = 1; i < arguments.length; i++)
-    result = result.replace('%' + (i - 1), arguments[i]);
-  return result;
-}
-
-
 var idCounter = 0;
 var ID_PREFIX = "resource";
 
