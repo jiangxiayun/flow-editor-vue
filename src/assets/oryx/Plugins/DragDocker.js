@@ -7,7 +7,7 @@ import ORYX_Canvas from '../core/Canvas'
 import ORYX_Command from '../core/Command'
 import ORYX_Math from '../core/Math'
 
-import { UIEnableDrag } from '../core/UIEnableDrag'
+import UIDragFunction from '../core/UIEnableDrag'
 
 export default class DragDocker {
   /**
@@ -171,7 +171,7 @@ export default class DragDocker {
       this.startEventPos = eventCoordinates
 
       // Enable the Docker for Drag'n'Drop, give the mouseMove and mouseUp-Callback with
-      UIEnableDrag(event, uiObj, option)
+      UIDragFunction.UIEnableDrag(event, uiObj, option)
     }
   }
 

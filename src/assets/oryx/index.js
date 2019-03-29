@@ -13,7 +13,7 @@ import Math from './core/Math'
 
 import StencilSet from './core/StencilSet/index'
 import SVG from './core/SVG'
-import { UIEnableDrag, UIDragCallback, UIDisableDrag } from './core/UIEnableDrag'
+import UIDragFunction from './core/UIEnableDrag'
 
 import Editor from './Editor'
 import Plugins from './Plugins'
@@ -110,9 +110,7 @@ ORYX.Core.Shape = Shape
 ORYX.Core.Node = Node
 ORYX.Core.Edge = Edge
 ORYX.Core.Move = Move
-ORYX.Core.UIEnableDrag = UIEnableDrag
-ORYX.Core.UIDragCallback = UIDragCallback
-ORYX.Core.UIDisableDrag = UIDisableDrag
+ORYX.Core.UIDragFunction = UIDragFunction
 ORYX.Core.Controls = Controls
 ORYX.Core.Math = Math
 ORYX.Core.StencilSet = StencilSet
