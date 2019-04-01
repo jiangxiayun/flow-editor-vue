@@ -914,7 +914,7 @@ export default class Label {
     }
   }
 
-  shown () {
+  show () {
     if (!this.isVisible) {
       this.isVisible = true
       this._isChanged = true

@@ -3,6 +3,7 @@ import ORYX_Config from '../CONFIG'
 import ORYX_Edge from '../core/Edge'
 import ORYX_Node from '../core/Node'
 import ORYX_Command from '../core/Command'
+import ORYX_Move from '../core/Move'
 import ORYX_Controls from '../core/Controls/index'
 
 export default class KeysMove extends AbstractPlugin {
@@ -11,7 +12,7 @@ export default class KeysMove extends AbstractPlugin {
     this.facade = facade
     this.copyElements = []
 
-    //this.facade.registerOnEvent(ORYX.CONFIG.EVENT_KEYDOWN, this.keyHandler.bind(this));
+    // this.facade.registerOnEvent(ORYX.CONFIG.EVENT_KEYDOWN, this.keyHandler.bind(this));
 
     // SELECT ALL
     this.facade.offer({
@@ -227,7 +228,7 @@ export default class KeysMove extends AbstractPlugin {
 
       if (p.x != 0 || p.y != 0) {
         // Instantiate the moveCommand
-        const commands = [new ORYX_Command.Move(selection, p, null, currentSelection, this)]
+        const commands = [new ORYX_Move(selection, p, null, currentSelection, this)]
         // Execute the commands
         this.facade.executeCommands(commands)
       }

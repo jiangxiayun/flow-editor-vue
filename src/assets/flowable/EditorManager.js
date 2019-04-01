@@ -1,4 +1,5 @@
-import { FLOWABLE, FLOWABLE_eventBus_initAddListener } from './FLOWABLE_Config'
+import { FLOWABLE } from './FLOWABLE_Config'
+import FLOW_OPTIONS from './FLOW_OPTIONS'
 import { findGroup, addGroup } from '@/assets/Util'
 import ORYX from '@/assets/oryx'
 
@@ -9,6 +10,7 @@ import ORYX from '@/assets/oryx'
  **/
 export default class EditorManager {
   constructor (config) {
+    config = jQuery.extend(true, {}, config)
     this.treeFilteredElements = ['SubProcess', 'CollapsedSubProcess']
     this.canvasTracker = new Hash()
     this.structualIcons = {
@@ -30,7 +32,9 @@ export default class EditorManager {
     this.setToolbarItems()
 
     const baseUrl = 'http://b3mn.org/stencilset/'
+
     const stencilSet = new ORYX.Core.StencilSet.StencilSet(baseUrl, config.stencilData)
+
     ORYX.Core.StencilSet.loadStencilSet(baseUrl, stencilSet, config.modelData.modelId)
     jQuery.ajax({
       type: 'GET',
@@ -132,7 +136,7 @@ export default class EditorManager {
   getStencilData () { return this.stencilData }
 
   setStencilData (stencilData) {
-    //we don't want a references!
+    // we don't want a references!
     this.stencilData = jQuery.extend(true, {}, stencilData)
   }
 
@@ -330,15 +334,14 @@ export default class EditorManager {
 
     // this will be overwritten almost instantly.
     this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes))
-    console.log('new ORYX.Editor', config)
     this.editor = new ORYX.Editor(config)
 
     this.current = this.editor.id
     this.loading = false
 
-    FLOWABLE.eventBus.editor = this.editor
-    FLOWABLE.eventBus.dispatch('ORYX-EDITOR-LOADED', {})
-    FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_EDITOR_BOOTED, {})
+    FLOW_OPTIONS.events.editor = this.editor
+    FLOW_OPTIONS.events.dispatch('ORYX-EDITOR-LOADED', {})
+    FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_EDITOR_BOOTED, {})
 
     const eventMappings = [
       // 元素选择
@@ -358,18 +361,18 @@ export default class EditorManager {
 
     eventMappings.forEach((eventMapping) => {
       this.registerOnEvent(eventMapping.oryxType, function (event) {
-        FLOWABLE.eventBus.dispatch(eventMapping.flowableType, event)
+        FLOW_OPTIONS.events.dispatch(eventMapping.flowableType, event)
       })
     })
 
     // if an element is added te properties will catch this event.
-    FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.filterEvent.bind(this))
-    FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED, this.filterEvent.bind(this))
-    FLOWABLE.eventBus.addListener('EDITORMANAGER-EDIT-ACTION', function () {
+    FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.filterEvent.bind(this))
+    FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED, this.filterEvent.bind(this))
+    FLOW_OPTIONS.events.addListener('EDITORMANAGER-EDIT-ACTION', function () {
       this.renderProcessHierarchy()
     })
 
-    FLOWABLE_eventBus_initAddListener()
+    FLOW_OPTIONS.initAddListener()
     this.initRegisterOnEvent()
   }
 
@@ -415,7 +418,7 @@ export default class EditorManager {
    */
   getStencilItemById (stencilItemId) {
     for (let i = 0; i < this.showStencilData.length; i++) {
-      var element = this.showStencilData[i]
+      let element = this.showStencilData[i]
 
       // Real group
       if (element.items !== null && element.items !== undefined) {
@@ -584,7 +587,7 @@ export default class EditorManager {
 
         this.selectedItem = selectedItem
         this.selectedShape = selectedShape
-        FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, {
+        FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, {
           selectedItem,
           selectedShape
         })
@@ -595,7 +598,7 @@ export default class EditorManager {
     })
 
     this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
-      FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS)
+      FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS)
 
       var shapes = event.elements
 
@@ -784,7 +787,6 @@ export default class EditorManager {
     return this.editor.eventCoordinatesXY(x, y)
   }
 
-
   edit (resourceId) {
     //Save the current canvas in the canvastracker if it is the root process.
     this.syncCanvasTracker()
@@ -810,10 +812,9 @@ export default class EditorManager {
     this.current = resourceId
 
     this.loading = false
-    FLOWABLE.eventBus.dispatch('EDITORMANAGER-EDIT-ACTION', {})
-    FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_UNDO_REDO_RESET, {})
+    FLOW_OPTIONS.events.dispatch('EDITORMANAGER-EDIT-ACTION', {})
+    FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_UNDO_REDO_RESET, {})
   }
-
 
   _buildTreeChildren (childShapes) {
     var children = []
@@ -900,7 +901,7 @@ export default class EditorManager {
   }
 
   dispatchOryxEvent (event) {
-    FLOWABLE.eventBus.dispatchOryxEvent(event)
+    FLOW_OPTIONS.events.dispatchOryxEvent(event)
   }
 
   isLoading () {
@@ -939,5 +940,16 @@ export default class EditorManager {
       }
     }
     return false
+  }
+
+  dispatchFlowEvent (type, event) {
+    FLOW_OPTIONS.events.dispatch(type, event)
+  }
+  addListenerFlowEvent (type, callback, scope) {
+    FLOW_OPTIONS.events.addListener(type, callback, scope)
+  }
+
+  flowToolbarEvent (services) {
+    FLOW_OPTIONS.TOOLBAR.ACTIONS.deleteItem(services)
   }
 }

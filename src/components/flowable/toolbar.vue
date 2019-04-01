@@ -163,6 +163,7 @@
 
 <script>
   import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
+  import FLOW_OPTIONS from '@/assets/flowable/FLOW_OPTIONS'
   import ORYX_CONFIG from '@/assets/oryx/CONFIG'
 
   export default {
@@ -200,9 +201,9 @@
     },
     methods: {
       executeFunctionByName (functionName, context /*, args */) {
-        var args = Array.prototype.slice.call(arguments).splice(2)
-        var namespaces = functionName.split('.')
-        var func = namespaces.pop()
+        const args = Array.prototype.slice.call(arguments).splice(2)
+        let namespaces = functionName.split('.')
+        let func = namespaces.pop()
         for (let i = 1; i < namespaces.length; i++) {
           context = context[namespaces[i]]
         }
@@ -225,14 +226,14 @@
           // '$translate' : $translate,
           'editorManager': this.editorManager
         }
-        this.executeFunctionByName(buttonClicked.action, FLOWABLE, services)
+        this.executeFunctionByName(buttonClicked.action, FLOW_OPTIONS, services)
 
         // Other events
         let event = {
           type: FLOWABLE.eventBus.EVENT_TYPE_TOOLBAR_BUTTON_CLICKED,
           toolbarItem: buttonClicked
         }
-        FLOWABLE.eventBus.dispatch(event.type, event)
+        this.editorManager.dispatchFlowEvent(event.type, event)
       },
       toolbarSecondaryButtonClicked (buttonIndex) {
         let buttonClicked = this.secondaryItems[buttonIndex]
@@ -245,37 +246,37 @@
           // '$location': $location,
           'editorManager': this.editorManager
         }
-        this.executeFunctionByName(buttonClicked.action, FLOWABLE, services)
+        this.executeFunctionByName(buttonClicked.action, FLOW_OPTIONS, services)
       },
       MousetrapBind () {
         /* Key bindings */
         Mousetrap.bind('mod+z', () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOWABLE.TOOLBAR.ACTIONS.undo(services)
+          FLOW_OPTIONS.TOOLBAR.ACTIONS.undo(services)
           return false
         })
 
         Mousetrap.bind('mod+y', () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOWABLE.TOOLBAR.ACTIONS.redo(services)
+          FLOW_OPTIONS.TOOLBAR.ACTIONS.redo(services)
           return false
         })
 
         Mousetrap.bind('mod+c', () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOWABLE.TOOLBAR.ACTIONS.copy(services)
+          FLOW_OPTIONS.TOOLBAR.ACTIONS.copy(services)
           return false
         })
 
         Mousetrap.bind('mod+v', () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOWABLE.TOOLBAR.ACTIONS.paste(services)
+          FLOW_OPTIONS.TOOLBAR.ACTIONS.paste(services)
           return false
         })
 
         Mousetrap.bind(['del'], () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOWABLE.TOOLBAR.ACTIONS.deleteItem(services)
+          FLOW_OPTIONS.TOOLBAR.ACTIONS.deleteItem(services)
           return false
         })
       },
@@ -329,9 +330,9 @@
         this.modelMetaData.key = this.saveDialog.key
         this.modelMetaData.description = this.saveDialog.description
 
-        var json = this.editorManager.getModel()
+        let json = this.editorManager.getModel()
 
-        var params = {
+        let params = {
           modeltype: this.modelMetaData.model.modelType,
           json_xml: JSON.stringify(json),
           name: this.saveDialog.name,
@@ -436,7 +437,7 @@
             this.save(() => {
               this.ignoreChanges = true  // Otherwise will get pop up that changes are not saved.
               if (this.editorManager.getStencilData()) {
-                var stencilNameSpace = this.editorManager.getStencilData().namespace
+                let stencilNameSpace = this.editorManager.getStencilData().namespace
                 if (stencilNameSpace !== undefined && stencilNameSpace !== null && stencilNameSpace.indexOf('cmmn1.1') !== -1) {
                   // $location.path('/casemodels')
                   console.log('/casemodels2')

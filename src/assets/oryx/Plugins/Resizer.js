@@ -156,7 +156,6 @@ export default class Resizer {
     }).bind(this))
 
     Event.stop(event)
-
   }
 
   registerOnResizeStart (callback) {
@@ -261,7 +260,6 @@ export default class Resizer {
     if (additionalIEZoom === 1) {
       upL.y = upL.y - jQuery('#canvasSection').offset().top + a.f
       upL.x = upL.x - jQuery('#canvasSection').offset().left + a.e
-
     } else {
       let canvasOffsetLeft = jQuery('#canvasSection').offset().left
       let canvasScrollLeft = jQuery('#canvasSection').scrollLeft()

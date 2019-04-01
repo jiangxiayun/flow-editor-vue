@@ -115,7 +115,6 @@ export default class StencilSet {
   }
 
   stencil (id) {
-    console.log(9999999999990, this._stencils)
     return this._stencils.get(id)
   }
 
@@ -327,6 +326,7 @@ export default class StencilSet {
     this.__handleStencilset(response)
 
     let pps = new Hash()
+
     // init property packages
     if (this._jsonObject.propertyPackages) {
       $A(this._jsonObject.propertyPackages).each((function (pp) {
@@ -338,7 +338,6 @@ export default class StencilSet {
     // init each stencil
     $A(this._jsonObject.stencils).each((function (stencil) {
       defaultPosition++
-
       // instantiate normally.
       let oStencil = new Stencil(stencil, this.namespace(), this._baseUrl, this, pps, defaultPosition)
       this._stencils.set(oStencil.id(), oStencil)

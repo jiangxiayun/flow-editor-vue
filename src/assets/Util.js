@@ -2,17 +2,17 @@
 export function findGroup (name, groupArray) {
   for (var index = 0; index < groupArray.length; index++) {
     if (groupArray[index].name === name) {
-      return groupArray[index];
+      return groupArray[index]
     }
   }
-  return null;
+  return null
 }
 
 // Helper method: add a new group to an array of groups
 export function addGroup (groupName, groupArray) {
-  var group = { name: groupName, items: [], paletteItems: [], groups: [], visible: true };
-  groupArray.push(group);
-  return group;
+  var group = { name: groupName, items: [], paletteItems: [], groups: [], visible: true }
+  groupArray.push(group)
+  return group
 }
 
 export function getAdditionalIEZoom () {
@@ -38,37 +38,102 @@ export function getAdditionalIEZoom () {
  */
 export function _internalCreateModal (modalConfig, $modal, $scope) {
   if ($scope !== null && $scope !== undefined) {
-    $scope.modal = $modal(modalConfig);
+    $scope.modal = $modal(modalConfig)
 
     $scope.$on('$routeChangeStart', function () {
       if ($scope.modal) {
-        $scope.modal.hide();
+        $scope.modal.hide()
       }
-    });
+    })
 
-    return $scope.modal;
+    return $scope.modal
   } else {
-    return $modal(modalConfig);
+    return $modal(modalConfig)
   }
 }
 
-export function extendDeep(parent, child) {
+export function extendDeep (parent, child) {
 
   let proxy = null
 
-  proxy = JSON.stringify(parent); // 把parent对象转换成字符串
+  proxy = JSON.stringify(parent) // 把parent对象转换成字符串
   proxy = JSON.parse(proxy) // 把字符串转换成对象，这是parent的一个副本
 
-  child = child || {};
+  child = child || {}
 
-  for(let i in proxy) {
+  for (let i in proxy) {
     // 判断对象是否包含特定的自身（非继承）属性
-    if(proxy.hasOwnProperty(i)) {
-      child[i] = proxy[i];
+    if (proxy.hasOwnProperty(i)) {
+      child[i] = proxy[i]
     }
   }
 
-  proxy = null; // 因为proxy是中间对象，可以将它回收掉
+  proxy = null // 因为proxy是中间对象，可以将它回收掉
 
-  return child;
+  return child
+}
+
+/**
+ * @description [throttle 节流函数]
+ * @author shanshuizinong
+ * @param {Function} fn 延时调用函数
+ * @param {Number} delay 延迟多长时间
+ * @param {Number} atleast 至少多长时间触发一次
+ * @return {Function} 延迟执行的方法
+ */
+export function throttle (fn, delay, atleast) {
+  let timer = null
+  let previous = null
+  return function () {
+    let now = +new Date()
+    if (!previous) previous = now
+    if (atleast && now - previous > atleast) {
+      fn()
+      previous = now
+      clearTimeout(timer)
+    } else {
+      clearTimeout(timer)
+      timer = setTimeout(function () {
+        fn()
+        previous = null
+      }, delay)
+    }
+  }
+}
+
+// 防抖
+export function _debounce (fn, delay = 200) {
+  let timer
+  return function () {
+    const th = this
+    const args = arguments
+    if (timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(function () {
+      timer = null
+      fn.apply(th, args)
+    }, delay)
+  }
+}
+
+// 节流
+export function _throttle (fn, interval = 200) {
+  let last
+  let timer
+  return function () {
+    const th = this
+    const args = arguments
+    let now = +new Date()
+    if (last && now - last < interval) {
+      clearTimeout(timer)
+      timer = setTimeout(function () {
+        last = now
+        fn.apply(th, args)
+      }, interval)
+    } else {
+      last = now
+      fn.apply(th, args)
+    }
+  }
 }

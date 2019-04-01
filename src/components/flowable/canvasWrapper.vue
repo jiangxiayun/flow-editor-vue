@@ -4,7 +4,8 @@
     <div class="canvas-wrapper" id="canvasSection"
          v-droppable="{onDrop:'dropCallback',onOver: 'overCallback', onOut: 'outCallback'}"
          data-model="droppedElement"
-         data-drop="true">
+         data-drop="true"
+         @scroll.passive="fnScroll">
       <div class="canvas-message" id="model-modified-date"></div>
 
       <!--删除按钮-->
@@ -68,6 +69,7 @@
   import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
   import { getAdditionalIEZoom } from '@/assets/Util'
   import ORYX from '@/assets/oryx'
+  import { _debounce } from '@/assets/Util'
 
   export default {
     name: 'canvasWrapper',
@@ -95,8 +97,60 @@
       ...mapMutations('Flowable', [
         'UPDATE_dragModeOver', 'UPDATE_dragCanContain',
         'UPDATE_quickMenu']),
+      fnScroll () {
+        // Hides the resizer and quick menu items during scrolling
+        const selectedElements = this.editorManager.getSelection();
+        const subSelectionElements = this.editorManager.getSubSelection();
+
+        this.selectedElements = selectedElements;
+        this.subSelectionElements = subSelectionElements;
+        if (selectedElements && selectedElements.length > 0)
+        {
+          this.selectedElementBeforeScrolling = selectedElements[0];
+        }
+
+        jQuery('.Oryx_button').each(function(i, obj) {
+          this.orginalOryxButtonStyle = obj.style.display;
+          obj.style.display = 'none';
+        });
+        jQuery('.resizer_southeast').each(function(i, obj) {
+          this.orginalResizerSEStyle = obj.style.display;
+          obj.style.display = 'none';
+        });
+        jQuery('.resizer_northwest').each(function(i, obj) {
+          this.orginalResizerNWStyle = obj.style.display;
+          obj.style.display = 'none';
+        });
+        this.editorManager.handleEvents({type:ORYX.CONFIG.EVENT_CANVAS_SCROLL});
+        this.fnHandleScrollDebounce()
+      },
+      fnHandleScrollDebounce: _debounce(function(_type, index, item) {
+        // Puts the quick menu items and resizer back when scroll is stopped.
+        this.editorManager.setSelection([]); // needed cause it checks for element changes and does nothing if the elements are the same
+        this.editorManager.setSelection(this.selectedElements, this.subSelectionElements);
+        this.selectedElements = undefined;
+        this.subSelectionElements = undefined;
+
+        function handleDisplayProperty(obj) {
+          if (jQuery(obj).position().top > 0) {
+            obj.style.display = 'block';
+          } else {
+            obj.style.display = 'none';
+          }
+        }
+
+        jQuery('.Oryx_button').each(function(i, obj) {
+          handleDisplayProperty(obj);
+        });
+        jQuery('.resizer_southeast').each(function(i, obj) {
+          handleDisplayProperty(obj);
+        });
+        jQuery('.resizer_northwest').each(function(i, obj) {
+          handleDisplayProperty(obj);
+        });
+      }, 200),
       deleteShape () {
-        FLOWABLE.TOOLBAR.ACTIONS.deleteItem({ '$scope': this, 'editorManager': this.editorManager })
+        this.editorManager.flowToolbarEvent({ '$scope': this, 'editorManager': this.editorManager })
       },
       morphShape () {
         var shapes = this.editorManager.getSelection()
@@ -366,7 +420,7 @@
           highlightId: 'shapeMenu'
         })
 
-        FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS)
+        this.editorManager.dispatchFlowEvent(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS)
 
         // console.log('dragCanContain', this.dragCanContain)
         if (this.dragCanContain) {
@@ -543,7 +597,7 @@
               droppedItem: item,
               position: pos
             }
-            FLOWABLE.eventBus.dispatch(dropEvent.type, dropEvent)
+            this.editorManager.dispatchFlowEvent(dropEvent.type, dropEvent)
           }
         }
         this.editorManager.dragCurrentParent = undefined
@@ -740,6 +794,17 @@
 
           this.editorManager.executeCommands([command]);
         }
+      },
+      initScrollHandling() {
+        var canvasSection = jQuery('#canvasSection');
+        canvasSection.scroll(() => {
+
+        });
+
+        canvasSection.scrollStopped(() => {
+
+
+        });
       },
     }
   }

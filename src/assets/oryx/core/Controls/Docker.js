@@ -333,7 +333,6 @@ export default class Docker extends Control {
     this.node.setAttributeNS(null, 'visibility', 'visible')
 
     // Hide reference point if the connected shape is an edge
-    console.log(222, this.getDockedShape())
     let type = this.getDockedShape().getInstanceofType()
     if (type.includes('Edge')) {
       this._referencePointNode.setAttributeNS(null, 'visibility', 'hidden')

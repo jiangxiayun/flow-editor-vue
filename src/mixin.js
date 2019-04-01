@@ -20,64 +20,6 @@ const commonMix = {
         return 'bpmn2.0';
       }
     },
-    initScrollHandling() {
-      var canvasSection = jQuery('#canvasSection');
-      canvasSection.scroll(() => {
-        // Hides the resizer and quick menu items during scrolling
-        var selectedElements = this.editorManager.getSelection();
-        var subSelectionElements = this.editorManager.getSubSelection();
-
-        this.selectedElements = selectedElements;
-        this.subSelectionElements = subSelectionElements;
-        if (selectedElements && selectedElements.length > 0)
-        {
-          this.selectedElementBeforeScrolling = selectedElements[0];
-        }
-
-        jQuery('.Oryx_button').each(function(i, obj) {
-          this.orginalOryxButtonStyle = obj.style.display;
-          obj.style.display = 'none';
-        });
-        jQuery('.resizer_southeast').each(function(i, obj) {
-          this.orginalResizerSEStyle = obj.style.display;
-          obj.style.display = 'none';
-        });
-        jQuery('.resizer_northwest').each(function(i, obj) {
-          this.orginalResizerNWStyle = obj.style.display;
-          obj.style.display = 'none';
-        });
-        this.editorManager.handleEvents({type:ORYX.CONFIG.EVENT_CANVAS_SCROLL});
-      });
-
-      canvasSection.scrollStopped(() => {
-
-        // Puts the quick menu items and resizer back when scroll is stopped.
-
-        this.editorManager.setSelection([]); // needed cause it checks for element changes and does nothing if the elements are the same
-        this.editorManager.setSelection(this.selectedElements, this.subSelectionElements);
-        this.selectedElements = undefined;
-        this.subSelectionElements = undefined;
-
-        function handleDisplayProperty(obj) {
-          if (jQuery(obj).position().top > 0) {
-            obj.style.display = 'block';
-          } else {
-            obj.style.display = 'none';
-          }
-        }
-
-        jQuery('.Oryx_button').each(function(i, obj) {
-          handleDisplayProperty(obj);
-        });
-        jQuery('.resizer_southeast').each(function(i, obj) {
-          handleDisplayProperty(obj);
-        });
-        jQuery('.resizer_northwest').each(function(i, obj) {
-          handleDisplayProperty(obj);
-        });
-
-      });
-    },
     safeApply: function(fn) {
       if (this.$root) {
         var phase = this.$root.$$phase;

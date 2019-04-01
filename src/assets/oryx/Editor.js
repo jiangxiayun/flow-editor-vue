@@ -62,10 +62,8 @@ export default class Editor {
     // Initialize the eventlistener
     this._initEventListener()
 
-    console.log('_createCanvas', model)
     // CREATES the canvas
     this._createCanvas(model.stencil ? model.stencil.id : null, model.properties)
-    console.log('_createCanvas-------done')
     // 生成整个 EXT.VIEWPORT
     this._generateGUI()
 
@@ -389,11 +387,9 @@ export default class Editor {
       // Get any root stencil type
       stencilType = this.getStencilSets().values()[0].findRootStencilName()
     }
-    console.log('stencilType:', stencilType)
     // get the stencil associated with the type
     let canvasStencil = ORYX_StencilSet.stencil(stencilType)
 
-    console.log(222222, canvasStencil)
     if (!canvasStencil) {
       ORYX_Log.fatal('初始化失败, 因为类型为 %0 的模具不是加载的模具集的一部分。', stencilType)
     }

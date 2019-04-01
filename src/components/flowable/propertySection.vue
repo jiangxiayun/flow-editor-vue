@@ -69,6 +69,7 @@
 <script>
   import ORYX from '@/assets/oryx'
   import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
+  import FLOW_OPTIONS from '@/assets/flowable/FLOW_OPTIONS'
   import defaultValueDisplayTemplate from '@/components/propertyForm/default-value-display-template'
   import stringPropertyWriteModeTemplate from '@/components/propertyForm/string-property-write-mode-template'
   import textPropertyWriteTemplate from '@/components/propertyForm/text-property-write-template'
@@ -148,7 +149,7 @@
       /*
        * Listen to property updates and act upon them
        */
-      FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, (event) => {
+      FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, (event) => {
         if (event.property && event.property.key) {
           // If the name property is been updated, we also need to change the title of the currently selected item
           if (event.property.key === 'oryx-name' && this.selectedItem !== undefined && this.selectedItem !== null) {
@@ -160,7 +161,7 @@
             || event.property.value.length == 0)
         }
       })
-      FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, (event) => {
+      FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, (event) => {
         if (this.currentSelectedProperty.mode != 'write') {
           this.selectedItem = event.selectedItem
           this.selectedShape = event.selectedShape
@@ -268,7 +269,8 @@
             oldValue: oldValue,
             newValue: newValue
           }
-          FLOWABLE.eventBus.dispatch(event.type, event)
+
+          this.editorManager.dispatchFlowEvent(event.type, event)
         } else {
           // Switch the property back to read mode, no update was needed
           property.mode = 'read'

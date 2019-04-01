@@ -102,7 +102,6 @@ export default class Move extends  Command {
         // Layout all outgoing/incoming edges
         this.plugin.layoutEdges(value, allEdges, offset)
 
-
         let allSameEdges = [].concat(value.getIncomingShapes())
           .concat(value.getOutgoingShapes())
           // Remove all edges which are included in the selection from the list

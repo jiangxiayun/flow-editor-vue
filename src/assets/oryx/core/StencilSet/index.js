@@ -47,7 +47,6 @@ const StencilSet = {
     let splitted = namespace.split('#', 1)
     if (splitted.length === 1) {
       ORYX_Log.trace('Getting stencil set %0', splitted[0])
-      console.log(88, this._stencilSetsByNamespace.get(splitted[0] + '#'))
       return this._stencilSetsByNamespace.get(splitted[0] + '#')
     } else {
       return undefined
@@ -82,9 +81,7 @@ const StencilSet = {
   stencil:function (id) {
     ORYX_Log.trace('Getting stencil for %0', id)
     let ss = this.stencilSet(id)
-    console.log(666, ss)
     if (ss) {
-      console.log(777, ss.stencil(id))
       return ss.stencil(id)
     } else {
       ORYX_Log.trace('Cannot fild stencil for %0', id)
