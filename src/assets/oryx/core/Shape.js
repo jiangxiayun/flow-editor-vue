@@ -142,6 +142,7 @@ export default class Shape extends AbstractShape {
 
                 let refId = this.id + ref
 
+                console.log(555, ref, refId, property.type())
                 if (property.type() === ORYX_Config.TYPE_FLOWABLE_MULTIINSTANCE) {
                   // flowable-multiinstance
 
@@ -178,6 +179,22 @@ export default class Shape extends AbstractShape {
                     svgElemFrame.setAttributeNS(null, 'display', 'none')
                     svgElemFrame2.setAttributeNS(null, 'display', 'none')
                   }
+                } else if (property.type() === 'select') {
+                  if (ref === 'important_sign') {
+                    let svgElemParallel = this.node.ownerDocument.getElementById(this.id + 'important_sign')
+                    if (svgElemParallel) {
+                      if (prop === 'Parallel') {
+                        svgElemParallel.setAttributeNS(null, 'display', 'inherit')
+                        svgElemParallel.setAttributeNS(null, 'fill', 'red')
+                      } else if (prop === 'Sequential') {
+                        svgElemParallel.setAttributeNS(null, 'display', 'inherit')
+                        svgElemParallel.setAttributeNS(null, 'fill', 'orange')
+                      } else {
+                        svgElemParallel.setAttributeNS(null, 'display', 'none')
+                      }
+                    }
+                  }
+                  return
                 }
 
                 //get the SVG element

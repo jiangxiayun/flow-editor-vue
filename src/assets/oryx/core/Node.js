@@ -542,8 +542,7 @@ export default class Node extends Shape {
           width: parseFloat(minSizeValues[0]),
           height: parseFloat(minSizeValues[1])
         }
-      }
-      else {
+      } else {
         //set minimumSize to (1,1), so that width and height of the stencil can never be (0,0)
         this.minimumSize = {
           width: 1,

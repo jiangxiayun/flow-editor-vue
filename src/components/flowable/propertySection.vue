@@ -1,7 +1,7 @@
 <template>
   <!--表单信息区域-->
   <div id="propertiesHelpWrapper" class="col-xs-12">
-{{selectedShape}}
+<!--{{selectedShape}}-->
     <div class="propertySection" id="propertySection"
          :class="{collapsed: propertyWindowState.collapsed}">
       <div class="selected-item-section">
@@ -35,7 +35,7 @@
                 <i>{{ property.title }}&nbsp;({{$t('PROPERTY.REMOVED')}})&nbsp;:</i>
               </span>
               <span class="value">
-                {{getTemplateComponentName(property)}}||
+                <!--{{getTemplateComponentName(property)}}||-->
 
                 <!--当编辑的属性非弹窗形式，使用此处渲染-->
                 <template v-if="!(property.mode === 'write' &&

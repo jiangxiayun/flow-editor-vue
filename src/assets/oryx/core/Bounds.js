@@ -307,7 +307,6 @@ export default class Bounds {
    */
   centerMoveTo () {
     let currentPosition = this.center()
-
     switch (arguments.length) {
       case 1:
         this.moveBy(arguments[0].x - currentPosition.x, arguments[0].y - currentPosition.y)

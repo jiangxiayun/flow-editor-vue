@@ -34,7 +34,7 @@ export default class SVGShape {
     this.radiusY = undefined
     this.isHorizontallyResizable = false
     this.isVerticallyResizable = false
-    //this.anchors = [];
+    // this.anchors = [];
     this.anchorLeft = false
     this.anchorRight = false
     this.anchorTop = false
@@ -57,7 +57,6 @@ export default class SVGShape {
     if (ORYX_Utils.checkClassType(this.element, SVGRectElement) ||
       ORYX_Utils.checkClassType(this.element, SVGImageElement)) {
       this.type = 'Rect'
-
       const xAttr = this.element.getAttributeNS(null, 'x')
       if (xAttr) {
         this.oldX = parseFloat(xAttr)

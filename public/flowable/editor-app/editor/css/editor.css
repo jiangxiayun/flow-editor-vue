@@ -155,7 +155,8 @@ text * {
 }
 
 /*** Resizer ***/
-
+.resizer_south,
+.resizer_north,
 .resizer_southeast,
 .resizer_northwest {
 	width:12px; 
@@ -213,4 +214,19 @@ text * {
     background-image:url(../../images/nw-handle-dark.gif);
     cursor: nw-resize;
     background-position: -2px -2px;
+}
+
+.resizer_south {
+	width: 100%;
+	height: 6px;
+	border-top: 1px solid #5581b9;
+	border-bottom: 1px solid #5581b9;
+	cursor: s-resize;
+}
+.resizer_north {
+	width: 100%;
+	height: 6px;
+	border-bottom: 1px solid #5581b9;
+	border-top: 1px solid #5581b9;
+	cursor: n-resize;
 }

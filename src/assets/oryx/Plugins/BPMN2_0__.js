@@ -170,7 +170,6 @@ class ResizeLanesCommand extends Command {
   }
 
   setHeight (newHeight, oldHeight, parent, parentHeight, store) {
-    console.log('setHeight!!!!')
     // Set heigh of the lane
     this.plugin.setDimensions(this.lane, this.lane.bounds.width(), newHeight)
     this.plugin.hashedBounds[this.pool.id][this.lane.id] = this.lane.absoluteBounds()
@@ -304,8 +303,7 @@ export default class BPMN2_0 extends AbstractPlugin {
 
     this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDOCKER_DOCKED, this.handleDockerDocked.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_PROPWINDOW_PROP_CHANGED, this.handlePropertyChanged.bind(this))
-    this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool_H.bind(this))
-    this.facade.registerOnEvent('layout.bpmn2_0.pool_V', this.handleLayoutPool_V.bind(this))
+    this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
     this.facade.registerOnEvent('layout.bpmn2_0.subprocess', this.handleSubProcess.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_LOADED, this.afterLoad.bind(this))
@@ -332,20 +330,15 @@ export default class BPMN2_0 extends AbstractPlugin {
    */
   onSelectionChanged (event) {
     let selection = event.elements
+
     if (selection && selection.length === 1) {
       let namespace = this.getNamespace()
       let shape = selection[0]
-      let id = shape.getStencil().idWithoutNs()
-      // shape.getStencil().idWithoutNs() === 'Pool'
-      if (id.endsWith('Pool')) {
+      if (shape.getStencil().idWithoutNs() === 'Pool') {
         if (shape.getChildNodes().length === 0) {
           // create a lane inside the selected pool
-          let laneName = 'Lane'
-          if (id === 'V-Pool') {
-            laneName = 'V-Lane'
-          }
           let option = {
-            type: namespace + laneName,
+            type: namespace + 'Lane',
             position: { x: 0, y: 0 },
             namespace: shape.getStencil().namespace(),
             parent: shape
@@ -397,25 +390,23 @@ export default class BPMN2_0 extends AbstractPlugin {
   }
 
   handleShapeRemove (option) {
+
     let sh = option.shape
     let parent = option.parent
 
-    // if (sh instanceof ORYX_Node && sh.getStencil().idWithoutNs() === 'Lane' && this.facade.isExecutingCommands()) {
-    if (sh instanceof ORYX_Node && sh.getStencil().id().endsWith('Lane') && this.facade.isExecutingCommands()) {
+    if (sh instanceof ORYX_Node && sh.getStencil().idWithoutNs() === 'Lane' && this.facade.isExecutingCommands()) {
       let pool = this.getParentPool(parent)
       if (pool && pool.parent) {
 
         let isLeafFn = function (leaf) {
           return !leaf.getChildNodes().any(function (r) {
-            // return r.getStencil().idWithoutNs() === 'Lane'
-            return r.getStencil().id().endsWith('Lane')
+            return r.getStencil().idWithoutNs() === 'Lane'
           })
         }
 
         let isLeaf = isLeafFn(sh)
         let parentHasMoreLanes = parent.getChildNodes().any(function (r) {
-          // return r.getStencil().idWithoutNs() === 'Lane'
-          return r.getStencil().id().endsWith('Lane')
+          return r.getStencil().idWithoutNs() === 'Lane'
         })
 
         if (isLeaf && parentHasMoreLanes) {
@@ -423,11 +414,10 @@ export default class BPMN2_0 extends AbstractPlugin {
           this.facade.executeCommands([command])
         } else if (!isLeaf &&
           !this.facade.getSelection().any(function (select) { // Find one of the selection, which is a lane and child of "sh" and is a leaf lane
-            // return select instanceof ORYX_Node && select.getStencil().idWithoutNs() === 'Lane' &&
-            //   select.isParent(sh) && isLeafFn(select)
-            return select instanceof ORYX_Node && select.getStencil().id().endsWith('Lane') &&
+            return select instanceof ORYX_Node && select.getStencil().idWithoutNs() === 'Lane' &&
               select.isParent(sh) && isLeafFn(select)
           })) {
+
           class CommandB extends Command{
             constructor (shape, facade) {
               super()
@@ -453,8 +443,11 @@ export default class BPMN2_0 extends AbstractPlugin {
           parent.add(sh)
         }
       }
+
     }
+
   }
+
 
   hashChildShapes (shape) {
     let children = shape.getChildNodes()
@@ -574,6 +567,7 @@ export default class BPMN2_0 extends AbstractPlugin {
 
     // Set dockers
     this.facade.executeCommands([new ORYX_MoveDockersCommand(obj)])
+
   }
 
   /**
@@ -655,44 +649,19 @@ export default class BPMN2_0 extends AbstractPlugin {
     }
 
   }
-  handleLayoutPool_H (event) {
-    let pool = event.shape
-    const canvas = this.facade.getCanvas()
-    let lowRight = {
-      x: canvas.bounds.b.x,
-      y: pool.bounds.b.y
-    }
-    let upLeft = {
-      x: 11,
-      y: pool.bounds.a.y
-    }
-    pool.bounds.set(upLeft, lowRight)
-    this.handleLayoutPool(event)
-  }
-  handleLayoutPool_V (event) {
-    let pool = event.shape
-    const canvas = this.facade.getCanvas()
-    let lowRight = {
-      x: pool.bounds.b.x,
-      y: canvas.bounds.b.y
-    }
-    let upLeft = {
-      x: pool.bounds.a.x,
-      y: 5
-    }
-    pool.bounds.set(upLeft, lowRight)
-    this.handleLayoutPool(event)
-  }
+
   /**
    * Handler for layouting event 'layout.bpmn2_0.pool'
    * @param {Object} event
    */
   handleLayoutPool (event) {
+    console.log(8888)
     let pool = event.shape
     let selection = this.facade.getSelection()
-
     let currentShape = selection.include(pool) ? pool : selection.first()
+
     currentShape = currentShape || pool
+
     this.currentPool = pool
 
     // Check if it is a pool or a lane
@@ -769,7 +738,6 @@ export default class BPMN2_0 extends AbstractPlugin {
 
     let height, width, x, y
 
-    console.log(777, deletedLanes, addedLanes)
     if (deletedLanes.length > 0 || addedLanes.length > 0) {
       if (addedLanes.length === 1 && this.getLanes(addedLanes[0].parent).length === 1) {
         // Set height from the pool
@@ -779,12 +747,8 @@ export default class BPMN2_0 extends AbstractPlugin {
         height = this.updateHeight(pool)
       }
       // Set width from the pool
-      if (pool.getStencil().idWithoutNs() === 'V-Pool') {
-        width = this.updateVPoolWidth(pool)
-      } else {
-        width = this.adjustWidth(lanes, pool.bounds.width())
-      }
-      console.log(33, width, height)
+      width = this.adjustWidth(lanes, pool.bounds.width())
+
       pool.update()
     } else if (pool == currentShape) {
       /**
@@ -798,6 +762,7 @@ export default class BPMN2_0 extends AbstractPlugin {
           let old = this.hashedPoolPositions[pool.id]
           scale = old.height() / pool.bounds.height()
         }
+
         this.adjustLanes(pool, allLanes, oldXY.x - xy.x, oldXY.y - xy.y, scale)
       }
 
@@ -863,6 +828,7 @@ export default class BPMN2_0 extends AbstractPlugin {
       if (poolHashedPositions && poolHashedPositions.keys().any(function (key, i) {
         return (allLanes[i] || {}).id !== key
       })) {
+
         class LanesHasBeenReordered extends Command{
           constructor (originPosition, newPosition, lanes, plugin, poolId) {
             super()
@@ -898,6 +864,7 @@ export default class BPMN2_0 extends AbstractPlugin {
 
         let command = new LanesHasBeenReordered(hashedPositions, hp2, allLanes, this, pool.id)
         this.facade.executeCommands([command])
+
       }
     }
 
@@ -911,7 +878,9 @@ export default class BPMN2_0 extends AbstractPlugin {
 
       // Cache also the bounds of child shapes, mainly for child subprocesses
       this.hashChildShapes(allLanes[i])
+
       this.hashedLaneDepth[allLanes[i].id] = this.getDepth(allLanes[i], pool)
+
       this.forceToUpdateLane(allLanes[i])
     }
 
@@ -973,6 +942,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     if (!bounds || !shape) {
       return false
     }
+
     let oldB = bounds
     //var oldXY = oldB.upperLeft();
     //var xy = shape.absoluteXY();
@@ -995,7 +965,6 @@ export default class BPMN2_0 extends AbstractPlugin {
 
         }
       }.bind(this))
-
       this.hashedBounds[pool.id][l.id].moveBy(-(x || 0), !scale ? -y : 0)
       if (scale) {
         l.isScaled = true
@@ -1014,6 +983,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     }.bind(this))
     return lanes
   }
+
 
   forceToUpdateLane (lane) {
     if (lane.bounds.height() !== lane._svgShapes[0].height) {
@@ -1039,82 +1009,24 @@ export default class BPMN2_0 extends AbstractPlugin {
 
       [].concat(children[j].getIncomingShapes())
         .concat(children[j].getOutgoingShapes())
+
     })
 
   }
 
   setDimensions (shape, width, height, x, y) {
-    // let isLane = shape.getStencil().id().endsWith('Lane')
-    let laneType = shape.getStencil().idWithoutNs()
+    let isLane = shape.getStencil().id().endsWith('Lane')
     // Set the bounds
-
-    if (laneType === 'Lane') {
-      shape.bounds.set(
-        30,
-        shape.bounds.a.y,
-        width ? shape.bounds.a.x + width - 30 : shape.bounds.b.x,
-        height ? shape.bounds.a.y + height : shape.bounds.b.y
-      )
-    } else if (laneType === 'V-Lane') {
-      shape.bounds.set(
-        shape.bounds.a.x,
-        30,
-        width ? shape.bounds.a.x + width : shape.bounds.b.x,
-        height ? shape.bounds.a.y + height - 30 : shape.bounds.b.y
-      )
-    } else {
-      shape.bounds.set(
-        (shape.bounds.a.x - (x || 0)),
-        (shape.bounds.a.y - (y || 0)),
-        width ? shape.bounds.a.x + width - (x || 0) : shape.bounds.b.x,
-        height ? shape.bounds.a.y + height - (y || 0) : shape.bounds.b.y
-      )
-    }
-    // shape.bounds.set(
-    //   isLane ? 30 : (shape.bounds.a.x - (x || 0)),
-    //   isLane ? shape.bounds.a.y : (shape.bounds.a.y - (y || 0)),
-    //   width ? shape.bounds.a.x + width - (isLane ? 30 : (x || 0)) : shape.bounds.b.x,
-    //   height ? shape.bounds.a.y + height - (isLane ? 0 : (y || 0)) : shape.bounds.b.y
-    // )
+    shape.bounds.set(
+      isLane ? 30 : (shape.bounds.a.x - (x || 0)),
+      isLane ? shape.bounds.a.y : (shape.bounds.a.y - (y || 0)),
+      width ? shape.bounds.a.x + width - (isLane ? 30 : (x || 0)) : shape.bounds.b.x,
+      height ? shape.bounds.a.y + height - (isLane ? 0 : (y || 0)) : shape.bounds.b.y
+    )
   }
 
-  setLanePosition (shape, x, y) {
-    if (shape.getStencil().idWithoutNs() === 'Lane') {
-      shape.bounds.moveTo(30, y)
-    } else {
-      shape.bounds.moveTo(x, 30)
-    }
-  }
-
-  updateVPoolWidth (root) {
-    let lanes = this.getLanes(root)
-    if (lanes.length === 0) {
-      return root.bounds.width()
-    }
-    let width = 0
-    let i = -1
-    while (++i < lanes.length) {
-      this.setLanePosition(lanes[i], width, null)
-      width += this.updateVPoolWidth(lanes[i])
-    }
-    this.setDimensions(root, width)
-    return width
-  }
-  adjustVLaneWidth (lanes, width) {
-    (lanes || []).each(function (lane) {
-      this.setDimensions(lane, width)
-      this.adjustVLaneWidth(this.getLanes(lane), width)
-    }.bind(this))
-    return width
-  }
-
-  adjustVLaneHeight (lanes, height) {
-    (lanes || []).each(function (lane) {
-      this.setDimensions(lane, null, height)
-      this.adjustVLaneHeight(this.getLanes(lane), height)
-    }.bind(this))
-
-    return height
+  setLanePosition (shape, y) {
+    shape.bounds.moveTo(30, y)
   }
 
   adjustWidth (lanes, width) {
@@ -1127,6 +1039,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     return width
   }
 
+
   adjustHeight (lanes, changedLane, propagateHeight) {
     let oldHeight = 0
     if (!changedLane && propagateHeight) {
@@ -1135,9 +1048,10 @@ export default class BPMN2_0 extends AbstractPlugin {
         oldHeight += lanes[i].bounds.height()
       }
     }
-    console.log(555, changedLane)
+
     let i = -1
     let height = 0
+
     // Iterate trough every lane
     while (++i < lanes.length) {
       if (lanes[i] === changedLane) {
@@ -1155,7 +1069,7 @@ export default class BPMN2_0 extends AbstractPlugin {
         this.adjustHeight(this.getLanes(lanes[i]), undefined, tempHeight)
         // Set height propotional to the propagated and old height
         this.setDimensions(lanes[i], null, tempHeight)
-        this.setLanePosition(lanes[i], null, height)
+        this.setLanePosition(lanes[i], height)
       } else {
         // Get height from children
         let tempHeight = this.adjustHeight(this.getLanes(lanes[i]), changedLane, propagateHeight)
@@ -1163,31 +1077,33 @@ export default class BPMN2_0 extends AbstractPlugin {
           tempHeight = lanes[i].bounds.height()
         }
         this.setDimensions(lanes[i], null, tempHeight)
-        this.setLanePosition(lanes[i], null, height)
+        this.setLanePosition(lanes[i], height)
       }
 
       height += lanes[i].bounds.height()
     }
 
     return height
+
   }
+
 
   updateHeight (root) {
     let lanes = this.getLanes(root)
 
-    console.log(99, root.getStencil().idWithoutNs())
-    if (lanes.length == 0 || root.getStencil().idWithoutNs() === 'V-Pool') {
+    if (lanes.length == 0) {
       return root.bounds.height()
     }
-    console.log(999999999999999999999999)
+
     let height = 0
     let i = -1
     while (++i < lanes.length) {
-      this.setLanePosition(lanes[i], null, height)
+      this.setLanePosition(lanes[i], height)
       height += this.updateHeight(lanes[i])
     }
 
     this.setDimensions(root, null, height)
+
     return height
   }
 
@@ -1396,15 +1312,10 @@ export default class BPMN2_0 extends AbstractPlugin {
    */
   getLanes (shape, recursive) {
     let namespace = this.getNamespace()
-    let id = shape.getStencil().idWithoutNs()
-    let laneName = 'Lane'
-    if (id === 'V-Pool') {
-      laneName = 'V-Lane'
-    }
 
     // Get all the child lanes
     let lanes = shape.getChildNodes(recursive || false).findAll(function (node) {
-      return (node.getStencil().id() === namespace + laneName)
+      return (node.getStencil().id() === namespace + 'Lane')
     })
 
     // Sort all lanes by there y coordinate

@@ -38,7 +38,7 @@
         }
       },
       dragCallback (event, ui) {
-        console.log('dragCallback')
+        // console.log('dragCallback')
         if (this.$store.state.dragModeOver != false) {
           const coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY);
 
@@ -76,7 +76,7 @@
             let item = this.editorManager.getStencilItemById(event.target.id);
             let parentCandidate = aShapes[0];
 
-            if (item.id === 'Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
+            if (item.id === 'Lane' || item.id === 'V-Lane'  || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
               item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
               item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
               item.id === 'EntryCriterion') {
@@ -147,6 +147,10 @@
                 }
               } else if (parentCandidate.getStencil().idWithoutNs() === 'Pool') {
                 if (item.id === 'Lane') {
+                  _canContain = true;
+                }
+              } else if (parentCandidate.getStencil().idWithoutNs() === 'V-Pool') {
+                if (item.id === 'V-Lane') {
                   _canContain = true;
                 }
               }

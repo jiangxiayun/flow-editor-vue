@@ -121,6 +121,14 @@
           this.orginalResizerNWStyle = obj.style.display;
           obj.style.display = 'none';
         });
+        jQuery('.resizer_south').each(function(i, obj) {
+          this.orginalResizerNWStyle = obj.style.display;
+          obj.style.display = 'none';
+        });
+        jQuery('.resizer_north').each(function(i, obj) {
+          this.orginalResizerNWStyle = obj.style.display;
+          obj.style.display = 'none';
+        });
         this.editorManager.handleEvents({type:ORYX.CONFIG.EVENT_CANVAS_SCROLL});
         this.fnHandleScrollDebounce()
       },
@@ -146,6 +154,12 @@
           handleDisplayProperty(obj);
         });
         jQuery('.resizer_northwest').each(function(i, obj) {
+          handleDisplayProperty(obj);
+        });
+        jQuery('.resizer_south').each(function(i, obj) {
+          handleDisplayProperty(obj);
+        });
+        jQuery('.resizer_north').each(function(i, obj) {
           handleDisplayProperty(obj);
         });
       }, 200),

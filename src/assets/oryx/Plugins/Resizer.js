@@ -37,7 +37,6 @@ export default class Resizer {
 
   handleMouseDown (event) {
     this.dragEnable = true
-
     this.offsetScroll = { x: this.scrollNode.scrollLeft, y: this.scrollNode.scrollTop }
 
     this.offSetPosition = {
@@ -97,7 +96,7 @@ export default class Resizer {
     }
 
     // respect minimum and maximum sizes of stencil
-    if (this.orientation === 'northwest') {
+    if (this.orientation === 'northwest' || this.orientation === 'north') {
       if (this.bounds.width() - offset.x > this.maxSize.width) {
         offset.x = -(this.maxSize.width - this.bounds.width())
         if (this.aspectRatio)
@@ -142,11 +141,28 @@ export default class Resizer {
       }
     }
 
-    if (this.orientation === 'northwest') {
-      this.bounds.extend({ x: -offset.x, y: -offset.y })
-      this.bounds.moveBy(offset)
-    } else { // defaults to southeast
-      this.bounds.extend(offset)
+    // if (this.orientation === 'northwest') {
+    //   this.bounds.extend({ x: -offset.x, y: -offset.y })
+    //   this.bounds.moveBy(offset)
+    // } else { // defaults to southeast
+    //   this.bounds.extend(offset)
+    // }
+
+    switch (this.orientation) {
+      case 'northwest':
+        this.bounds.extend({ x: -offset.x, y: -offset.y })
+        this.bounds.moveBy(offset)
+        break
+      case 'southeast':
+        this.bounds.extend(offset)
+        break
+      case 'north':
+        this.bounds.extend({ x: 0, y: -offset.y })
+        this.bounds.moveBy({ x: 0, y: offset.y })
+        break
+      case 'south':
+        this.bounds.extend({ x: 0, y: offset.y })
+        break
     }
 
     this.update()
@@ -206,17 +222,18 @@ export default class Resizer {
   setBounds (bounds, min, max, aspectRatio) {
     this.bounds = bounds
 
-    if (!min)
+    if (!min) {
       min = { width: ORYX_Config.MINIMUM_SIZE, height: ORYX_Config.MINIMUM_SIZE }
+    }
 
-    if (!max)
+    if (!max) {
       max = { width: ORYX_Config.MAXIMUM_SIZE, height: ORYX_Config.MAXIMUM_SIZE }
+    }
 
     this.minSize = min
     this.maxSize = max
 
     this.aspectRatio = aspectRatio
-
     this.update()
   }
 
@@ -274,12 +291,23 @@ export default class Resizer {
       upL.x = upL.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft) + a.e
     }
 
-    if (this.orientation === 'northwest') {
-      upL.x -= 13
-      upL.y -= 13
-    } else { // defaults to southeast
-      upL.x += (a.a * this.bounds.width()) + 3
-      upL.y += (a.d * this.bounds.height()) + 3
+    switch (this.orientation) {
+      case 'northwest':
+        upL.x -= 13
+        upL.y -= 13
+        break
+      case 'southeast':
+        upL.x += (a.a * this.bounds.width()) + 3
+        upL.y += (a.d * this.bounds.height()) + 3
+        break
+      case 'north':
+        upL.x = 0
+        upL.y -= 3
+        break
+      case 'south':
+        upL.x = 0
+        upL.y += (a.d * this.bounds.height()) - 3
+        break
     }
 
     this.position = upL

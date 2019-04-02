@@ -72,3 +72,6 @@ ORYX.Core.StencilSet.stencil(stencilType)
  _namespace: (...)
  _stencil: (...)
 */
+
+
+shape.getStencil().id()

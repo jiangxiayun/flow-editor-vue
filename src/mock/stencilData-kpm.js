@@ -56,6 +56,7 @@ export const AA = {
           "description": "重要度",
           "popular": true,
           "refToView": "important_sign"
+          // "refToView": "compensation"
         }
       ]
     },
@@ -2020,6 +2021,60 @@ export const AA = {
       ]
     },
     {
+      "type": "node",
+      "id": "V-Pool",
+      "title": "V-Pool",
+      "description": "A pool to stucture the process definition",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"250\" height=\"600\" version=\"1.0\"><defs></defs><oryx:magnets><oryx:magnet oryx:cx=\"0\" oryx:cy=\"299\" oryx:anchors=\"left\"/><oryx:magnet oryx:cx=\"124\" oryx:cy=\"599\" oryx:anchors=\"bottom\"/><oryx:magnet oryx:cx=\"249\" oryx:cy=\"299\" oryx:anchors=\"right\"/><oryx:magnet oryx:cx=\"124\" oryx:cy=\"0\" oryx:anchors=\"top\"/><oryx:magnet oryx:cx=\"124\" oryx:cy=\"299\" oryx:default=\"yes\"/></oryx:magnets><g pointer-events=\"none\"><defs><radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"100%\" fx=\"20%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/></radialGradient></defs><rect id=\"border\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"250\" height=\"600\" fill=\"none\" stroke-width=\"9\" stroke=\"none\" visibility=\"visible\" pointer-events=\"stroke\"/><rect id=\"c\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"250\" height=\"600\" stroke=\"black\" fill=\"url(#background) white\" fill-opacity=\"0.3\"/><rect id=\"caption\" oryx:anchors=\"top left right\" x=\"0\" y=\"0\" width=\"250\" height=\"30\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) white\" pointer-events=\"all\"/><rect id=\"captionDisableAntialiasing\" oryx:anchors=\"top left right\" x=\"0\" y=\"0\" width=\"250\" height=\"30\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) white\" pointer-events=\"all\"/><text x=\"125\" y=\"13\" font-size=\"12\" id=\"text_name\" oryx:fittoelem=\"caption\" oryx:align=\"middle center\" oryx:anchors=\"top\" fill=\"black\" stroke=\"black\"></text></g></svg>",
+      "icon": "swimlane/pool.png",
+      "groups": [
+        "V-泳道"
+      ],
+      "layout": [
+        {
+          "type": "layout.bpmn2_0.pool_V"
+        }
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "process_idpackage",
+        "isexecutablepackage"
+      ],
+      "hiddenPropertyPackages": [
+
+      ],
+      "roles": [
+        "canContainArtifacts",
+        "all"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "V-Lane",
+      "title": "V-Lane",
+      "description": "A lane to stucture the process definition",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg   xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"250\"   height=\"600\"   version=\"1.0\"><defs></defs><g pointer-events=\"none\"><defs><radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"200%\" fx=\"20%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"0\"/></radialGradient></defs><rect id=\"border_invisible\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"250\" height=\"600\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" visibility=\"hidden\" pointer-events=\"stroke\"/><rect id=\"border\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"250\" height=\"600\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) white\" pointer-events=\"none\"/><rect id=\"caption\" oryx:anchors=\"top left right\" x=\"0\" y=\"1\" width=\"248\" height=\"30\" stroke=\"black\" stroke-width=\"0\" fill=\"white\" visibility=\"hidden\" class=\"stripable-element-force\" pointer-events=\"all\"/><path stroke=\"black\" stroke-width=\"1\" fill=\"none\" d=\"M 0,0 L 0,250\" oryx:anchors=\"top left right\" id=\"captionDisableAntialiasing\"/><!--rect id=\"captionDisableAntialiasing\"oryx:anchors=\"left top bottom\"x=\"0\"y=\"0\"width=\"30\"height=\"250\"stroke=\"black\"stroke-width=\"1\"fill=\"url(#background) white\"/--><text x=\"125\" y=\"13\" font-size=\"12\" id=\"text_name\" oryx:align=\"middle center\" oryx:anchors=\"top\" oryx:fittoelem=\"caption\" fill=\"black\" stroke=\"black\"></text></g></svg>",
+      "icon": "swimlane/lane.png",
+      "groups": [
+        "V-泳道"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage"
+      ],
+      "hiddenPropertyPackages": [
+
+      ],
+      "roles": [
+        "V-PoolChild",
+        "canContainArtifacts",
+        "all"
+      ]
+    },
+    {
       "type": "edge",
       "id": "SequenceFlow",
       "title": "Sequence flow",
@@ -2344,7 +2399,23 @@ export const AA = {
         ]
       },
       {
+        "role": "V-Pool",
+        "contains": [
+          "V-Lane"
+        ]
+      },
+      {
         "role": "Lane",
+        "contains": [
+          "sequence_start",
+          "sequence_end",
+          "EventSubProcess",
+          "TextAnnotation",
+          "DataStore"
+        ]
+      },
+      {
+        "role": "V-Lane",
         "contains": [
           "sequence_start",
           "sequence_end",

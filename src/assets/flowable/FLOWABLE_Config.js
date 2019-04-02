@@ -317,6 +317,10 @@ export const FLOWABLE = {
     'oryx-input-complex': {
       'readModeTemplateUrl': 'form-reference-display-template',
       'writeModeTemplateUrl': 'form-reference-write-template'
+    },
+    'oryx-important_level-select': {
+      'readModeTemplateUrl': 'default-value-display-template',
+      'writeModeTemplateUrl': 'multiinstance-property-write-template'
     }
   },
   TOOLBAR_CONFIG: {

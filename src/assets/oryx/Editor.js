@@ -1050,7 +1050,6 @@ export default class Editor {
       } else {
         newShapeObject = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, stencil, this._getPluginFacade())
       }
-
       this.getCanvas().add(newShapeObject)
       newShapeObject.deserialize(option.serialize)
 
@@ -1065,6 +1064,9 @@ export default class Editor {
     // Create an New Shape, dependents on an Edge or a Node
     if (sset.stencil(shapetype).type() == 'node') {
       newShapeObject = new ORYX_Node({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
+      console.log(2, newShapeObject)
+      console.log(3, sset.stencil(shapetype).idWithoutNs())
+      console.log(4,  canvas.bounds.width())
     } else {
       newShapeObject = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
     }
