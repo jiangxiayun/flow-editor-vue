@@ -356,6 +356,30 @@ const Utils = {
       (userAgent.indexOf('Trident') !== -1 && userAgent.indexOf('rv:11') !== -1)
     return a
   },
+  IE10AndBelow: function () {
+    if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
+      let ua = navigator.userAgent
+      if (ua.indexOf('MSIE') >= 0) {
+        // IE 10 and below
+        return true
+      }
+    }
+    return false
+  },
+  IEZoomBelow10: function (z) {
+    if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
+      let ua = navigator.userAgent
+      if (ua.indexOf('MSIE') >= 0) {
+        // IE 10 and below
+        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
+        if (zoom !== 100) {
+          z = zoom / 100
+          return z
+        }
+      }
+    }
+    return z
+  },
   getTranslation: function (jsonObject, name) {
     // let lang = ORYX.I18N.Language.toLowerCase()
     let lang = 'en_us'

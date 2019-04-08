@@ -256,22 +256,22 @@ export default class Canvas extends AbstractShape {
     // if uiObject is child of another UIObject, remove it.
     if (uiObject instanceof UIObject) {
       if (!(this.children.member(uiObject))) {
-        //if uiObject is child of another parent, remove it from that parent.
+        // if uiObject is child of another parent, remove it from that parent.
         if (uiObject.parent) {
           uiObject.parent.remove(uiObject, true)
         }
 
-        //add uiObject to the Canvas
-        //add uiObject to this Shape
+        // add uiObject to the Canvas
+        // add uiObject to this Shape
         if (index != undefined)
           this.children.splice(index, 0, uiObject)
         else
           this.children.push(uiObject)
 
-        //set parent reference
+        // set parent reference
         uiObject.parent = this
 
-        //add uiObject.node to this.node depending on the type of uiObject
+        // add uiObject.node to this.node depending on the type of uiObject
         if (uiObject instanceof Shape) {
           if (uiObject instanceof Edge) {
             uiObject.addMarkers(this.rootNode.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'defs')[0])
@@ -553,13 +553,12 @@ export default class Canvas extends AbstractShape {
    * @param {Object} elements
    */
   getShapesWithSharedParent (elements) {
-
     // If there is no elements, return []
     if (!elements || elements.length < 1) {
       return []
     }
     // If there is one element, return this element
-    if (elements.length == 1) {
+    if (elements.length === 1) {
       return elements
     }
 

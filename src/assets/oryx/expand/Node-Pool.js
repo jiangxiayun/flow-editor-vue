@@ -1,8 +1,9 @@
-import Shape from './Shape'
-import ORYX_Bounds from './Bounds'
-import ORYX_SVG from './SVG'
-import ORYX_Edge from './Edge'
-import ORYX_Controls from './Controls'
+import Node from '../core/Node'
+import Shape from '../core/Shape'
+import ORYX_Bounds from '../core/Bounds'
+import ORYX_SVG from '../core/SVG'
+import ORYX_Edge from '../core/Edge'
+import ORYX_Controls from '../core/Controls'
 import ORYX_Config from '../CONFIG'
 import ORYX_Log from '../Log'
 
@@ -10,14 +11,13 @@ import ORYX_Log from '../Log'
  * @classDescription Abstract base class for all Nodes.
  * @extends ORYX.Core.Shape
  */
-export default class Node extends Shape {
+export default class NodePool extends Node {
   /**
    * Constructor
    * @param options {Object} A container for arguments.
    * @param stencil {Stencil}
    */
   constructor (options, stencil, facade) {
-    // arguments.callee.$.construct.apply(this, arguments);
     super(...arguments)
     this.isSelectable = true
     this.isMovable = true
@@ -58,16 +58,16 @@ export default class Node extends Shape {
 
         // iterate over all relevant svg elements and resize them
         this._svgShapes.each(function (svgShape) {
-          // adjust width
+          //adjust width
           if (svgShape.isHorizontallyResizable) {
             svgShape.width = svgShape.oldWidth * widthDelta
           }
-          // adjust height
+          //adjust height
           if (svgShape.isVerticallyResizable) {
             svgShape.height = svgShape.oldHeight * heightDelta
           }
 
-          // check, if anchors are set
+          //check, if anchors are set
           let anchorOffset
           let leftIncluded = svgShape.anchorLeft
           let rightIncluded = svgShape.anchorRight
@@ -107,7 +107,7 @@ export default class Node extends Shape {
           }
         })
 
-        // check, if the current bounds is unallowed horizontally or vertically resized
+        //check, if the current bounds is unallowed horizontally or vertically resized
         let p = {
           x: 0,
           y: 0
@@ -122,7 +122,7 @@ export default class Node extends Shape {
           bounds.extend(p)
         }
 
-        // check, if the current bounds are between maximum and minimum bounds
+        //check, if the current bounds are between maximum and minimum bounds
         p = {
           x: 0,
           y: 0
@@ -185,7 +185,7 @@ export default class Node extends Shape {
           }
         })
 
-        // set new position of labels
+        //set new position of labels
         this.getLabels().each(function (label) {
           // Set the position dependings on it anchor
           if (!label.isAnchorLeft()) {
@@ -223,7 +223,7 @@ export default class Node extends Shape {
           }
         })
 
-        // update docker
+        //update docker
         let docker = this.dockers[0]
         if (docker) {
           docker.bounds.unregisterCallback(this._dockerChangedCallback)
@@ -239,7 +239,9 @@ export default class Node extends Shape {
       }
 
       this.refresh()
+
       this.isChanged = false
+
       this._oldBounds = this.bounds.clone()
     }
 
@@ -634,6 +636,7 @@ export default class Node extends Shape {
     if (lowerRight.y === 0) {
       lowerRight.y = 1
     }
+
     this._oldBounds.set(upperLeft, lowerRight)
     this.bounds.set(upperLeft, lowerRight)
 
@@ -743,7 +746,54 @@ export default class Node extends Shape {
       label.y -= offsetY
       this._labels.set(label.id, label)
       label.registerOnChange(this.layout.bind(this))
+
+      // Only apply fitting on form-components
+      if (this._stencil.id().indexOf(ORYX_Config.FORM_ELEMENT_ID_PREFIX) == 0) {
+        label.registerOnChange(this.fitToLabels.bind(this))
+      }
     }).bind(this))
+  }
+
+  fitToLabels () {
+    let y = 0
+    this.getLabels().each(function (label) {
+      let lr = label.getY() + label.getHeight()
+      if (lr > y) {
+        y = lr
+      }
+    })
+
+    let bounds = this.bounds
+    let boundsChanged = false
+
+    if (this.minimumSize) {
+      // Check if y-value exceeds the min-value. If not, stick to this value.
+      let minHeight = this.minimumSize.height
+      if (y < minHeight && bounds.height() > minHeight && minHeight > this.forcedHeight) {
+        bounds.set(bounds.upperLeft().x, bounds.upperLeft().y, bounds.lowerRight().x, bounds.upperLeft().y + minHeight)
+        boundsChanged = true
+      } else if (y > minHeight && bounds.height() != y && y > this.forcedHeight) {
+        bounds.set(bounds.upperLeft().x, bounds.upperLeft().y, bounds.lowerRight().x, bounds.upperLeft().y + y)
+        boundsChanged = true
+      } else if (bounds.height() > this.forcedHeight && this.forcedHeight > 0) {
+        bounds.set(bounds.upperLeft().x, bounds.upperLeft().y, bounds.lowerRight().x, bounds.upperLeft().y + this.forcedHeight)
+        boundsChanged = true
+      }
+    }
+
+    if (boundsChanged) {
+      // Force facade to re-layout since bounds are changed AFTER layout has been performed
+      if (this.facade.getCanvas() != null) {
+        this.facade.getCanvas().update()
+      }
+
+      // Re-select if needed to force the select
+      if (this.facade.getSelection().member(this)) {
+        let selectedNow = this.facade.getSelection()
+        this.facade.setSelection([])
+        this.facade.setSelection(selectedNow)
+      }
+    }
   }
 
   /**
@@ -765,6 +815,6 @@ export default class Node extends Shape {
     return this._stencil.title() + ' ' + this.id
   }
   getInstanceofType () {
-    return 'Node, Shape'
+    return 'Node, Shape, NodePool'
   }
 }

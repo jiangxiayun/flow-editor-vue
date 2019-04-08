@@ -13,12 +13,7 @@ import ORYX_Config from '../CONFIG'
  * @extends ORYX.Core.AbstractShape
  */
 export default class Shape extends AbstractShape {
-  /**
-   * Constructor
-   */
   constructor (options, stencil, facade) {
-    // call base class constructor
-    // arguments.callee.$.construct.apply(this, arguments);
     super(...arguments)
     this.facade = facade
     this.dockers = []
@@ -142,7 +137,7 @@ export default class Shape extends AbstractShape {
 
                 let refId = this.id + ref
 
-                console.log(555, ref, refId, property.type())
+                // console.log(555, ref, refId, property.type())
                 if (property.type() === ORYX_Config.TYPE_FLOWABLE_MULTIINSTANCE) {
                   // flowable-multiinstance
 
@@ -464,7 +459,6 @@ export default class Shape extends AbstractShape {
     })
   }
 
-
   getOutgoingShapes (iterator) {
     if (iterator) {
       this.outgoing.each(iterator)
@@ -737,7 +731,6 @@ export default class Shape extends AbstractShape {
     return { x: refPointX, y: refPointY }
   }
 
-
   /**
    * Calculate if the point is inside the Shape
    * @param {PointX}
@@ -830,7 +823,6 @@ export default class Shape extends AbstractShape {
     return serializedObject
   }
 
-
   deserialize (serialize, json) {
     // arguments.callee.$.deserialize.apply(this, arguments);
     super.deserialize(serialize, json)
@@ -879,8 +871,6 @@ export default class Shape extends AbstractShape {
     }
     return json
   }
-
-
 
   /**
    * Private methods.

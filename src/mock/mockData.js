@@ -3,7 +3,7 @@ export const mockData = {
   "name": "请假模型",
   "key": "leave-model",
   "description": "请假模型",
-  "lastUpdated": "2019-03-21T06:12:28.780+0000",
+  "lastUpdated": "2019-04-04T05:49:37.132+0000",
   "lastUpdatedBy": "admin",
   "model": {
     "modelId": "6609363a-3be5-11e9-afe0-82ad27eff10d",
@@ -481,7 +481,7 @@ export const mockData = {
           "multiinstance_collection": "",
           "multiinstance_variable": "",
           "multiinstance_condition": "",
-          "isforcompensation": "false",
+          "isforcompensation": true,
           "usertaskassignment": "",
           "formkeydefinition": "",
           "formreference": "",
@@ -505,8 +505,8 @@ export const mockData = {
         ],
         "bounds": {
           "lowerRight": {
-            "x": 535,
-            "y": 125
+            "x": 600,
+            "y": 172
           },
           "upperLeft": {
             "x": 435,
@@ -516,52 +516,6 @@ export const mockData = {
         "dockers": [
 
         ]
-      },
-      {
-        "resourceId": "sid-B15F4736-8C5A-42FE-9E80-7AA659C64042",
-        "properties": {
-          "overrideid": "",
-          "name": "",
-          "documentation": "",
-          "conditionsequenceflow": "",
-          "executionlisteners": "",
-          "defaultflow": "false",
-          "skipexpression": ""
-        },
-        "stencil": {
-          "id": "SequenceFlow"
-        },
-        "childShapes": [
-
-        ],
-        "outgoing": [
-          {
-            "resourceId": "sid-4F6722CA-9043-4310-8BDD-2B3B97392E34"
-          }
-        ],
-        "bounds": {
-          "lowerRight": {
-            "x": 434.51348916164955,
-            "y": 170.6650587001788
-          },
-          "upperLeft": {
-            "x": 348.02752646335045,
-            "y": 116.5751756748212
-          }
-        },
-        "dockers": [
-          {
-            "x": 20.5,
-            "y": 20.5
-          },
-          {
-            "x": 50,
-            "y": 40
-          }
-        ],
-        "target": {
-          "resourceId": "sid-4F6722CA-9043-4310-8BDD-2B3B97392E34"
-        }
       },
       {
         "resourceId": "sid-2B855895-02F2-4FC0-94BE-3634AA7FEFAD",
@@ -587,18 +541,18 @@ export const mockData = {
         ],
         "bounds": {
           "lowerRight": {
-            "x": 691.1029931475042,
-            "y": 172.52318887085798
+            "x": 689.9496688685755,
+            "y": 172.76408571778015
           },
           "upperLeft": {
-            "x": 535.5376318524958,
-            "y": 106.46118612914204
+            "x": 600.0307998814245,
+            "y": 139.25544553221985
           }
         },
         "dockers": [
           {
-            "x": 50,
-            "y": 40
+            "x": 82.5,
+            "y": 63.5
           },
           {
             "x": 14,
@@ -653,6 +607,56 @@ export const mockData = {
         ],
         "target": {
           "resourceId": "sid-3B2BA28A-F373-4DAD-B916-FBD2C1ED714E"
+        }
+      },
+      {
+        "resourceId": "sid-B15F4736-8C5A-42FE-9E80-7AA659C64042",
+        "properties": {
+          "overrideid": "",
+          "name": "",
+          "documentation": "",
+          "conditionsequenceflow": "",
+          "executionlisteners": "",
+          "defaultflow": "false",
+          "skipexpression": ""
+        },
+        "stencil": {
+          "id": "SequenceFlow"
+        },
+        "childShapes": [
+
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-4F6722CA-9043-4310-8BDD-2B3B97392E34"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 434.03125,
+            "y": 157.8125
+          },
+          "upperLeft": {
+            "x": 335.5,
+            "y": 108.5
+          }
+        },
+        "dockers": [
+          {
+            "x": 20.5,
+            "y": 20.5
+          },
+          {
+            "x": 335.5,
+            "y": 108.5
+          },
+          {
+            "x": 82.5,
+            "y": 63.5
+          }
+        ],
+        "target": {
+          "resourceId": "sid-4F6722CA-9043-4310-8BDD-2B3B97392E34"
         }
       }
     ],

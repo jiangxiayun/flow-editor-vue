@@ -79,16 +79,7 @@ export default class SelectionFrame {
       }
 
       let additionalIEZoom = 1
-      if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-        let ua = navigator.userAgent
-        if (ua.indexOf('MSIE') >= 0) {
-          //IE 10 and below
-          let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-          if (zoom !== 100) {
-            additionalIEZoom = zoom / 100
-          }
-        }
-      }
+      additionalIEZoom = ORYX_Utils.IEZoomBelow10(additionalIEZoom)
 
       if (additionalIEZoom === 1) {
         a.x = a.x - (corrSVG.e - jQuery('#canvasSection').offset().left)
@@ -122,8 +113,9 @@ export default class SelectionFrame {
         let absBounds = value.absoluteBounds()
         let bA = absBounds.upperLeft()
         let bB = absBounds.lowerRight()
-        if (bA.x > a.x && bA.y > a.y && bB.x < b.x && bB.y < b.y)
+        if (bA.x > a.x && bA.y > a.y && bB.x < b.x && bB.y < b.y) {
           return true
+        }
         return false
       })
 

@@ -10,6 +10,7 @@ import ORYX_Command from '../core/Command'
 import ORYX_Command_Move from '../core/Move'
 import ORYX_Controls from '../core/Controls/index'
 import ORYX_Config from '../CONFIG'
+import ORYX_Utils from '../Utils'
 
 export default class DragDropResize extends AbstractPlugin {
   /**
@@ -79,636 +80,7 @@ export default class DragDropResize extends AbstractPlugin {
   }
 
   /**
-   * On Mouse Down
-   */
-  handleMouseDown (event, uiObj) {
-    // If the selection Bounds not intialized and the uiObj is not member of current selectio
-    // then return
-    if (!this.dragBounds || !this.currentShapes.member(uiObj) || !this.toMoveShapes.length) {
-      return
-    }
-
-    // Start Dragging
-    this.dragEnable = true
-    this.dragIntialized = true
-    this.edgesMovable = true
-
-    // Calculate the current zoom factor
-    let a = this.facade.getCanvas().node.getScreenCTM()
-    this.faktorXY.x = a.a
-    this.faktorXY.y = a.d
-
-    let eventX = Event.pointerX(event)
-    let eventY = Event.pointerY(event)
-
-    // Set the offset position of dragging
-    let upL = this.dragBounds.upperLeft()
-    this.offSetPosition = {
-      x: eventX - (upL.x * this.faktorXY.x),
-      y: eventY - (upL.y * this.faktorXY.y)
-    }
-
-    this.offsetScroll = { x: this.scrollNode.scrollLeft, y: this.scrollNode.scrollTop }
-
-    // Register on Global Mouse-MOVE Event
-    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.callbackMouseMove, false)
-    // Register on Global Mouse-UP Event
-    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.callbackMouseUp, true)
-
-    return
-  }
-
-  /**
-   * On Key Mouse Up
-   *
-   */
-  handleMouseUp (event) {
-
-    //disable containment highlighting
-    this.facade.raiseEvent({
-      type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
-      highlightId: 'dragdropresize.contain'
-    })
-
-    this.facade.raiseEvent({
-      type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
-      highlightId: 'dragdropresize.attached'
-    })
-
-    // If Dragging is finished
-    if (this.dragEnable) {
-
-      // and update the current selection
-      if (!this.dragIntialized) {
-
-        // Do Method after Dragging
-        this.afterDrag()
-
-        // Check if the Shape is allowed to dock to the other Shape
-        if (this.isAttachingAllowed &&
-          this.toMoveShapes.length == 1 && this.toMoveShapes[0] instanceof ORYX_Node &&
-          this.toMoveShapes[0].dockers.length > 0) {
-
-          // Get the position and the docker
-          let position = this.facade.eventCoordinates(event)
-          let docker = this.toMoveShapes[0].dockers[0]
-
-
-          // Command-Pattern for dragging several Shapes
-          class dockCommand extends ORYX_Command{
-            constructor (docker, position, newDockedShape, facade) {
-              super()
-              this.docker = docker
-              this.newPosition = position
-              this.newDockedShape = newDockedShape
-              this.newParent = newDockedShape.parent || facade.getCanvas()
-              this.oldPosition = docker.parent.bounds.center()
-              this.oldDockedShape = docker.getDockedShape()
-              this.oldParent = docker.parent.parent || facade.getCanvas()
-              this.facade = facade
-
-              if (this.oldDockedShape) {
-                this.oldPosition = docker.parent.absoluteBounds().center()
-              }
-
-            }
-            execute() {
-              this.dock(this.newDockedShape, this.newParent, this.newPosition)
-              // Raise Event for having the docked shape on top of the other shape
-              this.facade.raiseEvent({ type: ORYX_Config.EVENT_ARRANGEMENT_TOP, excludeCommand: true })
-            }
-            rollback () {
-              this.dock(this.oldDockedShape, this.oldParent, this.oldPosition)
-            }
-            dock (toDockShape, parent, pos) {
-              // Add to the same parent Shape
-              parent.add(this.docker.parent)
-              // Set the Docker to the new Shape
-              this.docker.setDockedShape(undefined)
-              this.docker.bounds.centerMoveTo(pos)
-              this.docker.setDockedShape(toDockShape)
-              //this.docker.update();
-
-              this.facade.setSelection([this.docker.parent])
-              this.facade.getCanvas().update()
-              this.facade.updateSelection()
-            }
-          }
-          // Instanziate the dockCommand
-          const commands = [new dockCommand(docker, position, this.containmentParentNode, this.facade)]
-          this.facade.executeCommands(commands)
-          // Check if adding is allowed to the other Shape
-        } else if (this.isAddingAllowed) {
-          // Refresh all Shapes --> Set the new Bounds
-          this.refreshSelectedShapes()
-        }
-
-        this.facade.updateSelection()
-
-        //this.currentShapes.each(function(shape) {shape.update()})
-        // Raise Event: Dragging is finished
-        this.facade.raiseEvent({ type: ORYX_Config.EVENT_DRAGDROP_END })
-      }
-      if (this.vLine)
-        this.vLine.hide()
-      if (this.hLine)
-        this.hLine.hide()
-    }
-
-    // Disable
-    this.dragEnable = false
-
-    // UnRegister on Global Mouse-UP/-Move Event
-    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.callbackMouseUp, true)
-    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.callbackMouseMove, false)
-
-    return
-  }
-
-  /**
-   * On Key Mouse Move
-   *
-   */
-  handleMouseMove (event) {
-    // If dragging is not enabled, go return
-    if (!this.dragEnable) {
-      return
-    }
-
-    // If Dragging is initialized
-    if (this.dragIntialized) {
-      // Raise Event: Drag will be started
-      this.facade.raiseEvent({ type: ORYX_Config.EVENT_DRAGDROP_START })
-      this.dragIntialized = false
-
-      // And hide the resizers and the highlighting
-      this.resizerSE.hide()
-      this.resizerNW.hide()
-      this.resizerSouth.hide()
-      this.resizerNorth.hide()
-
-      // if only edges are selected, containmentParentNode must be the canvas
-      this._onlyEdges = this.currentShapes.all(function (currentShape) {
-        return (currentShape instanceof ORYX_Edge)
-      })
-
-      // Do method before Drag
-      this.beforeDrag()
-
-      this._currentUnderlyingNodes = []
-
-    }
-
-
-    // Calculate the new position
-    let position = {
-      x: Event.pointerX(event) - this.offSetPosition.x,
-      y: Event.pointerY(event) - this.offSetPosition.y
-    }
-
-    position.x -= this.offsetScroll.x - this.scrollNode.scrollLeft
-    position.y -= this.offsetScroll.y - this.scrollNode.scrollTop
-
-    // If not the Control-Key are pressed
-    let modifierKeyPressed = event.shiftKey || event.ctrlKey
-    if (ORYX_Config.GRID_ENABLED && !modifierKeyPressed) {
-      // Snap the current position to the nearest Snap-Point
-      position = this.snapToGrid(position)
-    } else {
-      if (this.vLine)
-        this.vLine.hide()
-      if (this.hLine)
-        this.hLine.hide()
-    }
-
-    // Adjust the point by the zoom faktor
-    position.x /= this.faktorXY.x
-    position.y /= this.faktorXY.y
-
-    // Set that the position is not lower than zero
-    position.x = Math.max(0, position.x)
-    position.y = Math.max(0, position.y)
-
-    // Set that the position is not bigger than the canvas
-    let c = this.facade.getCanvas()
-    position.x = Math.min(c.bounds.width() - this.dragBounds.width(), position.x)
-    position.y = Math.min(c.bounds.height() - this.dragBounds.height(), position.y)
-
-    // Drag this bounds
-    this.dragBounds.moveTo(position)
-
-    // Update all selected shapes and the selection rectangle
-    //this.refreshSelectedShapes();
-    this.resizeRectangle(this.dragBounds)
-
-    this.isAttachingAllowed = false
-
-    //check, if a node can be added to the underlying node
-    let eventCoordinates = this.facade.eventCoordinates(event)
-
-    let additionalIEZoom = 1
-    if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-      let ua = navigator.userAgent
-      if (ua.indexOf('MSIE') >= 0) {
-        //IE 10 and below
-        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-        if (zoom !== 100) {
-          additionalIEZoom = zoom / 100
-        }
-      }
-    }
-
-    if (additionalIEZoom !== 1) {
-      eventCoordinates.x = eventCoordinates.x / additionalIEZoom
-      eventCoordinates.y = eventCoordinates.y / additionalIEZoom
-    }
-
-    let underlyingNodes = $A(this.facade.getCanvas().getAbstractShapesAtPosition(eventCoordinates))
-
-    let checkIfAttachable = this.toMoveShapes.length == 1 && this.toMoveShapes[0] instanceof ORYX_Node && this.toMoveShapes[0].dockers.length > 0
-    checkIfAttachable = checkIfAttachable && underlyingNodes.length != 1
-
-
-    if (!checkIfAttachable &&
-      underlyingNodes.length === this._currentUnderlyingNodes.length &&
-      underlyingNodes.all(function (node, index) {
-        return this._currentUnderlyingNodes[index] === node
-      }.bind(this))) {
-
-      return
-
-    } else if (this._onlyEdges) {
-      this.isAddingAllowed = true
-      this.containmentParentNode = this.facade.getCanvas()
-    } else {
-      /* Check the containment and connection rules */
-      let options = {
-        event: event,
-        underlyingNodes: underlyingNodes,
-        checkIfAttachable: checkIfAttachable
-      }
-      this.checkRules(options)
-    }
-
-    this._currentUnderlyingNodes = underlyingNodes.reverse()
-
-    //visualize the containment result
-    if (this.isAttachingAllowed) {
-
-      this.facade.raiseEvent({
-        type: ORYX_Config.EVENT_HIGHLIGHT_SHOW,
-        highlightId: 'dragdropresize.attached',
-        elements: [this.containmentParentNode],
-        style: ORYX_Config.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
-        color: ORYX_Config.SELECTION_VALID_COLOR
-      })
-
-    } else {
-      this.facade.raiseEvent({
-        type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
-        highlightId: 'dragdropresize.attached'
-      })
-    }
-
-    if (!this.isAttachingAllowed) {
-      if (this.isAddingAllowed) {
-
-        this.facade.raiseEvent({
-          type: ORYX_Config.EVENT_HIGHLIGHT_SHOW,
-          highlightId: 'dragdropresize.contain',
-          elements: [this.containmentParentNode],
-          color: ORYX_Config.SELECTION_VALID_COLOR
-        })
-
-      } else {
-        this.facade.raiseEvent({
-          type: ORYX_Config.EVENT_HIGHLIGHT_SHOW,
-          highlightId: 'dragdropresize.contain',
-          elements: [this.containmentParentNode],
-          color: ORYX_Config.SELECTION_INVALID_COLOR
-        })
-      }
-    } else {
-      this.facade.raiseEvent({
-        type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
-        highlightId: 'dragdropresize.contain'
-      })
-    }
-
-    // Stop the Event
-    //Event.stop(event);
-    return
-  }
-
-  //	/**
-  //	 * Rollbacks the docked shape of an edge, if the edge is not movable.
-  //	 */
-  //	redockEdges: function() {
-  //		this._undockedEdgesCommand.dockers.each(function(el){
-  //			el.docker.setDockedShape(el.dockedShape);
-  //			el.docker.setReferencePoint(el.refPoint);
-  //		})
-  //	},
-
-  /**
-   *  Checks the containment and connection rules for the selected shapes.
-   */
-  checkRules (options) {
-    let event = options.event
-    let underlyingNodes = options.underlyingNodes
-    let checkIfAttachable = options.checkIfAttachable
-    let noEdges = options.noEdges
-
-    //get underlying node that is not the same than one of the currently selected shapes or
-    // a child of one of the selected shapes with the highest z Order.
-    // The result is a shape or the canvas
-    this.containmentParentNode = underlyingNodes.reverse().find((function (node) {
-      return (node instanceof ORYX_Canvas) ||
-        (((node instanceof ORYX_Node) || ((node instanceof ORYX_Edge) && !noEdges))
-          && (!(this.currentShapes.member(node) ||
-            this.currentShapes.any(function (shape) {
-              return (shape.children.length > 0 && shape.getChildNodes(true).member(node))
-            }))))
-    }).bind(this))
-
-    if (checkIfAttachable) {
-
-      this.isAttachingAllowed = this.facade.getRules().canConnect({
-        sourceShape: this.containmentParentNode,
-        edgeShape: this.toMoveShapes[0],
-        targetShape: this.toMoveShapes[0]
-      })
-
-      if (this.isAttachingAllowed) {
-        let point = this.facade.eventCoordinates(event)
-        this.isAttachingAllowed = this.containmentParentNode.isPointOverOffset(point.x, point.y)
-      }
-    }
-
-    if (!this.isAttachingAllowed) {
-      //check all selected shapes, if they can be added to containmentParentNode
-      this.isAddingAllowed = this.toMoveShapes.all((function (currentShape) {
-        if (currentShape instanceof ORYX_Edge ||
-          currentShape instanceof ORYX_Controls.Docker ||
-          this.containmentParentNode === currentShape.parent) {
-          return true
-        } else if (this.containmentParentNode !== currentShape) {
-          if (!(this.containmentParentNode instanceof ORYX_Edge) || !noEdges) {
-            if (this.facade.getRules().canContain({
-              containingShape: this.containmentParentNode,
-              containedShape: currentShape
-            })) {
-              return true
-            }
-          }
-        }
-        return false
-      }).bind(this))
-    }
-
-    if (!this.isAttachingAllowed && !this.isAddingAllowed &&
-      (this.containmentParentNode instanceof ORYX_Edge)) {
-      options.noEdges = true
-      options.underlyingNodes.reverse()
-      this.checkRules(options)
-    }
-  }
-
-  /**
-   * Redraw the selected Shapes.
-   *
-   */
-  refreshSelectedShapes () {
-    // If the selection bounds not initialized, return
-    if (!this.dragBounds) {
-      return
-    }
-
-    // Calculate the offset between the bounds and the old bounds
-    let upL = this.dragBounds.upperLeft()
-    let oldUpL = this.oldDragBounds.upperLeft()
-    let offset = {
-      x: upL.x - oldUpL.x,
-      y: upL.y - oldUpL.y
-    }
-
-    // Instanciate the dragCommand
-    const commands = [new ORYX_Command_Move(
-      this.toMoveShapes, offset, this.containmentParentNode, this.currentShapes, this
-    )]
-    // If the undocked edges command is setted, add this command
-    if (this._undockedEdgesCommand instanceof ORYX_Command) {
-      commands.unshift(this._undockedEdgesCommand)
-    }
-    // Execute the commands
-    this.facade.executeCommands(commands)
-
-    // copy the bounds to the old bounds
-    if (this.dragBounds)
-      this.oldDragBounds = this.dragBounds.clone()
-
-  }
-
-  /**
-   * Callback for Resize
-   *
-   */
-  onResize (bounds) {
-    // If the selection bounds not initialized, return
-    if (!this.dragBounds) {
-      return
-    }
-
-    this.dragBounds = bounds
-    this.isResizing = true
-
-    // Update the rectangle
-    this.resizeRectangle(this.dragBounds)
-  }
-
-  onResizeStart () {
-    this.facade.raiseEvent({ type: ORYX_Config.EVENT_RESIZE_START })
-  }
-
-  onResizeEnd () {
-    if (!(this.currentShapes instanceof Array) || this.currentShapes.length <= 0) {
-      return
-    }
-
-    // If Resizing finished, the Shapes will be resize
-    if (this.isResizing) {
-      class commandClass extends ORYX_Command{
-        constructor (shape, newBounds, plugin) {
-          super()
-          this.shape = shape
-          this.oldBounds = shape.bounds.clone()
-          this.newBounds = newBounds
-          this.plugin = plugin
-        }
-        execute () {
-          this.shape.bounds.set(this.newBounds.a, this.newBounds.b)
-          this.update(this.getOffset(this.oldBounds, this.newBounds))
-        }
-        rollback () {
-          this.shape.bounds.set(this.oldBounds.a, this.oldBounds.b)
-          this.update(this.getOffset(this.newBounds, this.oldBounds))
-        }
-        getOffset(b1, b2) {
-          return {
-            x: b2.a.x - b1.a.x,
-            y: b2.a.y - b1.a.y,
-            xs: b2.width() / b1.width(),
-            ys: b2.height() / b1.height()
-          }
-        }
-        update (offset) {
-          this.shape.getLabels().each(function (label) {
-            label.changed()
-          })
-
-          let allEdges = [].concat(this.shape.getIncomingShapes())
-            .concat(this.shape.getOutgoingShapes())
-            // Remove all edges which are included in the selection from the list
-            .findAll(function (r) {
-              return r instanceof ORYX_Edge
-            }.bind(this))
-
-          this.plugin.layoutEdges(this.shape, allEdges, offset)
-          this.plugin.facade.setSelection([this.shape])
-          this.plugin.facade.getCanvas().update()
-          this.plugin.facade.updateSelection()
-        }
-      }
-
-      let bounds = this.dragBounds.clone()
-      let shape = this.currentShapes[0]
-
-      if (shape.parent) {
-        let parentPosition = shape.parent.absoluteXY()
-        bounds.moveBy(-parentPosition.x, -parentPosition.y)
-      }
-
-      let command = new commandClass(shape, bounds, this)
-
-      this.facade.executeCommands([command])
-      this.isResizing = false
-      this.facade.raiseEvent({ type: ORYX_Config.EVENT_RESIZE_END })
-    }
-  }
-
-  /**
-   * Prepare the Dragging
-   *
-   */
-  beforeDrag () {
-    class undockEdgeCommand extends ORYX_Command{
-      constructor (moveShapes) {
-        super()
-        this.dockers = moveShapes.collect(function (shape) {
-          return shape instanceof ORYX_Controls.Docker ? {
-            docker: shape,
-            dockedShape: shape.getDockedShape(),
-            refPoint: shape.referencePoint
-          } : undefined
-        }).compact()
-      }
-      execute () {
-        this.dockers.each(function (el) {
-          el.docker.setDockedShape(undefined)
-        })
-      }
-      rollback () {
-        this.dockers.each(function (el) {
-          el.docker.setDockedShape(el.dockedShape)
-          el.docker.setReferencePoint(el.refPoint)
-          //el.docker.update();
-        })
-      }
-    }
-
-    this._undockedEdgesCommand = new undockEdgeCommand(this.toMoveShapes)
-    this._undockedEdgesCommand.execute()
-  }
-
-  hideAllLabels (shape) {
-    // Hide all labels from the shape
-    shape.getLabels().each(function (label) {
-      label.hide()
-    })
-    // Hide all labels from docked shapes
-    shape.getAllDockedShapes().each(function (dockedShape) {
-      let labels = dockedShape.getLabels()
-      if (labels.length > 0) {
-        labels.each(function (label) {
-          label.hide()
-        })
-      }
-    })
-
-    // Do this recursive for all child shapes
-    // EXP-NICO use getShapes
-    shape.getChildren().each((function (value) {
-      if (value instanceof ORYX_Shape)
-        this.hideAllLabels(value)
-    }).bind(this))
-  }
-
-  /**
-   * Finished the Dragging
-   *
-   */
-  afterDrag () {
-
-  }
-
-  /**
-   * Show all Labels at these shape
-   *
-   */
-  showAllLabels (shape) {
-    // Show the label of these shape
-    //shape.getLabels().each(function(label) {
-    for (let i = 0; i < shape.length; i++) {
-      let label = shape[i]
-      label.show()
-    }//);
-    // Show all labels at docked shapes
-    //shape.getAllDockedShapes().each(function(dockedShape) {
-    let allDockedShapes = shape.getAllDockedShapes()
-    for (let i = 0; i < allDockedShapes.length; i++) {
-      let dockedShape = allDockedShapes[i]
-      let labels = dockedShape.getLabels()
-      if (labels.length > 0) {
-        labels.each(function (label) {
-          label.show()
-        })
-      }
-    }//);
-
-    // Do this recursive
-    //shape.children.each((function(value) {
-    for (let i = 0; i < shape.children.length; i++) {
-      var value = shape.children[i]
-      if (value instanceof ORYX_Shape)
-        this.showAllLabels(value)
-    }//).bind(this));
-  }
-
-  /**
-   * Intialize Method, if there are new Plugins
-   *
-   */
-
-  /*registryChanged: function(pluginsData) {
-   // Save all new Plugin, sorted by group and index
-   this.pluginsData = pluginsData.sortBy( function(value) {
-   return (value.group + "" + value.index);
-   });
-   },*/
-
-  /**
    * On the Selection-Changed
-   *
    */
   onSelectionChanged (event) {
     let elements = event.elements
@@ -800,6 +172,21 @@ export default class DragDropResize extends AbstractPlugin {
         })
       }
 
+      let elementInLane = []
+      this.toMoveShapes.map((shape) => {
+        let box = {a: {}, b: {}}
+        if (shape.getStencil().id().endsWith('Pool')) {
+          box = shape.bounds.clone()
+          box.a.x += 30
+          elementInLane = this.findChindsInBound(box)
+        } else if (shape.getStencil().id().endsWith('Lane')) {
+          box = shape.bounds.clone()
+          elementInLane = this.findChindsInBound(box)
+        }
+      })
+      this.toMoveShapes = this.toMoveShapes.concat(elementInLane)
+      console.log('onSelectionChanged', this.toMoveShapes)
+
       // Set the new bounds
       this.dragBounds = newBounds
       this.oldDragBounds = newBounds.clone()
@@ -813,7 +200,7 @@ export default class DragDropResize extends AbstractPlugin {
         let aspectRatio = elements[0].getStencil().fixedAspectRatio() ?
           elements[0].bounds.width() / elements[0].bounds.height() : undefined
         let id = elements[0].getStencil().idWithoutNs()
-          // .getStencil().stencilSet().namespace()
+        // .getStencil().stencilSet().namespace()
         if (id === 'Pool' || id === 'Lane') {
           // 只能垂直拉伸
           this.resizerSouth.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
@@ -892,8 +279,633 @@ export default class DragDropResize extends AbstractPlugin {
   }
 
   /**
-   * Adjust an Point to the Snap Points
+   * On Mouse Down
+   */
+  handleMouseDown (event, uiObj) {
+    // If the selection Bounds not intialized and the uiObj is not member of current selectio
+    // then return
+    if (!this.dragBounds || !this.currentShapes.member(uiObj) || !this.toMoveShapes.length) {
+      return
+    }
+
+    // Start Dragging
+    this.dragEnable = true
+    this.dragIntialized = true
+    this.edgesMovable = true
+
+    // Calculate the current zoom factor
+    let a = this.facade.getCanvas().node.getScreenCTM()
+    this.faktorXY.x = a.a
+    this.faktorXY.y = a.d
+
+    let eventX = Event.pointerX(event)
+    let eventY = Event.pointerY(event)
+
+    // Set the offset position of dragging
+    let upL = this.dragBounds.upperLeft()
+    this.offSetPosition = {
+      x: eventX - (upL.x * this.faktorXY.x),
+      y: eventY - (upL.y * this.faktorXY.y)
+    }
+
+    this.offsetScroll = { x: this.scrollNode.scrollLeft, y: this.scrollNode.scrollTop }
+
+    // Register on Global Mouse-MOVE Event
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.callbackMouseMove, false)
+    // Register on Global Mouse-UP Event
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.callbackMouseUp, true)
+
+    return
+  }
+
+  /**
+   * On Key Mouse Up
+   */
+  handleMouseUp (event) {
+    // disable containment highlighting
+    this.facade.raiseEvent({
+      type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
+      highlightId: 'dragdropresize.contain'
+    })
+
+    this.facade.raiseEvent({
+      type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
+      highlightId: 'dragdropresize.attached'
+    })
+
+    // If Dragging is finished
+    if (this.dragEnable) {
+      // and update the current selection
+      if (!this.dragIntialized) {
+        // Do Method after Dragging
+        this.afterDrag()
+
+        // Check if the Shape is allowed to dock to the other Shape
+        if (this.isAttachingAllowed &&
+          this.toMoveShapes.length == 1 && this.toMoveShapes[0] instanceof ORYX_Node &&
+          this.toMoveShapes[0].dockers.length > 0) {
+
+          // Get the position and the docker
+          let position = this.facade.eventCoordinates(event)
+          let docker = this.toMoveShapes[0].dockers[0]
+
+
+          // Command-Pattern for dragging several Shapes
+          class dockCommand extends ORYX_Command{
+            constructor (docker, position, newDockedShape, facade) {
+              super()
+              this.docker = docker
+              this.newPosition = position
+              this.newDockedShape = newDockedShape
+              this.newParent = newDockedShape.parent || facade.getCanvas()
+              this.oldPosition = docker.parent.bounds.center()
+              this.oldDockedShape = docker.getDockedShape()
+              this.oldParent = docker.parent.parent || facade.getCanvas()
+              this.facade = facade
+
+              if (this.oldDockedShape) {
+                this.oldPosition = docker.parent.absoluteBounds().center()
+              }
+            }
+            execute() {
+              this.dock(this.newDockedShape, this.newParent, this.newPosition)
+              // Raise Event for having the docked shape on top of the other shape
+              this.facade.raiseEvent({ type: ORYX_Config.EVENT_ARRANGEMENT_TOP, excludeCommand: true })
+            }
+            rollback () {
+              this.dock(this.oldDockedShape, this.oldParent, this.oldPosition)
+            }
+            dock (toDockShape, parent, pos) {
+              // Add to the same parent Shape
+              parent.add(this.docker.parent)
+              // Set the Docker to the new Shape
+              this.docker.setDockedShape(undefined)
+              this.docker.bounds.centerMoveTo(pos)
+              this.docker.setDockedShape(toDockShape)
+              // this.docker.update();
+
+              this.facade.setSelection([this.docker.parent])
+              this.facade.getCanvas().update()
+              this.facade.updateSelection()
+            }
+          }
+          // Instanziate the dockCommand
+          const commands = [new dockCommand(docker, position, this.containmentParentNode, this.facade)]
+          this.facade.executeCommands(commands)
+          // Check if adding is allowed to the other Shape
+        } else if (this.isAddingAllowed) {
+          // Refresh all Shapes --> Set the new Bounds
+          this.refreshSelectedShapes()
+        }
+
+        this.facade.updateSelection()
+
+        // this.currentShapes.each(function(shape) {shape.update()})
+        // Raise Event: Dragging is finished
+        this.facade.raiseEvent({ type: ORYX_Config.EVENT_DRAGDROP_END })
+      }
+      if (this.vLine)
+        this.vLine.hide()
+      if (this.hLine)
+        this.hLine.hide()
+    }
+
+    // Disable
+    this.dragEnable = false
+
+    // UnRegister on Global Mouse-UP/-Move Event
+    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.callbackMouseUp, true)
+    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.callbackMouseMove, false)
+
+    return
+  }
+
+  /**
+   * On Key Mouse Move
+   */
+  handleMouseMove (event) {
+    // If dragging is not enabled, go return
+    if (!this.dragEnable) {
+      return
+    }
+
+    // If Dragging is initialized
+    if (this.dragIntialized) {
+      // Raise Event: Drag will be started
+      this.facade.raiseEvent({ type: ORYX_Config.EVENT_DRAGDROP_START })
+      this.dragIntialized = false
+
+      // And hide the resizers and the highlighting
+      this.resizerSE.hide()
+      this.resizerNW.hide()
+      this.resizerSouth.hide()
+      this.resizerNorth.hide()
+
+      // if only edges are selected, containmentParentNode must be the canvas
+      this._onlyEdges = this.currentShapes.all(function (currentShape) {
+        return (currentShape instanceof ORYX_Edge)
+      })
+
+      // Do method before Drag
+      this.beforeDrag()
+
+      this._currentUnderlyingNodes = []
+    }
+
+    // Calculate the new position
+    let position = {
+      x: Event.pointerX(event) - this.offSetPosition.x,
+      y: Event.pointerY(event) - this.offSetPosition.y
+    }
+
+    position.x -= this.offsetScroll.x - this.scrollNode.scrollLeft
+    position.y -= this.offsetScroll.y - this.scrollNode.scrollTop
+
+    // If not the Control-Key are pressed
+    let modifierKeyPressed = event.shiftKey || event.ctrlKey
+    if (ORYX_Config.GRID_ENABLED && !modifierKeyPressed) {
+      // Snap the current position to the nearest Snap-Point 辅助线吸附
+      position = this.snapToGrid(position)
+    } else {
+      if (this.vLine)
+        this.vLine.hide()
+      if (this.hLine)
+        this.hLine.hide()
+    }
+
+    // Adjust the point by the zoom faktor
+    position.x /= this.faktorXY.x
+    position.y /= this.faktorXY.y
+
+    // Set that the position is not lower than zero
+    position.x = Math.max(0, position.x)
+    position.y = Math.max(0, position.y)
+
+    // Set that the position is not bigger than the canvas
+    let c = this.facade.getCanvas()
+    position.x = Math.min(c.bounds.width() - this.dragBounds.width(), position.x)
+    position.y = Math.min(c.bounds.height() - this.dragBounds.height(), position.y)
+
+    // Drag this bounds
+    this.dragBounds.moveTo(position)
+
+    // Update all selected shapes and the selection rectangle
+    this.resizeRectangle(this.dragBounds)
+
+    this.isAttachingAllowed = false
+
+    // check, if a node can be added to the underlying node
+    let eventCoordinates = this.facade.eventCoordinates(event)
+
+    let additionalIEZoom = 1
+    additionalIEZoom = ORYX_Utils.IEZoomBelow10(additionalIEZoom)
+
+    if (additionalIEZoom !== 1) {
+      eventCoordinates.x = eventCoordinates.x / additionalIEZoom
+      eventCoordinates.y = eventCoordinates.y / additionalIEZoom
+    }
+
+    let underlyingNodes = $A(this.facade.getCanvas().getAbstractShapesAtPosition(eventCoordinates))
+
+    let checkIfAttachable = this.toMoveShapes.length === 1 &&
+      this.toMoveShapes[0] instanceof ORYX_Node &&
+      this.toMoveShapes[0].dockers.length > 0
+    console.log(233, checkIfAttachable, underlyingNodes, this._currentUnderlyingNodes)
+
+    checkIfAttachable = checkIfAttachable && underlyingNodes.length != 1
+
+    if (!checkIfAttachable &&
+      underlyingNodes.length === this._currentUnderlyingNodes.length &&
+      underlyingNodes.all(function (node, index) {
+        return this._currentUnderlyingNodes[index] === node
+      }.bind(this))) {
+
+      return
+
+    } else if (this._onlyEdges) {
+      this.isAddingAllowed = true
+      this.containmentParentNode = this.facade.getCanvas()
+    } else {
+      /* Check the containment and connection rules */
+      let options = {
+        event: event,
+        underlyingNodes: underlyingNodes,
+        checkIfAttachable: checkIfAttachable
+      }
+      this.checkRules(options)
+    }
+
+    this._currentUnderlyingNodes = underlyingNodes.reverse()
+
+    // visualize the containment result
+    if (this.isAttachingAllowed) {
+      this.facade.raiseEvent({
+        type: ORYX_Config.EVENT_HIGHLIGHT_SHOW,
+        highlightId: 'dragdropresize.attached',
+        elements: [this.containmentParentNode],
+        style: ORYX_Config.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
+        color: ORYX_Config.SELECTION_VALID_COLOR
+      })
+
+    } else {
+      this.facade.raiseEvent({
+        type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
+        highlightId: 'dragdropresize.attached'
+      })
+    }
+
+    if (!this.isAttachingAllowed) {
+      if (this.isAddingAllowed) {
+        this.facade.raiseEvent({
+          type: ORYX_Config.EVENT_HIGHLIGHT_SHOW,
+          highlightId: 'dragdropresize.contain',
+          elements: [this.containmentParentNode],
+          color: ORYX_Config.SELECTION_VALID_COLOR
+        })
+
+      } else {
+        this.facade.raiseEvent({
+          type: ORYX_Config.EVENT_HIGHLIGHT_SHOW,
+          highlightId: 'dragdropresize.contain',
+          elements: [this.containmentParentNode],
+          color: ORYX_Config.SELECTION_INVALID_COLOR
+        })
+      }
+    } else {
+      this.facade.raiseEvent({
+        type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
+        highlightId: 'dragdropresize.contain'
+      })
+    }
+
+    // Stop the Event
+    // Event.stop(event);
+    return
+  }
+
+  //	/**
+  //	 * Rollbacks the docked shape of an edge, if the edge is not movable.
+  //	 */
+  //	redockEdges: function() {
+  //		this._undockedEdgesCommand.dockers.each(function(el){
+  //			el.docker.setDockedShape(el.dockedShape);
+  //			el.docker.setReferencePoint(el.refPoint);
+  //		})
+  //	},
+
+  findChindsInBound (bound) {
+    // Calculate the elements from the childs of the canvas
+    let elements = this.facade.getCanvas().getChildShapes(true).findAll(function (value) {
+      if (value instanceof ORYX_Node) {
+        let absBounds = value.absoluteBounds()
+        let bA = absBounds.upperLeft()
+        let bB = absBounds.lowerRight()
+        if (bA.x > bound.a.x && bA.y > bound.a.y && bB.x < bound.b.x && bB.y < bound.b.y) {
+          return true
+        }
+      }
+
+      return false
+    })
+
+    return elements
+  }
+  /**
+   *  Checks the containment and connection rules for the selected shapes.
+   */
+  checkRules (options) {
+    let event = options.event
+    let underlyingNodes = options.underlyingNodes
+    let checkIfAttachable = options.checkIfAttachable
+    let noEdges = options.noEdges
+
+    // get underlying node that is not the same than one of the currently selected shapes or
+    // a child of one of the selected shapes with the highest z Order.
+    // The result is a shape or the canvas
+    this.containmentParentNode = underlyingNodes.reverse().find((function (node) {
+      return (node instanceof ORYX_Canvas) ||
+        (((node instanceof ORYX_Node) || ((node instanceof ORYX_Edge) && !noEdges))
+          && (!(this.currentShapes.member(node) ||
+            this.currentShapes.any(function (shape) {
+              return (shape.children.length > 0 && shape.getChildNodes(true).member(node))
+            }))))
+        // && !(node.getStencil().id().endsWith('Lane') || node.getStencil().id().endsWith('Pool'))
+    }).bind(this))
+
+    if (checkIfAttachable) {
+      this.isAttachingAllowed = this.facade.getRules().canConnect({
+        sourceShape: this.containmentParentNode,
+        edgeShape: this.toMoveShapes[0],
+        targetShape: this.toMoveShapes[0]
+      })
+
+      if (this.isAttachingAllowed) {
+        let point = this.facade.eventCoordinates(event)
+        this.isAttachingAllowed = this.containmentParentNode.isPointOverOffset(point.x, point.y)
+      }
+    }
+
+    if (!this.isAttachingAllowed) {
+      //check all selected shapes, if they can be added to containmentParentNode
+      this.isAddingAllowed = this.toMoveShapes.all((function (currentShape) {
+        if (currentShape instanceof ORYX_Edge ||
+          currentShape instanceof ORYX_Controls.Docker ||
+          this.containmentParentNode === currentShape.parent) {
+          return true
+        } else if (this.containmentParentNode !== currentShape) {
+          if (!(this.containmentParentNode instanceof ORYX_Edge) || !noEdges) {
+            if (this.facade.getRules().canContain({
+              containingShape: this.containmentParentNode,
+              containedShape: currentShape
+            })) {
+              return true
+            }
+          }
+        }
+        return false
+      }).bind(this))
+    }
+
+    if (!this.isAttachingAllowed && !this.isAddingAllowed &&
+      (this.containmentParentNode instanceof ORYX_Edge)) {
+      options.noEdges = true
+      options.underlyingNodes.reverse()
+      this.checkRules(options)
+    }
+  }
+
+  /**
+   * Redraw the selected Shapes.
+   */
+  refreshSelectedShapes () {
+    // If the selection bounds not initialized, return
+    if (!this.dragBounds) {
+      return
+    }
+
+    // Calculate the offset between the bounds and the old bounds
+    let upL = this.dragBounds.upperLeft()
+    let oldUpL = this.oldDragBounds.upperLeft()
+    let offset = {
+      x: upL.x - oldUpL.x,
+      y: upL.y - oldUpL.y
+    }
+
+    console.log('toMoveShapes', this.toMoveShapes, offset, this.containmentParentNode, this.currentShapes)
+    // Instanciate the dragCommand
+    const commands = [new ORYX_Command_Move(
+      this.toMoveShapes, offset, this.containmentParentNode, this.currentShapes, this
+    )]
+    // this.toMoveShapes.concat(this.elementsMoveWithLane)
+    // If the undocked edges command is setted, add this command
+    if (this._undockedEdgesCommand instanceof ORYX_Command) {
+      commands.unshift(this._undockedEdgesCommand)
+    }
+    // Execute the commands
+    this.facade.executeCommands(commands)
+
+    // copy the bounds to the old bounds
+    if (this.dragBounds) {
+      this.oldDragBounds = this.dragBounds.clone()
+    }
+  }
+
+  /**
+   * Callback for Resize
+   */
+  onResize (bounds) {
+    // If the selection bounds not initialized, return
+    if (!this.dragBounds) {
+      return
+    }
+
+    this.dragBounds = bounds
+    this.isResizing = true
+
+    // Update the rectangle
+    this.resizeRectangle(this.dragBounds)
+  }
+
+  onResizeStart () {
+    this.facade.raiseEvent({ type: ORYX_Config.EVENT_RESIZE_START })
+  }
+
+  onResizeEnd () {
+    if (!(this.currentShapes instanceof Array) || this.currentShapes.length <= 0) {
+      return
+    }
+
+    // If Resizing finished, the Shapes will be resize
+    if (this.isResizing) {
+      class commandClass extends ORYX_Command{
+        constructor (shape, newBounds, plugin) {
+          super()
+          this.shape = shape
+          this.oldBounds = shape.bounds.clone()
+          this.newBounds = newBounds
+          this.plugin = plugin
+        }
+        execute () {
+          this.shape.bounds.set(this.newBounds.a, this.newBounds.b)
+          this.update(this.getOffset(this.oldBounds, this.newBounds))
+        }
+        rollback () {
+          this.shape.bounds.set(this.oldBounds.a, this.oldBounds.b)
+          this.update(this.getOffset(this.newBounds, this.oldBounds))
+        }
+        getOffset(b1, b2) {
+          return {
+            x: b2.a.x - b1.a.x,
+            y: b2.a.y - b1.a.y,
+            xs: b2.width() / b1.width(),
+            ys: b2.height() / b1.height()
+          }
+        }
+        update (offset) {
+          this.shape.getLabels().each(function (label) {
+            label.changed()
+          })
+
+          let allEdges = [].concat(this.shape.getIncomingShapes())
+            .concat(this.shape.getOutgoingShapes())
+            // Remove all edges which are included in the selection from the list
+            .findAll(function (r) {
+              return r instanceof ORYX_Edge
+            }.bind(this))
+
+          this.plugin.layoutEdges(this.shape, allEdges, offset)
+          this.plugin.facade.setSelection([this.shape])
+          this.plugin.facade.getCanvas().update()
+          this.plugin.facade.updateSelection()
+        }
+      }
+
+      let bounds = this.dragBounds.clone()
+      let shape = this.currentShapes[0]
+
+      if (shape.parent) {
+        let parentPosition = shape.parent.absoluteXY()
+        bounds.moveBy(-parentPosition.x, -parentPosition.y)
+      }
+
+      let command = new commandClass(shape, bounds, this)
+
+      this.facade.executeCommands([command])
+      this.isResizing = false
+      this.facade.raiseEvent({ type: ORYX_Config.EVENT_RESIZE_END })
+    }
+  }
+
+  /**
+   * Prepare the Dragging
+   */
+  beforeDrag () {
+    class undockEdgeCommand extends ORYX_Command{
+      constructor (moveShapes) {
+        super()
+        this.dockers = moveShapes.collect(function (shape) {
+          return shape instanceof ORYX_Controls.Docker ? {
+            docker: shape,
+            dockedShape: shape.getDockedShape(),
+            refPoint: shape.referencePoint
+          } : undefined
+        }).compact()
+      }
+      execute () {
+        this.dockers.each(function (el) {
+          el.docker.setDockedShape(undefined)
+        })
+      }
+      rollback () {
+        this.dockers.each(function (el) {
+          el.docker.setDockedShape(el.dockedShape)
+          el.docker.setReferencePoint(el.refPoint)
+          //el.docker.update();
+        })
+      }
+    }
+
+    this._undockedEdgesCommand = new undockEdgeCommand(this.toMoveShapes)
+    this._undockedEdgesCommand.execute()
+  }
+
+  hideAllLabels (shape) {
+    // Hide all labels from the shape
+    shape.getLabels().each(function (label) {
+      label.hide()
+    })
+    // Hide all labels from docked shapes
+    shape.getAllDockedShapes().each(function (dockedShape) {
+      let labels = dockedShape.getLabels()
+      if (labels.length > 0) {
+        labels.each(function (label) {
+          label.hide()
+        })
+      }
+    })
+
+    // Do this recursive for all child shapes
+    // EXP-NICO use getShapes
+    shape.getChildren().each((function (value) {
+      if (value instanceof ORYX_Shape)
+        this.hideAllLabels(value)
+    }).bind(this))
+  }
+
+  /**
+   * Finished the Dragging
+   */
+  afterDrag () {
+
+  }
+
+  /**
+   * Show all Labels at these shape
+   */
+  showAllLabels (shape) {
+    // Show the label of these shape
+    //shape.getLabels().each(function(label) {
+    for (let i = 0; i < shape.length; i++) {
+      let label = shape[i]
+      label.show()
+    }//);
+    // Show all labels at docked shapes
+    //shape.getAllDockedShapes().each(function(dockedShape) {
+    let allDockedShapes = shape.getAllDockedShapes()
+    for (let i = 0; i < allDockedShapes.length; i++) {
+      let dockedShape = allDockedShapes[i]
+      let labels = dockedShape.getLabels()
+      if (labels.length > 0) {
+        labels.each(function (label) {
+          label.show()
+        })
+      }
+    }//);
+
+    // Do this recursive
+    //shape.children.each((function(value) {
+    for (let i = 0; i < shape.children.length; i++) {
+      var value = shape.children[i]
+      if (value instanceof ORYX_Shape)
+        this.showAllLabels(value)
+    }//).bind(this));
+  }
+
+  /**
+   * Intialize Method, if there are new Plugins
    *
+   */
+
+  /*registryChanged: function(pluginsData) {
+   // Save all new Plugin, sorted by group and index
+   this.pluginsData = pluginsData.sortBy( function(value) {
+   return (value.group + "" + value.index);
+   });
+   },*/
+
+  /**
+   * Adjust an Point to the Snap Points
+   * 将点调整到捕捉点
    */
   snapToGrid (position) {
     // Get the current Bounds
@@ -982,13 +994,11 @@ export default class DragDropResize extends AbstractPlugin {
 
   }
 
-
   /**
-   * Redraw of the Rectangle of the SelectedArea
+   * 重新绘制所选区域的矩形
    * @param {Object} bounds
    */
   resizeRectangle (bounds) {
-    // Resize the Rectangle
     this.selectedRect.resize(bounds)
   }
 

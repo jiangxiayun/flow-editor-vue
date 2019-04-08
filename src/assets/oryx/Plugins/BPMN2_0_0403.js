@@ -367,11 +367,10 @@ export default class BPMN2_0 extends AbstractPlugin {
 
       let pools = []
       let unselectLanes = []
-      console.log(11, lanes)
       lanes.each(function (lane) {
         pools.push(this.getParentPool(lane))
       }.bind(this))
-      console.log(22, pools)
+
       pools = pools.uniq().findAll(function (pool) {
         let childLanes = this.getLanes(pool, true)
         if (childLanes.all(function (lane) {
@@ -657,31 +656,31 @@ export default class BPMN2_0 extends AbstractPlugin {
 
   }
   handleLayoutPool_H (event) {
-    // let pool = event.shape
-    // const canvas = this.facade.getCanvas()
-    // let lowRight = {
-    //   x: canvas.bounds.b.x,
-    //   y: pool.bounds.b.y
-    // }
-    // let upLeft = {
-    //   x: 11,
-    //   y: pool.bounds.a.y
-    // }
-    // pool.bounds.set(upLeft, lowRight)
+    let pool = event.shape
+    const canvas = this.facade.getCanvas()
+    let lowRight = {
+      x: canvas.bounds.b.x,
+      y: pool.bounds.b.y
+    }
+    let upLeft = {
+      x: 11,
+      y: pool.bounds.a.y
+    }
+    pool.bounds.set(upLeft, lowRight)
     this.handleLayoutPool(event)
   }
   handleLayoutPool_V (event) {
-    // let pool = event.shape
-    // const canvas = this.facade.getCanvas()
-    // let lowRight = {
-    //   x: pool.bounds.b.x,
-    //   y: canvas.bounds.b.y
-    // }
-    // let upLeft = {
-    //   x: pool.bounds.a.x,
-    //   y: 5
-    // }
-    // pool.bounds.set(upLeft, lowRight)
+    let pool = event.shape
+    const canvas = this.facade.getCanvas()
+    let lowRight = {
+      x: pool.bounds.b.x,
+      y: canvas.bounds.b.y
+    }
+    let upLeft = {
+      x: pool.bounds.a.x,
+      y: 5
+    }
+    pool.bounds.set(upLeft, lowRight)
     this.handleLayoutPool(event)
   }
   /**
@@ -691,7 +690,6 @@ export default class BPMN2_0 extends AbstractPlugin {
   handleLayoutPool (event) {
     let pool = event.shape
     let selection = this.facade.getSelection()
-    console.log(444, pool)
 
     let currentShape = selection.include(pool) ? pool : selection.first()
     currentShape = currentShape || pool
@@ -771,10 +769,9 @@ export default class BPMN2_0 extends AbstractPlugin {
 
     let height, width, x, y
 
-    let poolTypeId = pool.getStencil().idWithoutNs()
-    // 有新增或者删除 lane
+    console.log(777, deletedLanes, addedLanes)
     if (deletedLanes.length > 0 || addedLanes.length > 0) {
-      if (addedLanes.length === 1 && this.getLanes(addedLanes[0].parent).length === 1 && poolTypeId === 'Pool') {
+      if (addedLanes.length === 1 && this.getLanes(addedLanes[0].parent).length === 1) {
         // Set height from the pool
         height = this.adjustHeight(lanes, addedLanes[0].parent)
       } else {
@@ -782,11 +779,12 @@ export default class BPMN2_0 extends AbstractPlugin {
         height = this.updateHeight(pool)
       }
       // Set width from the pool
-      if (poolTypeId === 'V-Pool') {
-        width = this.updateVPoolWidth(lanes, pool)
+      if (pool.getStencil().idWithoutNs() === 'V-Pool') {
+        width = this.updateVPoolWidth(pool)
       } else {
         width = this.adjustWidth(lanes, pool.bounds.width())
       }
+      console.log(33, width, height)
       pool.update()
     } else if (pool == currentShape) {
       /**
@@ -803,14 +801,10 @@ export default class BPMN2_0 extends AbstractPlugin {
         this.adjustLanes(pool, allLanes, oldXY.x - xy.x, oldXY.y - xy.y, scale)
       }
 
-      if (poolTypeId === 'V-Pool') {
-        width = this.updateVPoolWidth(lanes, pool)
-      } else {
-        // Set height from the pool
-        height = this.adjustHeight(lanes, undefined, pool.bounds.height())
-        // Set width from the pool
-        width = this.adjustWidth(lanes, pool.bounds.width())
-      }
+      // Set height from the pool
+      height = this.adjustHeight(lanes, undefined, pool.bounds.height())
+      // Set width from the pool
+      width = this.adjustWidth(lanes, pool.bounds.width())
     } else {
       /**‚
        * Set width/height depending on containing lanes
@@ -849,16 +843,13 @@ export default class BPMN2_0 extends AbstractPlugin {
         }
       })
 
-      if (poolTypeId === 'V-Pool') {
-        width = this.updateVPoolWidth(lanes, pool)
-      } else {
-        // Get height and adjust child heights
-        height = this.adjustHeight(lanes, currentShape)
-        // Check if something has changed and maybe create a command
-        this.checkForChanges(allLanes, changes)
-        // Set width from the current shape
-        width = this.adjustWidth(lanes, currentShape.bounds.width() + (this.getDepth(currentShape, pool) * 30))
-      }
+      // Get height and adjust child heights
+      height = this.adjustHeight(lanes, currentShape)
+      // Check if something has changed and maybe create a command
+      this.checkForChanges(allLanes, changes)
+
+      // Set width from the current shape
+      width = this.adjustWidth(lanes, currentShape.bounds.width() + (this.getDepth(currentShape, pool) * 30))
     }
 
     this.setDimensions(pool, width, height, x, y)
@@ -1095,21 +1086,16 @@ export default class BPMN2_0 extends AbstractPlugin {
     }
   }
 
-  updateVPoolWidth (lanes, root) {
+  updateVPoolWidth (root) {
+    let lanes = this.getLanes(root)
     if (lanes.length === 0) {
       return root.bounds.width()
     }
     let width = 0
     let i = -1
     while (++i < lanes.length) {
-      // this.setDimensions(lanes[i], tempWidth, null)
-      // this.setLanePosition(lanes[i], width, null)
-      // this.adjustHeight(this.getLanes(lanes[i]), undefined, tempWidth)
-      lanes[i].bounds.set({ x: width, y: 30 }, {
-        x: lanes[i].bounds.width() + width,
-        y: lanes[i].bounds.height() + 30
-      })
-      width += lanes[i].bounds.width()
+      this.setLanePosition(lanes[i], width, null)
+      width += this.updateVPoolWidth(lanes[i])
     }
     this.setDimensions(root, width)
     return width
@@ -1149,12 +1135,12 @@ export default class BPMN2_0 extends AbstractPlugin {
         oldHeight += lanes[i].bounds.height()
       }
     }
+    console.log(555, changedLane)
     let i = -1
     let height = 0
     // Iterate trough every lane
     while (++i < lanes.length) {
       if (lanes[i] === changedLane) {
-        console.log('!!!!!!!!!!!!!!!')
         // Propagate new height down to the children
         this.adjustHeight(this.getLanes(lanes[i]), undefined, lanes[i].bounds.height())
 
@@ -1187,12 +1173,13 @@ export default class BPMN2_0 extends AbstractPlugin {
   }
 
   updateHeight (root) {
-    console.log(888)
     let lanes = this.getLanes(root)
 
-    if (lanes.length === 0 || root.getStencil().idWithoutNs() === 'V-Pool') {
+    console.log(99, root.getStencil().idWithoutNs())
+    if (lanes.length == 0 || root.getStencil().idWithoutNs() === 'V-Pool') {
       return root.bounds.height()
     }
+    console.log(999999999999999999999999)
     let height = 0
     let i = -1
     while (++i < lanes.length) {
@@ -1408,7 +1395,6 @@ export default class BPMN2_0 extends AbstractPlugin {
    * @param {boolean} recursive
    */
   getLanes (shape, recursive) {
-    console.log(21111, shape, recursive)
     let namespace = this.getNamespace()
     let id = shape.getStencil().idWithoutNs()
     let laneName = 'Lane'

@@ -1064,9 +1064,6 @@ export default class Editor {
     // Create an New Shape, dependents on an Edge or a Node
     if (sset.stencil(shapetype).type() == 'node') {
       newShapeObject = new ORYX_Node({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
-      console.log(2, newShapeObject)
-      console.log(3, sset.stencil(shapetype).idWithoutNs())
-      console.log(4,  canvas.bounds.width())
     } else {
       newShapeObject = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
     }
@@ -1144,6 +1141,30 @@ export default class Editor {
 
       let lwR = b.lowerRight()
       b.moveBy(-Math.max(lwR.x - canvas.bounds.width(), 0), -Math.max(lwR.y - canvas.bounds.height(), 0))
+
+      // 处理泳道
+      // let canvasBound = this.facade.getCanvas().bounds
+      let nodeTypeId = newShapeObject.getStencil().idWithoutNs()
+      // .endsWith('Lane')
+      if (nodeTypeId === 'V-Pool') {
+        let po = {
+          a: { x: b.a.x, y: 0 },
+          b: { x: b.b.x, y: canvas.bounds.height() }
+        }
+        newShapeObject.bounds.set(po)
+      } else if (nodeTypeId === 'V-Lane') {
+        let po = {
+          a: { x: b.a.x, y: 30 },
+          b: { x: b.b.x, y: canvas.bounds.height() }
+        }
+        newShapeObject.bounds.set(po)
+      } else if (nodeTypeId === 'Pool') {
+        let po = {
+          a: { x: 0, y: b.a.y },
+          b: { x: canvas.bounds.width(), y: b.b.y }
+        }
+        newShapeObject.bounds.set(po)
+      }
     }
 
     // Update the shape
@@ -1558,7 +1579,6 @@ export default class Editor {
     return svgPoint.matrixTransform(matrix.inverse())
   }
 
-
   /**
    * Creates a new ORYX.Editor instance by fetching a model from given url and passing it to the constructur
    * @param {String} modelUrl The JSON URL of a model.
@@ -1604,7 +1624,6 @@ export default class Editor {
       }, 100)
     }
   }
-
 }
 
 
