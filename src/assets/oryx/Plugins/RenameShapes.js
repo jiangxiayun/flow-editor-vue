@@ -31,6 +31,13 @@ export default class RenameShapes {
       return
     }
 
+    console.log(66, this.facade.getAvailablePlugins())
+    const elementsWithoutRenameAction = this.facade.elementsWithoutRenameAction
+    if (elementsWithoutRenameAction.includes(shape.getStencil().idWithoutNs())) {
+      return false
+    }
+    console.log(7777)
+
     // Destroys the old input, if there is one
     this.destroy()
 

@@ -22,6 +22,7 @@ import KeysMove from './KeysMove'
 import Layouter from './Layouter'
 import BPMN2_0 from './BPMN2_0'
 import Arrangement from './Arrangement'
+import PoolAsProperty from './PoolAsProperty'
 
 const Plugins = {
   AbstractPlugin: AbstractPlugin,
@@ -48,6 +49,7 @@ const Plugins = {
   Layouter: Layouter,
   BPMN2_0: BPMN2_0,
   Arrangement: Arrangement,
+  PoolAsProperty: PoolAsProperty,
 }
 
 export default Plugins

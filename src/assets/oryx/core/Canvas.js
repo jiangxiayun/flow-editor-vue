@@ -263,10 +263,11 @@ export default class Canvas extends AbstractShape {
 
         // add uiObject to the Canvas
         // add uiObject to this Shape
-        if (index != undefined)
+        if (index != undefined) {
           this.children.splice(index, 0, uiObject)
-        else
+        } else {
           this.children.push(uiObject)
+        }
 
         // set parent reference
         uiObject.parent = this
@@ -278,8 +279,16 @@ export default class Canvas extends AbstractShape {
             uiObject.node = this.node.childNodes[0].childNodes[2].appendChild(uiObject.node)
             this.edges.push(uiObject)
           } else {
-            uiObject.node = this.node.childNodes[0].childNodes[1].appendChild(uiObject.node)
-            this.nodes.push(uiObject)
+            // uiObject.node = this.node.childNodes[0].childNodes[1].appendChild(uiObject.node)
+            if (uiObject.getStencil().id().endsWith('Pool')) {
+              console.log(888)
+              let childNodes = this.node.childNodes[0].childNodes[1]
+              uiObject.node = childNodes.insertBefore(uiObject.node, childNodes.firstChild)
+              this.nodes.unshift(uiObject)
+            } else {
+              uiObject.node = this.node.childNodes[0].childNodes[1].appendChild(uiObject.node)
+              this.nodes.push(uiObject)
+            }
           }
         } else {
           // UIObject
@@ -288,8 +297,9 @@ export default class Canvas extends AbstractShape {
 
         uiObject.bounds.registerCallback(this._changedCallback)
 
-        if (this.eventHandlerCallback && silent !== true)
+        if (this.eventHandlerCallback && silent !== true) {
           this.eventHandlerCallback({ type: ORYX_Config.EVENT_SHAPEADDED, shape: uiObject })
+        }
       } else {
         ORYX_Log.warn('add: ORYX.Core.UIObject is already a child of this object.')
       }
@@ -312,7 +322,7 @@ export default class Canvas extends AbstractShape {
       //delete parent reference of uiObject
       uiObject.parent = undefined
 
-      //delete uiObject.node from this.node
+      // delete uiObject.node from this.node
       if (uiObject instanceof Shape) {
         if (uiObject instanceof Edge) {
           uiObject.removeMarkers()

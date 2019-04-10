@@ -96,7 +96,7 @@ export default class Resizer {
     }
 
     // respect minimum and maximum sizes of stencil
-    if (this.orientation === 'northwest' || this.orientation === 'north') {
+    if (this.orientation === 'northwest' || this.orientation === 'north' || this.orientation === 'west') {
       if (this.bounds.width() - offset.x > this.maxSize.width) {
         offset.x = -(this.maxSize.width - this.bounds.width())
         if (this.aspectRatio)
@@ -118,7 +118,8 @@ export default class Resizer {
           offset.x = offset.y / this.aspectRatio
       }
 
-    } else { // defaults to southeast
+    } else {
+      // defaults to southeast
       if (this.bounds.width() + offset.x > this.maxSize.width) {
         offset.x = this.maxSize.width - this.bounds.width()
         if (this.aspectRatio)
@@ -163,8 +164,14 @@ export default class Resizer {
       case 'south':
         this.bounds.extend({ x: 0, y: offset.y })
         break
+      case 'west':
+        this.bounds.extend({ x: -offset.x, y: 0 })
+        this.bounds.moveBy({ x: offset.x, y: 0 })
+        break
+      case 'east':
+        this.bounds.extend({ x: offset.x, y: 0 })
+        break
     }
-
     this.update()
 
     this.resizeCallbacks.each((function (value) {
@@ -307,6 +314,14 @@ export default class Resizer {
       case 'south':
         upL.x = 0
         upL.y += (a.d * this.bounds.height()) - 3
+        break
+      case 'west':
+        upL.x -= 3
+        upL.y = 0
+        break
+      case 'east':
+        upL.x += (a.a * this.bounds.width()) - 3
+        upL.y = 0
         break
     }
 

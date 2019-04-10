@@ -304,8 +304,7 @@ export default class BPMN2_0 extends AbstractPlugin {
 
     this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDOCKER_DOCKED, this.handleDockerDocked.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_PROPWINDOW_PROP_CHANGED, this.handlePropertyChanged.bind(this))
-    this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool_H.bind(this))
-    this.facade.registerOnEvent('layout.bpmn2_0.pool_V', this.handleLayoutPool_V.bind(this))
+    this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
     this.facade.registerOnEvent('layout.bpmn2_0.subprocess', this.handleSubProcess.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_LOADED, this.afterLoad.bind(this))
@@ -367,11 +366,9 @@ export default class BPMN2_0 extends AbstractPlugin {
 
       let pools = []
       let unselectLanes = []
-      console.log(11, lanes)
       lanes.each(function (lane) {
         pools.push(this.getParentPool(lane))
       }.bind(this))
-      console.log(22, pools)
       pools = pools.uniq().findAll(function (pool) {
         let childLanes = this.getLanes(pool, true)
         if (childLanes.all(function (lane) {
@@ -655,34 +652,6 @@ export default class BPMN2_0 extends AbstractPlugin {
       this.facade.getCanvas().update()
     }
 
-  }
-  handleLayoutPool_H (event) {
-    // let pool = event.shape
-    // const canvas = this.facade.getCanvas()
-    // let lowRight = {
-    //   x: canvas.bounds.b.x,
-    //   y: pool.bounds.b.y
-    // }
-    // let upLeft = {
-    //   x: 11,
-    //   y: pool.bounds.a.y
-    // }
-    // pool.bounds.set(upLeft, lowRight)
-    this.handleLayoutPool(event)
-  }
-  handleLayoutPool_V (event) {
-    // let pool = event.shape
-    // const canvas = this.facade.getCanvas()
-    // let lowRight = {
-    //   x: pool.bounds.b.x,
-    //   y: canvas.bounds.b.y
-    // }
-    // let upLeft = {
-    //   x: pool.bounds.a.x,
-    //   y: 5
-    // }
-    // pool.bounds.set(upLeft, lowRight)
-    this.handleLayoutPool(event)
   }
   /**
    * Handler for layouting event 'layout.bpmn2_0.pool'

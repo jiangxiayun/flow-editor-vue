@@ -120,7 +120,7 @@ export default class Edge extends Shape {
           b.y = Math.max(b.y, center.y)
         }).bind(this))
 
-        //set the bounds of the the association
+        // set the bounds of the the association
         this.bounds.set(Object.clone(a), Object.clone(b))
       }
 

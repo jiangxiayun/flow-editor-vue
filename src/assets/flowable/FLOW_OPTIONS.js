@@ -274,7 +274,7 @@ const FLOWABLE_EDITOR_TOUR = {
   },
 
   _buildStepTemplate: function (addPrevButton, addNextButton, addEndTourButton, optionalForcedWidth, image) {
-    const width = 200
+    let width = 200
     if (optionalForcedWidth) {
       width = optionalForcedWidth
     }
@@ -482,7 +482,7 @@ const FLOW_OPTIONS = {
         // Show the tutorial the first time
         FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, true)
 
-        const dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services)
+        const dockerPlugin = FLOW_OPTIONS.TOOLBAR.ACTIONS._getOryxDockerPlugin(services)
         let enableAdd = !dockerPlugin.enabledAdd()
         dockerPlugin.setEnableAdd(enableAdd)
         if (enableAdd) {
@@ -495,7 +495,7 @@ const FLOW_OPTIONS = {
       removeBendPoint: function (services) {
         // Show the tutorial the first time
         FLOWABLE_EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, true)
-        const dockerPlugin = FLOWABLE.TOOLBAR.ACTIONS._getOryxDockerPlugin(services)
+        const dockerPlugin = FLOW_OPTIONS.TOOLBAR.ACTIONS._getOryxDockerPlugin(services)
         let enableRemove = !dockerPlugin.enabledRemove()
         dockerPlugin.setEnableRemove(enableRemove)
         if (enableRemove) {

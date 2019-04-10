@@ -25,7 +25,6 @@
       <notUsesIn namespace="http://b3mn.org/stencilset/xforms#"/>
     </plugin>
     
-    <plugin source="renameShapes.js" name="Plugins.RenameShapes" />
     <plugin source="processLink.js" name="Plugins.ProcessLink">
       <requires namespace="http://b3mn.org/stencilset/bpmn1.1#"/> 
     </plugin>
@@ -51,13 +50,14 @@
     <plugin source="overlay.js" name="Plugins.Overlay" />
     <plugin source="keysMove.js" name="Plugins.KeysMove" />
     <plugin source="Layouter/edgeLayouter.js" name="Plugins.Layouter.EdgeLayouter" />
-    
+
     <!-- Begin: BPMN2.0 specific plugins -->
     <plugin source="bpmn2.0/bpmn2.0.js" name="Plugins.BPMN2_0">
       <requires namespace="http://b3mn.org/stencilset/bpmn2.0#" />
     </plugin>
-
     <!-- End: BPMN2.0 specific plugins -->
+    <!--<plugin source="PoolAsProperty.js" name="Plugins.PoolAsProperty" />-->
+    <plugin source="renameShapes.js" name="Plugins.RenameShapes" />
   </plugins>
   
   <properties>

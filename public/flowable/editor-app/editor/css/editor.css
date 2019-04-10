@@ -157,6 +157,8 @@ text * {
 /*** Resizer ***/
 .resizer_south,
 .resizer_north,
+.resizer_east,
+.resizer_west,
 .resizer_southeast,
 .resizer_northwest {
 	width:12px; 
@@ -229,4 +231,19 @@ text * {
 	border-bottom: 1px solid #5581b9;
 	border-top: 1px solid #5581b9;
 	cursor: n-resize;
+}
+
+.resizer_east {
+	height: 100%;
+	width: 6px;
+	border-left: 1px solid #5581b9;
+	border-right: 1px solid #5581b9;
+	cursor: e-resize;
+}
+.resizer_west {
+	height: 100%;
+	width: 6px;
+	border-left: 1px solid #5581b9;
+	border-right: 1px solid #5581b9;
+	cursor: w-resize;
 }

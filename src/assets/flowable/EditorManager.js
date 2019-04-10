@@ -22,6 +22,9 @@ export default class EditorManager {
       'EventSubProcess': 'event.subprocess.png'
     }
 
+    // 设置不需要双击修改名称功能的节点
+    this.elementsWithoutRenameAction = config.elementsWithoutRenameAction
+
     this.setModelId(config.modelData.modelId)
     this.current = this.modelId // 当前流程id
     this.loading = true
@@ -322,7 +325,7 @@ export default class EditorManager {
   }
 
   bootEditor () {
-    //TODO: populate the canvas with correct json sections.
+    // TODO: populate the canvas with correct json sections.
     this.canvasTracker = new Hash()
 
     // 第一个参数boolean代表是否进行深度拷贝

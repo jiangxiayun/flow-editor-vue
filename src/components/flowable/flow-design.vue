@@ -67,6 +67,7 @@
       // this.getJson()
       this.editorManager =  new EditorManager({
         ...this.config,
+        elementsWithoutRenameAction: ['Lane', 'V-Lane']
       })
 
       // this.UPDATE_modelData(this.config.modelData)

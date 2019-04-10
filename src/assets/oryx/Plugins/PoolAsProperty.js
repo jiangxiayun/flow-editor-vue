@@ -12,7 +12,7 @@ import ORYX_Controls from '../core/Controls/index'
 import ORYX_Config from '../CONFIG'
 import ORYX_Utils from '../Utils'
 
-export default class DragDropResize extends AbstractPlugin {
+export default class PoolAsProperty extends AbstractPlugin {
   /**
    *  @param {Object} Facade: The Facade of the Editor
    */
@@ -73,14 +73,6 @@ export default class DragDropResize extends AbstractPlugin {
     this.resizerNorth.registerOnResize(this.onResize.bind(this))
     this.resizerNorth.registerOnResizeEnd(this.onResizeEnd.bind(this))
     this.resizerNorth.registerOnResizeStart(this.onResizeStart.bind(this))
-    this.resizerEast = new Resizer(containerNode, 'east', this.facade)
-    this.resizerEast.registerOnResize(this.onResize.bind(this))
-    this.resizerEast.registerOnResizeEnd(this.onResizeEnd.bind(this))
-    this.resizerEast.registerOnResizeStart(this.onResizeStart.bind(this))
-    this.resizerWest = new Resizer(containerNode, 'west', this.facade)
-    this.resizerWest.registerOnResize(this.onResize.bind(this))
-    this.resizerWest.registerOnResizeEnd(this.onResizeEnd.bind(this))
-    this.resizerWest.registerOnResizeStart(this.onResizeStart.bind(this))
 
     // For the Drag and Drop
     // Register on MouseDown-Event on a Shape
@@ -100,8 +92,6 @@ export default class DragDropResize extends AbstractPlugin {
     this.resizerNW.hide()
     this.resizerSouth.hide()
     this.resizerNorth.hide()
-    this.resizerEast.hide()
-    this.resizerWest.hide()
 
     // If there is no elements
     if (!elements || elements.length == 0) {
@@ -225,11 +215,6 @@ export default class DragDropResize extends AbstractPlugin {
           this.resizerNorth.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
           // this.resizerNorth.setFullLineBounds(this.dragBounds)
           this.resizerNorth.show()
-        } else if (id === 'V-Pool' || id === 'V-Lane') {
-          this.resizerEast.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          this.resizerEast.show()
-          this.resizerWest.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          this.resizerWest.show()
         } else {
           this.resizerSE.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
           this.resizerSE.show()
@@ -241,8 +226,6 @@ export default class DragDropResize extends AbstractPlugin {
         this.resizerNW.setBounds(undefined)
         this.resizerSouth.setBounds(undefined)
         this.resizerNorth.setBounds(undefined)
-        this.resizerEast.setBounds(undefined)
-        this.resizerWest.setBounds(undefined)
       }
 
       // If Snap-To-Grid is enabled, the Snap-Point will be calculate
@@ -463,8 +446,6 @@ export default class DragDropResize extends AbstractPlugin {
       this.resizerNW.hide()
       this.resizerSouth.hide()
       this.resizerNorth.hide()
-      this.resizerEast.hide()
-      this.resizerWest.hide()
 
       // if only edges are selected, containmentParentNode must be the canvas
       this._onlyEdges = this.currentShapes.all(function (currentShape) {
@@ -654,7 +635,7 @@ export default class DragDropResize extends AbstractPlugin {
             this.currentShapes.any(function (shape) {
               return (shape.children.length > 0 && shape.getChildNodes(true).member(node))
             }))) && !(node.getStencil().id().endsWith('Lane') || node.getStencil().id().endsWith('Pool')))
-        // && !(node.getStencil().id().endsWith('Lane') || node.getStencil().id().endsWith('Pool'))
+      // && !(node.getStencil().id().endsWith('Lane') || node.getStencil().id().endsWith('Pool'))
     }).bind(this))
 
     if (checkIfAttachable) {

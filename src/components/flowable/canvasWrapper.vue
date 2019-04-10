@@ -67,6 +67,7 @@
 <script>
   import { mapState, mapMutations } from 'vuex'
   import { FLOWABLE } from '@/assets/flowable/FLOWABLE_Config'
+  import FLOWABLE_OPTIONS from '@/assets/flowable/FLOW_OPTIONS'
   import { getAdditionalIEZoom } from '@/assets/Util'
   import ORYX from '@/assets/oryx'
   import { _debounce } from '@/assets/Util'
@@ -524,7 +525,8 @@
                 option.connectingType = targetStencil.id()
               }
 
-              let command = new FLOWABLE.CreateCommand(option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
+              console.log(1122)
+              let command = new FLOWABLE_OPTIONS.CreateCommand(option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
 
               this.editorManager.executeCommands([command])
             }
@@ -602,7 +604,6 @@
 
             // Update canvas
             let command = new commandClass(option, this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())
-
             this.editorManager.executeCommands([command])
 
             // Fire event to all who want to know about this
@@ -694,7 +695,7 @@
 
           var isValid = false
           if (stencil.type() === 'node') {
-            //check containment rules
+            // check containment rules
             var canContain = this.editorManager.getRules().canContain({
               containingShape: candidate,
               containedStencil: stencil
@@ -803,8 +804,8 @@
           }
 
           option['connectingType'] = targetStencil.id();
-
-          var command = new FLOWABLE.CreateCommand(option, undefined, undefined, this.editorManager.getEditor());
+          console.log(3344)
+          var command = new FLOWABLE_OPTIONS.CreateCommand(option, undefined, undefined, this.editorManager.getEditor());
 
           this.editorManager.executeCommands([command]);
         }

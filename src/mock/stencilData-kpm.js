@@ -2032,7 +2032,7 @@ export const AA = {
       ],
       "layout": [
         {
-          "type": "layout.bpmn2_0.pool_V"
+          "type": "layout.bpmn2_0.pool"
         }
       ],
       "propertyPackages": [

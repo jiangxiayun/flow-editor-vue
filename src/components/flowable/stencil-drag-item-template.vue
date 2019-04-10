@@ -72,11 +72,12 @@
             this.editorManager.getCanvas().setHightlightStateBasedOnX(coord.x);
           }
 
+          // console.log('aShapes', aShapes)
+          const item = this.editorManager.getStencilItemById(event.target.id);
           if (aShapes.length == 1 && aShapes[0] instanceof ORYX.Core.Canvas) {
-            let item = this.editorManager.getStencilItemById(event.target.id);
             let parentCandidate = aShapes[0];
 
-            if (item.id === 'Lane' || item.id === 'V-Lane'  || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
+            if (item.id === 'Lane' || item.id === 'V-Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
               item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
               item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
               item.id === 'EntryCriterion') {
@@ -109,12 +110,52 @@
             return false;
 
           } else  {
-            let item = this.editorManager.getStencilItemById(event.target.id);
+            // console.log(22, item)
             let parentCandidate = aShapes.reverse().find(function (candidate) {
+              // return (candidate instanceof ORYX.Core.Canvas
+              //   || candidate instanceof ORYX.Core.Node
+              //   || candidate instanceof ORYX.Core.Edge);
+
               return (candidate instanceof ORYX.Core.Canvas
-                || candidate instanceof ORYX.Core.Node
+                || (item.id.endsWith('Lane') ? candidate instanceof ORYX.Core.Node :
+                  (candidate instanceof ORYX.Core.Node && !(candidate.getStencil().id().endsWith('Lane') ||
+                    candidate.getStencil().id().endsWith('Pool'))))
                 || candidate instanceof ORYX.Core.Edge);
             });
+            console.log('parentCandidate', parentCandidate)
+            if (parentCandidate instanceof ORYX.Core.Canvas) {
+              if (item.id === 'Lane' || item.id === 'V-Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
+                item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
+                item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
+                item.id === 'EntryCriterion') {
+                this.UPDATE_dragCanContain(false)
+
+                // Show Highlight
+                this.editorManager.handleEvents({
+                  type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
+                  highlightId: 'shapeRepo.added',
+                  elements: [parentCandidate],
+                  style: ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
+                  color: ORYX.CONFIG.SELECTION_INVALID_COLOR
+                });
+              } else {
+                this.UPDATE_dragCanContain(true)
+                this.editorManager.dragCurrentParent = parentCandidate
+                this.editorManager.dragCurrentParentId = parentCandidate.id
+
+                this.editorManager.handleEvents({
+                  type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+                  highlightId: "shapeRepo.added"
+                });
+              }
+
+              this.editorManager.handleEvents({
+                type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+                highlightId: "shapeRepo.attached"
+              });
+
+              return false;
+            }
 
             if (!parentCandidate) {
               this.UPDATE_dragCanContain(false)
