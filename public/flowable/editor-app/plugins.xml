@@ -49,7 +49,7 @@
     <plugin source="shapeHighlighting.js" name="Plugins.ShapeHighlighting" />
     <plugin source="overlay.js" name="Plugins.Overlay" />
     <plugin source="keysMove.js" name="Plugins.KeysMove" />
-    <plugin source="Layouter/edgeLayouter.js" name="Plugins.Layouter.EdgeLayouter" />
+    <plugin source="Layouter.js" name="Plugins.Layouter.EdgeLayouter" />
 
     <!-- Begin: BPMN2.0 specific plugins -->
     <plugin source="bpmn2.0/bpmn2.0.js" name="Plugins.BPMN2_0">
@@ -58,6 +58,9 @@
     <!-- End: BPMN2.0 specific plugins -->
     <!--<plugin source="PoolAsProperty.js" name="Plugins.PoolAsProperty" />-->
     <plugin source="renameShapes.js" name="Plugins.RenameShapes" />
+    <plugin source="PoolAsProperty.js" name="Plugins.PoolAsProperty">
+      <requires namespace="http://b3mn.org/stencilset/bpmn2.0#" />
+    </plugin>
   </plugins>
   
   <properties>

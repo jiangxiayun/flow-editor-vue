@@ -98,6 +98,7 @@
   import conditionExpressionDisplayTemplate from '@/components/propertyForm/condition-expression-display-template'
   import conditionExpressionWriteTemplate from '@/components/propertyForm/condition-expression-write-template'
   import multiinstancePropertyWriteTemplate from '@/components/propertyForm/multiinstance-property-write-template'
+  import lanePropertyWriteTemplate from '@/components/propertyForm/lane-property-write-template'
 
   export default {
     name: 'propertySection',
@@ -143,7 +144,8 @@
       assignmentDisplayTemplate, assignmentWriteTemplate,
       taskListenersDisplayTemplate, taskListenersWriteTemplate,
       conditionExpressionDisplayTemplate, conditionExpressionWriteTemplate,
-      multiinstancePropertyWriteTemplate
+      multiinstancePropertyWriteTemplate,
+      lanePropertyWriteTemplate
     },
     mounted () {
       /*

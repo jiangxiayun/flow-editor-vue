@@ -101,6 +101,32 @@ export const AA = {
       ]
     },
     {
+      "name": "ispropertyfortaskpackage",
+      "properties": [
+        {
+          "id": "ispropertyfortask",
+          "type": "Boolean",
+          "title": "是否关联节点属性",
+          "value": "true",
+          "description": "泳道属性是否关联节点属性?",
+          "popular": true
+        }
+      ]
+    },
+    {
+      "name": "propertiesfortaskpackage",
+      "properties": [
+        {
+          "id": "propertiesfortask",
+          "type": "select",
+          "title": "关联属性",
+          "value": "None",
+          "description": "选择关联属性",
+          "popular": true
+        }
+      ]
+    },
+    {
       "name": "namepackage",
       "properties": [
         {
@@ -1986,10 +2012,10 @@ export const AA = {
         "namepackage",
         "documentationpackage",
         "process_idpackage",
-        "isexecutablepackage"
+        "ispropertyfortaskpackage"
       ],
       "hiddenPropertyPackages": [
-
+        "isexecutablepackage"
       ],
       "roles": [
         "canContainArtifacts",
@@ -2009,10 +2035,11 @@ export const AA = {
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
-        "documentationpackage"
+        "documentationpackage",
+        "propertiesfortaskpackage"
       ],
       "hiddenPropertyPackages": [
-
+        "propertiesfortaskpackage"
       ],
       "roles": [
         "PoolChild",
@@ -2040,7 +2067,7 @@ export const AA = {
         "namepackage",
         "documentationpackage",
         "process_idpackage",
-        "isexecutablepackage"
+        "ispropertyfortaskpackage"
       ],
       "hiddenPropertyPackages": [
 
@@ -2063,10 +2090,11 @@ export const AA = {
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
-        "documentationpackage"
+        "documentationpackage",
+        "propertiesfortaskpackage"
       ],
       "hiddenPropertyPackages": [
-
+        "propertiesfortaskpackage"
       ],
       "roles": [
         "V-PoolChild",

@@ -303,7 +303,6 @@ export default class BPMN2_0 extends AbstractPlugin {
     this.facade = facade
 
     this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDOCKER_DOCKED, this.handleDockerDocked.bind(this))
-    this.facade.registerOnEvent(ORYX_Config.EVENT_PROPWINDOW_PROP_CHANGED, this.handlePropertyChanged.bind(this))
     this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
     this.facade.registerOnEvent('layout.bpmn2_0.subprocess', this.handleSubProcess.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this))
@@ -602,57 +601,6 @@ export default class BPMN2_0 extends AbstractPlugin {
     }
   }
 
-  /**
-   * PropertyWindow.PropertyChanged Handler
-   */
-  handlePropertyChanged (option) {
-    let namespace = this.getNamespace()
-
-    let shapes = option.elements
-    let propertyKey = option.key
-    let propertyValue = option.value
-
-    let changed = false
-    shapes.each(function (shape) {
-      if ((shape.getStencil().id() === namespace + 'SequenceFlow') &&
-        (propertyKey === 'oryx-conditiontype')) {
-
-        if (propertyValue != 'Expression')
-        // Do not show the Diamond
-          shape.setProperty('oryx-showdiamondmarker', false)
-        else {
-          let incomingShapes = shape.getIncomingShapes()
-
-          if (!incomingShapes) {
-            shape.setProperty('oryx-showdiamondmarker', true)
-          }
-
-          let incomingGateway = incomingShapes.find(function (aShape) {
-            let foundGateway = aShape.getStencil().groups().find(function (group) {
-              if (group == 'Gateways')
-                return group
-            })
-            if (foundGateway)
-              return foundGateway
-          })
-
-          if (!incomingGateway)
-          // show diamond on edge source
-            shape.setProperty('oryx-showdiamondmarker', true)
-          else
-          // do not show diamond
-            shape.setProperty('oryx-showdiamondmarker', false)
-        }
-
-        changed = true
-      }
-    }.bind(this))
-
-    if (changed) {
-      this.facade.getCanvas().update()
-    }
-
-  }
   /**
    * Handler for layouting event 'layout.bpmn2_0.pool'
    * @param {Object} event
@@ -1377,7 +1325,6 @@ export default class BPMN2_0 extends AbstractPlugin {
    * @param {boolean} recursive
    */
   getLanes (shape, recursive) {
-    console.log(21111, shape, recursive)
     let namespace = this.getNamespace()
     let id = shape.getStencil().idWithoutNs()
     let laneName = 'Lane'

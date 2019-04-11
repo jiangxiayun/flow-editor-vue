@@ -3,6 +3,7 @@ import ORYX_Config from '../CONFIG'
 import ORYX_Log from '../Log'
 import ORYX_Editor from '../Editor'
 import { DataManager } from '../Kickstart'
+import ORYX_Node from '../core/Node'
 
 /**
  This abstract plugin class can be used to build plugins on.
@@ -345,7 +346,6 @@ export default class AbstractPlugin {
     }
   }
 
-
   /**
    * Does a primitive layouting with the incoming/outgoing
    * edges (set the dockers to the right position) and if
@@ -538,4 +538,5 @@ export default class AbstractPlugin {
 
     this.facade.executeCommands([new Command(allEdges, node, offset, this)])
   }
+
 }

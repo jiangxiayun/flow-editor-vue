@@ -262,7 +262,7 @@ export default class KeysMove extends AbstractPlugin {
       }
     }
 
-    command = new undockEdgeCommand(shapes)
+    const command = new undockEdgeCommand(shapes)
     command.execute()
     return command
   }

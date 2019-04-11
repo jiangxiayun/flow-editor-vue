@@ -187,6 +187,10 @@ export const FLOWABLE = {
     'oryx-important_level-select': {
       'readModeTemplateUrl': 'default-value-display-template',
       'writeModeTemplateUrl': 'multiinstance-property-write-template'
+    },
+    'oryx-propertiesfortask-select': {
+      'readModeTemplateUrl': 'default-value-display-template',
+      'writeModeTemplateUrl': 'lane-property-write-template'
     }
   },
   TOOLBAR_CONFIG: {

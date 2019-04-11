@@ -19,7 +19,6 @@ export default class AbstractLayouter extends AbstractPlugin {
    * @memberOf ORYX.Plugins.AbstractLayouter.prototype
    */
 
-
   /**
    * Constructor
    * @param {Object} facade
@@ -66,6 +65,7 @@ export default class AbstractLayouter extends AbstractPlugin {
    * @memberOf ORYX.Plugins.AbstractLayouter.prototype
    */
   _initLayout (event) {
+    console.log('_initLayout')
     // Get the shapes
     let shapes = [event.shapes].flatten().compact()
 

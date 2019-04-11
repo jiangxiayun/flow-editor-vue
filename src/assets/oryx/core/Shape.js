@@ -362,7 +362,6 @@ export default class Shape extends AbstractShape {
         // do layouting
         this._delegateEvent(event)
       }.bind(this))
-
     }
   }
 
