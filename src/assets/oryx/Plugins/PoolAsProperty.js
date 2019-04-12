@@ -12,22 +12,23 @@ import ORYX_Controls from '../core/Controls/index'
 import ORYX_Config from '../CONFIG'
 import ORYX_Utils from '../Utils'
 
+const LaneLinkProperties = [
+  "oryx-department",
+  "oryx-activerole",
+  "oryx-activesystem",
+]
+
 export default class PoolAsProperty extends AbstractPlugin {
   constructor (facade) {
     super(facade)
     this.facade = facade
     this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_PROPWINDOW_PROP_CHANGED, this.handlePropertyChanged.bind(this))
-    this.namespace = undefined
   }
 
   handleLayoutPool (event) {
     let pool = event.shape
     let ifAsPro = pool.properties.get('oryx-ispropertyfortask')
-    console.log('ifAsPro', ifAsPro)
-    if (!ifAsPro) {
-      return false
-    }
     // Get all the child lanes
     let lanes = pool.getChildNodes(false).findAll(function (node) {
       return node.getStencil().id().endsWith('Lane')
@@ -35,26 +36,31 @@ export default class PoolAsProperty extends AbstractPlugin {
     if (lanes.length <= 0) {
       return
     }
-    // 将泳道的属性设置到节点上
-    for (let i in lanes) {
-      let lane = lanes[i]
-      let propertiesfortask = pool.properties.get('oryx-propertiesfortask')
-      if (!propertiesfortask) {
-        return false
-      }
-      console.log('propertiesfortask', propertiesfortask)
-      let bound = lane.bounds
-      // let properties = lane.getStencil().properties()
-      let inBoundNodes = this.findChindsInBound(bound)
-      propertiesfortask.map((pro) => {
-        let lane_pro_value = lane.properties.get(pro)
-        if (lane_pro_value) {
-          inBoundNodes.map((ele) => {
-            ele.setProperty(pro, lane_pro_value)
-          })
+    lanes.each ((lane) => {
+      if (!ifAsPro) {
+        // 泳道不关联节点属性
+        lane.getStencil().property('oryx-propertiesfortask').disableHiddenPro()
+      } else {
+        // 泳道关联节点属性,单一维度
+        lane.getStencil().property('oryx-propertiesfortask').enableHiddenPro()
+        let propertyfortask = lane.properties.get('oryx-propertiesfortask')
+        // 若没有设置维度，结束
+        if (!propertyfortask || propertyfortask === 'None') {
+          return false
         }
-      })
-    }
+        console.log('泳道维度:', propertyfortask, propertyfortask_Value)
+        lane.getStencil().property(propertyfortask).enableHiddenPro()
+        console.log(2333, lane.getStencil().property(propertyfortask))
+        let propertyfortask_Value = lane.properties.get(propertyfortask)
+        // 将泳道的属性设置到节点上
+        let bound = lane.bounds
+        // let properties = lane.getStencil().properties()
+        let inBoundNodes = this.findChindsInBound(bound)
+        inBoundNodes.map((ele) => {
+          ele.setProperty(propertyfortask, propertyfortask_Value)
+        })
+      }
+    })
   }
 
   findChindsInBound (bound) {
@@ -78,8 +84,6 @@ export default class PoolAsProperty extends AbstractPlugin {
    * PropertyWindow.PropertyChanged Handler
    */
   handlePropertyChanged (option) {
-    let namespace = this.getNamespace()
-
     let shapes = option.elements
     let propertyKey = option.key
     let propertyValue = option.value
@@ -87,7 +91,7 @@ export default class PoolAsProperty extends AbstractPlugin {
     console.log('propertyKey', propertyKey)
     let changed = false
     shapes.each(function (shape) {
-      if ((shape.getStencil().id() === namespace + 'SequenceFlow') &&
+      if ((shape.getStencil().id().endsWith('SequenceFlow')) &&
         (propertyKey === 'oryx-conditiontype')) {
 
         if (propertyValue != 'Expression')
@@ -118,6 +122,18 @@ export default class PoolAsProperty extends AbstractPlugin {
         }
 
         changed = true
+      }
+
+      if (shape.getStencil().id().endsWith('Lane')) {
+        // 泳道维度变化
+        if (propertyKey === 'oryx-propertiesfortask') {
+          LaneLinkProperties.map((pro) => {
+            if (pro != propertyValue) {
+              // shape.getStencil().property(pro).disableHiddenPro()
+            }
+          })
+        }
+
       }
     }.bind(this))
 

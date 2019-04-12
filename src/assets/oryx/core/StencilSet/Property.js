@@ -413,4 +413,12 @@ export default class Property {
     return this._hidden
   }
 
+  // 打开隐藏的属性
+  enableHiddenPro () {
+    this._hidden = false
+  }
+  // 关闭（恢复）隐藏的属性
+  disableHiddenPro () {
+    this._hidden = true
+  }
 }

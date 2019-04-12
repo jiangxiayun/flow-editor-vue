@@ -32,6 +32,47 @@ export const AA = {
       ]
     },
     {
+      "name": "departmentpackage",
+      "properties": [
+        {
+          "id": "department",
+          "type": "Complex",
+          "title": "部门",
+          "value": "",
+          "description": "选择活动节点所在部门",
+          "popular": true,
+        }
+      ]
+    },
+    {
+      "name": "activerolepackage",
+      "properties": [
+        {
+          "id": "activerole",
+          "type": "Complex",
+          "title": "角色",
+          "value": "",
+          "description": "选择活动节点所属角色",
+          "popular": true,
+          "refToView": "text_role"
+        }
+      ]
+    },
+    {
+      "name": "activesystempackage",
+      "properties": [
+        {
+          "id": "activesystem",
+          "type": "select",
+          "title": "系统",
+          "value": "None",
+          "description": "选择活动节点落地系统",
+          "popular": true,
+          "refToView": "text_system"
+        }
+      ]
+    },
+    {
       "name": "numberepackage",
       "properties": [
         {
@@ -1790,6 +1831,9 @@ export const AA = {
         "inputpackage",
         "important_levelpackage",
         "attachmentpackage",
+        "departmentpackage",
+        "activerolepackage",
+        "activesystempackage"
       ],
       "hiddenPropertyPackages": [
 
@@ -1997,7 +2041,7 @@ export const AA = {
       "id": "Pool",
       "title": "泳池",
       "description": "A pool to stucture the process definition",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"600\"\n   height=\"250\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"0\" oryx:cy=\"124\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"249\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"599\" oryx:cy=\"124\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"0\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"299\" oryx:cy=\"124\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"none\" >\n    <defs>\n\t\t<radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"100%\" fx=\"20%\" fy=\"10%\">\n\t\t\t<stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t\t<stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t</radialGradient>\n\t</defs>\n\t  \t\n  \t<rect\n  \t\tid=\"border\"\n  \t\tclass=\"stripable-element-force\"\n  \t\toryx:resize=\"vertical horizontal\"\n  \t\tx=\"0\"\n  \t\ty=\"0\"\n  \t\twidth=\"600\"\n  \t\theight=\"250\"\n  \t\tfill=\"none\"\n  \t\tstroke-width=\"9\"\n  \t\tstroke=\"none\"\n  \t\tvisibility=\"visible\"\n  \t\tpointer-events=\"stroke\"\n  \t/>\n    <rect\n    \tid=\"c\"\n    \toryx:resize=\"vertical horizontal\"\n    \tx=\"0\"\n    \ty=\"0\"\n    \twidth=\"600\" \n    \theight=\"250\" \n    \tstroke=\"black\" \n    \tfill=\"url(#background) white\"\n    \tfill-opacity=\"0.3\" \n    />\n    \n\t<rect \n\t\tid=\"caption\"\n\t\toryx:anchors=\"left top bottom\"\n\t\tx=\"0\"\n\t\ty=\"0\"\n\t\twidth=\"30\"\n\t\theight=\"250\"\n\t\tstroke=\"black\"\n\t\tstroke-width=\"1\"\n\t\tfill=\"url(#background) white\"\n\t\tpointer-events=\"all\"\n\t/>\n\t\n\t<rect \n\t\tid=\"captionDisableAntialiasing\"\n\t\toryx:anchors=\"left top bottom\"\n\t\tx=\"0\"\n\t\ty=\"0\"\n\t\twidth=\"30\"\n\t\theight=\"250\"\n\t\tstroke=\"black\"\n\t\tstroke-width=\"1\"\n\t\tfill=\"url(#background) white\"\n\t\tpointer-events=\"all\"\n\t/>\n\t\n    <text x=\"13\" y=\"125\" font-size=\"12\" id=\"text_name\" oryx:fittoelem=\"caption\" oryx:align=\"middle center\" oryx:anchors=\"left\" oryx:rotate=\"270\" fill=\"black\" stroke=\"black\"></text>\n    \n  </g>\n</svg>",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"600\" height=\"250\" version=\"1.0\"><defs></defs><oryx:magnets><oryx:magnet oryx:cx=\"0\" oryx:cy=\"124\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"299\" oryx:cy=\"249\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"599\" oryx:cy=\"124\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"299\" oryx:cy=\"0\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"299\" oryx:cy=\"124\" oryx:default=\"yes\" /></oryx:magnets><g pointer-events=\"none\" ><defs></defs><rect id=\"border\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" fill=\"none\" stroke-width=\"9\" stroke=\"none\" visibility=\"visible\" pointer-events=\"stroke\"/><rect id=\"c\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" stroke=\"black\" fill=\"none\" fill-opacity=\"0.3\"/><rect id=\"caption\" oryx:anchors=\"left top bottom\" x=\"0\" y=\"0\" width=\"30\" height=\"250\" stroke=\"black\" stroke-width=\"1\" fill=\"white\" pointer-events=\"all\"/><rect id=\"captionDisableAntialiasing\" oryx:anchors=\"left top bottom\" x=\"0\" y=\"0\" width=\"30\" height=\"250\" stroke=\"black\" stroke-width=\"1\" fill=\"white\" pointer-events=\"all\"/><text x=\"13\" y=\"125\" font-size=\"12\" id=\"text_name\" oryx:fittoelem=\"caption\" oryx:align=\"middle center\" oryx:anchors=\"left\" oryx:rotate=\"270\" fill=\"black\" stroke=\"black\">部门/角色/人员</text></g></svg>",
       "icon": "swimlane/pool.png",
       "groups": [
         "水平泳道"
@@ -2027,7 +2071,7 @@ export const AA = {
       "id": "Lane",
       "title": "泳道",
       "description": "A lane to stucture the process definition",
-      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"600\"\n   height=\"250\"\n   version=\"1.0\">\n  <defs></defs>\n  <g pointer-events=\"none\" >\n  \n     <defs>\n\t\t<radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"200%\" fx=\"20%\" fy=\"10%\">\n\t\t\t<stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/>\n\t\t\t<stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"0\"/>\n\t\t</radialGradient>\n\t</defs>\n\t\n  \t<rect id=\"border_invisible\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" visibility=\"hidden\" pointer-events=\"stroke\"/>\t\t\n\t<rect id=\"border\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) white\" pointer-events=\"none\" />\n\t\n\t\n\t<rect \n\t\tid=\"caption\"\n\t\toryx:anchors=\"left top bottom\"\n\t\tx=\"0\"\n\t\ty=\"1\"\n\t\twidth=\"30\"\n\t\theight=\"248\"\n\t\tstroke=\"black\"\n\t\tstroke-width=\"0\"\n\t\tfill=\"white\"\n\t\tvisibility=\"hidden\"\n\t\tclass=\"stripable-element-force\"\n\t\tpointer-events=\"all\"\n\t/>\n\t\n\t<path\n\t\tstroke=\"black\"\n\t\tstroke-width=\"1\"\n\t\tfill=\"none\"\n\t\td=\"M 0,0 L 0,250\"\n        oryx:anchors=\"left top bottom\"\n        id=\"captionDisableAntialiasing\"\n    />\n\t\n\t<!--rect \n\t\tid=\"captionDisableAntialiasing\"\n\t\toryx:anchors=\"left top bottom\"\n\t\tx=\"0\"\n\t\ty=\"0\"\n\t\twidth=\"30\"\n\t\theight=\"250\"\n\t\tstroke=\"black\"\n\t\tstroke-width=\"1\"\n\t\tfill=\"url(#background) white\"\n\t/-->\n\t\n    <text \n\t\tx=\"13\"\n\t\ty=\"125\"\n\t\toryx:rotate=\"270\" \n\t\tfont-size=\"12\" \n\t\tid=\"text_name\" \n\t\toryx:align=\"middle center\" \n\t\toryx:anchors=\"left\"\n\t\toryx:fittoelem=\"caption\"\n\t\tfill=\"black\" \n\t\tstroke=\"black\">\n\t</text>\n  </g>\n</svg>",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"600\" height=\"250\" version=\"1.0\"><defs></defs><g pointer-events=\"none\" ><defs></defs><rect id=\"border_invisible\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" visibility=\"hidden\" pointer-events=\"stroke\"/><rect id=\"border\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" stroke=\"black\" stroke-width=\"1\" fill=\"none\" pointer-events=\"none\" /><rect id=\"caption\" oryx:anchors=\"left top bottom\" x=\"-1\" y=\"0\" width=\"30\" height=\"250\" stroke=\"black\" stroke-width=\"1\" stroke-dasharray='10' fill=\"white\" class=\"stripable-element-force\" pointer-events=\"all\"/><path stroke=\"black\" stroke-width=\"1\" fill=\"none\" d=\"M 0,0 L 0,250\" oryx:anchors=\"left top bottom\" id=\"captionDisableAntialiasing\"/><text x=\"13\" y=\"125\" oryx:rotate=\"270\" font-size=\"12\" id=\"text_name\" oryx:align=\"middle center\" oryx:anchors=\"left\" oryx:fittoelem=\"caption\" fill=\"black\" stroke=\"black\"></text></g></svg>",
       "icon": "swimlane/lane.png",
       "groups": [
         "水平泳道"
@@ -2036,10 +2080,16 @@ export const AA = {
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
-        "propertiesfortaskpackage"
+        "propertiesfortaskpackage",
+        "departmentpackage",
+        "activerolepackage",
+        "activesystempackage"
       ],
       "hiddenPropertyPackages": [
-        "propertiesfortaskpackage"
+        "propertiesfortask",
+        "department",
+        "activerole",
+        "activesystem"
       ],
       "roles": [
         "PoolChild",
@@ -2091,10 +2141,16 @@ export const AA = {
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
-        "propertiesfortaskpackage"
+        "propertiesfortaskpackage",
+        "departmentpackage",
+        "activerolepackage",
+        "activesystempackage"
       ],
       "hiddenPropertyPackages": [
-        "propertiesfortaskpackage"
+        "propertiesfortask",
+        "department",
+        "activerole",
+        "activesystem"
       ],
       "roles": [
         "V-PoolChild",

@@ -11,7 +11,7 @@
 
 <script>
   export default {
-    name: 'lane-property-write-template',
+    name: 'system-write-template',
     props: {
       property: {
         type: Object

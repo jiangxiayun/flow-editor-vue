@@ -30,6 +30,7 @@
                  :key="index"
                  :class="{'clear': index%2 == 0}"
                  @click="propertyClicked(index)">
+              <!--{{property}}-->
               <span class="title" v-if="!property.hidden">{{ property.title }}&nbsp;:</span>
               <span class="title-removed" v-if="property.hidden">
                 <i>{{ property.title }}&nbsp;({{$t('PROPERTY.REMOVED')}})&nbsp;:</i>
@@ -99,6 +100,7 @@
   import conditionExpressionWriteTemplate from '@/components/propertyForm/condition-expression-write-template'
   import multiinstancePropertyWriteTemplate from '@/components/propertyForm/multiinstance-property-write-template'
   import lanePropertyWriteTemplate from '@/components/propertyForm/lane-property-write-template'
+  import systemWriteTemplate from '@/components/propertyForm/system-write-template'
 
   export default {
     name: 'propertySection',
@@ -145,7 +147,8 @@
       taskListenersDisplayTemplate, taskListenersWriteTemplate,
       conditionExpressionDisplayTemplate, conditionExpressionWriteTemplate,
       multiinstancePropertyWriteTemplate,
-      lanePropertyWriteTemplate
+      lanePropertyWriteTemplate,
+      systemWriteTemplate
     },
     mounted () {
       /*

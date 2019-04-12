@@ -191,6 +191,18 @@ export const FLOWABLE = {
     'oryx-propertiesfortask-select': {
       'readModeTemplateUrl': 'default-value-display-template',
       'writeModeTemplateUrl': 'lane-property-write-template'
+    },
+    'oryx-department-complex': {
+      'readModeTemplateUrl': 'form-reference-display-template',
+      'writeModeTemplateUrl': 'form-reference-write-template'
+    },
+    'oryx-activerole-complex': {
+      'readModeTemplateUrl': 'form-reference-display-template',
+      'writeModeTemplateUrl': 'form-reference-write-template'
+    },
+    'oryx-activesystem-select': {
+      'readModeTemplateUrl': 'default-value-display-template',
+      'writeModeTemplateUrl': 'system-write-template'
     }
   },
   TOOLBAR_CONFIG: {
