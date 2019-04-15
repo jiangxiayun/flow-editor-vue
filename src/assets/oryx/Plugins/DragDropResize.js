@@ -201,7 +201,6 @@ export default class DragDropResize extends AbstractPlugin {
         }
       })
       this.toMoveShapes = this.toMoveShapes.concat(elementInLane)
-      console.log('onSelectionChanged', this.toMoveShapes)
 
       // Set the new bounds
       this.dragBounds = newBounds

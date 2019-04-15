@@ -1,7 +1,7 @@
 <template>
   <!--表单信息区域-->
   <div id="propertiesHelpWrapper" class="col-xs-12">
-<!--{{selectedShape}}-->
+    {{laneEnableValue}}
     <div class="propertySection" id="propertySection"
          :class="{collapsed: propertyWindowState.collapsed}">
       <div class="selected-item-section">
@@ -28,8 +28,12 @@
           <div>
             <div class="property-row" v-for="(property, index) in selectedItem.properties"
                  :key="index"
-                 :class="{'clear': index%2 == 0}"
-                 @click="propertyClicked(index)">
+                 :class="{'clear': index%2 == 0,
+                 'disable-pro': currentShapeType.endsWith('Lane') &&
+                 laneEnableValue &&
+                 laneValueAry.includes(property.key) &&
+                 property.key != laneEnableValue}"
+                 @click="propertyClicked(property)">
               <!--{{property}}-->
               <span class="title" v-if="!property.hidden">{{ property.title }}&nbsp;:</span>
               <span class="title-removed" v-if="property.hidden">
@@ -125,7 +129,9 @@
           properties: [],
           auditData: {}
         },
-        selectedShape: {}
+        selectedShape: {},
+        laneEnableValue: '',
+        laneValueAry: ['oryx-activerole', 'oryx-activesystem']
       }
     },
     props: {
@@ -164,18 +170,34 @@
           event.property.noValue = (event.property.value === undefined
             || event.property.value === null
             || event.property.value.length == 0)
+
+          if (this.laneValueAry.includes(event.property.key)) {
+            this.laneEnableValue = event.property.noValue ? '' : event.property.key
+          }
         }
+
       })
       FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, (event) => {
+        this.laneEnableValue = ''
         if (this.currentSelectedProperty.mode != 'write') {
           this.selectedItem = event.selectedItem
           this.selectedShape = event.selectedShape
+        }
+        if (event.selectedShape.getStencil().id().endsWith('Lane')) {
+          event.selectedItem.properties.map((pro) => {
+            if (this.laneValueAry.includes(pro.key) && !pro.noValue) {
+              this.laneEnableValue = pro.key
+            }
+          })
         }
       })
     },
     computed: {
       modelData () {
         return this.editorManager ? this.editorManager.getBaseModelData() : {}
+      },
+      currentShapeType () {
+        return this.selectedShape ? this.selectedShape.getStencil().idWithoutNs() : null
       }
     },
     methods: {
@@ -186,11 +208,14 @@
         }, 100)
       },
       /* Click handler for clicking a property */
-      propertyClicked (index) {
-        if (!this.selectedItem.properties[index].hidden) {
-          this.selectedItem.properties[index].mode = 'write'
+      propertyClicked (property) {
+        if (!(this.currentShapeType.endsWith('Lane') && this.laneEnableValue &&
+          this.laneValueAry.includes(property.key) && property.key != this.laneEnableValue)) {
+          if (!property.hidden) {
+            property.mode = 'write'
+          }
+          this.currentSelectedProperty = property
         }
-        this.currentSelectedProperty = this.selectedItem.properties[index]
       },
       // 获取字段对应的渲染组件
       getTemplateComponentName (property) {

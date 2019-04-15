@@ -1,7 +1,7 @@
 <template>
   <div>
     <select v-model="property.value" @change="multiInstanceChanged" @click.stop>
-      <option value="None">None</option>
+      <option value="">None</option>
       <option value="oryx-department">部门</option>
       <option value="oryx-activerole">角色</option>
       <option value="oryx-activesystem">系统</option>
@@ -18,9 +18,9 @@
       }
     },
     mounted () {
-      if (this.property.value === undefined && this.property.value === null) {
-        this.property.value = 'None';
-      }
+      // if (this.property.value === undefined && this.property.value === null) {
+      //   this.property.value = 'None';
+      // }
     },
     methods: {
       multiInstanceChanged () {

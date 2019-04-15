@@ -13,57 +13,104 @@ import ORYX_Config from '../CONFIG'
 import ORYX_Utils from '../Utils'
 
 const LaneLinkProperties = [
-  "oryx-department",
-  "oryx-activerole",
-  "oryx-activesystem",
+  'oryx-department',
+  'oryx-activerole',
+  'oryx-activesystem'
 ]
+
 
 export default class PoolAsProperty extends AbstractPlugin {
   constructor (facade) {
     super(facade)
     this.facade = facade
+    this.poolH = {}
+    this.poolV = {}
     this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_PROPWINDOW_PROP_CHANGED, this.handlePropertyChanged.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this))
+  }
+
+  onSelectionChanged (event) {
+    let elements = event.elements
+    console.log('onSelectionChanged', elements)
+    if (!elements || elements.length == 0) {
+      return
+    }
+
+    let lanes_H = this.getAllLanes(this.poolH)
+    if (lanes_H.length <= 0) {
+      return
+    }
+    lanes_H.map((lane) => {
+      this.setPropertiesWinthinLane(lane, elements)
+    })
+    let lanes_V = this.getAllLanes(this.poolV)
+    if (lanes_V.length <= 0) {
+      return
+    }
+    lanes_V.map((lane) => {
+      this.setPropertiesWinthinLane(lane, elements)
+    })
+  }
+
+  getAllLanes (pools, recursive) {
+    let lanes = []
+    for (let i in pools) {
+      let pool = pools[i]
+      let ls = pool.getChildNodes(recursive || false).findAll(function (node) {
+        return (node.getStencil().id().endsWith('Lane'))
+      })
+      lanes = lanes.concat(ls)
+    }
+
+    return lanes
+  }
+
+  setass (lanes, elements) {
+    this.setass(lanes, elements)
+  }
+  setPropertiesWinthinLane (lane, elements) {
+    let bound = lane.bounds
+    elements.map(function (shape) {
+      if (shape instanceof ORYX_Node) {
+        let absBounds = shape.absoluteBounds()
+        let bA = absBounds.upperLeft()
+        let bB = absBounds.lowerRight()
+        if (bA.x > bound.a.x && bA.y > bound.a.y && bB.x < bound.b.x && bB.y < bound.b.y) {
+          LaneLinkProperties.map((pro) => {
+            let value = lane.properties.get(pro)
+            value ?  shape.setProperty(pro, value) : null
+          })
+          return true
+        }
+      }
+
+      return false
+    })
   }
 
   handleLayoutPool (event) {
     let pool = event.shape
-    let ifAsPro = pool.properties.get('oryx-ispropertyfortask')
-    // Get all the child lanes
-    let lanes = pool.getChildNodes(false).findAll(function (node) {
-      return node.getStencil().id().endsWith('Lane')
-    })
-    if (lanes.length <= 0) {
-      return
+    let shape_id = pool.id
+    let type = pool.getStencil().idWithoutNs()
+    if (type === 'Pool') {
+      this.poolH[shape_id] = pool
+    } else if (type === 'V-Pool') {
+      this.poolV[shape_id] = pool
     }
-    lanes.each ((lane) => {
-      if (!ifAsPro) {
-        // 泳道不关联节点属性
-        lane.getStencil().property('oryx-propertiesfortask').disableHiddenPro()
-      } else {
-        // 泳道关联节点属性,单一维度
-        lane.getStencil().property('oryx-propertiesfortask').enableHiddenPro()
-        let propertyfortask = lane.properties.get('oryx-propertiesfortask')
-        // 若没有设置维度，结束
-        if (!propertyfortask || propertyfortask === 'None') {
-          return false
-        }
-        console.log('泳道维度:', propertyfortask, propertyfortask_Value)
-        lane.getStencil().property(propertyfortask).enableHiddenPro()
-        console.log(2333, lane.getStencil().property(propertyfortask))
-        let propertyfortask_Value = lane.properties.get(propertyfortask)
-        // 将泳道的属性设置到节点上
-        let bound = lane.bounds
-        // let properties = lane.getStencil().properties()
-        let inBoundNodes = this.findChindsInBound(bound)
-        inBoundNodes.map((ele) => {
-          ele.setProperty(propertyfortask, propertyfortask_Value)
-        })
-      }
-    })
   }
 
-  findChindsInBound (bound) {
+  handleShapeRemove (option) {
+    let sh = option.shape
+    let type = sh.getStencil().idWithoutNs()
+    if (type === 'Pool') {
+      delete this.poolH[sh.id]
+    } else if (type === 'V-Pool') {
+      delete this.poolV[sh.id]
+    }
+  }
+
+  findCanvasChindsInBound (bound) {
     // Calculate the elements from the childs of the canvas
     let elements = this.facade.getCanvas().getChildShapes(true).findAll(function (value) {
       if (value instanceof ORYX_Node) {
@@ -80,6 +127,7 @@ export default class PoolAsProperty extends AbstractPlugin {
 
     return elements
   }
+
   /**
    * PropertyWindow.PropertyChanged Handler
    */
@@ -124,17 +172,17 @@ export default class PoolAsProperty extends AbstractPlugin {
         changed = true
       }
 
-      if (shape.getStencil().id().endsWith('Lane')) {
-        // 泳道维度变化
-        if (propertyKey === 'oryx-propertiesfortask') {
-          LaneLinkProperties.map((pro) => {
-            if (pro != propertyValue) {
-              // shape.getStencil().property(pro).disableHiddenPro()
-            }
-          })
-        }
-
-      }
+      // if (shape.getStencil().id().endsWith('Lane')) {
+      //   // 泳道维度变化
+      //   if (propertyKey === 'oryx-propertiesfortask') {
+      //     LaneLinkProperties.map((pro) => {
+      //       if (pro != propertyValue) {
+      //         // shape.getStencil().property(pro).disableHiddenPro()
+      //       }
+      //     })
+      //   }
+      //
+      // }
     }.bind(this))
 
     if (changed) {

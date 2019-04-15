@@ -721,7 +721,8 @@ export default class BPMN2_0 extends AbstractPlugin {
       }
 
       if (poolTypeId === 'V-Pool') {
-        width = this.updateVPoolWidth(lanes, pool)
+        // width = this.updateVPoolWidth(lanes, pool)
+        width = this.adjustVLaneWidth(lanes, undefined, pool.bounds.width())
       } else {
         // Set height from the pool
         height = this.adjustHeight(lanes, undefined, pool.bounds.height())
@@ -1031,21 +1032,46 @@ export default class BPMN2_0 extends AbstractPlugin {
     this.setDimensions(root, width)
     return width
   }
-  adjustVLaneWidth (lanes, width) {
-    (lanes || []).each(function (lane) {
-      this.setDimensions(lane, width)
-      this.adjustVLaneWidth(this.getLanes(lane), width)
-    }.bind(this))
+
+  adjustVLaneWidth (lanes, changedLane, propagateWidth) {
+    let oldWidth = 0
+    if (!changedLane && propagateWidth) {
+      let i = -1
+      while (++i < lanes.length) {
+        oldWidth += lanes[i].bounds.width()
+      }
+    }
+    let i = -1
+    let width = 0
+    while (++i < lanes.length) {
+      if (lanes[i] === changedLane) {
+        // Propagate new height down to the children
+        this.adjustVLaneWidth(this.getLanes(lanes[i]), undefined, lanes[i].bounds.width())
+
+        lanes[i].bounds.set({ x: width, y: 30 }, {
+          x: lanes[i].bounds.width() + width,
+          y: lanes[i].bounds.height() + 30
+        })
+
+      } else if (!changedLane && propagateWidth) {
+        let tempWidth = (lanes[i].bounds.width() * propagateWidth) / oldWidth
+        this.adjustVLaneWidth(this.getLanes(lanes[i]), undefined, tempWidth)
+        this.setDimensions(lanes[i], tempWidth, null)
+        this.setLanePosition(lanes[i], width, null)
+      } else {
+        // Get height from children
+        let tempWidth = this.adjustVLaneWidth(this.getLanes(lanes[i]), changedLane, propagateWidth)
+        if (!tempWidth) {
+          tempWidth = lanes[i].bounds.width()
+        }
+        this.setDimensions(lanes[i], tempWidth, null)
+        this.setLanePosition(lanes[i], width, null)
+      }
+
+      width += lanes[i].bounds.width()
+    }
+
     return width
-  }
-
-  adjustVLaneHeight (lanes, height) {
-    (lanes || []).each(function (lane) {
-      this.setDimensions(lane, null, height)
-      this.adjustVLaneHeight(this.getLanes(lane), height)
-    }.bind(this))
-
-    return height
   }
 
   adjustWidth (lanes, width) {

@@ -65,7 +65,7 @@ export const AA = {
           "id": "activesystem",
           "type": "select",
           "title": "系统",
-          "value": "None",
+          "value": "",
           "description": "选择活动节点落地系统",
           "popular": true,
           "refToView": "text_system"
@@ -2055,8 +2055,7 @@ export const AA = {
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
-        "process_idpackage",
-        "ispropertyfortaskpackage"
+        "process_idpackage"
       ],
       "hiddenPropertyPackages": [
         "isexecutablepackage"
@@ -2080,16 +2079,12 @@ export const AA = {
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
-        "propertiesfortaskpackage",
         "departmentpackage",
         "activerolepackage",
         "activesystempackage"
       ],
       "hiddenPropertyPackages": [
-        "propertiesfortask",
-        "department",
-        "activerole",
-        "activesystem"
+
       ],
       "roles": [
         "PoolChild",
@@ -2116,8 +2111,7 @@ export const AA = {
         "overrideidpackage",
         "namepackage",
         "documentationpackage",
-        "process_idpackage",
-        "ispropertyfortaskpackage"
+        "process_idpackage"
       ],
       "hiddenPropertyPackages": [
 
@@ -2140,17 +2134,10 @@ export const AA = {
       "propertyPackages": [
         "overrideidpackage",
         "namepackage",
-        "documentationpackage",
-        "propertiesfortaskpackage",
-        "departmentpackage",
-        "activerolepackage",
-        "activesystempackage"
+        "documentationpackage"
       ],
       "hiddenPropertyPackages": [
-        "propertiesfortask",
-        "department",
-        "activerole",
-        "activesystem"
+
       ],
       "roles": [
         "V-PoolChild",

@@ -280,7 +280,9 @@ div.propertySection {
 .selected-item-body .property-row:hover {
     background-color: #d7dfe6;
 }
-
+.selected-item-body .property-row.disable-pro {
+    background: #b7b2b2;
+}
 .selected-item-body {
     padding: 0;
     overflow: auto;
