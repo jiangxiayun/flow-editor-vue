@@ -1130,7 +1130,6 @@ export default class BPMN2_0 extends AbstractPlugin {
   }
 
   updateHeight (root) {
-    console.log(888)
     let lanes = this.getLanes(root)
 
     if (lanes.length === 0 || root.getStencil().idWithoutNs() === 'V-Pool') {

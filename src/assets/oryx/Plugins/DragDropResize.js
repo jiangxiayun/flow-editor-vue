@@ -121,7 +121,8 @@ export default class DragDropResize extends AbstractPlugin {
 
       this.toMoveShapes = this.toMoveShapes.findAll(function (shape) {
         return shape instanceof ORYX_Node &&
-          (shape.dockers.length === 0 || !elements.member(shape.dockers.first().getDockedShape()))
+          (shape.dockers.length === 0 || !elements.member(shape.dockers.first().getDockedShape())) &&
+          !shape.getStencil().id().endsWith('Lane')
       })
 
       elements.each((function (shape) {
@@ -534,7 +535,7 @@ export default class DragDropResize extends AbstractPlugin {
     let checkIfAttachable = this.toMoveShapes.length === 1 &&
       this.toMoveShapes[0] instanceof ORYX_Node &&
       this.toMoveShapes[0].dockers.length > 0
-    console.log(233, checkIfAttachable, underlyingNodes, this._currentUnderlyingNodes)
+    // console.log(233, checkIfAttachable, underlyingNodes, this._currentUnderlyingNodes)
 
     checkIfAttachable = checkIfAttachable && underlyingNodes.length != 1
 

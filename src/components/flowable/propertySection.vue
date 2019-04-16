@@ -26,7 +26,8 @@
         </div>
         <div class="selected-item-body">
           <div>
-            <div class="property-row" v-for="(property, index) in selectedItem.properties"
+            <div class="property-row"
+                 v-for="(property, index) in selectedItem.properties"
                  :key="index"
                  :class="{'clear': index%2 == 0,
                  'disable-pro': currentShapeType.endsWith('Lane') &&
@@ -190,6 +191,7 @@
             }
           })
         }
+        console.log(555, this.selectedItem)
       })
     },
     computed: {

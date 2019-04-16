@@ -69,7 +69,6 @@ export default class Shape extends AbstractShape {
     // call base class refresh method
     // arguments.callee.$.refresh.apply(this, arguments);
     super.refresh()
-
     if (this.node.ownerDocument) {
       // adjust SVG to properties' values
       const me = this
@@ -81,12 +80,12 @@ export default class Shape extends AbstractShape {
             this.propertiesChanged.set(propChanged.key, false)
 
             // console.log('property', propChanged.key)
-            // console.log('property.type', property.type())
+            console.log('property.type', property.type())
             // handle choice properties
             if (property.type() == ORYX_Config.TYPE_CHOICE) {
               //iterate all references to SVG elements
               property.refToView().each((function (ref) {
-                //if property is referencing a label, update the label
+                // if property is referencing a label, update the label
                 if (ref !== '') {
                   let label = this._labels.get(this.id + ref)
                   if (label && property.item(prop)) {
@@ -129,7 +128,7 @@ export default class Shape extends AbstractShape {
               // iterate all references to SVG elements
               property.refToView().each((function (ref) {
                 // console.log('ref==========', ref)
-                //if the property does not reference an SVG element,
+                // if the property does not reference an SVG element,
                 // do nothing
                 if (ref === '') {
                   return
@@ -349,6 +348,8 @@ export default class Shape extends AbstractShape {
         label.update()
       })
     }
+
+    this.facade.raiseEvent({ type: 'shape_refreshed', option: this })
   }
 
   layout () {

@@ -474,6 +474,7 @@ export default class EditorManager {
      * Listen to selection change events: show properties
      */
     this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
+      console.log(22222)
       let shapes = event.elements
       let canvasSelected = false
       if (shapes && shapes.length === 0) {
@@ -501,7 +502,9 @@ export default class EditorManager {
         this.previousSelectedShape = this.selectedShape
 
         // Only do something if another element is selected (Oryx fires this event multiple times)
-        if (this.previousSelectedShape !== undefined && this.previousSelectedShape.getId() === selectedShape.getId()) {
+        if (this.previousSelectedShape !== undefined &&
+          (this.previousSelectedShape.getId() === selectedShape.getId() &&
+            selectedShape.getStencil().idWithoutNs() != 'UserTask')) {
           if (this.forceSelectionRefresh) {
             // Switch the flag again, this run will force refresh
             this.forceSelectionRefresh = false

@@ -28,29 +28,13 @@ export default class PoolAsProperty extends AbstractPlugin {
     this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_PROPWINDOW_PROP_CHANGED, this.handlePropertyChanged.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDROP_END, this.handleDragdropEnd.bind(this))
+    this.facade.registerOnEvent('newshape_addin_canvas', this.handleAddShape.bind(this))
+    this.facade.registerOnEvent('shape_refreshed', this.handleShapeRefreshed.bind(this))
   }
 
   onSelectionChanged (event) {
-    let elements = event.elements
-    console.log('onSelectionChanged', elements)
-    if (!elements || elements.length == 0) {
-      return
-    }
-
-    let lanes_H = this.getAllLanes(this.poolH)
-    if (lanes_H.length <= 0) {
-      return
-    }
-    lanes_H.map((lane) => {
-      this.setPropertiesWinthinLane(lane, elements)
-    })
-    let lanes_V = this.getAllLanes(this.poolV)
-    if (lanes_V.length <= 0) {
-      return
-    }
-    lanes_V.map((lane) => {
-      this.setPropertiesWinthinLane(lane, elements)
-    })
+    this.currentShapes = event.elements
   }
 
   getAllLanes (pools, recursive) {
@@ -66,29 +50,6 @@ export default class PoolAsProperty extends AbstractPlugin {
     return lanes
   }
 
-  setass (lanes, elements) {
-    this.setass(lanes, elements)
-  }
-  setPropertiesWinthinLane (lane, elements) {
-    let bound = lane.bounds
-    elements.map(function (shape) {
-      if (shape instanceof ORYX_Node) {
-        let absBounds = shape.absoluteBounds()
-        let bA = absBounds.upperLeft()
-        let bB = absBounds.lowerRight()
-        if (bA.x > bound.a.x && bA.y > bound.a.y && bB.x < bound.b.x && bB.y < bound.b.y) {
-          LaneLinkProperties.map((pro) => {
-            let value = lane.properties.get(pro)
-            value ?  shape.setProperty(pro, value) : null
-          })
-          return true
-        }
-      }
-
-      return false
-    })
-  }
-
   handleLayoutPool (event) {
     let pool = event.shape
     let shape_id = pool.id
@@ -98,34 +59,66 @@ export default class PoolAsProperty extends AbstractPlugin {
     } else if (type === 'V-Pool') {
       this.poolV[shape_id] = pool
     }
+
+    this.allUserTasks = this.findUserTaskInBound()
+    this.setNodesWhenLayoutPool(this.poolH)
+    this.setNodesWhenLayoutPool(this.poolV)
   }
 
   handleShapeRemove (option) {
+    console.log('handleShapeRemove', option)
     let sh = option.shape
-    let type = sh.getStencil().idWithoutNs()
-    if (type === 'Pool') {
-      delete this.poolH[sh.id]
-    } else if (type === 'V-Pool') {
-      delete this.poolV[sh.id]
+    if (sh instanceof ORYX_Node) {
+      let type = sh.getStencil().idWithoutNs()
+      if (type === 'Pool') {
+        delete this.poolH[sh.id]
+      } else if (type === 'V-Pool') {
+        delete this.poolV[sh.id]
+      }
     }
   }
 
-  findCanvasChindsInBound (bound) {
+  findUserTaskInBound () {
     // Calculate the elements from the childs of the canvas
     let elements = this.facade.getCanvas().getChildShapes(true).findAll(function (value) {
-      if (value instanceof ORYX_Node) {
-        let absBounds = value.absoluteBounds()
-        let bA = absBounds.upperLeft()
-        let bB = absBounds.lowerRight()
-        if (bA.x > bound.a.x && bA.y > bound.a.y && bB.x < bound.b.x && bB.y < bound.b.y) {
-          return true
-        }
+      if (value instanceof ORYX_Node && value.getStencil().id().endsWith('UserTask')) {
+        return true
       }
 
       return false
     })
 
     return elements
+  }
+
+  setNodesWhenLayoutPool (pool, elements) {
+    let lanes = this.getAllLanes(pool)
+    let i = -1
+    let tasks = elements || jQuery.extend(true, [], this.allUserTasks)
+    while (++i < lanes.length) {
+      tasks = this.setPropertiesWinthinLane(lanes[i], tasks)
+    }
+  }
+
+  setPropertiesWinthinLane (lane, elements) {
+    let bound = lane.absoluteBounds()
+    let other = elements.findAll(function (shape) {
+      let absBounds = shape.absoluteBounds()
+      let bA = absBounds.upperLeft()
+      let bB = absBounds.lowerRight()
+      if (bA.x > bound.a.x && bA.y > bound.a.y && bB.x < bound.b.x && bB.y < bound.b.y) {
+        LaneLinkProperties.map((pro) => {
+          let value = lane.properties.get(pro)
+          value ?  shape.setProperty(pro, value) : null
+        })
+        return false
+      }
+
+      return true
+    })
+
+    // 返回不在当前泳道内的节点，进入下一次遍历
+    return other
   }
 
   /**
@@ -174,21 +167,64 @@ export default class PoolAsProperty extends AbstractPlugin {
 
       // if (shape.getStencil().id().endsWith('Lane')) {
       //   // 泳道维度变化
-      //   if (propertyKey === 'oryx-propertiesfortask') {
-      //     LaneLinkProperties.map((pro) => {
-      //       if (pro != propertyValue) {
-      //         // shape.getStencil().property(pro).disableHiddenPro()
-      //       }
-      //     })
+      //   if (LaneLinkProperties.includes(propertyKey)) {
+      //     if (propertyValue) {
+      //       shape.getStencil().property(propertyKey).enableHiddenPro()
+      //     } else {
+      //       shape.getStencil().property(propertyKey).disableHiddenPro()
+      //     }
       //   }
-      //
+      //   shape.update()
       // }
     }.bind(this))
-
+    // this.shape.setProperty(this.key, this.oldValue)
+    // this.facade.getCanvas().update()
+    // this.facade.updateSelection()
     if (changed) {
       this.facade.getCanvas().update()
     }
 
   }
 
+  handleDragdropEnd () {
+    this.setNodesWhenLayoutPool(this.poolH, this.currentShapes)
+    this.setNodesWhenLayoutPool(this.poolV, this.currentShapes)
+    this.facade.getCanvas().update()
+    this.facade.updateSelection()
+  }
+
+  findInWhichLane (pool, shape) {
+    let lanes = this.getAllLanes(pool)
+    let i = -1
+    let found = false
+
+    let absoluteBounds = shape.absoluteBounds()
+    let bA = absoluteBounds.upperLeft()
+    let bB = absoluteBounds.lowerRight()
+
+    while (++i < lanes.length && !found) {
+      // let bound = lanes[i].bounds
+      let bound = lanes[i].absoluteBounds()
+      if (bA.x > bound.a.x && bA.y > bound.a.y && bB.x < bound.b.x && bB.y < bound.b.y) {
+        LaneLinkProperties.map((pro) => {
+          let value = lanes[i].properties.get(pro)
+          value ?  shape.setProperty(pro, value) : null
+        })
+      }
+    }
+  }
+  handleAddShape (option) {
+    let shape = option.shape
+    if (shape.getStencil().idWithoutNs() === 'UserTask') {
+      this.findInWhichLane(this.poolH, shape)
+      this.findInWhichLane(this.poolV, shape)
+    }
+  }
+
+  handleShapeRefreshed (event) {
+    let shape = event.option
+    if (shape instanceof ORYX_Node) {
+      console.log(889, shape)
+    }
+  }
 }
