@@ -80,7 +80,6 @@ export default class Shape extends AbstractShape {
             this.propertiesChanged.set(propChanged.key, false)
 
             // console.log('property', propChanged.key)
-            console.log('property.type', property.type())
             // handle choice properties
             if (property.type() == ORYX_Config.TYPE_CHOICE) {
               //iterate all references to SVG elements

@@ -31,7 +31,13 @@ export default class PoolAsProperty extends AbstractPlugin {
     this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDROP_END, this.handleDragdropEnd.bind(this))
     this.facade.registerOnEvent('newshape_addin_canvas', this.handleAddShape.bind(this))
     this.facade.registerOnEvent('shape_refreshed', this.handleShapeRefreshed.bind(this))
+
+    // Register on over/out to show / hide a docker
+    this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEOVER, this.handleMouseOver.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEOUT, this.handleMouseOut.bind(this))
+    // document.addEventListener('click', this.handleClick.bind(this))
   }
+
 
   onSelectionChanged (event) {
     this.currentShapes = event.elements
@@ -222,9 +228,27 @@ export default class PoolAsProperty extends AbstractPlugin {
   }
 
   handleShapeRefreshed (event) {
-    let shape = event.option
-    if (shape instanceof ORYX_Node) {
-      console.log(889, shape)
-    }
+    // let shape = event.option
+    // if (shape instanceof ORYX_Node) {
+    //   console.log(889, shape)
+    // }
+  }
+
+  handleMouseOver (event, uiObj) {
+    // console.log(33, uiObj)
+
+  }
+  // handleMouseOver (event, uiObj) {
+  //   // If there is a Docker, show this
+  //   if (!this.docker && uiObj instanceof ORYX_Controls.Docker) {
+  //     uiObj.show()
+  //   } else if (!this.docker && uiObj instanceof ORYX_Edge) {
+  //     uiObj.dockers.each(function (docker) {
+  //       docker.show()
+  //     })
+  //   }
+  // }
+  handleMouseOut (event, uiObj) {
+
   }
 }

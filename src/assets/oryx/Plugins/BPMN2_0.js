@@ -356,41 +356,41 @@ export default class BPMN2_0 extends AbstractPlugin {
     }
 
     // Preventing selection of all lanes but not the pool
-    if (selection.any(function (s) {
-      return s instanceof ORYX_Node && s.getStencil().id().endsWith('Lane')
-    })) {
-      let lanes = selection.findAll(function (s) {
-        return s instanceof ORYX_Node && s.getStencil().id().endsWith('Lane')
-      })
-
-      let pools = []
-      let unselectLanes = []
-      lanes.each(function (lane) {
-        pools.push(this.getParentPool(lane))
-      }.bind(this))
-      pools = pools.uniq().findAll(function (pool) {
-        let childLanes = this.getLanes(pool, true)
-        if (childLanes.all(function (lane) {
-          return lanes.include(lane)
-        })) {
-          unselectLanes = unselectLanes.concat(childLanes)
-          return true
-        } else if (selection.include(pool) && childLanes.any(function (lane) {
-          return lanes.include(lane)
-        })) {
-          unselectLanes = unselectLanes.concat(childLanes)
-          return true
-        } else {
-          return false
-        }
-      }.bind(this))
-
-      if (unselectLanes.length > 0 && pools.length > 0) {
-        selection = selection.without.apply(selection, unselectLanes)
-        selection = selection.concat(pools)
-        this.facade.setSelection(selection.uniq())
-      }
-    }
+    // if (selection.any(function (s) {
+    //   return s instanceof ORYX_Node && s.getStencil().id().endsWith('Lane')
+    // })) {
+    //   let lanes = selection.findAll(function (s) {
+    //     return s instanceof ORYX_Node && s.getStencil().id().endsWith('Lane')
+    //   })
+    //
+    //   let pools = []
+    //   let unselectLanes = []
+    //   lanes.each(function (lane) {
+    //     pools.push(this.getParentPool(lane))
+    //   }.bind(this))
+    //   pools = pools.uniq().findAll(function (pool) {
+    //     let childLanes = this.getLanes(pool, true)
+    //     if (childLanes.all(function (lane) {
+    //       return lanes.include(lane)
+    //     })) {
+    //       unselectLanes = unselectLanes.concat(childLanes)
+    //       return true
+    //     } else if (selection.include(pool) && childLanes.any(function (lane) {
+    //       return lanes.include(lane)
+    //     })) {
+    //       unselectLanes = unselectLanes.concat(childLanes)
+    //       return true
+    //     } else {
+    //       return false
+    //     }
+    //   }.bind(this))
+    //
+    //   if (unselectLanes.length > 0 && pools.length > 0) {
+    //     selection = selection.without.apply(selection, unselectLanes)
+    //     selection = selection.concat(pools)
+    //     this.facade.setSelection(selection.uniq())
+    //   }
+    // }
   }
 
   handleShapeRemove (option) {
@@ -608,7 +608,6 @@ export default class BPMN2_0 extends AbstractPlugin {
   handleLayoutPool (event) {
     let pool = event.shape
     let selection = this.facade.getSelection()
-    console.log(444, pool)
 
     let currentShape = selection.include(pool) ? pool : selection.first()
     currentShape = currentShape || pool
@@ -706,18 +705,22 @@ export default class BPMN2_0 extends AbstractPlugin {
       }
       pool.update()
     } else if (pool == currentShape) {
+      console.log('pool == currentShape')
       /**
        * Set width/height depending on the pool
        */
       if (selection.length === 1 && this.isResized(pool, this.hashedPoolPositions[pool.id])) {
-        let oldXY = this.hashedPoolPositions[pool.id].upperLeft()
-        let xy = pool.bounds.upperLeft()
+        // let oldXY = this.hashedPoolPositions[pool.id].upperLeft()
+        // let xy = pool.bounds.upperLeft()
+        let oldXY = this.hashedPoolPositions[pool.id]
+        let xy = pool.bounds
         let scale = 0
         if (this.shouldScale(pool)) {
           let old = this.hashedPoolPositions[pool.id]
           scale = old.height() / pool.bounds.height()
         }
-        this.adjustLanes(pool, allLanes, oldXY.x - xy.x, oldXY.y - xy.y, scale)
+        this.adjustPoolBothendsLanes(pool, allLanes, oldXY, xy, scale)
+        // this.adjustLanes(pool, allLanes, oldXY.x - xy.x, oldXY.y - xy.y, scale)
       }
 
       if (poolTypeId === 'V-Pool') {
@@ -845,7 +848,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     this.hashedPoolPositions[pool.id] = pool.bounds.clone()
 
     // Update selection
-    //this.facade.setSelection(selection);
+    // this.facade.setSelection(selection);
   }
 
   shouldScale (element) {
@@ -906,9 +909,80 @@ export default class BPMN2_0 extends AbstractPlugin {
     return Math.round(oldB.width() - shape.bounds.width()) !== 0 || Math.round(oldB.height() - shape.bounds.height()) !== 0
   }
 
+  adjustPoolBothendsLanes(pool, lanes, oldXY, xy, scale) {
+    scale = scale || 0
+    let length = lanes.length
+    if (oldXY.a.y !== xy.a.y) {
+      lanes[0].bounds.extend({x: oldXY.a.x - xy.a.x, y: oldXY.a.y - xy.a.y}, 'upperLeft')
+    } else if (oldXY.b.y !== xy.b.y) {
+      lanes[length - 1].bounds.extend({x: xy.b.x - oldXY.b.x , y: xy.b.y - oldXY.b.y})
+    }
+    let cy = scale ? child.bounds.center().y - (child.bounds.center().y / scale) : -y
+    child.bounds.moveBy((x || 0), -cy)
+
+    lanes.each(function (l) {
+      l.getChildNodes().each(function (child) {
+        if (!child.getStencil().id().endsWith('Lane')) {
+          let cy = scale ? child.bounds.center().y - (child.bounds.center().y / scale) : -y
+          child.bounds.moveBy((x || 0), -cy)
+
+          if (scale && child.getStencil().id().endsWith('Subprocess')) {
+            this.moveChildDockers(child, { x: (0), y: -cy })
+          }
+
+        }
+      }.bind(this))
+
+      this.hashedBounds[pool.id][l.id].moveBy(-(x || 0), !scale ? -y : 0)
+      if (scale) {
+        l.isScaled = true
+      }
+    }.bind(this))
+  }
+
+  findCanvasNodes () {
+    let elements = this.facade.getCanvas().getChildShapes(true).findAll(function (value) {
+      if (value instanceof ORYX_Node) {
+        return true
+      }
+      return false
+    })
+    return elements
+  }
+
+  updatePositionNodesInBound (lane, elements, x, y, scale) {
+    let bound = lane.absoluteBounds()
+    console.log(bound.a.y, bound.b.y,)
+    let nodes = elements.findAll(function (value) {
+      let absBounds = value.absoluteBounds()
+      let bA = absBounds.upperLeft()
+      let bB = absBounds.lowerRight()
+      console.log(bA.y, bB.y, value.node)
+      if (bA.x > bound.a.x && bA.y > bound.a.y && bB.x < bound.b.x && bB.y < bound.b.y) {
+        let cy = scale ? value.bounds.center().y - (value.bounds.center().y / scale) : -y
+        console.log(233, x, -cy)
+        value.bounds.moveBy((x || 0), cy)
+
+        return false
+      }
+      return true
+    })
+
+    return nodes
+  }
+
   adjustLanes (pool, lanes, x, y, scale) {
     scale = scale || 0
 
+    // let nodes = this.findCanvasNodes()
+    // let i = -1
+    // while ( ++i < lanes.length) {
+    //   nodes = this.updatePositionNodesInBound(lanes[i], nodes, x, y, scale)
+    //   this.hashedBounds[pool.id][lanes[i].id].moveBy(-(x || 0), !scale ? -y : 0)
+    //   if (scale) {
+    //     lanes[i].isScaled = true
+    //   }
+    // }
     // For every lane, adjust the child nodes with the offset
     lanes.each(function (l) {
       l.getChildNodes().each(function (child) {

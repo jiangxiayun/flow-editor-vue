@@ -474,7 +474,6 @@ export default class EditorManager {
      * Listen to selection change events: show properties
      */
     this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
-      console.log(22222)
       let shapes = event.elements
       let canvasSelected = false
       if (shapes && shapes.length === 0) {

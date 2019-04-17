@@ -231,10 +231,10 @@ export default class DragDropResize extends AbstractPlugin {
           this.resizerWest.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
           this.resizerWest.show()
         } else {
-          this.resizerSE.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          this.resizerSE.show()
-          this.resizerNW.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          this.resizerNW.show()
+          // this.resizerSE.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
+          // this.resizerSE.show()
+          // this.resizerNW.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
+          // this.resizerNW.show()
         }
       } else {
         this.resizerSE.setBounds(undefined)

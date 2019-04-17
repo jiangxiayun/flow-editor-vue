@@ -215,13 +215,18 @@ export default class Bounds {
    * Relatively extends the bounds by p.
    * @param {Point} p
    */
-  extend (p) {
+  extend (p, type='lowerRight') {
     if (p.x !== 0 || p.y !== 0) {
       // this is over cross for the case that a and b have same coordinates.
       //((this.a.x > this.b.x) ? this.a : this.b).x += p.x;
       //((this.b.y > this.a.y) ? this.b : this.a).y += p.y;
-      this.b.x += p.x
-      this.b.y += p.y
+      if (type === 'lowerRight') {
+        this.b.x += p.x
+        this.b.y += p.y
+      } else if (type === 'upperLeft') {
+        this.a.x += p.x
+        this.a.y += p.y
+      }
 
       this._changed(true)
     }
