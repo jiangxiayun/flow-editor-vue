@@ -219,6 +219,7 @@ export default class PoolAsProperty extends AbstractPlugin {
       }
     }
   }
+
   handleAddShape (option) {
     let shape = option.shape
     if (shape.getStencil().idWithoutNs() === 'UserTask') {
