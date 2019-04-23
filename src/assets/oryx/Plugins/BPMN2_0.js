@@ -6,6 +6,7 @@ import ORYX_Edge from '../core/Edge'
 import ORYX_Node from '../core/Node'
 import ORYX_Canvas from '../core/Canvas'
 import ORYX_Controls from '../core/Controls'
+import ORYX_Command_Move from '../core/Move'
 
 class ResizeLanesCommand extends Command {
   constructor (shape, parent, pool, plugin) {
@@ -331,6 +332,7 @@ export default class BPMN2_0 extends AbstractPlugin {
    */
   onSelectionChanged (event) {
     let selection = event.elements
+    this.currentSelection = selection
     if (selection && selection.length === 1) {
       let namespace = this.getNamespace()
       let shape = selection[0]
@@ -1032,41 +1034,14 @@ export default class BPMN2_0 extends AbstractPlugin {
       return false
     })
 
-    let Dockes = []
-    allShapes.each((function (shape) {
-      if (!(shape instanceof ORYX_Edge)) {
-        return
-      }
+    const commands = [new ORYX_Command_Move(
+      elements, offset, null, this.currentSelection, this
+    )]
+    this.facade.executeCommands(commands)
 
-      let dks = shape.getDockers()
-      let hasF = elements.member(dks.first().getDockedShape())
-      let hasL = elements.member(dks.last().getDockedShape())
-
-      /* Enable movement of undocked edges */
-      if (!hasF && !hasL) {
-        let isUndocked = !dks.first().getDockedShape() && !dks.last().getDockedShape()
-        if (isUndocked) {
-          Dockes.push(dks)
-        }
-      }
-
-      if (shape.dockers.length > 2 && hasF && hasL) {
-        Dockes = Dockes.concat(dks.findAll(function (el, index) {
-          return index > 0 && index < dks.length - 1
-        }))
-      }
-    }))
-    console.log(222, Dockes)
-    Dockes.each(function (d) {
-      if (d instanceof ORYX_Controls.Docker) {
-        elements.push(d.parent)
-      }
-    })
-    console.log(33, elements)
-    elements.each(function (s) {
-      s.bounds.moveBy(offset)
-    })
-    // return elements
+    // elements.each(function (s) {
+    //   s.bounds.moveBy(offset)
+    // })
   }
 
   updatePositionNodesInBound (lane, elements, x, y, scale) {

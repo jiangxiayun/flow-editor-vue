@@ -1033,6 +1033,7 @@ export default class Editor {
    */
   // 创建图形元素
   createShape (option) {
+    console.log(12, option)
     // If there is no argument, throw an exception
     if (!option || !option.type || !option.namespace) {
       throw 'To create a new shape you have to give an argument with type and namespace'
@@ -1087,7 +1088,7 @@ export default class Editor {
     // If there is create a shape and in the argument there is given an ConnectingType and is instance of an edge
     if (option.connectingType && option.connectedShape && !(newShapeObject instanceof ORYX_Edge)) {
       // there will be create a new Edge
-      con = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(option.connectingType))
+      con = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(option.connectingType), this._getPluginFacade())
 
       // And both endings dockers will be referenced to the both shapes
       con.dockers.first().setDockedShape(option.connectedShape)
@@ -1180,7 +1181,7 @@ export default class Editor {
     }
 
     if (con && con.alignDockers) {
-      //con.alignDockers();
+      // con.alignDockers();
     }
     if (newShapeObject.alignDockers) {
       newShapeObject.alignDockers()

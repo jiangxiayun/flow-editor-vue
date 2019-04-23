@@ -122,6 +122,11 @@ class CreateCommand extends ORYX.Core.Command {
     }
 
     this.facade.getCanvas().update()
+    // this.facade.raiseEvent({ type: 'newshape_addin_canvas', shape: this.shape })
+    this.facade.handleEvents({
+      type: 'newshape_addin_canvas',
+      shape: this.shape
+    })
     this.facade.updateSelection()
   }
 

@@ -122,7 +122,7 @@
                     candidate.getStencil().id().endsWith('Pool'))))
                 || candidate instanceof ORYX.Core.Edge);
             });
-            console.log('parentCandidate', parentCandidate)
+            // console.log('parentCandidate', parentCandidate)
             if (parentCandidate instanceof ORYX.Core.Canvas) {
               if (item.id === 'Lane' || item.id === 'V-Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
                 item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||

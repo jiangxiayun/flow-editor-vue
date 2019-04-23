@@ -41,7 +41,8 @@ export default class Shape extends AbstractShape {
         ['g', { 'class': 'controls' },
           ['g', { 'class': 'dockers' }],
           ['g', { 'class': 'magnets' }]
-        ]
+        ],
+        ['g', { 'class': 'helper' }]
       ])
   }
 

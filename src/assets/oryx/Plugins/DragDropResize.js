@@ -724,7 +724,7 @@ export default class DragDropResize extends AbstractPlugin {
     // this.toMoveShapes.concat(this.elementsMoveWithLane)
     // If the undocked edges command is setted, add this command
     if (this._undockedEdgesCommand instanceof ORYX_Command) {
-      // commands.unshift(this._undockedEdgesCommand)
+      commands.unshift(this._undockedEdgesCommand)
     }
     // Execute the commands
     this.facade.executeCommands(commands)

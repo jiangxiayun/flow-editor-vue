@@ -222,6 +222,7 @@ export default class PoolAsProperty extends AbstractPlugin {
 
   handleAddShape (option) {
     let shape = option.shape
+    console.log(444)
     if (shape.getStencil().idWithoutNs() === 'UserTask') {
       this.findInWhichLane(this.poolH, shape)
       this.findInWhichLane(this.poolV, shape)

@@ -525,7 +525,6 @@
                 option.connectingType = targetStencil.id()
               }
 
-              console.log(1122)
               let command = new FLOWABLE_OPTIONS.CreateCommand(option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
 
               this.editorManager.executeCommands([command])
@@ -770,7 +769,7 @@
         }
       },
       quickAddItem (newItemId) {
-        // console.log('Oryx_button:', newItemId)
+        console.log('Oryx_button:', newItemId)
         let shapes = this.editorManager.getSelection();
         if (shapes && shapes.length === 1) {
           this.currentSelectedShape = shapes.first();
@@ -804,7 +803,6 @@
           }
 
           option['connectingType'] = targetStencil.id();
-          console.log(3344)
           var command = new FLOWABLE_OPTIONS.CreateCommand(option, undefined, undefined, this.editorManager.getEditor());
 
           this.editorManager.executeCommands([command]);
