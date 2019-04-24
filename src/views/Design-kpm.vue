@@ -16,11 +16,16 @@
         </div>
       </div>
     </template>
+
+    <template slot="propertyWrapper" slot-scope="scope">
+      <propertySection :editorManager="scope.editorManager"></propertySection>
+    </template>
   </flowDesign>
 </template>
 
 <script>
   import flowDesign from '@/components/flowable/flow-design'
+  import propertySection from '@/components/flowable/propertySection'
   import { AA } from '@/mock/stencilData-kpm.js'
   import { mockData } from '@/mock/mockData.js'
 
@@ -35,7 +40,7 @@
         }
       }
     },
-    components: { flowDesign },
+    components: { flowDesign, propertySection },
     created () {},
     computed: {},
     mounted () {

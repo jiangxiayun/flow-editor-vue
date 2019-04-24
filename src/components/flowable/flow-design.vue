@@ -18,7 +18,7 @@
 
 
           <slot name="propertyWrapper" v-bind:editorManager="editorManager">
-            <propertySection :editorManager="editorManager"></propertySection>
+            <!--<propertySection :editorManager="editorManager"></propertySection>-->
           </slot>
         </div>
       </div>

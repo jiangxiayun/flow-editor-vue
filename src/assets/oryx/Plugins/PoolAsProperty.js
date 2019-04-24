@@ -227,6 +227,12 @@ export default class PoolAsProperty extends AbstractPlugin {
       this.findInWhichLane(this.poolH, shape)
       this.findInWhichLane(this.poolV, shape)
     }
+    // if (shape.getStencil().idWithoutNs() === 'Pool') {
+    //   this.findInWhichLane(this.poolH, shape)
+    //   this.findInWhichLane(this.poolV, shape)
+    //   let parent = shape.node.childNodes[1]
+    //   this.nodes.push(uiObject)
+    // }
   }
 
   handleShapeRefreshed (event) {
