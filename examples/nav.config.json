@@ -1,0 +1,60 @@
+{
+  "开发指南": [
+    {
+      "name": "site-index",
+      "path": "/"
+    },
+    {
+      "name": "introduce",
+      "path": "/introduce",
+      "desc": "介绍"
+    },
+    {
+      "name": "start",
+      "path": "/start",
+      "desc": "快速上手"
+    },
+    {
+      "name": "logs",
+      "path": "/logs",
+      "desc": "更新日志"
+    },
+    {
+      "name": "contribute",
+      "path": "/contribute",
+      "desc": "开发指南"
+    },
+    {
+      "name": "index",
+      "isMobile": "1",
+      "path": "/index",
+      "type": "pages"
+    }
+  ],
+  "组件": [
+    {
+      "desc": "基础组件",
+      "isMobile": "1",
+      "items": [
+        {
+          "desc": "Icon 图标",
+          "name": "icon",
+          "isMobile": "1",
+          "path": "/icon"
+        }
+      ]
+    },
+    {
+      "desc": "卡片组件",
+      "isMobile": "1",
+      "items": [
+        {
+          "desc": "Base 基础卡片",
+          "isMobile": "1",
+          "name": "base-card",
+          "path": "/base-card"
+        }
+      ]
+    }
+  ]
+}

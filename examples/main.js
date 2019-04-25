@@ -8,11 +8,14 @@ import './directives.js'
 import commonMix from './mixin'
 import i18n from './i18n'
 
-import flowEditor from './../packages/index'
+import flowEditor from './../src/index'
 Vue.use(flowEditor)
 
 import stencilDragItemTemplate from '@/components/flowable/stencil-drag-item-template'
 Vue.component('stencilDragItem', stencilDragItemTemplate)
+import demoBlock from '@/components/demo-block.vue'
+Vue.component('demo-block', demoBlock)
+// 注意，在注册全局组件时，一定是叫demo-block。
 
 Vue.config.productionTip = false
 

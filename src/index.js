@@ -1,6 +1,6 @@
 // 整合所有的组件，对外导出，即一个完整的组件库
 
-import flowEditor from './flow-design'
+import flowEditor from '../packages/flow-design'
 
 
 // 存储组件列表

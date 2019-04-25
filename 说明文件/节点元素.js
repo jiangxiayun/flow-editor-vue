@@ -1,3 +1,13 @@
+PathParser
+e.getStencilSetName is not a function"   CanvasWrapper
+Failed to resolve directive: droppable (found in <CanvasWrapper>)
+
+"ReferenceError: Mousetrap is not defined"
+
+found in
+
+---> <Toolbar>
+
 // flowable数据库中对画图的配置数据  stencil-sets
 let stencilSets = {
   "title": "Process editor",

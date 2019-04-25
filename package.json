@@ -5,14 +5,20 @@
   "main": "lib/flowable-oryx.umd.min.js",
   "files": [
     "lib",
-    "packages"
+    "packages",
+    "src"
   ],
+  "homepage": "https://gitee.com/learnjxy/flowable-front",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/learnjxy/flowable-front.git"
+  },
   "keyword": "flow-editor flowable oryx",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lib": "vue-cli-service build --target lib --name flowable-oryx --dest lib packages/index.js",
+    "lib": "vue-cli-service build --target lib --name flowable_oryx --dest lib src/index.js",
     "lint": "vue-cli-service lint",
     "test:e2e": "vue-cli-service test:e2e",
     "test:unit": "vue-cli-service test:unit"
@@ -39,12 +45,17 @@
     "chai": "^4.1.2",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0",
+    "gh-pages": "^2.0.1",
     "html-webpack-plugin": "^3.2.0",
+    "markdown-it-container": "^2.0.0",
+    "markdown-it-decorate": "^1.2.2",
+    "markdown-it-task-checkbox": "^1.0.6",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.1.0",
     "vue-cli-plugin-element": "^1.0.1",
     "vue-cli-plugin-i18n": "^0.5.2",
     "vue-easytable": "^1.7.2",
-    "vue-template-compiler": "^2.5.21"
+    "vue-markdown-loader": "^2.4.1",
+    "vue-template-compiler": "^2.6.6"
   }
 }

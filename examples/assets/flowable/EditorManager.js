@@ -1,11 +1,7 @@
 import { FLOWABLE } from './FLOWABLE_Config'
 import FLOW_OPTIONS from './FLOW_OPTIONS'
 import { findGroup, addGroup } from '@/assets/Util'
-// import ORYX_Node from '@/assets/oryx/core/Node'
-// import NodePool from '@/assets/oryx/expand/Node-Pool'
-// ORYX_Node = class ORYX_Node_Expand extends NodePool{}
 import ORYX from '@/assets/oryx'
-// ORYX.Core.Node = NodePool
 
 /**流程图编辑器 类
  * @params modelData: 流程图实例数据
@@ -342,6 +338,7 @@ export default class EditorManager {
     this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes))
     this.editor = new ORYX.Editor(config)
 
+    console.log('canvasTracker', this.canvasTracker)
     this.current = this.editor.id
     this.loading = false
 
