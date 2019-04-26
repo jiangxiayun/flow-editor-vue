@@ -135,7 +135,7 @@
 <script>
   import DialogWrapper from './DialogWrapper'
   import tableSortTemplate from './table-sort-template'
-  import { EVENTS_SELECT_OPTION } from '@/assets/flowable/_config'
+  import { EVENTS_SELECT_OPTION } from 'src/flowable/_config'
 
   export default {
     name: 'event-listeners-write-template',

@@ -2,7 +2,7 @@
   <flowEditor :config="config">
 
     <template slot="paletteWrapper" slot-scope="scope">
-      <div id="paletteHelpWrapper" class="col-xs-3 full-height" v-if="scope.editorManager">
+      <div id="paletteHelpWrapper" class="paletteHelpWrapper" v-if="scope.editorManager">
         <div class="stencils" id="paletteSection">
           <div v-for="group in scope.editorManager.showStencilData" :key="group.id"
                v-if="group.visible && group.items" class="stencil-group">
@@ -25,7 +25,7 @@
 
 <script>
   // import flowDesign from '@/components/flowable/flow-design'
-  import propertySection from '@/components/flowable/propertySection'
+  import propertySection from 'packages/property-section'
   import { AA } from '@/mock/stencilData-kpm.js'
   import { mockData } from '@/mock/mockData.js'
 
@@ -52,5 +52,12 @@
   }
 </script>
 <style lang="scss">
-  @import "@/assets/scss/kpm.scss";
+  @import "~@/assets/styles/kpm.scss";
+</style>
+<style lang="scss" scoped>
+  .paletteHelpWrapper{
+    float: left;
+    width: 200px;
+    transition: 0.3s width;
+  }
 </style>

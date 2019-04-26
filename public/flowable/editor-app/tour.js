@@ -1,15 +1,16 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { t } from 'src/locale'
 
 var FLOWABLE_EDITOR_TOUR = {
   /*
@@ -26,20 +27,20 @@ var FLOWABLE_EDITOR_TOUR = {
     }
 
     const translations = [
-      $scope.$t('TOUR.WELCOME-TITLE', {userName: userName}),
-      $scope.$t('TOUR.WELCOME-CONTENT'),
-      $scope.$t('TOUR.PALETTE-TITLE'),
-      $scope.$t('TOUR.PALETTE-CONTENT'),
-      $scope.$t('TOUR.CANVAS-TITLE'),
-      $scope.$t('TOUR.CANVAS-CONTENT'),
-      $scope.$t('TOUR.DRAGDROP-TITLE'),
-      $scope.$t('TOUR.DRAGDROP-CONTENT'),
-      $scope.$t('TOUR.PROPERTIES-TITLE'),
-      $scope.$t('TOUR.PROPERTIES-CONTENT'),
-      $scope.$t('TOUR.TOOLBAR-TITLE'),
-      $scope.$t('TOUR.TOOLBAR-CONTENT'),
-      $scope.$t('TOUR.END-TITLE'),
-      $scope.$t('TOUR.END-CONTENT')
+      t('TOUR.WELCOME-TITLE', {userName: userName}),
+      t('TOUR.WELCOME-CONTENT'),
+      t('TOUR.PALETTE-TITLE'),
+      t('TOUR.PALETTE-CONTENT'),
+      t('TOUR.CANVAS-TITLE'),
+      t('TOUR.CANVAS-CONTENT'),
+      t('TOUR.DRAGDROP-TITLE'),
+      t('TOUR.DRAGDROP-CONTENT'),
+      t('TOUR.PROPERTIES-TITLE'),
+      t('TOUR.PROPERTIES-CONTENT'),
+      t('TOUR.TOOLBAR-TITLE'),
+      t('TOUR.TOOLBAR-CONTENT'),
+      t('TOUR.END-TITLE'),
+      t('TOUR.END-CONTENT')
     ]
     // We're using a hack here due to https://github.com/sorich87/bootstrap-tour/issues/85:
     // when clicking next in the tour, it always sets the 'display' css property to 'none'
@@ -121,7 +122,7 @@ var FLOWABLE_EDITOR_TOUR = {
    */
   sequenceFlowBendpoint: function ($scope, useLocalStorage) {
     const translations = [
-      $scope.$t('FEATURE-TOUR.BENDPOINT.TITLE'), $scope.$t('FEATURE-TOUR.BENDPOINT.DESCRIPTION')
+      t('FEATURE-TOUR.BENDPOINT.TITLE'), t('FEATURE-TOUR.BENDPOINT.DESCRIPTION')
     ]
     // We're using a hack here due to https://github.com/sorich87/bootstrap-tour/issues/85:
     // when clicking next in the tour, it always sets the 'display' css property to 'none'

@@ -27,9 +27,9 @@
     "@antv/g6": "^2.2.6",
     "@antv/g6-editor": "^1.2.0",
     "axios": "^0.18.0",
+    "deepmerge": "^3.2.0",
     "element-ui": "^2.4.5",
     "vue": "^2.5.22",
-    "vue-i18n": "^8.0.0",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"
   },
@@ -53,7 +53,6 @@
     "node-sass": "^4.9.0",
     "sass-loader": "^7.1.0",
     "vue-cli-plugin-element": "^1.0.1",
-    "vue-cli-plugin-i18n": "^0.5.2",
     "vue-easytable": "^1.7.2",
     "vue-markdown-loader": "^2.4.1",
     "vue-template-compiler": "^2.6.6"

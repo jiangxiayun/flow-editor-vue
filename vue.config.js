@@ -65,6 +65,8 @@ module.exports = {
   chainWebpack: config => {
     config.resolve.alias
       .set('@', resolve('examples'))
+      .set('packages', resolve('packages'))
+      .set('src', resolve('src'))
     config.module
       .rule('md')
       .test(/\.md/)
@@ -82,22 +84,13 @@ module.exports = {
       jquery: 'jQuery',
       'ORYX': 'ORYX'
     }
-  },
+  }
   // 注意：格式 ‘aaa’:‘ccc’,左边代表要引入资源包的名字，右边代表该模块在外面使用引用的名字
   // 例如 jQuery在外面的引用就为$
   /*
    上面的例子。属性名称是 jquery，表示应该排除 import $ from 'jquery' 中的 jquery 模块。
    为了替换这个模块，jQuery 的值将被用来检索一个全局的 jQuery 变量。
    */
-
-  pluginOptions: {
-    i18n: {
-      locale: 'zh',
-      fallbackLocale: 'en',
-      localeDir: 'assets/i18n',
-      enableInSFC: false
-    }
-  }
 }
 
 
