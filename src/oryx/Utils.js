@@ -292,6 +292,7 @@ const Utils = {
       // Add the Plugin-Data to all available Plugins
       me.availablePlugins.push(pluginData)
     })
+    console.log(44, me.availablePlugins)
   },
   /**
    * @namespace Collection of methods which can be used on a shape json object (ORYX.Core.AbstractShape#toJSON()).

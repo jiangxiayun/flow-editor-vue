@@ -1,6 +1,6 @@
 <template>
   <!--画布区域-->
-  <div id="canvasHelpWrapper" class="col-xs-12">
+  <div id="canvasHelpWrapper" class="canvasHelpWrapper">
     <div class="canvas-wrapper" id="canvasSection"
          v-droppable="{onDrop:'dropCallback',onOver: 'overCallback', onOut: 'outCallback'}"
          data-model="droppedElement"
@@ -8,58 +8,58 @@
          @scroll.passive="fnScroll">
       <div class="canvas-message" id="model-modified-date"></div>
 
-      <!--删除按钮-->
-      <div class="Oryx_button"
-           id="delete-button"
-           :title="t('BUTTON.ACTION.DELETE.TOOLTIP')"
-           @click="deleteShape()"
-           style="display:none">
-        <img src="flowable/editor-app/images/delete.png"/>
-      </div>
-      <!--设置修改形状-->
-      <div class="Oryx_button"
-           id="morph-button"
-           :title="t('BUTTON.ACTION.MORPH.TOOLTIP')"
-           @click="morphShape()"
-           style="display:none">
+      <div id="flow_op_btns" v-show="!btn_visibile.hide_shape_buttons">
+        <!--删除按钮-->
+        <div class="Oryx_button" id="delete-button"
+             :title="t('BUTTON.ACTION.DELETE.TOOLTIP')"
+             @click="deleteShape">
+          <img src="flowable/editor-app/images/delete.png"/>
+        </div>
+        <!--设置修改形状-->
+        <div v-if="!btn_visibile.hide_morph_buttons"
+             class="Oryx_button" id="morph-button"
+             :title="t('BUTTON.ACTION.MORPH.TOOLTIP')"
+             @click="morphShape">
 
-        <el-dropdown trigger="click" @command="handleCommand">
+          <el-dropdown trigger="click" @command="handleCommand">
       <span class="el-dropdown-link">
         <img src="flowable/editor-app/images/wrench.png"/>
         <!--下拉菜单<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
       </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item v-for="item in morphShapes" :key="item.id" :command="item">
-              <img width="16px;" height="16px;"
-                   :src="`/flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
-              {{item.name}}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item v-for="item in morphShapes" :key="item.id" :command="item">
+                <img width="16px;" height="16px;"
+                     :src="`/flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
+                {{item.name}}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
 
+        </div>
+        <!--编辑-->
+        <div v-if="!btn_visibile.hide_edit_buttons"
+             class="Oryx_button" id="edit-button" @click="editShape">
+          <img src="flowable/editor-app/images/pencil.png"/>
+        </div>
       </div>
-      <!--编辑-->
-      <div class="Oryx_button"
-           id="edit-button"
-           style="display:none"
-           @click="editShape()">
-        <img src="flowable/editor-app/images/pencil.png"/>
-      </div>
+
       <!--v-draggable="{onStart:'startDragCallbackQuickMenu', onDrag:'dragCallbackQuickMenu',-->
       <!--revert: 'invalid', helper: 'clone', opacity : 0.5}"-->
-      <div class="Oryx_button"
-           v-for="item in quickMenuItems"
-           :key="item.id"
-           :id="item.id"
-           :title="item.description"
-           @click="quickAddItem(item.id)"
-           data-model="draggedElement"
-           data-drag="true"
-           v-draggable="{onStart:'startDragCallbackQuickMenu', onDrag:'dragCallbackQuickMenu',
-           revert: 'invalid', helper: 'clone', opacity : 0.5}"
-           style="display:none;position: absolute;">
-        <img :src="`flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
+      <div id="flow_add_btns" v-show="!(btn_visibile.hide_shape_buttons || btn_visibile.hide_flow_add_btns)">
+        <div v-for="item in quickMenuItems"
+             class="Oryx_button"
+             :key="item.id"
+             :id="item.id"
+             :title="item.description"
+             @click="quickAddItem(item.id)"
+             data-model="draggedElement"
+             data-drag="true"
+             v-draggable="{onStart:'startDragCallbackQuickMenu', onDrag:'dragCallbackQuickMenu',
+           revert: 'invalid', helper: 'clone', opacity : 0.5}">
+          <img :src="`flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
+        </div>
       </div>
+
     </div>
   </div>
 </template>
@@ -78,14 +78,27 @@
       return {
         morphShapes: [],
         currentSelectedMorph: null,
-        newShape: null
+        newShape: null,
+        btn_visibile: {
+          hide_shape_buttons: true,
+          hide_flow_add_btns: true,
+          hide_morph_buttons: true,
+          hide_edit_buttons: true
+        }
       }
     },
     mixins: [Locale],
     props: {
       editorManager: {}
     },
-    mounted () {},
+    mounted () {
+      // 隐藏画布节点的快捷按钮
+      FLOWABLE_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, (btns) => {
+        btns.map(btn => {
+          this.btn_visibile[btn.type] = btn.status
+        })
+      })
+    },
     computed: {
       ...mapState('Flowable', ['dragCanContain', 'quickMenu']),
       modelData () {
@@ -101,69 +114,69 @@
         'UPDATE_quickMenu']),
       fnScroll () {
         // Hides the resizer and quick menu items during scrolling
-        const selectedElements = this.editorManager.getSelection();
-        const subSelectionElements = this.editorManager.getSubSelection();
+        const selectedElements = this.editorManager.getSelection()
+        const subSelectionElements = this.editorManager.getSubSelection()
 
-        this.selectedElements = selectedElements;
-        this.subSelectionElements = subSelectionElements;
-        if (selectedElements && selectedElements.length > 0)
-        {
-          this.selectedElementBeforeScrolling = selectedElements[0];
+        this.selectedElements = selectedElements
+        this.subSelectionElements = subSelectionElements
+        if (selectedElements && selectedElements.length > 0) {
+          this.selectedElementBeforeScrolling = selectedElements[0]
         }
+        this.btn_visibile.hide_shape_buttons = true
 
-        jQuery('.Oryx_button').each(function(i, obj) {
-          this.orginalOryxButtonStyle = obj.style.display;
-          obj.style.display = 'none';
-        });
-        jQuery('.resizer_southeast').each(function(i, obj) {
-          this.orginalResizerSEStyle = obj.style.display;
-          obj.style.display = 'none';
-        });
-        jQuery('.resizer_northwest').each(function(i, obj) {
-          this.orginalResizerNWStyle = obj.style.display;
-          obj.style.display = 'none';
-        });
-        jQuery('.resizer_south').each(function(i, obj) {
-          this.orginalResizerNWStyle = obj.style.display;
-          obj.style.display = 'none';
-        });
-        jQuery('.resizer_north').each(function(i, obj) {
-          this.orginalResizerNWStyle = obj.style.display;
-          obj.style.display = 'none';
-        });
-        this.editorManager.handleEvents({type:ORYX.CONFIG.EVENT_CANVAS_SCROLL});
+        jQuery('.resizer_southeast').each(function (i, obj) {
+          this.orginalResizerSEStyle = obj.style.display
+          obj.style.display = 'none'
+        })
+        jQuery('.resizer_northwest').each(function (i, obj) {
+          this.orginalResizerNWStyle = obj.style.display
+          obj.style.display = 'none'
+        })
+        jQuery('.resizer_south').each(function (i, obj) {
+          this.orginalResizerNWStyle = obj.style.display
+          obj.style.display = 'none'
+        })
+        jQuery('.resizer_north').each(function (i, obj) {
+          this.orginalResizerNWStyle = obj.style.display
+          obj.style.display = 'none'
+        })
+        this.editorManager.handleEvents({ type: ORYX.CONFIG.EVENT_CANVAS_SCROLL })
         this.fnHandleScrollDebounce()
       },
       fnHandleScrollDebounce: _debounce(function(_type, index, item) {
         // Puts the quick menu items and resizer back when scroll is stopped.
-        this.editorManager.setSelection([]); // needed cause it checks for element changes and does nothing if the elements are the same
-        this.editorManager.setSelection(this.selectedElements, this.subSelectionElements);
-        this.selectedElements = undefined;
-        this.subSelectionElements = undefined;
+        // this.editorManager.setSelection([])
+        // needed cause it checks for element changes and does nothing if the elements are the same
+        // this.editorManager.setSelection(this.selectedElements, this.subSelectionElements)
+        this.editorManager.updateOryxButtonPosition(this.selectedElements)
+        this.selectedElements = undefined
+        this.subSelectionElements = undefined
 
-        function handleDisplayProperty(obj) {
+        console.log(8888)
+
+        function handleDisplayProperty (obj) {
           if (jQuery(obj).position().top > 0) {
-            obj.style.display = 'block';
+            obj.style.display = 'block'
           } else {
-            obj.style.display = 'none';
+            obj.style.display = 'none'
           }
         }
 
-        jQuery('.Oryx_button').each(function(i, obj) {
-          handleDisplayProperty(obj);
-        });
-        jQuery('.resizer_southeast').each(function(i, obj) {
-          handleDisplayProperty(obj);
-        });
-        jQuery('.resizer_northwest').each(function(i, obj) {
-          handleDisplayProperty(obj);
-        });
-        jQuery('.resizer_south').each(function(i, obj) {
-          handleDisplayProperty(obj);
-        });
-        jQuery('.resizer_north').each(function(i, obj) {
-          handleDisplayProperty(obj);
-        });
+        // jQuery('.Oryx_button').each(function(i, obj) {
+        //   handleDisplayProperty(obj);
+        // });
+        jQuery('.resizer_southeast').each(function (i, obj) {
+          handleDisplayProperty(obj)
+        })
+        jQuery('.resizer_northwest').each(function (i, obj) {
+          handleDisplayProperty(obj)
+        })
+        jQuery('.resizer_south').each(function (i, obj) {
+          handleDisplayProperty(obj)
+        })
+        jQuery('.resizer_north').each(function (i, obj) {
+          handleDisplayProperty(obj)
+        })
       }, 200),
       deleteShape () {
         this.editorManager.flowToolbarEvent({ '$scope': this, 'editorManager': this.editorManager })
@@ -193,13 +206,14 @@
       },
       // 切换元素类型
       handleCommand (item) {
-        class MorphTo extends ORYX.Core.Command{
+        class MorphTo extends ORYX.Core.Command {
           constructor (shape, stencil, facade) {
             super()
             this.shape = shape
             this.stencil = stencil
             this.facade = facade
           }
+
           execute () {
             var shape = this.shape
             var stencil = this.stencil
@@ -335,6 +349,7 @@
             this.facade.getCanvas().update()
             this.facade.updateSelection()
           }
+
           rollback () {
             if (!this.shape || !this.newShape || !this.newShape.parent) {
               return
@@ -351,6 +366,7 @@
             this.facade.getCanvas().update()
             this.facade.updateSelection()
           }
+
           /**
            * Set all incoming and outgoing edges from the shape to the new shape
            * @param {Shape} shape
@@ -436,7 +452,12 @@
           highlightId: 'shapeMenu'
         })
 
-        this.editorManager.dispatchFlowEvent(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS)
+        this.editorManager.dispatchFlowEvent(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS,[
+          { type: 'hide_shape_buttons', status: true },
+          { type: 'hide_flow_add_btns', status: true },
+          { type: 'hide_morph_buttons', status: true },
+          { type: 'hide_edit_buttons', status: true }
+        ])
 
         // console.log('dragCanContain', this.dragCanContain)
         if (this.dragCanContain) {
@@ -562,7 +583,8 @@
                 this.parent = null
                 this.canAttach = canAttach
               }
-              execute() {
+
+              execute () {
                 if (!this.shape) {
                   this.shape = this.facade.createShape(option)
                   this.parent = this.shape.parent
@@ -588,7 +610,8 @@
                 this.facade.updateSelection()
 
               }
-              rollback() {
+
+              rollback () {
                 if (this.shape) {
                   this.facade.setSelection(this.selection.without(this.shape))
                   this.facade.deleteShape(this.shape)
@@ -771,55 +794,58 @@
       },
       quickAddItem (newItemId) {
         console.log('Oryx_button:', newItemId)
-        let shapes = this.editorManager.getSelection();
+        let shapes = this.editorManager.getSelection()
         if (shapes && shapes.length === 1) {
-          this.currentSelectedShape = shapes.first();
+          this.currentSelectedShape = shapes.first()
 
-          var containedStencil = undefined;
-          var stencilSets = this.editorManager.getStencilSets().values();
+          var containedStencil = undefined
+          var stencilSets = this.editorManager.getStencilSets().values()
           for (let i = 0; i < stencilSets.length; i++) {
-            let stencilSet = stencilSets[i];
-            let nodes = stencilSet.nodes();
+            let stencilSet = stencilSets[i]
+            let nodes = stencilSet.nodes()
             for (let j = 0; j < nodes.length; j++) {
               if (nodes[j].idWithoutNs() === newItemId) {
-                containedStencil = nodes[j];
-                break;
+                containedStencil = nodes[j]
+                break
               }
             }
           }
 
-          if (!containedStencil) return;
+          if (!containedStencil) return
 
-          var option = {type: this.currentSelectedShape.getStencil().namespace() + newItemId, namespace: this.currentSelectedShape.getStencil().namespace()};
-          option['connectedShape'] = this.currentSelectedShape;
-          option['parent'] = this.currentSelectedShape.parent;
-          option['containedStencil'] = containedStencil;
+          var option = {
+            type: this.currentSelectedShape.getStencil().namespace() + newItemId,
+            namespace: this.currentSelectedShape.getStencil().namespace()
+          }
+          option['connectedShape'] = this.currentSelectedShape
+          option['parent'] = this.currentSelectedShape.parent
+          option['containedStencil'] = containedStencil
 
-          var args = { sourceShape: this.currentSelectedShape, targetStencil: containedStencil };
-          var targetStencil = this.editorManager.getRules().connectMorph(args);
+          var args = { sourceShape: this.currentSelectedShape, targetStencil: containedStencil }
+          var targetStencil = this.editorManager.getRules().connectMorph(args)
 
           // Check if there can be a target shape
           if (!targetStencil) {
-            return;
+            return
           }
 
-          option['connectingType'] = targetStencil.id();
-          var command = new FLOWABLE_OPTIONS.CreateCommand(option, undefined, undefined, this.editorManager.getEditor());
+          option['connectingType'] = targetStencil.id()
+          var command = new FLOWABLE_OPTIONS.CreateCommand(option, undefined, undefined, this.editorManager.getEditor())
 
-          this.editorManager.executeCommands([command]);
+          this.editorManager.executeCommands([command])
         }
       },
-      initScrollHandling() {
-        var canvasSection = jQuery('#canvasSection');
+      initScrollHandling () {
+        var canvasSection = jQuery('#canvasSection')
         canvasSection.scroll(() => {
 
-        });
+        })
 
         canvasSection.scrollStopped(() => {
 
 
-        });
-      },
+        })
+      }
     }
   }
 </script>

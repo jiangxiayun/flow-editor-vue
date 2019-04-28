@@ -4,9 +4,9 @@
     Licensed under the Apache License, Version 2.0 (the "License");
  	you may not use this file except in compliance with the License.
  	You may obtain a copy of the License at
- 
+
        http://www.apache.org/licenses/LICENSE-2.0
-  
+
  	Unless required by applicable law or agreed to in writing, software
  	distributed under the License is distributed on an "AS IS" BASIS,
  	WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,11 +24,11 @@
     <plugin source="canvasResize.js" name="Plugins.CanvasResize">
       <notUsesIn namespace="http://b3mn.org/stencilset/xforms#"/>
     </plugin>
-    
+
     <plugin source="processLink.js" name="Plugins.ProcessLink">
-      <requires namespace="http://b3mn.org/stencilset/bpmn1.1#"/> 
+      <requires namespace="http://b3mn.org/stencilset/bpmn1.1#"/>
     </plugin>
-      
+
     <!-- following plugins don't require Ext -->
     <plugin source="arrangement.js" name="Plugins.Arrangement">
       <notUsesIn namespace="http://b3mn.org/stencilset/xforms#"/>
@@ -62,15 +62,15 @@
       <requires namespace="http://b3mn.org/stencilset/bpmn2.0#" />
     </plugin>
   </plugins>
-  
+
   <properties>
     <property group="File" index="1" />
-    <property group="Edit" index="2" /> 
+    <property group="Edit" index="2" />
     <property group="Undo" index="3" />
     <property group="Alignment" index="4" />
     <property group="Group" index="5" />
     <property group="Z-Order" index="6" />
     <property group="Docker" index="7" />
-    <property group="Zoom" index="8" /> 
+    <property group="Zoom" index="8" />
   </properties>
 </config>

@@ -37,6 +37,26 @@
           type: 'flow',
           modelData: mockData,
           stencilData: AA,
+          plugins: [
+            {name: 'Plugins.Loading'},
+            {name: 'Plugins.CanvasResize', notUsesIn: 'xforms'},
+            {name: 'Plugins.ProcessLink'},
+            {name: 'Plugins.Arrangement'},
+            {name: 'Plugins.Save'},
+            {name: 'Plugins.View'},
+            {name: 'Plugins.DragDropResize'},
+            {name: 'Plugins.HighlightingSelectedShapes'},
+            {name: 'Plugins.DragDocker'},
+            {name: 'Plugins.AddDocker'},
+            {name: 'Plugins.SelectionFrame'},
+            {name: 'Plugins.ShapeHighlighting'},
+            {name: 'Plugins.Overlay'},
+            {name: 'Plugins.KeysMove'},
+            {name: 'Plugins.EdgeLayouter'},
+            {name: 'Plugins.BPMN2_0'},
+            {name: 'Plugins.RenameShapes'},
+            {name: 'Plugins.PoolAsProperty'},
+          ]
         }
       }
     },

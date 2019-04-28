@@ -668,12 +668,6 @@ const FLOW_OPTIONS = {
         editorManager.edit(decodeURIComponent(results[2].replace(/\+/g, ' ')))
       }
     })
-    // 隐藏画布节点的快捷按钮
-    this.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, function (event) {
-      jQuery('.Oryx_button').each(function (i, obj) {
-        obj.style.display = 'none'
-      })
-    })
     this.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_UNDO_REDO_RESET, function () {
       if (this.items) {
         for (let i = 0; i < this.items.length; i++) {

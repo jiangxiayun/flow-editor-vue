@@ -204,12 +204,7 @@ text * {
 
 .contentCanvasWrapper{
   flex: 1;
-  overflow: auto;
-}
-
-
-.collapsedCanvasWrapper {
-  padding-left: 0px !important;
+  overflow: hidden;
 }
 
 /**Process navigator */
@@ -319,6 +314,24 @@ text * {
   opacity: 1.0;
 }
 
+#flow_op_btns{
+  position: absolute;
+}
+#flow_add_btns{
+  position: absolute;
+  max-width: 72px;
+}
+
+.Oryx_button {
+ display: inline-block;
+  width: 24px;
+  height: 24px;
+  padding: 2px;
+  background-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+}
+
 /** End Resizer **/
 
 .Oryx_button img {
@@ -369,15 +382,7 @@ text * {
   top: 0px;
 }
 
-.Oryx_button {
-  width: 24px;
-  height: 24px;
-  padding: 2px;
-  position: absolute;
-  background-color: #ffffff;
-  background-color: rgba(255, 255, 255, 0.7);
-  cursor: pointer;
-}
+
 
 .Oryx_button_with_caption {
   width: inherit;
@@ -570,7 +575,10 @@ text * {
 }
 
 
-
+.canvasHelpWrapper{
+  overflow: hidden;
+  position: relative;
+}
 /* Modeling Canvas
 -------------------------------- */
 div.canvas-wrapper {

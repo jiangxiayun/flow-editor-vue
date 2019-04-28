@@ -23,8 +23,10 @@ import Layouter from './Layouter'
 import BPMN2_0 from './BPMN2_0'
 import Arrangement from './Arrangement'
 import PoolAsProperty from './PoolAsProperty'
+import ORYX_Log from '../Log'
 
 const Plugins = {
+  availablePlugins: [],
   AbstractPlugin: AbstractPlugin,
   AbstractLayouter: AbstractLayouter,
   Edit: Edit,
@@ -50,6 +52,19 @@ const Plugins = {
   BPMN2_0: BPMN2_0,
   Arrangement: Arrangement,
   PoolAsProperty: PoolAsProperty,
+  _loadPlugins: function(plugins) {
+    const availablePlugins = []
+    plugins.map(plugin => {
+      let pluginData = new Map()
+      if (!plugin.name) {
+        ORYX_Log.error('A plugin is not providing a name. Ingnoring this plugin.')
+        return
+      }
+      pluginData.set('name', plugin.name)
+      availablePlugins.push(pluginData)
+    })
+    this.availablePlugins = availablePlugins
+  }
 }
 
 export default Plugins

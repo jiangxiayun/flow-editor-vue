@@ -2,6 +2,7 @@ import { FLOWABLE } from './FLOWABLE_Config'
 import FLOW_OPTIONS from './FLOW_OPTIONS'
 import { findGroup, addGroup } from '../Util'
 import ORYX from '../oryx'
+import ORYX_Log from '../oryx/Log'
 
 /**流程图编辑器 类
  * @params modelData: 流程图实例数据
@@ -38,13 +39,15 @@ export default class EditorManager {
     const stencilSet = new ORYX.Core.StencilSet.StencilSet(baseUrl, config.stencilData)
 
     ORYX.Core.StencilSet.loadStencilSet(baseUrl, stencilSet, config.modelData.modelId)
-    jQuery.ajax({
-      type: 'GET',
-      url: 'flowable/editor-app/plugins.xml',
-      success: function (data, textStatus, jqXHR) {
-        ORYX.Utils._loadPlugins(data)
-      }
-    })
+    ORYX.Plugins._loadPlugins(config.plugins)
+    // this._loadPlugins(config.plugins)
+    // jQuery.ajax({
+    //   type: 'GET',
+    //   url: 'flowable/editor-app/plugins.xml',
+    //   success: function (data, textStatus, jqXHR) {
+    //     ORYX.Utils._loadPlugins(data)
+    //   }
+    // })
     // 拖拽功能辅助变量
     this.dragCurrentParent = undefined
     this.dragCurrentParentId = undefined
@@ -55,6 +58,19 @@ export default class EditorManager {
     this.selectedItem = {}
 
     this.bootEditor()
+  }
+
+  _loadPlugins (plugins) {
+    const availablePlugins = []
+    plugins.map(plugin => {
+      let pluginData = new Map()
+      if (!plugin.name) {
+        ORYX_Log.error('A plugin is not providing a name. Ingnoring this plugin.')
+        return
+      }
+      pluginData.set('name', plugin.name)
+    })
+    this.availablePlugins = availablePlugins
   }
 
   getSelectedItem () { return this.selectedItem }
@@ -466,281 +482,6 @@ export default class EditorManager {
     return undefined
   }
 
-  initRegisterOnEvent () {
-    /*
-     * Listen to selection change events: show properties
-     */
-    this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
-      let shapes = event.elements
-      let canvasSelected = false
-      if (shapes && shapes.length === 0) {
-        shapes = [this.getCanvas()]
-        canvasSelected = true
-      }
-      if (shapes && shapes.length > 0) {
-        const selectedShape = shapes.first()
-        const stencil = selectedShape.getStencil()
-
-        if (this.selectedElementBeforeScrolling &&
-          stencil.id().indexOf('BPMNDiagram') !== -1 &&
-          stencil.id().indexOf('CMMNDiagram') !== -1) {
-          // ignore canvas event because of empty selection when scrolling stops
-          return
-        }
-
-        if (this.selectedElementBeforeScrolling &&
-          this.selectedElementBeforeScrolling.getId() === selectedShape.getId()) {
-          this.selectedElementBeforeScrolling = null
-          return
-        }
-
-        // Store previous selection
-        this.previousSelectedShape = this.selectedShape
-
-        // Only do something if another element is selected (Oryx fires this event multiple times)
-        if (this.previousSelectedShape !== undefined &&
-          (this.previousSelectedShape.getId() === selectedShape.getId() &&
-            selectedShape.getStencil().idWithoutNs() != 'UserTask')) {
-          if (this.forceSelectionRefresh) {
-            // Switch the flag again, this run will force refresh
-            this.forceSelectionRefresh = false
-          } else {
-            // Selected the same element again, no need to update anything
-            return
-          }
-        }
-
-        let selectedItem = { 'title': '', 'properties': [] }
-
-        if (canvasSelected) {
-          selectedItem.auditData = {
-            'author': this.modelData.createdByUser,
-            'createDate': this.modelData.createDate
-          }
-        }
-
-        // Gather properties of selected item 获取选中元素的属性
-        let properties = stencil.properties()
-        for (let i = 0; i < properties.length; i++) {
-          let property = properties[i]
-          if (!property.popular()) continue
-          let key = property.prefix() + '-' + property.id()
-
-          if (key === 'oryx-name') {
-            selectedItem.title = selectedShape.properties.get(key)
-          }
-
-          // First we check if there is a config for 'key-type' and then for 'type' alone
-          let propertyConfig = FLOWABLE.PROPERTY_CONFIG[key + '-' + property.type()]
-          if (propertyConfig === undefined || propertyConfig === null) {
-            propertyConfig = FLOWABLE.PROPERTY_CONFIG[property.type()]
-          }
-
-          if (propertyConfig === undefined || propertyConfig === null) {
-            console.log('WARNING: no property configuration defined for ' + key + ' of type ' + property.type())
-            console.warn('警告: 找不到 ' + key + ' of type ' + property.type() + '属性所对应的组件')
-          } else {
-            if (selectedShape.properties.get(key) === 'true') {
-              selectedShape.properties.set(key, true)
-            }
-
-            if (FLOWABLE.UI_CONFIG.showRemovedProperties === false && property.isHidden()) {
-              continue
-            }
-
-            let currentProperty = {
-              'key': key,
-              'title': property.title(),
-              'description': property.description(),
-              'type': property.type(),
-              'mode': 'read',
-              'hidden': property.isHidden(),
-              'value': selectedShape.properties.get(key)
-            }
-
-            if ((currentProperty.type === 'complex' || currentProperty.type === 'multiplecomplex') && currentProperty.value && currentProperty.value.length > 0) {
-              try {
-                currentProperty.value = JSON.parse(currentProperty.value)
-              } catch (err) {
-                // ignore
-              }
-            }
-
-            if (propertyConfig.readModeTemplateUrl !== undefined && propertyConfig.readModeTemplateUrl !== null) {
-              currentProperty.readModeTemplateUrl = propertyConfig.readModeTemplateUrl
-            }
-            if (propertyConfig.writeModeTemplateUrl !== null && propertyConfig.writeModeTemplateUrl !== null) {
-              currentProperty.writeModeTemplateUrl = propertyConfig.writeModeTemplateUrl
-            }
-
-            if (propertyConfig.templateUrl !== undefined && propertyConfig.templateUrl !== null) {
-              currentProperty.templateUrl = propertyConfig.templateUrl
-              currentProperty.hasReadWriteMode = false
-            } else {
-              currentProperty.hasReadWriteMode = true
-            }
-
-            if (currentProperty.value === undefined
-              || currentProperty.value === null
-              || currentProperty.value.length == 0) {
-              currentProperty.noValue = true
-            }
-
-            selectedItem.properties.push(currentProperty)
-          }
-        }
-
-        this.selectedItem = selectedItem
-        this.selectedShape = selectedShape
-        FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, {
-          selectedItem,
-          selectedShape
-        })
-      } else {
-        this.selectedItem = {}
-        this.selectedShape = null
-      }
-    })
-
-    this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
-      FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS)
-
-      var shapes = event.elements
-
-      if (shapes && shapes.length == 1) {
-
-        var selectedShape = shapes.first()
-
-        var a = this.getCanvas().node.getScreenCTM()
-
-        var absoluteXY = selectedShape.absoluteXY()
-
-        absoluteXY.x *= a.a
-        absoluteXY.y *= a.d
-
-        var additionalIEZoom = 1
-        if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-          var ua = navigator.userAgent
-          if (ua.indexOf('MSIE') >= 0) {
-            //IE 10 and below
-            var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-            if (zoom !== 100) {
-              additionalIEZoom = zoom / 100
-            }
-          }
-        }
-
-        if (additionalIEZoom === 1) {
-          absoluteXY.y = absoluteXY.y - jQuery('#canvasSection').offset().top + 5
-          absoluteXY.x = absoluteXY.x - jQuery('#canvasSection').offset().left
-
-        } else {
-          var canvasOffsetLeft = jQuery('#canvasSection').offset().left
-          var canvasScrollLeft = jQuery('#canvasSection').scrollLeft()
-          var canvasScrollTop = jQuery('#canvasSection').scrollTop()
-
-          var offset = a.e - (canvasOffsetLeft * additionalIEZoom)
-          var additionaloffset = 0
-          if (offset > 10) {
-            additionaloffset = (offset / additionalIEZoom) - offset
-          }
-          absoluteXY.y = absoluteXY.y - (jQuery('#canvasSection').offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop)
-          absoluteXY.x = absoluteXY.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft)
-        }
-
-        var bounds = new ORYX.Core.Bounds(a.e + absoluteXY.x, a.f + absoluteXY.y, a.e + absoluteXY.x + a.a * selectedShape.bounds.width(), a.f + absoluteXY.y + a.d * selectedShape.bounds.height())
-        var shapeXY = bounds.upperLeft()
-
-        var stencilItem = this.getStencilItemById(selectedShape.getStencil().idWithoutNs())
-        var morphShapes = []
-        if (stencilItem && stencilItem.morphRole) {
-          for (var i = 0; i < this.morphRoles.length; i++) {
-            if (this.morphRoles[i].role === stencilItem.morphRole) {
-              morphShapes = this.morphRoles[i].morphOptions
-            }
-          }
-        }
-
-        var x = shapeXY.x
-        if (bounds.width() < 48) {
-          x -= 24
-        }
-
-        if (morphShapes && morphShapes.length > 0) {
-          // In case the element is not wide enough, start the 2 bottom-buttons more to the left
-          // to prevent overflow in the right-menu
-
-          var morphButton = document.getElementById('morph-button')
-          morphButton.style.display = 'block'
-          morphButton.style.left = x + 24 + 'px'
-          morphButton.style.top = (shapeXY.y + bounds.height() + 2) + 'px'
-        }
-
-        var deleteButton = document.getElementById('delete-button')
-        deleteButton.style.display = 'block'
-        deleteButton.style.left = x + 'px'
-        deleteButton.style.top = (shapeXY.y + bounds.height() + 2) + 'px'
-
-        var editable = selectedShape._stencil._jsonStencil.id.endsWith('CollapsedSubProcess')
-        var editButton = document.getElementById('edit-button')
-        if (editable) {
-          editButton.style.display = 'block'
-          if (morphShapes && morphShapes.length > 0) {
-            editButton.style.left = x + 24 + 24 + 'px'
-          } else {
-            editButton.style.left = x + 24 + 'px'
-          }
-          editButton.style.top = (shapeXY.y + bounds.height() + 2) + 'px'
-
-        } else {
-          editButton.style.display = 'none'
-        }
-
-        if (stencilItem && (stencilItem.canConnect || stencilItem.canConnectAssociation)) {
-          var quickButtonCounter = 0
-          var quickButtonX = shapeXY.x + bounds.width() + 5
-          var quickButtonY = shapeXY.y
-          jQuery('.Oryx_button').each(function (i, obj) {
-            if (obj.id !== 'morph-button' && obj.id != 'delete-button' && obj.id !== 'edit-button') {
-              quickButtonCounter++
-              if (quickButtonCounter > 3) {
-                quickButtonX = shapeXY.x + bounds.width() + 5
-                quickButtonY += 24
-                quickButtonCounter = 1
-
-              } else if (quickButtonCounter > 1) {
-                quickButtonX += 24
-              }
-
-              obj.style.display = 'block'
-              obj.style.left = quickButtonX + 'px'
-              obj.style.top = quickButtonY + 'px'
-            }
-          })
-        }
-      }
-    })
-
-    // 控制 toolbar buttons 是否可用
-    this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
-      const elements = event.elements
-      for (let i = 0; i < this.toolbarItems.length; i++) {
-        let item = this.toolbarItems[i]
-        if (item.enabledAction && item.enabledAction === 'element') {
-          let minLength = 1
-          if (item.minSelectionCount) {
-            minLength = item.minSelectionCount
-          }
-          if (elements.length >= minLength && !item.enabled) {
-            item.enabled = true
-          } else if (elements.length == 0 && item.enabled) {
-            item.enabled = false
-          }
-        }
-      }
-    })
-  }
-
   handleEvents (events) {
     this.editor.handleEvents(events)
   }
@@ -857,8 +598,8 @@ export default class EditorManager {
   }
 
   syncCanvasTracker () {
-    var shapes = this.getCanvas().getChildren()
-    var jsonShapes = []
+    let shapes = this.getCanvas().getChildren()
+    let jsonShapes = []
     shapes.each(function (shape) {
       //toJson is an summary object but its not a json string.!!!!!
       jsonShapes.push(shape.toJSON())
@@ -885,11 +626,11 @@ export default class EditorManager {
   }
 
   _mergeCanvasToChild (parent) {
-    for (var i = 0; i < parent.childShapes.length; i++) {
-      var childShape = parent.childShapes[i]
+    for (let i = 0; i < parent.childShapes.length; i++) {
+      let childShape = parent.childShapes[i]
       if (childShape.stencil.id === 'CollapsedSubProcess') {
 
-        var elements = this.canvasTracker.get(childShape.resourceId)
+        let elements = this.canvasTracker.get(childShape.resourceId)
         if (elements) {
           elements = JSON.parse(elements)
         } else {
@@ -905,10 +646,6 @@ export default class EditorManager {
     }
   }
 
-  dispatchOryxEvent (event) {
-    FLOW_OPTIONS.events.dispatchOryxEvent(event)
-  }
-
   isLoading () {
     return this.loading
   }
@@ -916,14 +653,14 @@ export default class EditorManager {
   navigateTo (resourceId) {
     //TODO: this could be improved by check if the resourceId is not equal to the current tracker...
     this.syncCanvasTracker()
-    var found = false
+    let found = false
     this.canvasTracker.each(function (pair) {
-      var key = pair.key
-      var children = JSON.parse(pair.value)
-      var targetable = this._findTarget(children, resourceId)
+      let key = pair.key
+      let children = JSON.parse(pair.value)
+      let targetable = this._findTarget(children, resourceId)
       if (!found && targetable) {
         this.edit(key)
-        var flowableShape = this.getCanvas().getChildShapeByResourceId(targetable)
+        let flowableShape = this.getCanvas().getChildShapeByResourceId(targetable)
         this.setSelection([flowableShape], [], true)
         found = true
       }
@@ -931,14 +668,14 @@ export default class EditorManager {
   }
 
   _findTarget (children, resourceId) {
-    for (var i = 0; i < children.length; i++) {
-      var child = children[i]
+    for (let i = 0; i < children.length; i++) {
+      let child = children[i]
       if (child.resourceId === resourceId) {
         return child.resourceId
       } else if (child.properties && child.properties['overrideid'] === resourceId) {
         return child.resourceId
       } else {
-        var result = this._findTarget(child.childShapes, resourceId)
+        let result = this._findTarget(child.childShapes, resourceId)
         if (result) {
           return result
         }
@@ -950,11 +687,251 @@ export default class EditorManager {
   dispatchFlowEvent (type, event) {
     FLOW_OPTIONS.events.dispatch(type, event)
   }
-  addListenerFlowEvent (type, callback, scope) {
-    FLOW_OPTIONS.events.addListener(type, callback, scope)
-  }
-
   flowToolbarEvent (services) {
     FLOW_OPTIONS.TOOLBAR.ACTIONS.deleteItem(services)
+  }
+
+  initRegisterOnEvent () {
+    this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
+      let shapes = event.elements
+      // Listen to selection change events: show properties
+      this.showShapeProperties(shapes)
+      this.updateOryxButtonPosition(shapes)
+      // 控制 toolbar buttons 是否可用
+      this.updateToolbarButtonStatus(shapes)
+    })
+  }
+  showShapeProperties (shapes) {
+    let canvasSelected = false
+    if (shapes && shapes.length === 0) {
+      shapes = [this.getCanvas()]
+      canvasSelected = true
+    }
+    if (shapes && shapes.length > 0) {
+      const selectedShape = shapes.first()
+      const stencil = selectedShape.getStencil()
+
+      if (this.selectedElementBeforeScrolling &&
+        stencil.id().indexOf('BPMNDiagram') !== -1 &&
+        stencil.id().indexOf('CMMNDiagram') !== -1) {
+        // ignore canvas event because of empty selection when scrolling stops
+        return
+      }
+
+      if (this.selectedElementBeforeScrolling &&
+        this.selectedElementBeforeScrolling.getId() === selectedShape.getId()) {
+        this.selectedElementBeforeScrolling = null
+        return
+      }
+
+      // Store previous selection
+      this.previousSelectedShape = this.selectedShape
+
+      // Only do something if another element is selected (Oryx fires this event multiple times)
+      if (this.previousSelectedShape !== undefined &&
+        (this.previousSelectedShape.getId() === selectedShape.getId() &&
+          selectedShape.getStencil().idWithoutNs() != 'UserTask')) {
+        if (this.forceSelectionRefresh) {
+          // Switch the flag again, this run will force refresh
+          this.forceSelectionRefresh = false
+        } else {
+          // Selected the same element again, no need to update anything
+          return
+        }
+      }
+
+      let selectedItem = { 'title': '', 'properties': [] }
+      if (canvasSelected) {
+        selectedItem.auditData = {
+          'author': this.modelData.createdByUser,
+          'createDate': this.modelData.createDate
+        }
+      }
+
+      // 获取选中元素的属性
+      let properties = stencil.properties()
+      for (let i = 0; i < properties.length; i++) {
+        let property = properties[i]
+        if (!property.popular()) continue
+        let key = property.prefix() + '-' + property.id()
+
+        if (key === 'oryx-name') {
+          selectedItem.title = selectedShape.properties.get(key)
+        }
+
+        // First we check if there is a config for 'key-type' and then for 'type' alone
+        let propertyConfig = FLOWABLE.PROPERTY_CONFIG[key + '-' + property.type()]
+        if (propertyConfig === undefined || propertyConfig === null) {
+          propertyConfig = FLOWABLE.PROPERTY_CONFIG[property.type()]
+        }
+
+        if (propertyConfig === undefined || propertyConfig === null) {
+          console.log('WARNING: no property configuration defined for ' + key + ' of type ' + property.type())
+          console.warn('警告: 找不到 ' + key + ' of type ' + property.type() + '属性所对应的组件')
+        } else {
+          if (selectedShape.properties.get(key) === 'true') {
+            selectedShape.properties.set(key, true)
+          }
+
+          if (FLOWABLE.UI_CONFIG.showRemovedProperties === false && property.isHidden()) {
+            continue
+          }
+
+          let currentProperty = {
+            'key': key,
+            'title': property.title(),
+            'description': property.description(),
+            'type': property.type(),
+            'mode': 'read',
+            'hidden': property.isHidden(),
+            'value': selectedShape.properties.get(key)
+          }
+
+          if ((currentProperty.type === 'complex' || currentProperty.type === 'multiplecomplex') && currentProperty.value && currentProperty.value.length > 0) {
+            try {
+              currentProperty.value = JSON.parse(currentProperty.value)
+            } catch (err) {
+              // ignore
+            }
+          }
+
+          if (propertyConfig.readModeTemplateUrl !== undefined && propertyConfig.readModeTemplateUrl !== null) {
+            currentProperty.readModeTemplateUrl = propertyConfig.readModeTemplateUrl
+          }
+          if (propertyConfig.writeModeTemplateUrl !== null && propertyConfig.writeModeTemplateUrl !== null) {
+            currentProperty.writeModeTemplateUrl = propertyConfig.writeModeTemplateUrl
+          }
+
+          if (propertyConfig.templateUrl !== undefined && propertyConfig.templateUrl !== null) {
+            currentProperty.templateUrl = propertyConfig.templateUrl
+            currentProperty.hasReadWriteMode = false
+          } else {
+            currentProperty.hasReadWriteMode = true
+          }
+
+          if (currentProperty.value === undefined
+            || currentProperty.value === null
+            || currentProperty.value.length == 0) {
+            currentProperty.noValue = true
+          }
+
+          selectedItem.properties.push(currentProperty)
+        }
+      }
+
+      this.selectedItem = selectedItem
+      this.selectedShape = selectedShape
+      FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, {
+        selectedItem,
+        selectedShape
+      })
+    } else {
+      this.selectedItem = {}
+      this.selectedShape = null
+    }
+  }
+  updateOryxButtonPosition (selectedElements) {
+    FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
+      { type: 'hide_shape_buttons', status: true }
+    ])
+    let hide_flow_add_btns = true
+    let hide_morph_buttons = true
+    let hide_edit_buttons = true
+
+    const shapes = selectedElements
+    if (shapes && shapes.length === 1) {
+      const selectedShape = shapes.first()
+      const a = this.getCanvas().node.getScreenCTM() // 获取 svg对象 的转换矩阵CTM
+
+      let absoluteXY = selectedShape.absoluteXY()
+      absoluteXY.x *= a.a
+      absoluteXY.y *= a.d
+
+      let additionalIEZoom = 1
+      additionalIEZoom = ORYX.Utils.IEZoomBelow10(additionalIEZoom)
+
+      const canvasSection = jQuery('#canvasSection')
+      if (additionalIEZoom === 1) {
+        absoluteXY.y = absoluteXY.y - canvasSection.offset().top + 5
+        absoluteXY.x = absoluteXY.x - canvasSection.offset().left
+      } else {
+        let canvasOffsetLeft = canvasSection.offset().left
+        let canvasScrollLeft = canvasSection.scrollLeft()
+        let canvasScrollTop = canvasSection.scrollTop()
+
+        let offset = a.e - (canvasOffsetLeft * additionalIEZoom)
+        let additionaloffset = 0
+        if (offset > 10) {
+          additionaloffset = (offset / additionalIEZoom) - offset
+        }
+        absoluteXY.y = absoluteXY.y - (canvasSection.offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop)
+        absoluteXY.x = absoluteXY.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft)
+      }
+
+      let bounds = new ORYX.Core.Bounds(
+        a.e + absoluteXY.x,
+        a.f + absoluteXY.y,
+        a.e + absoluteXY.x + a.a * selectedShape.bounds.width(),
+        a.f + absoluteXY.y + a.d * selectedShape.bounds.height()
+      )
+      const shapeXY = bounds.upperLeft()
+      const stencilItem = this.getStencilItemById(selectedShape.getStencil().idWithoutNs())
+      let morphShapes = []
+      if (stencilItem && stencilItem.morphRole) {
+        for (let i = 0; i < this.morphRoles.length; i++) {
+          if (this.morphRoles[i].role === stencilItem.morphRole) {
+            morphShapes = this.morphRoles[i].morphOptions
+          }
+        }
+      }
+
+      let x = shapeXY.x
+      // 如果元素不够宽, 把左边2个按钮往左移，防止溢出
+      if (bounds.width() < 48) {
+        x -= 24
+      }
+
+      if (morphShapes && morphShapes.length > 0) {
+        hide_morph_buttons = false
+      }
+
+      let flow_op_btns = document.getElementById('flow_op_btns')
+      flow_op_btns.style.left = x + 'px'
+      flow_op_btns.style.top = (shapeXY.y + bounds.height() + 2) + 'px'
+
+      let editable = selectedShape._stencil._jsonStencil.id.endsWith('CollapsedSubProcess')
+      hide_edit_buttons = !editable
+
+      if (stencilItem && (stencilItem.canConnect || stencilItem.canConnectAssociation)) {
+        let quickButtonX = shapeXY.x + bounds.width() + 5
+        let quickButtonY = shapeXY.y
+        let flow_add_btns = document.getElementById('flow_add_btns')
+        flow_add_btns.style.left = quickButtonX + 'px'
+        flow_add_btns.style.top = quickButtonY + 'px'
+        hide_flow_add_btns = false
+      }
+      FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
+        { type: 'hide_shape_buttons', status: false },
+        { type: 'hide_flow_add_btns', status: hide_flow_add_btns },
+        { type: 'hide_morph_buttons', status: hide_morph_buttons },
+        { type: 'hide_edit_buttons', status: hide_edit_buttons },
+      ])
+    }
+  }
+  updateToolbarButtonStatus (elements) {
+    for (let i = 0; i < this.toolbarItems.length; i++) {
+      let item = this.toolbarItems[i]
+      if (item.enabledAction && item.enabledAction === 'element') {
+        let minLength = 1
+        if (item.minSelectionCount) {
+          minLength = item.minSelectionCount
+        }
+        if (elements.length >= minLength && !item.enabled) {
+          item.enabled = true
+        } else if (elements.length == 0 && item.enabled) {
+          item.enabled = false
+        }
+      }
+    }
   }
 }

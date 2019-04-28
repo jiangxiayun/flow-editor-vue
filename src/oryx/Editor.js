@@ -61,7 +61,6 @@ export default class Editor {
 
     // Initialize the eventlistener
     this._initEventListener()
-
     // CREATES the canvas
     this._createCanvas(model.stencil ? model.stencil.id : null, model.properties)
     // 生成整个 EXT.VIEWPORT
@@ -78,11 +77,14 @@ export default class Editor {
     }.bind(this)
 
     // LOAD the plugins
-    window.setTimeout(function () {
-      this.loadPlugins()
-      loadPluginFinished = true
-      initFinished()
-    }.bind(this), 100)
+    this.loadPlugins()
+    loadPluginFinished = true
+    initFinished()
+    // window.setTimeout(function () {
+    //   this.loadPlugins()
+    //   loadPluginFinished = true
+    //   initFinished()
+    // }.bind(this), 100)
 
     // LOAD the content of the current editor instance
     window.setTimeout(function () {
@@ -285,13 +287,6 @@ export default class Editor {
    *  Laden der Plugins
    */
   loadPlugins () {
-    // if there should be plugins but still are none, try again.
-    // TODO this should wait for every plugin respectively.
-    /*if (!ORYX.Plugins && ORYX.availablePlugins.length > 0) {
-     window.setTimeout(this.loadPlugins.bind(this), 100);
-     return;
-     }*/
-
     const me = this
     let newPlugins = []
     let loadedStencilSetsNamespaces = this.getStencilSets().keys()
@@ -299,62 +294,23 @@ export default class Editor {
     // Available Plugins will be initalize
     let facade = this._getPluginFacade()
 
-    // If there is an Array where all plugins are described, than only take those
-    // (that comes from the usage of oryx with a mashup api)
-    //todo MashupAPI
-    // if (ORYX.MashupAPI && ORYX.MashupAPI.loadablePlugins && ORYX.MashupAPI.loadablePlugins instanceof Array) {
-    //
-    //   // Get the plugins from the available plugins (those who are in the plugins.xml)
-    //   ORYX.availablePlugins = $A(ORYX.availablePlugins).findAll(function (value) {
-    //     return ORYX.MashupAPI.loadablePlugins.include(value.name)
-    //   })
-    //
-    //   // Add those plugins to the list, which are only in the loadablePlugins list
-    //   ORYX.MashupAPI.loadablePlugins.each(function (className) {
-    //     if (!(ORYX.availablePlugins.find(function (val) {
-    //       return val.name == className
-    //     }))) {
-    //       ORYX.availablePlugins.push({ name: className })
-    //     }
-    //   })
-    // }
-
-    //todo availablePlugins
-    ORYX_Utils.availablePlugins.each(function (value) {
+    Plugins_s.availablePlugins.each(function (value) {
       ORYX_Log.debug('Initializing plugin \'%0\'', value.get('name'))
-
-      if ((!value.get('requires') || !value.get('requires').namespaces || value.get('requires').namespaces.any(function (req) {
-          return loadedStencilSetsNamespaces.indexOf(req) >= 0
-        })) &&
-        (!value.get('notUsesIn') || !value.get('notUsesIn').namespaces || !value.get('notUsesIn').namespaces.any(function (req) {
-          return loadedStencilSetsNamespaces.indexOf(req) >= 0
-        })) && (value.get('engaged') || (value.get('engaged') === undefined))) {
-        /*only load activated plugins or undefined */
-        // console.log(333, Plugins.Loading)
-        // console.log(PluginsList['Plugins']['Loading'])
-        // let a = eval('Plugins.Loading')()
-        // let a = new Plugins.Loading()
-        // eval('new Plugins.Loading(facade, value)')
-        try {
-          // wow funcky code here!
-          let className = eval(value.get('name'))
-          // let className = value.get('name')
-          if (className) {
-            let plugin = new className(facade, value)
-            plugin.type = value.get('name')
-            newPlugins.push(plugin)
-            plugin.engaged = true
-          }
-        } catch (e) {
-          ORYX_Log.warn('Plugin %0 is not available %1', value.get('name'), e)
+      try {
+        let className = eval(value.get('name'))
+        // let className = value.get('name')
+        if (className) {
+          let plugin = new className(facade, value)
+          plugin.type = value.get('name')
+          newPlugins.push(plugin)
+          plugin.engaged = true
         }
-
-      } else {
-        ORYX_Log.info('Plugin need a stencilset which is not loaded\'', value.get('name'))
+      } catch (e) {
+        ORYX_Log.warn('Plugin %0 is not available %1', value.get('name'), e)
       }
 
     })
-
+    console.log('newPlugins', newPlugins)
     newPlugins.each(function (value) {
       // If there is an GUI-Plugin, they get all Plugins-Offer-Meta-Data
       if (value.registryChanged)

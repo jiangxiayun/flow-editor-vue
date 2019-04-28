@@ -7,12 +7,7 @@
         <paletteWrapper :editorManager="editorManager"></paletteWrapper>
       </slot>
 
-      <div id="contentCanvasWrapper" class="contentCanvasWrapper"
-           :class="{collapsedCanvasWrapper: !paletteWrapperOpen}">
-        <div id="paletteSectionOpen" :class="{hidden: paletteWrapperOpen}"
-             @click="UPDATE_paletteWrapperOpen(true)">
-          <i class="glyphicon glyphicon-chevron-right"></i>
-        </div>
+      <div id="contentCanvasWrapper" class="contentCanvasWrapper">
         <canvasWrapper :editorManager="editorManager"></canvasWrapper>
 
         <slot name="propertyWrapper" v-bind:editorManager="editorManager">
@@ -59,9 +54,7 @@
     },
     components: { toolbar, paletteWrapper, canvasWrapper, propertySection },
     created () {},
-    computed: {
-      ...mapState('Flowable', ['paletteWrapperOpen'])
-    },
+    computed: {},
     mounted () {
       // this.getJson()
       this.editorManager = new EditorManager({
@@ -73,7 +66,7 @@
       this.resizeFun()
     },
     methods: {
-      ...mapMutations('Flowable', ['UPDATE_paletteWrapperOpen', 'UPDATE_modelData']),
+      ...mapMutations('Flowable', ['UPDATE_modelData']),
       getJson () {
         let id = this.$route.params.id
         APIS.editorJson(id, {}).then(res => {

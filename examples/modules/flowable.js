@@ -2,8 +2,6 @@
 const Flowable = {
   namespaced: true,
   state: {
-    paletteWrapperOpen: true,
-    // modelData: {},
     stencilItemGroups: [],
     quickMenuItems: [],
     dragModeOver: false,
@@ -11,9 +9,6 @@ const Flowable = {
     quickMenu: undefined
   },
   mutations: {
-    UPDATE_paletteWrapperOpen (state, data) {
-      state.paletteWrapperOpen = data
-    },
     UPDATE_dragModeOver (state, data) {
       state.dragModeOver = data
     },
