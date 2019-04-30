@@ -14,12 +14,14 @@
 <script>
   import { mapMutations } from 'vuex'
   import ORYX_CONFIG from 'src/oryx/CONFIG'
+  import { draggable } from 'src/directives/drag-drop'
 
   export default {
     name: "stencilDragItem",
     data() {
       return {}
     },
+    directives: { draggable },
     props: {
       editorManager: {},
       item: {

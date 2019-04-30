@@ -70,6 +70,7 @@
   import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
   import { _debounce, getAdditionalIEZoom } from 'src/Util'
   import Locale from 'src/mixins/locale'
+  import { draggable, droppable } from 'src/directives/drag-drop'
 
   export default {
     name: 'canvasWrapper',
@@ -87,6 +88,10 @@
       }
     },
     mixins: [Locale],
+    directives: {
+      draggable,
+      droppable
+    },
     props: {
       editorManager: {}
     },
@@ -142,7 +147,7 @@
         this.editorManager.handleEvents({ type: ORYX_CONFIG.EVENT_CANVAS_SCROLL })
         this.fnHandleScrollDebounce()
       },
-      fnHandleScrollDebounce: _debounce(function(_type, index, item) {
+      fnHandleScrollDebounce: _debounce(function (_type, index, item) {
         // Puts the quick menu items and resizer back when scroll is stopped.
         // this.editorManager.setSelection([])
         // needed cause it checks for element changes and does nothing if the elements are the same
@@ -241,7 +246,7 @@
           highlightId: 'shapeMenu'
         })
 
-        this.editorManager.dispatchFlowEvent(ORYX_CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS,[
+        this.editorManager.dispatchFlowEvent(ORYX_CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
           { type: 'hide_shape_buttons', status: true },
           { type: 'hide_flow_add_btns', status: true },
           { type: 'hide_morph_buttons', status: true },

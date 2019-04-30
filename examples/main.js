@@ -4,7 +4,7 @@ import router from './router'
 import store from './store'
 import './plugins/element.js'
 import './plugins/VTable.js'
-import './directives.js'
+// import './directives.js'
 import commonMix from './mixin'
 
 import flowEditor from './../src/index'

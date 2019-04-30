@@ -162,6 +162,7 @@
 </template>
 
 <script>
+  import Mousetrap from 'mousetrap'
   import ORYX_CONFIG from 'src/oryx/CONFIG'
   import Locale from 'src/mixins/locale'
 
