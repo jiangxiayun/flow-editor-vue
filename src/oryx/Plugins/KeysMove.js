@@ -14,6 +14,7 @@ export default class KeysMove extends AbstractPlugin {
 
     // this.facade.registerOnEvent(ORYX.CONFIG.EVENT_KEYDOWN, this.keyHandler.bind(this));
 
+    // 参数
     // SELECT ALL
     this.facade.offer({
       keyCodes: [{

@@ -867,7 +867,6 @@ export default class Editor {
    */
   registerPluginsOnKeyEvents () {
     this.pluginsData.each(function (pluginData) {
-
       if (pluginData.keyCodes) {
         pluginData.keyCodes.each(function (keyComb) {
           let eventName = 'key.event'
@@ -902,8 +901,10 @@ export default class Editor {
           if (pluginData.toggle === true && pluginData.buttonInstance) {
             this.registerOnEvent(eventName, function () {
               pluginData.buttonInstance.toggle(!pluginData.buttonInstance.pressed) // Toggle
-              pluginData.functionality.call(pluginData, pluginData.buttonInstance, pluginData.buttonInstance.pressed) // Call
-                                                                                                                       // function
+              pluginData.functionality.call(
+                pluginData,
+                pluginData.buttonInstance,
+                pluginData.buttonInstance.pressed) // Call function
             })
           } else {
             this.registerOnEvent(eventName, pluginData.functionality)
