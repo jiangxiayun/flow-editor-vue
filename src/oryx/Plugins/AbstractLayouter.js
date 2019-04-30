@@ -1,10 +1,8 @@
 import AbstractPlugin from './AbstractPlugin'
 import ORYX_Config from '../CONFIG'
 
-
 /**
  This abstract plugin implements the core behaviour of layout
-
  @class ORYX.Plugins.AbstractLayouter
  @constructor Creates a new instance
  @author Willi Tscheschner
@@ -25,7 +23,6 @@ export default class AbstractLayouter extends AbstractPlugin {
    * @memberOf ORYX.Plugins.AbstractLayouter.prototype
    */
   constructor (facade) {
-    // arguments.callee.$.construct.apply(this, arguments);
     super(facade)
     this.layouted = []
     this.facade.registerOnEvent(ORYX_Config.EVENT_LAYOUT, this._initLayout.bind(this))
@@ -50,7 +47,7 @@ export default class AbstractLayouter extends AbstractPlugin {
     // Return TRUE if there is any correlation between
     // the 'layouted' attribute and the shape themselve.
     return this.layouted.any(function (s) {
-      if (typeof s == 'string') {
+      if (typeof s === 'string') {
         return shape.getStencil().id().include(s)
       } else {
         return shape instanceof s
@@ -65,7 +62,6 @@ export default class AbstractLayouter extends AbstractPlugin {
    * @memberOf ORYX.Plugins.AbstractLayouter.prototype
    */
   _initLayout (event) {
-    console.log('_initLayout')
     // Get the shapes
     let shapes = [event.shapes].flatten().compact()
 

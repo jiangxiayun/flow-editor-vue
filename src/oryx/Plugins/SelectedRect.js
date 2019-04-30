@@ -27,7 +27,7 @@ export default class SelectedRect {
 
   resize (bounds) {
     let upL = bounds.upperLeft()
-    let padding = ORYX_Config.SELECTED_AREA_PADDING
+    let padding = ORYX_Config.CustomConfigs.SELECTED_AREA_PADDING
 
     this.dashedArea.setAttributeNS(null, 'width', bounds.width() + 2 * padding)
     this.dashedArea.setAttributeNS(null, 'height', bounds.height() + 2 * padding)

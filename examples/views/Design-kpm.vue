@@ -28,6 +28,7 @@
   import propertySection from 'packages/property-section'
   import { AA } from '@/mock/stencilData-kpm.js'
   import { mockData } from '@/mock/mockData.js'
+  import configure from './initConfig'
 
   export default {
     name: 'Editor',
@@ -37,26 +38,39 @@
           type: 'flow',
           modelData: mockData,
           stencilData: AA,
-          plugins: [
-            {name: 'Plugins.Loading'},
-            {name: 'Plugins.CanvasResize', notUsesIn: 'xforms'},
-            {name: 'Plugins.ProcessLink'},
-            {name: 'Plugins.Arrangement'},
-            {name: 'Plugins.Save'},
-            {name: 'Plugins.View'},
-            {name: 'Plugins.DragDropResize'},
-            {name: 'Plugins.HighlightingSelectedShapes'},
-            {name: 'Plugins.DragDocker'},
-            {name: 'Plugins.AddDocker'},
-            {name: 'Plugins.SelectionFrame'},
-            {name: 'Plugins.ShapeHighlighting'},
-            {name: 'Plugins.Overlay'},
-            {name: 'Plugins.KeysMove'},
-            {name: 'Plugins.EdgeLayouter'},
-            {name: 'Plugins.BPMN2_0'},
-            {name: 'Plugins.RenameShapes'},
-            {name: 'Plugins.PoolAsProperty'},
-          ]
+          pluginConfig: {
+            properties: [
+              { group: 'File', index: 1},
+              { group: 'Edit', index: 2},
+              { group: 'Undo', index: 3},
+              { group: 'Alignment', index: 4},
+              { group: 'Group', index: 5},
+              { group: 'Z-Order', index: 6},
+              { group: 'Docker', index: 7},
+              { group: 'Zoom', index: 8},
+            ],
+            plugins: [
+              {name: 'Plugins.Loading'},
+              {name: 'Plugins.CanvasResize', notUsesIn: 'xforms'},
+              {name: 'Plugins.ProcessLink'},
+              {name: 'Plugins.Arrangement'},
+              {name: 'Plugins.Save'},
+              {name: 'Plugins.View'},
+              {name: 'Plugins.DragDropResize'},
+              {name: 'Plugins.HighlightingSelectedShapes'},
+              {name: 'Plugins.DragDocker'},
+              {name: 'Plugins.AddDocker'},
+              {name: 'Plugins.SelectionFrame'},
+              {name: 'Plugins.ShapeHighlighting'},
+              {name: 'Plugins.Overlay'},
+              {name: 'Plugins.KeysMove'},
+              {name: 'Plugins.Layouter.EdgeLayouter'},
+              {name: 'Plugins.BPMN2_0'},
+              {name: 'Plugins.RenameShapes'},
+              {name: 'Plugins.PoolAsProperty'},
+            ],
+          },
+          editorConfigs: configure
         }
       }
     },

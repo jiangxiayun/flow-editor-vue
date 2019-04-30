@@ -1,12 +1,8 @@
-import ORYX from '../oryx'
-
-
-
 /** Inspired by https://github.com/krasimir/EventBus/blob/master/src/EventBus.js */
 
-export const FLOWABLE = {
+const FLOWABLE_CONFIG = {
   UI_CONFIG: {
-    'showRemovedProperties': false
+    'showRemovedProperties': false,
   },
   HEADER_CONFIG: {
     'showAppTitle': true,
@@ -42,168 +38,6 @@ export const FLOWABLE = {
     /** Event fired when a different process must be loaded. */
     EVENT_TYPE_NAVIGATE_TO_PROCESS: 'event-type-navigate-to-process',
     EVENT_TYPE_UNDO_REDO_RESET: 'event-type-undo-redo-reset'
-  },
-  PROPERTY_CONFIG: {
-    'string': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'string-property-write-mode-template'
-    },
-    'boolean': {
-      'templateUrl': 'boolean-property-template'
-    },
-    'text': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'text-property-write-template'
-    },
-    'flowable-calledelementtype': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'calledelementtype-property-write-template'
-    },
-    'flowable-multiinstance': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'multiinstance-property-write-template'
-    },
-    'flowable-processhistorylevel': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'process-historylevel-property-write-template'
-    },
-    'flowable-ordering': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'ordering-property-write-template'
-    },
-    'oryx-dataproperties-complex': {
-      'readModeTemplateUrl': 'data-properties-display-template',
-      'writeModeTemplateUrl': 'data-properties-write-template'
-    },
-    'oryx-formproperties-complex': {
-      'readModeTemplateUrl': 'form-properties-display-template',
-      'writeModeTemplateUrl': 'form-properties-write-template'
-    },
-    'oryx-executionlisteners-multiplecomplex': {
-      'readModeTemplateUrl': 'execution-listeners-display-template',
-      'writeModeTemplateUrl': 'execution-listeners-write-template'
-    },
-    'oryx-tasklisteners-multiplecomplex': {
-      'readModeTemplateUrl': 'task-listeners-display-template',
-      'writeModeTemplateUrl': 'task-listeners-write-template'
-    },
-    'oryx-eventlisteners-multiplecomplex': {
-      'readModeTemplateUrl': 'event-listeners-display-template',
-      'writeModeTemplateUrl': 'event-listeners-write-template'
-    },
-    'oryx-usertaskassignment-complex': {
-      'readModeTemplateUrl': 'assignment-display-template',
-      'writeModeTemplateUrl': 'assignment-write-template'
-    },
-    'oryx-servicetaskfields-complex': {
-      'readModeTemplateUrl': 'fields-display-template',
-      'writeModeTemplateUrl': 'fields-write-template'
-    },
-    'oryx-callactivityinparameters-complex': {
-      'readModeTemplateUrl': 'in-parameters-display-template',
-      'writeModeTemplateUrl': 'in-parameters-write-template'
-    },
-    'oryx-callactivityoutparameters-complex': {
-      'readModeTemplateUrl': 'out-parameters-display-template',
-      'writeModeTemplateUrl': 'out-parameters-write-template'
-    },
-    // oryx子进程引用子进程链接
-    'oryx-subprocessreference-subprocess-link': {
-      'readModeTemplateUrl': 'subprocess-reference-display-template',
-      'writeModeTemplateUrl': 'subprocess-reference-write-template'
-    },
-    'oryx-formreference-complex': {
-      'readModeTemplateUrl': 'form-reference-display-template',
-      'writeModeTemplateUrl': 'form-reference-write-template'
-    },
-    'oryx-sequencefloworder-complex': {
-      'readModeTemplateUrl': 'sequenceflow-order-display-template',
-      'writeModeTemplateUrl': 'sequenceflow-order-write-template'
-    },
-    'oryx-conditionsequenceflow-complex': {
-      'readModeTemplateUrl': 'condition-expression-display-template',
-      'writeModeTemplateUrl': 'condition-expression-write-template'
-    },
-    'oryx-signaldefinitions-multiplecomplex': {
-      'readModeTemplateUrl': 'signal-definitions-display-template',
-      'writeModeTemplateUrl': 'signal-definitions-write-template'
-    },
-    'oryx-signalref-string': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'signal-property-write-template'
-    },
-    'oryx-messagedefinitions-multiplecomplex': {
-      'readModeTemplateUrl': 'message-definitions-display-template',
-      'writeModeTemplateUrl': 'message-definitions-write-template'
-    },
-    'oryx-messageref-string': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'message-property-write-template'
-    },
-    'oryx-duedatedefinition-complex': {
-      'readModeTemplateUrl': 'duedate-display-template',
-      'writeModeTemplateUrl': 'duedate-write-template'
-    },
-    'oryx-decisiontaskdecisiontablereference-complex': {
-      'readModeTemplateUrl': 'decisiontable-reference-display-template',
-      'writeModeTemplateUrl': 'decisiontable-reference-write-template'
-    },
-    'oryx-casetaskcasereference-complex': {
-      'readModeTemplateUrl': 'case-reference-display-template',
-      'writeModeTemplateUrl': 'case-reference-write-template'
-    },
-    'oryx-processtaskprocessreference-complex': {
-      'readModeTemplateUrl': 'process-reference-display-template',
-      'writeModeTemplateUrl': 'process-reference-write-template'
-    },
-    'oryx-processtaskinparameters-complex': {
-      'readModeTemplateUrl': 'in-parameters-display-template',
-      'writeModeTemplateUrl': 'in-parameters-write-template'
-    },
-    'oryx-processtaskoutparameters-complex': {
-      'readModeTemplateUrl': 'out-parameters-display-template',
-      'writeModeTemplateUrl': 'out-parameters-write-template'
-    },
-    'flowable-transitionevent': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'transition-event-write-template'
-    },
-    'flowable-planitem-dropdown': {
-      'readModeTemplateUrl': 'planitem-dropdown-read-template',
-      'writeModeTemplateUrl': 'planitem-dropdown-write-template'
-    },
-    'flowable-http-request-method': {
-      'readModeTemplateUrl': 'http-request-method-display-template',
-      'writeModeTemplateUrl': 'http-request-method-property-write-template'
-    },
-    'oryx-output-complex': {
-      'readModeTemplateUrl': 'form-reference-display-template',
-      'writeModeTemplateUrl': 'form-reference-write-template'
-    },
-    'oryx-input-complex': {
-      'readModeTemplateUrl': 'form-reference-display-template',
-      'writeModeTemplateUrl': 'form-reference-write-template'
-    },
-    'oryx-important_level-select': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'multiinstance-property-write-template'
-    },
-    'oryx-propertiesfortask-select': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'lane-property-write-template'
-    },
-    'oryx-department-complex': {
-      'readModeTemplateUrl': 'form-reference-display-template',
-      'writeModeTemplateUrl': 'form-reference-write-template'
-    },
-    'oryx-activerole-complex': {
-      'readModeTemplateUrl': 'form-reference-display-template',
-      'writeModeTemplateUrl': 'form-reference-write-template'
-    },
-    'oryx-activesystem-select': {
-      'readModeTemplateUrl': 'default-value-display-template',
-      'writeModeTemplateUrl': 'system-write-template'
-    }
   },
   TOOLBAR_CONFIG: {
     'items': [
@@ -384,3 +218,6 @@ export const FLOWABLE = {
     ]
   }
 }
+
+
+export default FLOWABLE_CONFIG

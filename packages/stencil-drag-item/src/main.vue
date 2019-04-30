@@ -13,7 +13,7 @@
 
 <script>
   import { mapMutations } from 'vuex'
-  import ORYX from 'src/oryx'
+  import ORYX_CONFIG from 'src/oryx/CONFIG'
 
   export default {
     name: "stencilDragItem",
@@ -68,13 +68,13 @@
             }
           }
 
-          if (aShapes[0] instanceof ORYX.Core.Canvas) {
+          if (this.editorManager.instanceofCanvas(aShapes[0])) {
             this.editorManager.getCanvas().setHightlightStateBasedOnX(coord.x);
           }
 
           // console.log('aShapes', aShapes)
           const item = this.editorManager.getStencilItemById(event.target.id);
-          if (aShapes.length == 1 && aShapes[0] instanceof ORYX.Core.Canvas) {
+          if (aShapes.length == 1 && this.editorManager.instanceofCanvas(aShapes[0])) {
             let parentCandidate = aShapes[0];
 
             if (item.id === 'Lane' || item.id === 'V-Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
@@ -85,11 +85,11 @@
 
               // Show Highlight
               this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
+                type: ORYX_CONFIG.EVENT_HIGHLIGHT_SHOW,
                 highlightId: 'shapeRepo.added',
                 elements: [parentCandidate],
-                style: ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
-                color: ORYX.CONFIG.SELECTION_INVALID_COLOR
+                style: ORYX_CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
+                color: ORYX_CONFIG.SELECTION_INVALID_COLOR
               });
             } else {
               this.UPDATE_dragCanContain(true)
@@ -97,13 +97,13 @@
               this.editorManager.dragCurrentParentId = parentCandidate.id
 
               this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+                type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeRepo.added"
               });
             }
 
             this.editorManager.handleEvents({
-              type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+              type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
               highlightId: "shapeRepo.attached"
             });
 
@@ -111,19 +111,19 @@
 
           } else  {
             // console.log(22, item)
-            let parentCandidate = aShapes.reverse().find(function (candidate) {
+            let parentCandidate = aShapes.reverse().find((candidate) => {
               // return (candidate instanceof ORYX.Core.Canvas
               //   || candidate instanceof ORYX.Core.Node
               //   || candidate instanceof ORYX.Core.Edge);
 
-              return (candidate instanceof ORYX.Core.Canvas
-                || (item.id.endsWith('Lane') ? candidate instanceof ORYX.Core.Node :
-                  (candidate instanceof ORYX.Core.Node && !(candidate.getStencil().id().endsWith('Lane') ||
+              return (this.editorManager.instanceofCanvas(candidate)
+                || (item.id.endsWith('Lane') ? this.editorManager.instanceofNode(candidate) :
+                  (this.editorManager.instanceofNode(candidate) && !(candidate.getStencil().id().endsWith('Lane') ||
                     candidate.getStencil().id().endsWith('Pool'))))
-                || candidate instanceof ORYX.Core.Edge);
+                || this.editorManager.instanceofEdge(candidate));
             });
             // console.log('parentCandidate', parentCandidate)
-            if (parentCandidate instanceof ORYX.Core.Canvas) {
+            if (this.editorManager.instanceofCanvas(parentCandidate)) {
               if (item.id === 'Lane' || item.id === 'V-Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
                 item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
                 item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
@@ -132,11 +132,11 @@
 
                 // Show Highlight
                 this.editorManager.handleEvents({
-                  type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
+                  type: ORYX_CONFIG.EVENT_HIGHLIGHT_SHOW,
                   highlightId: 'shapeRepo.added',
                   elements: [parentCandidate],
-                  style: ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
-                  color: ORYX.CONFIG.SELECTION_INVALID_COLOR
+                  style: ORYX_CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
+                  color: ORYX_CONFIG.SELECTION_INVALID_COLOR
                 });
               } else {
                 this.UPDATE_dragCanContain(true)
@@ -144,13 +144,13 @@
                 this.editorManager.dragCurrentParentId = parentCandidate.id
 
                 this.editorManager.handleEvents({
-                  type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+                  type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
                   highlightId: "shapeRepo.added"
                 });
               }
 
               this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+                type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeRepo.attached"
               });
 
@@ -198,15 +198,15 @@
 
               if (_canContain) {
                 this.editorManager.handleEvents({
-                  type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
+                  type: ORYX_CONFIG.EVENT_HIGHLIGHT_SHOW,
                   highlightId: "shapeRepo.attached",
                   elements: [parentCandidate],
-                  style: ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
-                  color: ORYX.CONFIG.SELECTION_VALID_COLOR
+                  style: ORYX_CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
+                  color: ORYX_CONFIG.SELECTION_VALID_COLOR
                 });
 
                 this.editorManager.handleEvents({
-                  type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+                  type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
                   highlightId: "shapeRepo.added"
                 });
               } else {
@@ -230,14 +230,14 @@
 
                 // Show Highlight
                 this.editorManager.handleEvents({
-                  type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
+                  type: ORYX_CONFIG.EVENT_HIGHLIGHT_SHOW,
                   highlightId: 'shapeRepo.added',
                   elements: [parentCandidate],
-                  color: _canContain ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
+                  color: _canContain ? ORYX_CONFIG.SELECTION_VALID_COLOR : ORYX_CONFIG.SELECTION_INVALID_COLOR
                 });
 
                 this.editorManager.handleEvents({
-                  type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+                  type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
                   highlightId: "shapeRepo.attached"
                 });
               }
@@ -273,14 +273,14 @@
 
               // Show Highlight
               this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
+                type: ORYX_CONFIG.EVENT_HIGHLIGHT_SHOW,
                 highlightId: 'shapeRepo.added',
                 elements: [canvasCandidate],
-                color: ORYX.CONFIG.SELECTION_VALID_COLOR
+                color: ORYX_CONFIG.SELECTION_VALID_COLOR
               });
 
               this.editorManager.handleEvents({
-                type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+                type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeRepo.attached"
               });
             }

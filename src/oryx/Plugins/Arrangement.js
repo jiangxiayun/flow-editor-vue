@@ -357,7 +357,7 @@ export default class Arrangement extends AbstractPlugin {
       }
       setBounds (shape, maxSize) {
         if (!maxSize)
-          maxSize = { width: ORYX_Config.MAXIMUM_SIZE, height: ORYX_Config.MAXIMUM_SIZE }
+          maxSize = { width: ORYX_Config.CustomConfigs.MAXIMUM_SIZE, height: ORYX_Config.CustomConfigs.MAXIMUM_SIZE }
         if (!shape.bounds) {
           throw 'Bounds not definined.'
         }

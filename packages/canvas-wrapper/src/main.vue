@@ -1,7 +1,7 @@
 <template>
   <!--画布区域-->
   <div id="canvasHelpWrapper" class="canvasHelpWrapper">
-    <div class="canvas-wrapper" id="canvasSection"
+    <div class="canvas-wrapper canvasSection" id="canvasSection"
          v-droppable="{onDrop:'dropCallback',onOver: 'overCallback', onOut: 'outCallback'}"
          data-model="droppedElement"
          data-drop="true"
@@ -66,9 +66,8 @@
 
 <script>
   import { mapState, mapMutations } from 'vuex'
-  import { FLOWABLE } from 'src/flowable/FLOWABLE_Config'
-  import FLOWABLE_OPTIONS from 'src/flowable/FLOW_OPTIONS'
-  import ORYX from 'src/oryx'
+  import ORYX_CONFIG from 'src/oryx/CONFIG'
+  import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
   import { _debounce, getAdditionalIEZoom } from 'src/Util'
   import Locale from 'src/mixins/locale'
 
@@ -93,7 +92,7 @@
     },
     mounted () {
       // 隐藏画布节点的快捷按钮
-      FLOWABLE_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, (btns) => {
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, (btns) => {
         btns.map(btn => {
           this.btn_visibile[btn.type] = btn.status
         })
@@ -140,7 +139,7 @@
           this.orginalResizerNWStyle = obj.style.display
           obj.style.display = 'none'
         })
-        this.editorManager.handleEvents({ type: ORYX.CONFIG.EVENT_CANVAS_SCROLL })
+        this.editorManager.handleEvents({ type: ORYX_CONFIG.EVENT_CANVAS_SCROLL })
         this.fnHandleScrollDebounce()
       },
       fnHandleScrollDebounce: _debounce(function(_type, index, item) {
@@ -151,8 +150,6 @@
         this.editorManager.updateOryxButtonPosition(this.selectedElements)
         this.selectedElements = undefined
         this.subSelectionElements = undefined
-
-        console.log(8888)
 
         function handleDisplayProperty (obj) {
           if (jQuery(obj).position().top > 0) {
@@ -206,216 +203,6 @@
       },
       // 切换元素类型
       handleCommand (item) {
-        class MorphTo extends ORYX.Core.Command {
-          constructor (shape, stencil, facade) {
-            super()
-            this.shape = shape
-            this.stencil = stencil
-            this.facade = facade
-          }
-
-          execute () {
-            var shape = this.shape
-            var stencil = this.stencil
-            var resourceId = shape.resourceId
-
-            // Serialize all attributes
-            var serialized = shape.serialize()
-            stencil.properties().each((function (prop) {
-              if (prop.readonly()) {
-                serialized = serialized.reject(function (serProp) {
-                  return serProp.name == prop.id()
-                })
-              }
-            }).bind(this))
-
-            // Get shape if already created, otherwise create a new shape
-            if (this.newShape) {
-              this.facade.getCanvas().add(this.newShape)
-            } else {
-              this.newShape = this.facade.createShape({
-                type: stencil.id(),
-                namespace: stencil.namespace(),
-                resourceId: resourceId
-              })
-            }
-
-            // calculate new bounds using old shape's upperLeft and new shape's width/height
-            var boundsObj = serialized.find(function (serProp) {
-              return (serProp.prefix === 'oryx' && serProp.name === 'bounds')
-            })
-
-            var changedBounds = null
-
-            if (!this.facade.getRules().preserveBounds(shape.getStencil())) {
-              var bounds = boundsObj.value.split(',')
-              if (parseInt(bounds[0], 10) > parseInt(bounds[2], 10)) { // if lowerRight comes first, swap array items
-                var tmp = bounds[0]
-                bounds[0] = bounds[2]
-                bounds[2] = tmp
-                tmp = bounds[1]
-                bounds[1] = bounds[3]
-                bounds[3] = tmp
-              }
-              bounds[2] = parseInt(bounds[0], 10) + this.newShape.bounds.width()
-              bounds[3] = parseInt(bounds[1], 10) + this.newShape.bounds.height()
-              boundsObj.value = bounds.join(',')
-            } else {
-              var height = shape.bounds.height()
-              var width = shape.bounds.width()
-
-              // consider the minimum and maximum size of
-              // the new shape
-
-              if (this.newShape.minimumSize) {
-                if (shape.bounds.height() < this.newShape.minimumSize.height) {
-                  height = this.newShape.minimumSize.height
-                }
-
-                if (shape.bounds.width() < this.newShape.minimumSize.width) {
-                  width = this.newShape.minimumSize.width
-                }
-              }
-
-              if (this.newShape.maximumSize) {
-                if (shape.bounds.height() > this.newShape.maximumSize.height) {
-                  height = this.newShape.maximumSize.height
-                }
-
-                if (shape.bounds.width() > this.newShape.maximumSize.width) {
-                  width = this.newShape.maximumSize.width
-                }
-              }
-
-              changedBounds = {
-                a: {
-                  x: shape.bounds.a.x,
-                  y: shape.bounds.a.y
-                },
-                b: {
-                  x: shape.bounds.a.x + width,
-                  y: shape.bounds.a.y + height
-                }
-              }
-            }
-
-            var oPos = shape.bounds.center()
-            if (changedBounds !== null) {
-              this.newShape.bounds.set(changedBounds)
-            }
-
-            // Set all related dockers
-            this.setRelatedDockers(shape, this.newShape)
-
-            // store DOM position of old shape
-            var parentNode = shape.node.parentNode
-            var nextSibling = shape.node.nextSibling
-
-            // Delete the old shape
-            this.facade.deleteShape(shape)
-
-            // Deserialize the new shape - Set all attributes
-            this.newShape.deserialize(serialized)
-            /*
-             * Change color to default if unchanged
-             * 23.04.2010
-             */
-            if (shape.getStencil().property('oryx-bgcolor')
-              && shape.properties['oryx-bgcolor']
-              && shape.getStencil().property('oryx-bgcolor').value().toUpperCase() == shape.properties['oryx-bgcolor'].toUpperCase()) {
-              if (this.newShape.getStencil().property('oryx-bgcolor')) {
-                this.newShape.setProperty('oryx-bgcolor', this.newShape.getStencil().property('oryx-bgcolor').value())
-              }
-            }
-
-            if (changedBounds !== null) {
-              this.newShape.bounds.set(changedBounds)
-            }
-
-            if (this.newShape.getStencil().type() === 'edge' || (this.newShape.dockers.length == 0 || !this.newShape.dockers[0].getDockedShape())) {
-              this.newShape.bounds.centerMoveTo(oPos)
-            }
-
-            if (this.newShape.getStencil().type() === 'node' && (this.newShape.dockers.length == 0 || !this.newShape.dockers[0].getDockedShape())) {
-              this.setRelatedDockers(this.newShape, this.newShape)
-            }
-
-            // place at the DOM position of the old shape
-            if (nextSibling) parentNode.insertBefore(this.newShape.node, nextSibling)
-            else parentNode.appendChild(this.newShape.node)
-
-            // Set selection
-            this.facade.setSelection([this.newShape])
-            this.facade.getCanvas().update()
-            this.facade.updateSelection()
-          }
-
-          rollback () {
-            if (!this.shape || !this.newShape || !this.newShape.parent) {
-              return
-            }
-            // Append shape to the parent
-            this.newShape.parent.add(this.shape)
-            // Set dockers
-            this.setRelatedDockers(this.newShape, this.shape)
-            // Delete new shape
-            this.facade.deleteShape(this.newShape)
-            // Set selection
-            this.facade.setSelection([this.shape])
-            // Update
-            this.facade.getCanvas().update()
-            this.facade.updateSelection()
-          }
-
-          /**
-           * Set all incoming and outgoing edges from the shape to the new shape
-           * @param {Shape} shape
-           * @param {Shape} newShape
-           */
-          setRelatedDockers (shape, newShape) {
-            if (shape.getStencil().type() === 'node') {
-
-              (shape.incoming || []).concat(shape.outgoing || [])
-                .each(function (i) {
-                  i.dockers.each(function (docker) {
-                    if (docker.getDockedShape() == shape) {
-                      var rPoint = Object.clone(docker.referencePoint)
-                      // Move reference point per percent
-
-                      var rPointNew = {
-                        x: rPoint.x * newShape.bounds.width() / shape.bounds.width(),
-                        y: rPoint.y * newShape.bounds.height() / shape.bounds.height()
-                      }
-
-                      docker.setDockedShape(newShape)
-                      // Set reference point and center to new position
-                      docker.setReferencePoint(rPointNew)
-                      if (i instanceof ORYX.Core.Edge) {
-                        docker.bounds.centerMoveTo(rPointNew)
-                      } else {
-                        var absXY = shape.absoluteXY()
-                        docker.bounds.centerMoveTo({ x: rPointNew.x + absXY.x, y: rPointNew.y + absXY.y })
-                        //docker.bounds.moveBy({x:rPointNew.x-rPoint.x, y:rPointNew.y-rPoint.y});
-                      }
-                    }
-                  })
-                })
-
-              // for attached events
-              if (shape.dockers.length > 0 && shape.dockers.first().getDockedShape()) {
-                newShape.dockers.first().setDockedShape(shape.dockers.first().getDockedShape())
-                newShape.dockers.first().setReferencePoint(Object.clone(shape.dockers.first().referencePoint))
-              }
-
-            } else { // is edge
-              newShape.dockers.first().setDockedShape(shape.dockers.first().getDockedShape())
-              newShape.dockers.first().setReferencePoint(shape.dockers.first().referencePoint)
-              newShape.dockers.last().setDockedShape(shape.dockers.last().getDockedShape())
-              newShape.dockers.last().setReferencePoint(shape.dockers.last().referencePoint)
-            }
-          }
-        }
-
         let stencil = undefined
         const stencilSets = this.editorManager.getStencilSets().values()
 
@@ -435,24 +222,26 @@
         if (!stencil) return
 
         // Create and execute command (for undo/redo)
-        const command = new MorphTo(this.currentSelectedShape, stencil, this.editorManager.getEditor())
-        this.editorManager.executeCommands([command])
+        // const command = new MorphTo(this.currentSelectedShape, stencil, this.editorManager.getEditor())
+        // this.editorManager.executeCommands([command])
+        this.editorManager.assignCommand('MorphTo', this.currentSelectedShape, stencil, this.editorManager.getEditor())
+
       },
       dropCallback (event, ui) {
         this.editorManager.handleEvents({
-          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+          type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
           highlightId: 'shapeRepo.attached'
         })
         this.editorManager.handleEvents({
-          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+          type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
           highlightId: 'shapeRepo.added'
         })
         this.editorManager.handleEvents({
-          type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
+          type: ORYX_CONFIG.EVENT_HIGHLIGHT_HIDE,
           highlightId: 'shapeMenu'
         })
 
-        this.editorManager.dispatchFlowEvent(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS,[
+        this.editorManager.dispatchFlowEvent(ORYX_CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS,[
           { type: 'hide_shape_buttons', status: true },
           { type: 'hide_flow_add_btns', status: true },
           { type: 'hide_morph_buttons', status: true },
@@ -547,9 +336,10 @@
                 option.connectingType = targetStencil.id()
               }
 
-              let command = new FLOWABLE_OPTIONS.CreateCommand(option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
-
-              this.editorManager.executeCommands([command])
+              // let command = new FLOWABLE_OPTIONS.CreateCommand(option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
+              //
+              // this.editorManager.executeCommands([command])
+              this.editorManager.assignCommand('CreateCommand', option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
             }
 
           } else {
@@ -569,69 +359,15 @@
             option['position'] = pos
             option['parent'] = this.editorManager.dragCurrentParent
 
-            class commandClass extends ORYX.Core.Command {
-              constructor (option, dockedShape, canAttach, position, facade) {
-                super()
-                this.option = option
-                this.docker = null
-                this.dockedShape = dockedShape
-                this.dockedShapeParent = dockedShape.parent || facade.getCanvas()
-                this.position = position
-                this.facade = facade
-                this.selection = this.facade.getSelection()
-                this.shape = null
-                this.parent = null
-                this.canAttach = canAttach
-              }
-
-              execute () {
-                if (!this.shape) {
-                  this.shape = this.facade.createShape(option)
-                  this.parent = this.shape.parent
-                } else if (this.parent) {
-                  this.parent.add(this.shape)
-                }
-
-                if (this.canAttach && this.shape.dockers && this.shape.dockers.length) {
-                  this.docker = this.shape.dockers[0]
-
-                  this.dockedShapeParent.add(this.docker.parent)
-
-                  // Set the Docker to the new Shape
-                  this.docker.setDockedShape(undefined)
-                  this.docker.bounds.centerMoveTo(this.position)
-                  if (this.dockedShape !== this.facade.getCanvas()) {
-                    this.docker.setDockedShape(this.dockedShape)
-                  }
-                  this.facade.setSelection([this.docker.parent])
-                }
-
-                this.facade.getCanvas().update()
-                this.facade.updateSelection()
-
-              }
-
-              rollback () {
-                if (this.shape) {
-                  this.facade.setSelection(this.selection.without(this.shape))
-                  this.facade.deleteShape(this.shape)
-                }
-                if (this.canAttach && this.docker) {
-                  this.docker.setDockedShape(undefined)
-                }
-                this.facade.getCanvas().update()
-                this.facade.updateSelection()
-
-              }
-            }
 
             // Update canvas
-            let command = new commandClass(option, this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())
-            this.editorManager.executeCommands([command])
+            // let command = new commandClass(option, this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())
+            // this.editorManager.executeCommands([command])
+            this.editorManager.assignCommand('CommandClass', option, this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())
 
             // Fire event to all who want to know about this
             let dropEvent = {
-              type: FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED,
+              type: ORYX_CONFIG.EVENT_TYPE_ITEM_DROPPED,
               droppedItem: item,
               position: pos
             }
@@ -687,16 +423,16 @@
             }
           }
 
-          if (aShapes[0] instanceof ORYX.Core.Canvas) {
+          if (this.editorManager.instanceofCanvas(aShapes[0])) {
             this.editorManager.getCanvas().setHightlightStateBasedOnX(coord.x)
           }
 
-          var stencil = undefined
-          var stencilSets = this.editorManager.getStencilSets().values()
-          for (var i = 0; i < stencilSets.length; i++) {
-            var stencilSet = stencilSets[i]
-            var nodes = stencilSet.nodes()
-            for (var j = 0; j < nodes.length; j++) {
+          let stencil = undefined
+          let stencilSets = this.editorManager.getStencilSets().values()
+          for (let i = 0; i < stencilSets.length; i++) {
+            let stencilSet = stencilSets[i]
+            let nodes = stencilSet.nodes()
+            for (let j = 0; j < nodes.length; j++) {
               if (nodes[j].idWithoutNs() === event.target.id) {
                 stencil = nodes[j]
                 break
@@ -714,20 +450,20 @@
             }
           }
 
-          var candidate = aShapes.last()
+          let candidate = aShapes.last()
 
-          var isValid = false
+          let isValid = false
           if (stencil.type() === 'node') {
             // check containment rules
-            var canContain = this.editorManager.getRules().canContain({
+            let canContain = this.editorManager.getRules().canContain({
               containingShape: candidate,
               containedStencil: stencil
             })
 
-            var parentCandidate = aShapes.reverse().find(function (candidate) {
-              return (candidate instanceof ORYX.Core.Canvas
-                || candidate instanceof ORYX.Core.Node
-                || candidate instanceof ORYX.Core.Edge)
+            let parentCandidate = aShapes.reverse().find(function (candidate) {
+              return (this.editorManager.instanceofCanvas(candidate)
+                || this.editorManager.instanceofNode(candidate)
+                || this.editorManager.instanceofEdge(candidate))
             })
 
             if (!parentCandidate) {
@@ -743,16 +479,15 @@
             isValid = canContain
 
           } else { //Edge
+            let shapes = this.editorManager.getSelection()
+            if (shapes && shapes.length === 1) {
+              let currentSelectedShape = shapes.first()
+              let curCan = candidate
+              let canConnect = false
 
-            var shapes = this.editorManager.getSelection()
-            if (shapes && shapes.length == 1) {
-              var currentSelectedShape = shapes.first()
-              var curCan = candidate
-              var canConnect = false
-
-              var targetStencil = this.editorManager.getStencilItemById(curCan.getStencil().idWithoutNs())
+              let targetStencil = this.editorManager.getStencilItemById(curCan.getStencil().idWithoutNs())
               if (targetStencil) {
-                var associationConnect = false
+                let associationConnect = false
                 if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
                   associationConnect = true
                 } else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
@@ -760,7 +495,7 @@
                 }
 
                 if (targetStencil.canConnectTo || associationConnect) {
-                  while (!canConnect && curCan && !(curCan instanceof ORYX.Core.Canvas)) {
+                  while (!canConnect && curCan && !this.editorManager.instanceofCanvas(curCan)) {
                     candidate = curCan
                     //check connection rules
                     canConnect = this.editorManager.getRules().canConnect({
@@ -772,7 +507,7 @@
                   }
                 }
               }
-              var parentCandidate = this.editorManager.getCanvas()
+              let parentCandidate = this.editorManager.getCanvas()
 
               isValid = canConnect
               this.editorManager.dragCurrentParent = parentCandidate
@@ -785,10 +520,10 @@
           }
 
           this.editorManager.handleEvents({
-            type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
+            type: ORYX_CONFIG.EVENT_HIGHLIGHT_SHOW,
             highlightId: 'shapeMenu',
             elements: [candidate],
-            color: isValid ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
+            color: isValid ? ORYX_CONFIG.SELECTION_VALID_COLOR : ORYX_CONFIG.SELECTION_INVALID_COLOR
           })
         }
       },
@@ -798,8 +533,8 @@
         if (shapes && shapes.length === 1) {
           this.currentSelectedShape = shapes.first()
 
-          var containedStencil = undefined
-          var stencilSets = this.editorManager.getStencilSets().values()
+          let containedStencil = undefined
+          let stencilSets = this.editorManager.getStencilSets().values()
           for (let i = 0; i < stencilSets.length; i++) {
             let stencilSet = stencilSets[i]
             let nodes = stencilSet.nodes()
@@ -813,7 +548,7 @@
 
           if (!containedStencil) return
 
-          var option = {
+          let option = {
             type: this.currentSelectedShape.getStencil().namespace() + newItemId,
             namespace: this.currentSelectedShape.getStencil().namespace()
           }
@@ -821,8 +556,8 @@
           option['parent'] = this.currentSelectedShape.parent
           option['containedStencil'] = containedStencil
 
-          var args = { sourceShape: this.currentSelectedShape, targetStencil: containedStencil }
-          var targetStencil = this.editorManager.getRules().connectMorph(args)
+          let args = { sourceShape: this.currentSelectedShape, targetStencil: containedStencil }
+          let targetStencil = this.editorManager.getRules().connectMorph(args)
 
           // Check if there can be a target shape
           if (!targetStencil) {
@@ -830,21 +565,8 @@
           }
 
           option['connectingType'] = targetStencil.id()
-          var command = new FLOWABLE_OPTIONS.CreateCommand(option, undefined, undefined, this.editorManager.getEditor())
-
-          this.editorManager.executeCommands([command])
+          this.editorManager.assignCommand('CreateCommand', option, undefined, undefined, this.editorManager.getEditor())
         }
-      },
-      initScrollHandling () {
-        var canvasSection = jQuery('#canvasSection')
-        canvasSection.scroll(() => {
-
-        })
-
-        canvasSection.scrollStopped(() => {
-
-
-        })
       }
     }
   }

@@ -80,11 +80,6 @@ export default class Editor {
     this.loadPlugins()
     loadPluginFinished = true
     initFinished()
-    // window.setTimeout(function () {
-    //   this.loadPlugins()
-    //   loadPluginFinished = true
-    //   initFinished()
-    // }.bind(this), 100)
 
     // LOAD the content of the current editor instance
     window.setTimeout(function () {
@@ -161,7 +156,6 @@ export default class Editor {
   /**
    * Generate the whole viewport of the
    * Editor and initialized the Ext-Framework
-   *
    */
   _generateGUI () {
     // Defines the layout height if it's NOT fullscreen
@@ -174,11 +168,10 @@ export default class Editor {
       canvasParent.parentNode.setAttributeNS(null, 'align', 'center')
       canvasParent.setAttributeNS(null, 'align', 'left')
       this.getCanvas().setSize({
-        width: ORYX_Config.CANVAS_WIDTH,
-        height: ORYX_Config.CANVAS_HEIGHT
+        width: ORYX_Config.CustomConfigs.CANVAS_WIDTH,
+        height: ORYX_Config.CustomConfigs.CANVAS_HEIGHT
       })
     }
-
   }
 
   getAvailablePlugins () {
@@ -294,7 +287,7 @@ export default class Editor {
     // Available Plugins will be initalize
     let facade = this._getPluginFacade()
 
-    Plugins_s.availablePlugins.each(function (value) {
+    Plugins.availablePlugins.each(function (value) {
       ORYX_Log.debug('Initializing plugin \'%0\'', value.get('name'))
       try {
         let className = eval(value.get('name'))
@@ -310,7 +303,6 @@ export default class Editor {
       }
 
     })
-    console.log('newPlugins', newPlugins)
     newPlugins.each(function (value) {
       // If there is an GUI-Plugin, they get all Plugins-Offer-Meta-Data
       if (value.registryChanged)
@@ -357,9 +349,10 @@ export default class Editor {
     div.addClassName('ORYX_Editor')
 
     // create the canvas
+    console.log(44, ORYX_Config.CustomConfigs)
     this._canvas = new ORYX_Canvas({
-      width: ORYX_Config.CANVAS_WIDTH,
-      height: ORYX_Config.CANVAS_HEIGHT,
+      width: ORYX_Config.CustomConfigs.CANVAS_WIDTH,
+      height: ORYX_Config.CustomConfigs.CANVAS_HEIGHT,
       'eventHandlerCallback': this.handleEvents.bind(this),
       id: this.id,
       parentNode: div

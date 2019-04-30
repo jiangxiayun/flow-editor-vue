@@ -162,11 +162,8 @@
 </template>
 
 <script>
-  import { FLOWABLE } from 'src/flowable/FLOWABLE_Config'
-  import FLOW_OPTIONS from 'src/flowable/FLOW_OPTIONS'
   import ORYX_CONFIG from 'src/oryx/CONFIG'
   import Locale from 'src/mixins/locale'
-  // import { t } from 'src/locale'
 
   export default {
     name: 'toolbar',
@@ -203,15 +200,18 @@
       this.MousetrapBind()
     },
     methods: {
-      executeFunctionByName (functionName, context /*, args */) {
-        const args = Array.prototype.slice.call(arguments).splice(2)
+      executeFunctionByName (functionName, context) {
         let namespaces = functionName.split('.')
         let func = namespaces.pop()
-        for (let i = 1; i < namespaces.length; i++) {
-          context = context[namespaces[i]]
-        }
+        return this.editorManager.TOOLBAR_ACTIONS[func](context)
 
-        return context[func].apply(this, args)
+        // const args = Array.prototype.slice.call(arguments).splice(2)
+        // let namespaces = functionName.split('.')
+        // let func = namespaces.pop()
+        // for (let i = 1; i < namespaces.length; i++) {
+        //   context = context[namespaces[i]]
+        // }
+        // return context[func].apply(this, args)
       },
       toolbarButtonClicked (buttonIndex) {
         if (buttonIndex === 0) {
@@ -223,17 +223,13 @@
         let services = {
           '$scope': this,
           '$rootScope': this.$parent,
-          // '$http' : $http,
-          // '$modal' : $modal,
-          // '$q' : $q,
-          // '$translate' : $translate,
           'editorManager': this.editorManager
         }
-        this.executeFunctionByName(buttonClicked.action, FLOW_OPTIONS, services)
+        this.executeFunctionByName(buttonClicked.action, services)
 
         // Other events
         let event = {
-          type: FLOWABLE.eventBus.EVENT_TYPE_TOOLBAR_BUTTON_CLICKED,
+          type: ORYX_CONFIG.EVENT_TYPE_TOOLBAR_BUTTON_CLICKED,
           toolbarItem: buttonClicked
         }
         this.editorManager.dispatchFlowEvent(event.type, event)
@@ -242,44 +238,39 @@
         let buttonClicked = this.secondaryItems[buttonIndex]
         let services = {
           'this': this,
-          // '$http' : $http,
-          // '$modal' : $modal,
-          // '$q' : $q,
-          // '$translate' : $translate,
-          // '$location': $location,
           'editorManager': this.editorManager
         }
-        this.executeFunctionByName(buttonClicked.action, FLOW_OPTIONS, services)
+        this.executeFunctionByName(buttonClicked.action, services)
       },
       MousetrapBind () {
         /* Key bindings */
         Mousetrap.bind('mod+z', () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOW_OPTIONS.TOOLBAR.ACTIONS.undo(services)
+          this.editorManager.TOOLBAR_ACTIONS.undo(services)
           return false
         })
 
         Mousetrap.bind('mod+y', () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOW_OPTIONS.TOOLBAR.ACTIONS.redo(services)
+          this.editorManager.TOOLBAR_ACTIONS.redo(services)
           return false
         })
 
         Mousetrap.bind('mod+c', () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOW_OPTIONS.TOOLBAR.ACTIONS.copy(services)
+          this.editorManager.TOOLBAR_ACTIONS.copy(services)
           return false
         })
 
         Mousetrap.bind('mod+v', () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOW_OPTIONS.TOOLBAR.ACTIONS.paste(services)
+          this.editorManager.TOOLBAR_ACTIONS.paste(services)
           return false
         })
 
         Mousetrap.bind(['del'], () => {
           const services = { '$scope': this, 'editorManager': this.editorManager }
-          FLOW_OPTIONS.TOOLBAR.ACTIONS.deleteItem(services)
+          this.editorManager.TOOLBAR_ACTIONS.deleteItem(services)
           return false
         })
       },
@@ -461,11 +452,6 @@
       editorManager (nv, ov) {
         if (!ov) {
           this.registerOnEvent()
-
-          // if (nv.getCurrentModelId() != nv.getModelId()) {
-          //   nv.edit(nv.getModelId())
-          // }
-
           this.modelMetaData = this.editorManager.getBaseModelData()
           if (this.modelMetaData.description) {
             this.description = this.modelMetaData.description

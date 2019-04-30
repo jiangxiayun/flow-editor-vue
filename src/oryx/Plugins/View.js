@@ -25,14 +25,14 @@ export default class View {
   /** @lends ORYX.Plugins.View.prototype */
   constructor (facade, ownPluginData) {
     this.facade = facade
-    //Standard Values
+    // Standard Values
     this.zoomLevel = 1.0
     this.maxFitToScreenLevel = 1.5
     this.minZoomLevel = 0.1
     this.maxZoomLevel = 2.5
     this.diff = 5 //difference between canvas and view port, s.th. like toolbar??
 
-    //Read properties
+    // Read properties
     if (ownPluginData !== undefined && ownPluginData !== null) {
       ownPluginData.get('properties').each(function (property) {
         if (property.zoomLevel) {
@@ -53,7 +53,7 @@ export default class View {
     /* Register zoom in */
     this.facade.offer({
       'name': this.I18N.View.zoomIn,
-      'functionality': this.zoom.bind(this, [1.0 + ORYX_Config.ZOOM_OFFSET]),
+      'functionality': this.zoom.bind(this, [1.0 + ORYX_Config.CustomConfigs.ZOOM_OFFSET]),
       'group': this.I18N.View.group,
       'icon': ORYX_Config.PATH + 'images/magnifier_zoom_in.png',
       'description': this.I18N.View.zoomInDesc,
@@ -68,7 +68,7 @@ export default class View {
     /* Register zoom out */
     this.facade.offer({
       'name': this.I18N.View.zoomOut,
-      'functionality': this.zoom.bind(this, [1.0 - ORYX_Config.ZOOM_OFFSET]),
+      'functionality': this.zoom.bind(this, [1.0 - ORYX_Config.CustomConfigs.ZOOM_OFFSET]),
       'group': this.I18N.View.group,
       'icon': ORYX_Config.PATH + 'images/magnifier_zoom_out.png',
       'description': this.I18N.View.zoomOutDesc,

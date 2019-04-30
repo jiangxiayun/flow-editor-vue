@@ -1,6 +1,6 @@
 {
   "name": "flow-editor-vue",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "基于flowable绘图工具oryx的流程引擎",
   "main": "lib/flowable-oryx.umd.min.js",
   "files": [

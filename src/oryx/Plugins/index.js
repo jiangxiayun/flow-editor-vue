@@ -52,15 +52,39 @@ const Plugins = {
   BPMN2_0: BPMN2_0,
   Arrangement: Arrangement,
   PoolAsProperty: PoolAsProperty,
-  _loadPlugins: function(plugins) {
+  getProperties: function(props) {
+    if (!props) return []
+    let arry = []
+    props.forEach((prop) => {
+      let property = new Map()
+      let attributes = Object.keys(prop)
+      attributes.map(function (attr) {
+        property.set(attr, prop[attr])
+      })
+      if (attributes.length > 0) {
+        arry.push(property)
+      }
+    })
+    return arry
+  },
+  _loadPlugins: function(config) {
+    // Get the globale Properties
+    let globalProperties = this.getProperties(config.properties)
+
     const availablePlugins = []
-    plugins.map(plugin => {
+    config.plugins.map(plugin => {
       let pluginData = new Map()
       if (!plugin.name) {
         ORYX_Log.error('A plugin is not providing a name. Ingnoring this plugin.')
         return
       }
       pluginData.set('name', plugin.name)
+      // Get all private Properties
+      let properties = this.getProperties(plugin.properties)
+      // Set all Global-Properties to the Properties
+      properties = properties.concat(globalProperties)
+      // Set Properties to Plugin-Data
+      pluginData.set('properties', properties)
       availablePlugins.push(pluginData)
     })
     this.availablePlugins = availablePlugins

@@ -94,7 +94,6 @@ class DeleteCommand extends Command {
   }
 }
 
-
 export default class Edit {
   ClipBoard = ClipBoard
   DeleteCommand = DeleteCommand
@@ -117,7 +116,7 @@ export default class Edit {
     this.facade = facade
     this.clipboard = new this.ClipBoard()
 
-    //this.facade.registerOnEvent(ORYX.CONFIG.EVENT_KEYDOWN, this.keyHandler.bind(this));
+    // this.facade.registerOnEvent(ORYX.CONFIG.EVENT_KEYDOWN, this.keyHandler.bind(this));
 
     this.facade.offer({
       name: this.I18N.Edit.cut,
@@ -279,7 +278,7 @@ export default class Edit {
     let childShapesToConsider = [] // all child shapes of top-level shapes
 
     shapes.each(function (shape) {
-      //Throw away these shapes which have a parent in given shapes
+      // Throw away these shapes which have a parent in given shapes
       let isChildShapeOfAnother = shapes.any(function (s2) {
         return s2.hasChildShape(shape)
       })
@@ -351,7 +350,7 @@ export default class Edit {
    */
   editPaste () {
     // Create a new canvas with childShapes
-    //and stencilset namespace to be JSON Import conform
+    // and stencilset namespace to be JSON Import conform
     let canvas = {
       childShapes: this.clipboard.shapesAsJson,
       stencilset: {
@@ -361,8 +360,9 @@ export default class Edit {
     // Apply json helper to iterate over json object
     jQuery.extend(canvas, ORYX_Utils.JSONHelper)
 
-    // let childShapeResourceIds = canvas.getChildShapes(true).pluck('resourceId')
-    let childShapeResourceIds = getChildShapes.getChildShapes(canvas, true).pluck('resourceId')
+    let childShapeResourceIds = canvas.getChildShapes(true).pluck('resourceId')
+    // console.log(2, getChildShapes)
+    // let childShapeResourceIds = getChildShapes.getChildShapes(canvas, true).pluck('resourceId')
     let outgoings = {}
     // Iterate over all shapes
     canvas.eachChild(function (shape, parent) {
@@ -412,12 +412,12 @@ export default class Edit {
       if (this.clipboard.useOffset) {
         shape.bounds = {
           lowerRight: {
-            x: shape.bounds.lowerRight.x + ORYX_Config.COPY_MOVE_OFFSET,
-            y: shape.bounds.lowerRight.y + ORYX_Config.COPY_MOVE_OFFSET
+            x: shape.bounds.lowerRight.x + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
+            y: shape.bounds.lowerRight.y + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET
           },
           upperLeft: {
-            x: shape.bounds.upperLeft.x + ORYX_Config.COPY_MOVE_OFFSET,
-            y: shape.bounds.upperLeft.y + ORYX_Config.COPY_MOVE_OFFSET
+            x: shape.bounds.upperLeft.x + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
+            y: shape.bounds.upperLeft.y + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET
           }
         }
       }
@@ -450,8 +450,8 @@ export default class Edit {
             }
           } else if (this.clipboard.useOffset) {
             return {
-              x: docker.x + ORYX_Config.COPY_MOVE_OFFSET,
-              y: docker.y + ORYX_Config.COPY_MOVE_OFFSET,
+              x: docker.x + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
+              y: docker.y + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
               getDocker: docker.getDocker
             }
           } else {
@@ -473,8 +473,8 @@ export default class Edit {
 
           if (this.clipboard.useOffset) {
             return {
-              x: docker.x + ORYX_Config.COPY_MOVE_OFFSET,
-              y: docker.y + ORYX_Config.COPY_MOVE_OFFSET,
+              x: docker.x + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
+              y: docker.y + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
               getDocker: docker.getDocker
             }
           } else {

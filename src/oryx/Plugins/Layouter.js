@@ -1,7 +1,6 @@
 /**
  * Edge layouter is an implementation to layout an edge
  * @class ORYX.Plugins.Layouter.EdgeLayouter
- * @author Willi Tscheschner
  */
 
 import AbstractLayouter from './AbstractLayouter'
@@ -48,16 +47,12 @@ class EdgeLayouter extends AbstractLayouter {
     let to = edge.getOutgoingNodes()[0]
 
     // Return if one is null
-    if (!from || !to) {
-      return
-    }
+    if (!from || !to) return
 
     let positions = this.getPositions(from, to, edge)
-
     if (positions.length > 0) {
       this.setDockers(edge, positions[0].a, positions[0].b)
     }
-
   }
 
   /**
@@ -108,7 +103,7 @@ class EdgeLayouter extends AbstractLayouter {
 
     // Enlarge both bounds with 10
     ab.widen(5) // Wide the from less than
-    bb.widen(20)// the to because of the arrow from the edge
+    bb.widen(20) // the to because of the arrow from the edge
 
     let positions = []
     let off = this.getOffset.bind(this)
@@ -200,8 +195,6 @@ class EdgeLayouter extends AbstractLayouter {
       d2 = d2 == 't' ? 'b' : (d2 == 'r' ? 'l' : (d2 == 'b' ? 't' : (d2 == 'l' ? 'r' : 'r')))
     }
 
-
-    let weight = 0
     // Get rules for from "out" and to "in"
     let dr1 = this.facade.getRules().getLayoutingRules(from, edge)['out']
     let dr2 = this.facade.getRules().getLayoutingRules(to, edge)['in']
@@ -251,8 +244,8 @@ class EdgeLayouter extends AbstractLayouter {
       })
 
     // If there are equivalent edges, set 0
-    //fromWeight = sameIncomingFrom ? 0 : fromWeight;
-    //toWeight = sameOutgoingTo ? 0 : toWeight;
+    // fromWeight = sameIncomingFrom ? 0 : fromWeight;
+    // toWeight = sameOutgoingTo ? 0 : toWeight;
 
     // Get the sum of "out" and the direction plus "in" and the direction
     return (sameIncomingFrom || sameOutgoingTo ? 0 : fromWeight + toWeight)
@@ -267,9 +260,7 @@ class EdgeLayouter extends AbstractLayouter {
    * @param {Object} b
    */
   setDockers (edge, a, b) {
-    if (!edge) {
-      return
-    }
+    if (!edge) return
 
     // Remove all dockers (implicit,
     // start and end dockers will not removed)
@@ -290,9 +281,8 @@ class EdgeLayouter extends AbstractLayouter {
     })
 
     // Update edge
-    //edge.refresh();
+    // edge.refresh();
     edge._update(true)
-
   }
 }
 

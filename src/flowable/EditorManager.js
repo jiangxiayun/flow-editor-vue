@@ -1,16 +1,33 @@
-import { FLOWABLE } from './FLOWABLE_Config'
-import FLOW_OPTIONS from './FLOW_OPTIONS'
+import FLOWABLE_CONFIG from './FLOWABLE_Config'
+import TOOLBAR_ACTIONS from './TOOLBAR_ACTIONS'
+import FLOW_eventBus from './FLOW_eventBus'
 import { findGroup, addGroup } from '../Util'
 import ORYX from '../oryx'
-import ORYX_Log from '../oryx/Log'
 
+import CreateCommand from './Command/CreateCommand'
+import MorphTo from './Command/MorphTo'
+import SetProperty from './Command/setProperty'
+import CommandClass from './Command/commandClass'
+
+const FLOWABLE = jQuery.extend(true, {}, FLOWABLE_CONFIG)
 /**流程图编辑器 类
  * @params modelData: 流程图实例数据
  * @params stencilData: 流程元素/组件
  **/
 export default class EditorManager {
+  Commands = {
+    CreateCommand,
+    MorphTo,
+    SetProperty,
+    CommandClass
+  }
+  TOOLBAR_ACTIONS = TOOLBAR_ACTIONS
   constructor (config) {
+    this.listeners = {}
     config = jQuery.extend(true, {}, config)
+    // this.editorConfigs = jQuery.extend(true, FLOWABLE, config.editorConfigs)
+    config.editorConfigs && ORYX.CONFIG.setCustomConfigs(config.editorConfigs)
+    this.property_config = config.editorConfigs.PROPERTY_CONFIG
     this.treeFilteredElements = ['SubProcess', 'CollapsedSubProcess']
     this.canvasTracker = new Hash()
     this.structualIcons = {
@@ -39,15 +56,7 @@ export default class EditorManager {
     const stencilSet = new ORYX.Core.StencilSet.StencilSet(baseUrl, config.stencilData)
 
     ORYX.Core.StencilSet.loadStencilSet(baseUrl, stencilSet, config.modelData.modelId)
-    ORYX.Plugins._loadPlugins(config.plugins)
-    // this._loadPlugins(config.plugins)
-    // jQuery.ajax({
-    //   type: 'GET',
-    //   url: 'flowable/editor-app/plugins.xml',
-    //   success: function (data, textStatus, jqXHR) {
-    //     ORYX.Utils._loadPlugins(data)
-    //   }
-    // })
+    config.pluginConfig && ORYX.Plugins._loadPlugins(config.pluginConfig)
     // 拖拽功能辅助变量
     this.dragCurrentParent = undefined
     this.dragCurrentParentId = undefined
@@ -59,28 +68,27 @@ export default class EditorManager {
 
     this.bootEditor()
   }
+  assignCommand (type, ...configs) {
+    if (!type) return
+    const Commands = this.Commands
+    let command = new Commands[type](...configs)
+    this.executeCommands([command])
+  }
 
-  _loadPlugins (plugins) {
-    const availablePlugins = []
-    plugins.map(plugin => {
-      let pluginData = new Map()
-      if (!plugin.name) {
-        ORYX_Log.error('A plugin is not providing a name. Ingnoring this plugin.')
-        return
-      }
-      pluginData.set('name', plugin.name)
-    })
-    this.availablePlugins = availablePlugins
+  instanceofCanvas (shape) {
+    return shape instanceof ORYX.Core.Canvas
+  }
+  instanceofNode (shape) {
+    return shape instanceof ORYX.Core.Node
+  }
+  instanceofEdge (shape) {
+    return shape instanceof ORYX.Core.Edge
   }
 
   getSelectedItem () { return this.selectedItem }
-
   getSelectedShape () { return this.selectedShape }
-
   getContainmentRules () { return this.containmentRules }
-
   getToolbarItems () { return this.toolbarItems }
-
   setToolbarItems () {
     let items = []
     const toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items
@@ -99,7 +107,6 @@ export default class EditorManager {
   getSecondaryItems () { return FLOWABLE.TOOLBAR_CONFIG.secondaryItems }
 
   getModelId () { return this.modelId }
-
   setModelId (modelId) { this.modelId = modelId }
 
   getModel () {
@@ -141,7 +148,6 @@ export default class EditorManager {
 
     return model
   }
-
   setModelData (response) {
     this.modelData = response
     // _this.UPDATE_modelData(response)
@@ -152,16 +158,13 @@ export default class EditorManager {
   getCurrentModelId () { return this.current }
 
   getStencilData () { return this.stencilData }
-
   setStencilData (stencilData) {
     // we don't want a references!
     this.stencilData = jQuery.extend(true, {}, stencilData)
   }
-
   getShowStencilData () {
     return this.showStencilData
   }
-
   setShowStencilData () {
     let quickMenuDefinition = undefined
     let ignoreForPaletteDefinition = undefined
@@ -327,11 +330,8 @@ export default class EditorManager {
   }
 
   getSelection () { return this.editor.selection }
-
   setSelection (selection) { this.editor.setSelection(selection) }
-
   updateSelection () { this.editor.updateSelection() }
-
   getSubSelection () {
     return this.editor._subSelection
   }
@@ -354,44 +354,42 @@ export default class EditorManager {
     this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes))
     this.editor = new ORYX.Editor(config)
 
-    console.log('canvasTracker', this.canvasTracker)
     this.current = this.editor.id
     this.loading = false
 
-    FLOW_OPTIONS.events.editor = this.editor
-    FLOW_OPTIONS.events.dispatch('ORYX-EDITOR-LOADED', {})
-    FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_EDITOR_BOOTED, {})
+    FLOW_eventBus.dispatch('ORYX-EDITOR-LOADED', {})
+    FLOW_eventBus.dispatch(ORYX.CONFIG.EVENT_TYPE_EDITOR_BOOTED, {})
 
     const eventMappings = [
       // 元素选择
-      { oryxType: ORYX.CONFIG.EVENT_SELECTION_CHANGED, flowableType: FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGE },
+      { oryxType: ORYX.CONFIG.EVENT_SELECTION_CHANGED, flowableType: ORYX.CONFIG.EVENT_TYPE_SELECTION_CHANGE },
       // 双击
-      { oryxType: ORYX.CONFIG.EVENT_DBLCLICK, flowableType: FLOWABLE.eventBus.EVENT_TYPE_DOUBLE_CLICK },
+      { oryxType: ORYX.CONFIG.EVENT_DBLCLICK, flowableType: ORYX.CONFIG.EVENT_TYPE_DOUBLE_CLICK },
       // 鼠标状态
-      { oryxType: ORYX.CONFIG.EVENT_MOUSEOUT, flowableType: FLOWABLE.eventBus.EVENT_TYPE_MOUSE_OUT },
-      { oryxType: ORYX.CONFIG.EVENT_MOUSEOVER, flowableType: FLOWABLE.eventBus.EVENT_TYPE_MOUSE_OVER },
-      { oryxType: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED, flowableType: FLOWABLE.eventBus.EVENT_TYPE_EDITOR_READY },
+      { oryxType: ORYX.CONFIG.EVENT_MOUSEOUT, flowableType: ORYX.CONFIG.EVENT_TYPE_MOUSE_OUT },
+      { oryxType: ORYX.CONFIG.EVENT_MOUSEOVER, flowableType: ORYX.CONFIG.EVENT_TYPE_MOUSE_OVER },
+      { oryxType: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED, flowableType: ORYX.CONFIG.EVENT_TYPE_EDITOR_READY },
       // 属性变化
       {
         oryxType: ORYX.CONFIG.EVENT_PROPERTY_CHANGED,
-        flowableType: FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED
+        flowableType: ORYX.CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED
       }
     ]
 
     eventMappings.forEach((eventMapping) => {
-      this.registerOnEvent(eventMapping.oryxType, function (event) {
-        FLOW_OPTIONS.events.dispatch(eventMapping.flowableType, event)
+      this.registerOnEvent(eventMapping.oryxType, (event) => {
+        FLOW_eventBus.dispatch(eventMapping.flowableType, event)
       })
     })
 
     // if an element is added te properties will catch this event.
-    FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.filterEvent.bind(this))
-    FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_ITEM_DROPPED, this.filterEvent.bind(this))
-    FLOW_OPTIONS.events.addListener('EDITORMANAGER-EDIT-ACTION', function () {
+    FLOW_eventBus.addListener(ORYX.CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.filterEvent.bind(this))
+    FLOW_eventBus.addListener(ORYX.CONFIG.EVENT_TYPE_ITEM_DROPPED, this.filterEvent.bind(this))
+    FLOW_eventBus.addListener('EDITORMANAGER-EDIT-ACTION', function () {
       this.renderProcessHierarchy()
     })
 
-    FLOW_OPTIONS.initAddListener()
+    this.initAddListener()
     this.initRegisterOnEvent()
   }
 
@@ -409,7 +407,6 @@ export default class EditorManager {
     }
 
   }
-
   filterEvent (event) {
     // this event is fired when the user changes a property by the property editor.
     if (event.type === 'event-type-property-value-changed') {
@@ -430,7 +427,6 @@ export default class EditorManager {
       this.renderProcessHierarchy()
     }
   }
-
 
   /**
    * Helper method to find a stencil item.
@@ -485,7 +481,6 @@ export default class EditorManager {
   handleEvents (events) {
     this.editor.handleEvents(events)
   }
-
   registerOnEvent (event, callback) {
     this.editor.registerOnEvent(event, callback)
   }
@@ -493,20 +488,15 @@ export default class EditorManager {
   getChildShapeByResourceId (resourceId) {
     return this.editor.getCanvas().getChildShapeByResourceId(resourceId)
   }
-
   getJSON () { return this.editor.getJSON() }
 
   getStencilSets () { return this.editor.getStencilSets() }
-
   getCanvas () { return this.editor.getCanvas() }
-
   getRules () { return this.editor.getRules() }
-
   getEditor () {
     //TODO: find out if we can avoid exposing the editor object to angular.
     return this.editor
   }
-
   getTree () {
     //build a tree of all subprocesses and there children.
     var result = new Hash()
@@ -524,11 +514,9 @@ export default class EditorManager {
   executeCommands (commands) {
     this.editor.executeCommands(commands)
   }
-
   eventCoordinates (coordinates) {
     return this.editor.eventCoordinates(coordinates)
   }
-
   eventCoordinatesXY (x, y) {
     return this.editor.eventCoordinatesXY(x, y)
   }
@@ -558,8 +546,8 @@ export default class EditorManager {
     this.current = resourceId
 
     this.loading = false
-    FLOW_OPTIONS.events.dispatch('EDITORMANAGER-EDIT-ACTION', {})
-    FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_UNDO_REDO_RESET, {})
+    FLOW_eventBus.dispatch('EDITORMANAGER-EDIT-ACTION', {})
+    FLOW_eventBus.dispatch(ORYX.CONFIG.EVENT_TYPE_UNDO_REDO_RESET, {})
   }
 
   _buildTreeChildren (childShapes) {
@@ -596,7 +584,6 @@ export default class EditorManager {
     }
     return children
   }
-
   syncCanvasTracker () {
     let shapes = this.getCanvas().getChildren()
     let jsonShapes = []
@@ -606,7 +593,6 @@ export default class EditorManager {
     })
     this.canvasTracker.set(this.current, JSON.stringify(jsonShapes))
   }
-
   findAndRegisterCanvas (childShapes) {
     for (let i = 0; i < childShapes.length; i++) {
       let childShape = childShapes[i]
@@ -624,7 +610,6 @@ export default class EditorManager {
       }
     }
   }
-
   _mergeCanvasToChild (parent) {
     for (let i = 0; i < parent.childShapes.length; i++) {
       let childShape = parent.childShapes[i]
@@ -645,7 +630,6 @@ export default class EditorManager {
       }
     }
   }
-
   isLoading () {
     return this.loading
   }
@@ -685,10 +669,10 @@ export default class EditorManager {
   }
 
   dispatchFlowEvent (type, event) {
-    FLOW_OPTIONS.events.dispatch(type, event)
+    FLOW_eventBus.dispatch(type, event)
   }
   flowToolbarEvent (services) {
-    FLOW_OPTIONS.TOOLBAR.ACTIONS.deleteItem(services)
+    this.TOOLBAR_ACTIONS.deleteItem(services)
   }
 
   initRegisterOnEvent () {
@@ -760,9 +744,9 @@ export default class EditorManager {
         }
 
         // First we check if there is a config for 'key-type' and then for 'type' alone
-        let propertyConfig = FLOWABLE.PROPERTY_CONFIG[key + '-' + property.type()]
+        let propertyConfig = this.property_config[key + '-' + property.type()]
         if (propertyConfig === undefined || propertyConfig === null) {
-          propertyConfig = FLOWABLE.PROPERTY_CONFIG[property.type()]
+          propertyConfig = this.property_config[property.type()]
         }
 
         if (propertyConfig === undefined || propertyConfig === null) {
@@ -821,7 +805,7 @@ export default class EditorManager {
 
       this.selectedItem = selectedItem
       this.selectedShape = selectedShape
-      FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, {
+      FLOW_eventBus.dispatch(ORYX.CONFIG.EVENT_TYPE_SELECTION_CHANGED, {
         selectedItem,
         selectedShape
       })
@@ -831,7 +815,7 @@ export default class EditorManager {
     }
   }
   updateOryxButtonPosition (selectedElements) {
-    FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
+    FLOW_eventBus.dispatch(ORYX.CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
       { type: 'hide_shape_buttons', status: true }
     ])
     let hide_flow_add_btns = true
@@ -910,7 +894,7 @@ export default class EditorManager {
         flow_add_btns.style.top = quickButtonY + 'px'
         hide_flow_add_btns = false
       }
-      FLOW_OPTIONS.events.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
+      FLOW_eventBus.dispatch(ORYX.CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
         { type: 'hide_shape_buttons', status: false },
         { type: 'hide_flow_add_btns', status: hide_flow_add_btns },
         { type: 'hide_morph_buttons', status: hide_morph_buttons },
@@ -933,5 +917,47 @@ export default class EditorManager {
         }
       }
     }
+  }
+  initAddListener (editorManager) {
+    FLOW_eventBus.addListener(ORYX.CONFIG.EVENT_TYPE_EDITOR_READY, () => {
+      var url = window.location.href
+      var regex = new RegExp('[?&]subProcessId(=([^&#]*)|&|#|$)')
+      var results = regex.exec(url)
+      if (results && results[2]) {
+        editorManager.edit(decodeURIComponent(results[2].replace(/\+/g, ' ')))
+      }
+    })
+    FLOW_eventBus.addListener(ORYX.CONFIG.EVENT_TYPE_UNDO_REDO_RESET, function () {
+      if (this.items) {
+        for (let i = 0; i < this.items.length; i++) {
+          let item = this.items[i]
+          if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.undo' || item.action === 'FLOWABLE.TOOLBAR.ACTIONS.redo') {
+            item.enabled = false
+          }
+        }
+      }
+
+    }, this)
+    FLOW_eventBus.addListener(ORYX.CONFIG.EVENT_TYPE_SHOW_VALIDATION_POPUP, function (event) {
+      // Method to open validation dialog
+      var showValidationDialog = function () {
+        this.currentValidationId = event.validationId
+        this.isOnProcessLevel = event.onProcessLevel
+
+        _internalCreateModal({ template: 'editor-app/popups/validation-errors.html?version=' + Date.now() }, $modal, this)
+      }
+
+      showValidationDialog()
+    })
+    FLOW_eventBus.addListener(ORYX.CONFIG.EVENT_TYPE_NAVIGATE_TO_PROCESS, function (event) {
+      var modelMetaData = editorManager.getBaseModelData()
+      this.editorHistory.push({
+        id: modelMetaData.modelId,
+        name: modelMetaData.name,
+        type: 'bpmnmodel'
+      })
+
+      $window.location.href = '../editor/#/editor/' + event.processId
+    })
   }
 }

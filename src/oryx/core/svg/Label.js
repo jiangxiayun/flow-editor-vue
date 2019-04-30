@@ -111,14 +111,14 @@ export default class Label {
 
     // get offset top
     this.offsetTop = this.node.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'offsetTop') ||
-      ORYX_CONFIG.OFFSET_EDGE_LABEL_TOP
+      ORYX_CONFIG.CustomConfigs.OFFSET_EDGE_LABEL_TOP
     if (this.offsetTop) {
       this.offsetTop = parseInt(this.offsetTop)
     }
 
     // get offset top
     this.offsetBottom = this.node.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'offsetBottom') ||
-      ORYX_CONFIG.OFFSET_EDGE_LABEL_BOTTOM
+      ORYX_CONFIG.CustomConfigs.OFFSET_EDGE_LABEL_BOTTOM
     if (this.offsetBottom) {
       this.offsetBottom = parseInt(this.offsetBottom)
     }

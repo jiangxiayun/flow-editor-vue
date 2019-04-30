@@ -73,9 +73,8 @@
 </template>
 
 <script>
-  import ORYX from 'src/oryx'
-  import { FLOWABLE } from 'src/flowable/FLOWABLE_Config'
-  import FLOW_OPTIONS from 'src/flowable/FLOW_OPTIONS'
+  import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
+  import ORYX_CONFIG from 'src/oryx/CONFIG'
   // import defaultValueDisplayTemplate from '@/components/propertyForm/default-value-display-template'
   // import stringPropertyWriteModeTemplate from '@/components/propertyForm/string-property-write-mode-template'
   // import textPropertyWriteTemplate from '@/components/propertyForm/text-property-write-template'
@@ -161,7 +160,7 @@
       /*
        * Listen to property updates and act upon them
        */
-      FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED, (event) => {
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED, (event) => {
         if (event.property && event.property.key) {
           // If the name property is been updated, we also need to change the title of the currently selected item
           if (event.property.key === 'oryx-name' && this.selectedItem !== undefined && this.selectedItem !== null) {
@@ -178,7 +177,7 @@
         }
 
       })
-      FLOW_OPTIONS.events.addListener(FLOWABLE.eventBus.EVENT_TYPE_SELECTION_CHANGED, (event) => {
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, (event) => {
         this.laneEnableValue = ''
         if (this.currentSelectedProperty.mode != 'write') {
           this.selectedItem = event.selectedItem
@@ -259,33 +258,9 @@
 
         const _this = this
         if (newValue != oldValue) {
-          class commandClass extends ORYX.Core.Command{
-            constructor () {
-              super()
-              this.key = key
-              this.oldValue = oldValue
-              this.newValue = newValue
-              this.shape = shape
-              this.facade = _this.editorManager.getEditor()
-            }
-            execute () {
-              this.shape.setProperty(this.key, this.newValue)
-              this.facade.getCanvas().update()
-              this.facade.updateSelection()
-            }
-            rollback () {
-              this.shape.setProperty(this.key, this.oldValue)
-              this.facade.getCanvas().update()
-              this.facade.updateSelection()
-            }
-          }
-          // Instantiate the class
-          var command = new commandClass()
-
-          // Execute the command
-          this.editorManager.executeCommands([command])
+          this.editorManager.assignCommand('SetProperty', key, oldValue, newValue, shape, _this.editorManager.getEditor())
           this.editorManager.handleEvents({
-            type: ORYX.CONFIG.EVENT_PROPWINDOW_PROP_CHANGED,
+            type: ORYX_CONFIG.EVENT_PROPWINDOW_PROP_CHANGED,
             elements: [shape],
             key: key
           })
@@ -296,7 +271,7 @@
           // Fire event to all who is interested
           // Fire event to all who want to know about this
           var event = {
-            type: FLOWABLE.eventBus.EVENT_TYPE_PROPERTY_VALUE_CHANGED,
+            type: ORYX_CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED,
             property: property,
             oldValue: oldValue,
             newValue: newValue

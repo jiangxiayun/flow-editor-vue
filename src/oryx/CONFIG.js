@@ -2,96 +2,59 @@
 const ORYX_CONFIGURATION_DELAY = 100
 const ORYX_CONFIGURATION_WAIT_ATTEMPTS = 10
 
-/*
- * Data management constants. Do not change these, as they are used
- * both internally and externally to communicate on events and to identify
- * command object actions in triple production and embedding rules.
- */
-
 // Triple constants
 const TRIPLE_REMOVE = 0x01
 const TRIPLE_ADD = 0x02
 const TRIPLE_RELOAD = 0x04
 const TRIPLE_SAVE = 0x08
 
-
-// HTTP status code constants
-//
-//// 2xx
-//const 200_OK =			'Ok';
-//const 201_CREATED =		'Created';
-//const 202_ACCEPTED =		'Accepted';
-//const 204_NO_CONTENT =	'No Content';
-//
-//// 3xx
-//const 301_MOVED_PERMANENTLY =	'Moved Permanently';
-//const 302_MOVED_TEMPORARILY =	'Moved Temporarily';
-//const 304_NOT_MODIFIED =		'Not Modified';
-//
-//// 4xx
-//const 400_BAD_REQUEST =	'Bad Request';
-//const 401_UNAUTHORIZED =	'Unauthorized';
-//const 403_FORBIDDEN =		'Forbidden';
-//const 404_NOT_FOUND =		'Not Found';
-//const 409_CONFLICT =		'Conflict';
-//
-//// 5xx
-//const 500_INTERNAL_SERVER_ERROR =		'Internal Server Error';
-//const 501_NOT_IMPLEMENTED =			'Not Implemented';
-//const 502_BAD_GATEWAY =				'Bad Gateway';
-//const 503_SERVICE_UNAVAILABLE =		'Service Unavailable';
-//
-
-
-// if (!ORYX.CONFIG) ORYX.CONFIG = {}
-
-const ROOT_PATH = 'editor/'  //TODO: Remove last slash!!
-const LIBS_PATH = 'libs'
-const SERVER_HANDLER_ROOT = 'service'
+// const ROOT_PATH = 'editor/'  //T ODO: Remove last slash!!
+// const LIBS_PATH = 'libs'
+// const SERVER_HANDLER_ROOT = 'service'
 
 const ORYX_CONFIG = {
-  PATH: 'editor/',
+  // PATH: 'editor/',
   /**
    * This file contains URI constants that may be used for XMLHTTPRequests.
    * 此文件包含可用于xmlhttpRequests的uri常量
    */
-  ROOT_PATH: 'editor/', //TODO: Remove last slash!!
-  EXPLORER_PATH: 'explorer',
+  // ROOT_PATH: 'editor/', // TODO: Remove last slash!!
+  // EXPLORER_PATH: 'explorer',
 
   DISABLE_GRADIENT: true,
   /**
    * Regular Config
    */
-  SERVER_HANDLER_ROOT: 'service',
-  SERVER_EDITOR_HANDLER: SERVER_HANDLER_ROOT + '/editor',
-  SERVER_MODEL_HANDLER: SERVER_HANDLER_ROOT + '/model',
-  STENCILSET_HANDLER: SERVER_HANDLER_ROOT + '/editor_stencilset?embedsvg=true&url=true&namespace=',
-  STENCIL_SETS_URL: SERVER_HANDLER_ROOT + '/editor_stencilset',
-
-  PLUGINS_CONFIG: 'editor-app/plugins.xml',
-  SYNTAXCHECKER_URL: SERVER_HANDLER_ROOT + '/syntaxchecker',
-  DEPLOY_URL: SERVER_HANDLER_ROOT + '/model/deploy',
-  MODEL_LIST_URL: SERVER_HANDLER_ROOT + '/models',
-  FORM_FLOW_LIST_URL: SERVER_HANDLER_ROOT + '/formflows',
-  FORM_FLOW_IMAGE_URL: SERVER_HANDLER_ROOT + '/formflow',
-  FORM_LIST_URL: SERVER_HANDLER_ROOT + '/forms',
-  FORM_IMAGE_URL: SERVER_HANDLER_ROOT + '/form',
-  SUB_PROCESS_LIST_URL: SERVER_HANDLER_ROOT + '/subprocesses',
-  SUB_PROCESS_IMAGE_URL: SERVER_HANDLER_ROOT + '/subprocess',
-  TEST_SERVICE_URL: SERVER_HANDLER_ROOT + '/service/',
-
-  SERVICE_LIST_URL: SERVER_HANDLER_ROOT + '/services',
-  CONDITION_ELEMENT_LIST_URL: SERVER_HANDLER_ROOT + '/conditionelements',
-  constIABLEDEF_ELEMENT_LIST_URL: SERVER_HANDLER_ROOT + '/constiabledefinitionelements',
-  VALIDATOR_LIST_URL: SERVER_HANDLER_ROOT + '/validators',
-
-  SS_EXTENSIONS_FOLDER: ROOT_PATH + 'stencilsets/extensions/',
-  SS_EXTENSIONS_CONFIG: SERVER_HANDLER_ROOT + '/editor_ssextensions',
-  ORYX_NEW_URL: '/new',
-  BPMN_LAYOUTER: ROOT_PATH + 'bpmnlayouter',
-
-  EXPRESSION_METADATA_URL: SERVER_HANDLER_ROOT + '/expression-metadata',
-  DATASOURCE_METADATA_URL: SERVER_HANDLER_ROOT + '/datasource-metadata',
+  // SERVER_HANDLER_ROOT: 'service',
+  // SERVER_EDITOR_HANDLER: SERVER_HANDLER_ROOT + '/editor',
+  // SERVER_MODEL_HANDLER: SERVER_HANDLER_ROOT + '/model',
+  // STENCILSET_HANDLER: SERVER_HANDLER_ROOT + '/editor_stencilset?embedsvg=true&url=true&namespace=',
+  // STENCIL_SETS_URL: SERVER_HANDLER_ROOT + '/editor_stencilset',
+  //
+  // PLUGINS_CONFIG: 'editor-app/plugins.xml',
+  // SYNTAXCHECKER_URL: SERVER_HANDLER_ROOT + '/syntaxchecker',
+  // DEPLOY_URL: SERVER_HANDLER_ROOT + '/model/deploy',
+  // MODEL_LIST_URL: SERVER_HANDLER_ROOT + '/models',
+  // FORM_FLOW_LIST_URL: SERVER_HANDLER_ROOT + '/formflows',
+  // FORM_FLOW_IMAGE_URL: SERVER_HANDLER_ROOT + '/formflow',
+  // FORM_LIST_URL: SERVER_HANDLER_ROOT + '/forms',
+  // FORM_IMAGE_URL: SERVER_HANDLER_ROOT + '/form',
+  // SUB_PROCESS_LIST_URL: SERVER_HANDLER_ROOT + '/subprocesses',
+  // SUB_PROCESS_IMAGE_URL: SERVER_HANDLER_ROOT + '/subprocess',
+  // TEST_SERVICE_URL: SERVER_HANDLER_ROOT + '/service/',
+  //
+  // SERVICE_LIST_URL: SERVER_HANDLER_ROOT + '/services',
+  // CONDITION_ELEMENT_LIST_URL: SERVER_HANDLER_ROOT + '/conditionelements',
+  // constIABLEDEF_ELEMENT_LIST_URL: SERVER_HANDLER_ROOT + '/constiabledefinitionelements',
+  // VALIDATOR_LIST_URL: SERVER_HANDLER_ROOT + '/validators',
+  //
+  // SS_EXTENSIONS_FOLDER: ROOT_PATH + 'stencilsets/extensions/',
+  // SS_EXTENSIONS_CONFIG: SERVER_HANDLER_ROOT + '/editor_ssextensions',
+  // ORYX_NEW_URL: '/new',
+  // BPMN_LAYOUTER: ROOT_PATH + 'bpmnlayouter',
+  //
+  // EXPRESSION_METADATA_URL: SERVER_HANDLER_ROOT + '/expression-metadata',
+  // DATASOURCE_METADATA_URL: SERVER_HANDLER_ROOT + '/datasource-metadata',
 
   /**
    * Signavio specific constiables
@@ -103,7 +66,7 @@ const ORYX_CONFIG = {
   APPNAME: 'Flowable',
   WEB_URL: '.',
 
-  BLANK_IMAGE: LIBS_PATH + '/ext-2.0.2/resources/images/default/s.gif',
+  // BLANK_IMAGE: LIBS_PATH + '/ext-2.0.2/resources/images/default/s.gif',
 
   /* Specify offset of header */
   OFFSET_HEADER: 61,
@@ -127,33 +90,6 @@ const ORYX_CONFIG = {
   NAMESPACE_ORYX: 'http://www.b3mn.org/oryx',
   NAMESPACE_SVG: 'http://www.w3.org/2000/svg',
 
-  /* UI */
-  CANVAS_WIDTH: 1200,
-  CANVAS_HEIGHT: 1050,
-  CANVAS_RESIZE_INTERVAL: 100,
-  CANVAS_MIN_WIDTH: 800,
-  CANVAS_MIN_HEIGHT: 300,
-  SELECTED_AREA_PADDING: 4,
-  CANVAS_BACKGROUND_COLOR: 'none',
-  GRID_DISTANCE: 30,
-  GRID_ENABLED: true,
-  ZOOM_OFFSET: 0.1,
-  DEFAULT_SHAPE_MARGIN: 60,
-  SCALERS_SIZE: 7,
-  MINIMUM_SIZE: 20,
-  MAXIMUM_SIZE: 10000,
-  OFFSET_MAGNET: 15,
-  OFFSET_EDGE_LABEL_TOP: 8,
-  OFFSET_EDGE_LABEL_BOTTOM: 8,
-  OFFSET_EDGE_BOUNDS: 5,
-  COPY_MOVE_OFFSET: 30,
-
-  BORDER_OFFSET: 14,
-
-  MAX_NUM_SHAPES_NO_GROUP: 20, // Updated so the form editor shows all elements at once
-
-  SHAPEMENU_CREATE_OFFSET_CORNER: 30,
-  SHAPEMENU_CREATE_OFFSET: 45,
 
   /* Shape-Menu Align */
   SHAPEMENU_RIGHT: 'Oryx_Right',
@@ -203,7 +139,6 @@ const ORYX_CONFIG = {
   /* Open Morph Menu with Hover */
   ENABLE_MORPHMENU_BY_HOVER: false,
 
-
   /* Editor constants come here */
   EDITOR_ALIGN_BOTTOM: 0x01,
   EDITOR_ALIGN_MIDDLE: 0x02,
@@ -219,6 +154,7 @@ const ORYX_CONFIG = {
   EVENT_MOUSEOVER: 'mouseover',
   EVENT_MOUSEOUT: 'mouseout',
   EVENT_MOUSEMOVE: 'mousemove',
+  EVENT_CLICK: 'click',
   EVENT_DBLCLICK: 'dblclick',
   EVENT_KEYDOWN: 'keydown',
   EVENT_KEYUP: 'keyup',
@@ -271,10 +207,35 @@ const ORYX_CONFIG = {
   EVENT_SHOW_PROPERTYWINDOW: 'propertywindow.show',
   EVENT_ABOUT_TO_SAVE: 'file.aboutToSave',
 
-  //extra events
+  // extra events
   EVENT_EDITOR_INIT_COMPLETED: 'editor.init.completed',
 
-  //actions events that are fired when a button or key was pressed after completing the initial logic.
+  EVENT_TYPE_EDITOR_READY: 'event-type-editor-ready',
+  EVENT_TYPE_EDITOR_BOOTED: 'event-type-editor-booted',
+  EVENT_TYPE_SELECTION_CHANGE: 'event-type-selection-change',
+  EVENT_TYPE_TOOLBAR_BUTTON_CLICKEDEVENT_TYPE_TOOLBAR_BUTTON_CLICKED: 'event-type-toolbar-button-clicked',
+  /** Event fired when a stencil item is dropped on the canvas. */
+  EVENT_TYPE_ITEM_DROPPED: 'event-type-item-dropped',
+  /** Event fired when a property value is changed. */
+  EVENT_TYPE_PROPERTY_VALUE_CHANGED: 'event-type-property-value-changed',
+  EVENT_TYPE_SELECTION_CHANGED: 'event-type-selection-changed',
+  /** Event fired on double click in canvas. */
+  EVENT_TYPE_DOUBLE_CLICK: 'event-type-double-click',
+  /** Event fired on a mouse out */
+  EVENT_TYPE_MOUSE_OUT: 'event-type-mouse-out',
+  /** Event fired on a mouse over */
+  EVENT_TYPE_MOUSE_OVER: 'event-type-mouse-over',
+  /** Event fired when a model is saved. */
+  EVENT_TYPE_MODEL_SAVED: 'event-type-model-saved',
+  /** Event fired when the quick menu buttons should be hidden. */
+  EVENT_TYPE_HIDE_SHAPE_BUTTONS: 'event-type-hide-shape-buttons',
+  /** Event fired when the validation popup should be shown. */
+  EVENT_TYPE_SHOW_VALIDATION_POPUP: 'event-type-show-validation-popup',
+  /** Event fired when a different process must be loaded. */
+  EVENT_TYPE_NAVIGATE_TO_PROCESS: 'event-type-navigate-to-process',
+  EVENT_TYPE_UNDO_REDO_RESET: 'event-type-undo-redo-reset',
+
+  // actions events that are fired when a button or key was pressed after completing the initial logic.
   ACTION_DELETE_COMPLETED: 'delete.action.completed',
 
   /* Selection Shapes Highlights */
@@ -333,11 +294,11 @@ const ORYX_CONFIG = {
   FORM_GROUP_EMPTY_HEIGHT: 100,
 
   /* Form element types */
-  FORM_ELEMENT_ID_PREFIX: 'http://b3mn.org/stencilset/xforms',
-  FORM_ELEMENT_TYPE_ROOT: 'http://b3mn.org/stencilset/xforms#XForm',
-  FORM_ELEMENT_TYPE_GROUP: 'http://b3mn.org/stencilset/xforms#Group',
-  FORM_ELEMENT_TYPE_REPEATING_GROUP: 'http://b3mn.org/stencilset/xforms#RepeatingGroup',
-  FORM_ELEMENT_TYPE_LABEL_FIELD: 'http://b3mn.org/stencilset/xforms#LabelField',
+  // FORM_ELEMENT_ID_PREFIX: 'http://b3mn.org/stencilset/xforms',
+  // FORM_ELEMENT_TYPE_ROOT: 'http://b3mn.org/stencilset/xforms#XForm',
+  // FORM_ELEMENT_TYPE_GROUP: 'http://b3mn.org/stencilset/xforms#Group',
+  // FORM_ELEMENT_TYPE_REPEATING_GROUP: 'http://b3mn.org/stencilset/xforms#RepeatingGroup',
+  // FORM_ELEMENT_TYPE_LABEL_FIELD: 'http://b3mn.org/stencilset/xforms#LabelField',
 
   XMLNS: {
     ATOM: "http://www.w3.org/2005/Atom",
@@ -347,6 +308,39 @@ const ORYX_CONFIG = {
     RDF: "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
     RAZIEL: "http://b3mn.org/Raziel",
     SCHEMA: ""
+  },
+  CustomConfigs: {
+    /* UI */
+    CANVAS_WIDTH: 1200,
+    CANVAS_HEIGHT: 1050,
+    CANVAS_RESIZE_INTERVAL: 100,
+    CANVAS_MIN_WIDTH: 800,
+    CANVAS_MIN_HEIGHT: 300,
+    SELECTED_AREA_PADDING: 4,
+    CANVAS_BACKGROUND_COLOR: 'none',
+    GRID_DISTANCE: 30,
+    GRID_ENABLED: true,
+    ZOOM_OFFSET: 0.1,
+    DEFAULT_SHAPE_MARGIN: 60,
+    SCALERS_SIZE: 7,
+    MINIMUM_SIZE: 20,
+    MAXIMUM_SIZE: 10000,
+    OFFSET_MAGNET: 15,
+    OFFSET_EDGE_LABEL_TOP: 8,
+    OFFSET_EDGE_LABEL_BOTTOM: 8,
+    OFFSET_EDGE_BOUNDS: 5,
+    COPY_MOVE_OFFSET: 30,
+
+    BORDER_OFFSET: 14,
+
+    MAX_NUM_SHAPES_NO_GROUP: 20, // Updated so the form editor shows all elements at once
+
+    SHAPEMENU_CREATE_OFFSET_CORNER: 30,
+    SHAPEMENU_CREATE_OFFSET: 45,
+  },
+  setCustomConfigs: function (configs) {
+    console.log(88, configs)
+    this.CustomConfigs = Object.assign(this.CustomConfigs, configs.editorCustomConfigs)
   }
 }
 
