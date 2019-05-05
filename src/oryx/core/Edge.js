@@ -8,6 +8,7 @@ import ERDF from '../ERDF'
 
 import ORYX_UIObject from '../core/UIObject'
 import ORYX_Node from '../core/Node'
+import { PathParser } from '../path_parser'
 
 /**
  * @classDescription Abstract base class for all connections.

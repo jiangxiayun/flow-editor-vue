@@ -1,6 +1,7 @@
 import ORYX_Config from '../CONFIG'
 import ORYX_Command from '../core/Command'
 import ORYX_Shape from '../core/Shape'
+import autogrow from 'src/libs/jquery.autogrow-textarea'
 
 // 双击修改名称
 export default class RenameShapes {
@@ -66,7 +67,6 @@ export default class RenameShapes {
     if (!nearestLabel) {
       nearestLabel = labels.find(function (label) {
         let el = label.id.split('_')
-        console.log(el)
         return el[el.length - 1] === 'name'
       })
     }

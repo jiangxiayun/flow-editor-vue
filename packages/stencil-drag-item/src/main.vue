@@ -5,21 +5,23 @@
        data-drag="true"
        data-model="draggedElement">
     <img v-if="!item.customIcon" width="16px;" height="16px;"
-         :src="`/flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
-    <img v-if="item.customIcon" :src="getImageUrl(item.icon)" width="16px;" height="16px;"/>
+         :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
+    <!--<img v-if="item.customIcon" :src="getImageUrl(item.icon)" width="16px;" height="16px;"/>-->
     <span>{{item.name}}</span>
   </div>
 </template>
 
 <script>
-  import { mapMutations } from 'vuex'
   import ORYX_CONFIG from 'src/oryx/CONFIG'
   import { draggable } from 'src/directives/drag-drop'
+  import { EventBus } from 'src/EventBus'
 
   export default {
     name: "stencilDragItem",
     data() {
-      return {}
+      return {
+        dragModeOver_drag: false
+      }
     },
     directives: { draggable },
     props: {
@@ -28,20 +30,24 @@
         type: Object
       }
     },
+    mounted () {
+      EventBus.$on('UPDATE_dragModeOver_forDragItem', (status) => {
+        console.log(9999, status)
+        this.dragModeOver_drag = status
+      })
+    },
     methods: {
-      ...mapMutations('Flowable', ['UPDATE_dragModeOver', 'UPDATE_dragCanContain'
-        , 'UPDATE_quickMenu']),
       startDragCallback  (event, ui) {
         console.log('startDragCallback')
-        this.UPDATE_dragModeOver(false)
-        this.UPDATE_quickMenu(false)
+        EventBus.$emit('UPDATE_dragModeOver', false)
+        EventBus.$emit('UPDATE_quickMenu', false)
         if (!ui.helper.hasClass('stencil-item-dragged')) {
           ui.helper.addClass('stencil-item-dragged');
         }
       },
       dragCallback (event, ui) {
         // console.log('dragCallback')
-        if (this.$store.state.dragModeOver != false) {
+        if (this.dragModeOver_drag !== false) {
           const coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY);
 
           let additionalIEZoom = 1;
@@ -65,7 +71,7 @@
 
           if (aShapes.length <= 0) {
             if (event.helper) {
-              this.UPDATE_dragCanContain(false)
+              EventBus.$emit('UPDATE_dragCanContain', false)
               return false;
             }
           }
@@ -83,7 +89,7 @@
               item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
               item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
               item.id === 'EntryCriterion') {
-              this.UPDATE_dragCanContain(false)
+              EventBus.$emit('UPDATE_dragCanContain', false)
 
               // Show Highlight
               this.editorManager.handleEvents({
@@ -94,7 +100,7 @@
                 color: ORYX_CONFIG.SELECTION_INVALID_COLOR
               });
             } else {
-              this.UPDATE_dragCanContain(true)
+              EventBus.$emit('UPDATE_dragCanContain', true)
               this.editorManager.dragCurrentParent = parentCandidate
               this.editorManager.dragCurrentParentId = parentCandidate.id
 
@@ -130,8 +136,7 @@
                 item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
                 item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
                 item.id === 'EntryCriterion') {
-                this.UPDATE_dragCanContain(false)
-
+                EventBus.$emit('UPDATE_dragCanContain', false)
                 // Show Highlight
                 this.editorManager.handleEvents({
                   type: ORYX_CONFIG.EVENT_HIGHLIGHT_SHOW,
@@ -141,7 +146,7 @@
                   color: ORYX_CONFIG.SELECTION_INVALID_COLOR
                 });
               } else {
-                this.UPDATE_dragCanContain(true)
+                EventBus.$emit('UPDATE_dragCanContain', true)
                 this.editorManager.dragCurrentParent = parentCandidate
                 this.editorManager.dragCurrentParentId = parentCandidate.id
 
@@ -160,7 +165,7 @@
             }
 
             if (!parentCandidate) {
-              this.UPDATE_dragCanContain(false)
+              EventBus.$emit('UPDATE_dragCanContain', false)
               return false;
             }
 
@@ -247,7 +252,7 @@
               this.editorManager.dragCurrentParent = parentCandidate
               this.editorManager.dragCurrentParentId = parentCandidate.id
               this.editorManager.dragCurrentParentStencil = parentStencilId
-              this.UPDATE_dragCanContain(_canContain)
+              EventBus.$emit('UPDATE_dragCanContain', _canContain)
 
             } else  {
               let canvasCandidate = this.editorManager.getCanvas();
@@ -271,8 +276,7 @@
               this.editorManager.dragCurrentParent = canvasCandidate
               this.editorManager.dragCurrentParentId = canvasCandidate.id
               this.editorManager.dragCurrentParentStencil = canvasCandidate.getStencil().id()
-              this.UPDATE_dragCanContain(canConnect)
-
+              EventBus.$emit('UPDATE_dragCanContain', canConnect)
               // Show Highlight
               this.editorManager.handleEvents({
                 type: ORYX_CONFIG.EVENT_HIGHLIGHT_SHOW,

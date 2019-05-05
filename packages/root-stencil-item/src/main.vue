@@ -8,8 +8,8 @@
         jqyoui-draggable="{onStart:'startDragCallback', onDrag:'dragCallback'}"
         data-jqyoui-options="{revert: 'invalid', helper: 'clone', opacity : 0.5}">
         <img v-if="!group.customIcon" width="16px;" height="16px;"
-             :src="`/flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${group.icon}`"/>
-        <img v-if="group.customIcon" :src="getImageUrl(group.icon)" width="16px;" height="16px;"/>
+             :src="require(`@/assets/images/bpmn2.0/icons/${group.icon}`)"/>
+        <!--<img v-if="group.customIcon" :src="getImageUrl(group.icon)" width="16px;" height="16px;"/>-->
         {{group.name}}
 </span>
 

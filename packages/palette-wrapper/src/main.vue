@@ -1,6 +1,6 @@
 <template>
   <!--组件元素-->
-  <div id="paletteHelpWrapper" class="paletteHelpWrapper" :class="{close: !paletteWrapperOpen}">
+  <div id="paletteHelpWrapper" class="paletteHelpWrapper">
     <div class="stencils" id="paletteSection">
       <div v-if="stencilItemGroups.length > 1">
         <div v-for="(group, index) in stencilItemGroups" :key="group.name">
@@ -30,11 +30,11 @@
               jqyoui-draggable="{onStart:'startDragCallback', onDrag:'dragCallback'}"
               data-jqyoui-options="{revert: 'invalid', helper: 'clone', opacity : 0.5}">
 
-            <img :src="`../../assets/images/stencilsets/bpmn2.0/icons/${item.icon}`" width="16px;" height="16px;"/>
+            <img :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)" width="16px;" height="16px;"/>
             <img v-if="!item.customIcon" width="16px;" height="16px;"
-                 :src="`../../assets/images/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
-            <img v-if="item.customIcon" width="16px;" height="16px;"
-                 :src="getImageUrl(item.icon)" />
+                 :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
+            <!--<img v-if="item.customIcon" width="16px;" height="16px;"-->
+                 <!--:src="getImageUrl(item.icon)" />-->
             {{item.name | translate}}
           </li>
           <!--ng-model="draggedElement"-->
@@ -51,7 +51,7 @@
              :class="{'current-process': treeview.current}" >
           Process: {{treeview.name}}
           <img v-show="!treeview.current"
-               src="/flowable/editor-app/images/pencil.png" class="pull-right"
+               src="@/assets/images/pencil.png" class="pull-right"
                @click="edit(treeview.id)" />
         </div>
         <ul class="process-treeview-list" v-if="treeview.children">
@@ -65,14 +65,10 @@
         </div>
       </div>
     </div>
-    <div id="paletteSectionFooter" @click="updatePaletteWrapperOpen">
-      <i class="glyphicon glyphicon-chevron-left"></i>
-    </div>
   </div>
 </template>
 
 <script>
-  import { mapState, mapMutations } from 'vuex'
   import stencilItemTemplate from 'packages/stencil-item'
   import processTreeList from 'packages/process-tree-list'
   import rootStencilItemTemplate from 'packages/root-stencil-item'
@@ -103,7 +99,6 @@
       // console.log(333, a)
     },
     computed: {
-      ...mapState('Flowable', ['paletteWrapperOpen']),
       stencilItemGroups () {
         if (!this.editorManager) return []
         const data = this.editorManager.getShowStencilData();
@@ -113,12 +108,8 @@
       },
     },
     methods: {
-      ...mapMutations('Flowable', ['UPDATE_paletteWrapperOpen']),
-      updatePaletteWrapperOpen () {
-        this.UPDATE_paletteWrapperOpen(false)
-      },
       showSubProcess (child) {
-        var flowableShapes = this.editorManager.getChildShapeByResourceId(child.resourceId);
+        const flowableShapes = this.editorManager.getChildShapeByResourceId(child.resourceId);
         this.editorManager.setSelection([flowableShapes],[],true);
       },
       edit (resourceId) {

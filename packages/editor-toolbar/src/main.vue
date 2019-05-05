@@ -447,6 +447,21 @@
       },
       close () {
         this.saveVisible = false
+      },
+      safeApply: function (fn) {
+        if (this.$root) {
+          let phase = this.$root.$$phase
+          if (phase === '$apply' || phase === '$digest') {
+            if (fn && (typeof(fn) === 'function')) {
+              fn()
+            }
+          } else {
+            // this.$apply(fn);
+          }
+
+        } else {
+          // this.$apply(fn);
+        }
       }
     },
     watch: {

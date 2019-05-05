@@ -94,8 +94,8 @@ export function droppable (el, binding, vnode) {
     }
 
     let element = jQuery(el)
-    console.log('element', element)
-    console.log('droppable', element.droppable)
+    // console.log('element', element)
+    // console.log('droppable', element.droppable)
     element
       .droppable({ disabled: false })
       .droppable({

@@ -4,7 +4,7 @@ import ORYX_Math from '../Math'
 import EditPathHandler from './EditPathHandler'
 import MinMaxPathHandler from './MinMaxPathHandler'
 import PointsPathHandler from './PointsPathHandler'
-
+import { PathParser } from '../../path_parser'
 
 /**
  * @classDescription 此类包装对SVG基本形状或路径的操作.
@@ -49,6 +49,7 @@ export default class SVGShape {
 
     this.init()
   }
+
   /**
    * 初始化上面声明的所有属性。.
    */
@@ -493,7 +494,8 @@ export default class SVGShape {
     let hasOwnerSVG = false
     try {
       hasOwnerSVG = !!elem.ownerSVGElement
-    } catch (e) {}
+    } catch (e) {
+    }
 
     // Is SVG context
     if (hasOwnerSVG) {

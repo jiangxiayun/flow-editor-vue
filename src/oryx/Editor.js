@@ -349,7 +349,6 @@ export default class Editor {
     div.addClassName('ORYX_Editor')
 
     // create the canvas
-    console.log(44, ORYX_Config.CustomConfigs)
     this._canvas = new ORYX_Canvas({
       width: ORYX_Config.CustomConfigs.CANVAS_WIDTH,
       height: ORYX_Config.CustomConfigs.CANVAS_HEIGHT,
@@ -1515,7 +1514,7 @@ export default class Editor {
     if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
       let ua = navigator.userAgent
       if (ua.indexOf('MSIE') >= 0) {
-        //IE 10 and below
+        // IE 10 and below
         let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
         if (zoom !== 100) {
           additionalIEZoom = zoom / 100

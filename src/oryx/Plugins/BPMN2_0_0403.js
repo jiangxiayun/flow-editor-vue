@@ -1135,7 +1135,7 @@ export default class BPMN2_0 extends AbstractPlugin {
         oldHeight += lanes[i].bounds.height()
       }
     }
-    console.log(555, changedLane)
+    // console.log(555, changedLane)
     let i = -1
     let height = 0
     // Iterate trough every lane

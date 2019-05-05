@@ -339,7 +339,6 @@ const ORYX_CONFIG = {
     SHAPEMENU_CREATE_OFFSET: 45,
   },
   setCustomConfigs: function (configs) {
-    console.log(88, configs)
     this.CustomConfigs = Object.assign(this.CustomConfigs, configs.editorCustomConfigs)
   }
 }

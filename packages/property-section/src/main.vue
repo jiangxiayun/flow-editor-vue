@@ -190,7 +190,9 @@
             }
           })
         }
-        console.log(555, this.selectedItem)
+      })
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_DOUBLE_CLICK, (event, shape) => {
+        console.log(111, shape)
       })
     },
     computed: {

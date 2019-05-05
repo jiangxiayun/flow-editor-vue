@@ -1,6 +1,6 @@
 // Helper method: find a group in an array
 export function findGroup (name, groupArray) {
-  for (var index = 0; index < groupArray.length; index++) {
+  for (let index = 0; index < groupArray.length; index++) {
     if (groupArray[index].name === name) {
       return groupArray[index]
     }
@@ -10,7 +10,7 @@ export function findGroup (name, groupArray) {
 
 // Helper method: add a new group to an array of groups
 export function addGroup (groupName, groupArray) {
-  var group = { name: groupName, items: [], paletteItems: [], groups: [], visible: true }
+  let group = { name: groupName, items: [], paletteItems: [], groups: [], visible: true }
   groupArray.push(group)
   return group
 }

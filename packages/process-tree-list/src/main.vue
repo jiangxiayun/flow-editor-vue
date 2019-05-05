@@ -2,11 +2,11 @@
   <div>
     <div @click="showSubProcess(child)"
          class="process-treeview-list-item" :class="{'current-process': child.current}">
-      <img :src="`/flowable/editor-app/stencilsets/${getStencilSetName()}/icons/activity/${child.icon}`"
+      <img :src="require(`@/assets/images/bpmn2.0/icons/activity/${child.icon}`)"
            width="16px;" height="16px;"/>
       {{child.name}}
       <img v-show="!child.current && child.type === 'CollapsedSubProcess'"
-           src="/flowable/editor-app/images/pencil.png" class="pull-right" @click="$emit('edit', child.id)" />
+           src="@/assets/images/pencil.png" class="pull-right" @click="$emit('edit', child.id)" />
     </div>
     <ul v-if="child.children" class="process-treeview-list">
       <li v-for="child in child.children" :key="child.id">

@@ -1,6 +1,5 @@
 import axios from 'axios'
 import { checkCode, HttpCode } from './_checkCode'
-import store from '../store'
 
 const appServer = axios.create({
   baseURL: process.env.VUE_APP_API_PREFIX,

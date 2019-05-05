@@ -57,13 +57,13 @@ const FLOW_eventBus = {
   /**
    * Dispatch an event to all event listeners registered to that specific type.
    */
-  dispatch: function (type, event) {
+  dispatch: function (type, event, shape) {
     if (typeof this.listeners[type] !== 'undefined') {
       const numOfCallbacks = this.listeners[type].length
       for (let i = 0; i < numOfCallbacks; i++) {
         let listener = this.listeners[type][i]
         if (listener && listener.callback) {
-          listener.callback.apply(listener.scope, [event])
+          listener.callback.apply(listener.scope, [event, shape])
         }
       }
     }

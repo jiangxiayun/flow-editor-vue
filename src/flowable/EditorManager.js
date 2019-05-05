@@ -377,8 +377,8 @@ export default class EditorManager {
     ]
 
     eventMappings.forEach((eventMapping) => {
-      this.registerOnEvent(eventMapping.oryxType, (event) => {
-        FLOW_eventBus.dispatch(eventMapping.flowableType, event)
+      this.registerOnEvent(eventMapping.oryxType, (event, shape) => {
+        FLOW_eventBus.dispatch(eventMapping.flowableType, event, shape)
       })
     })
 

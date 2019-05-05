@@ -13,7 +13,7 @@
         <div class="Oryx_button" id="delete-button"
              :title="t('BUTTON.ACTION.DELETE.TOOLTIP')"
              @click="deleteShape">
-          <img src="flowable/editor-app/images/delete.png"/>
+          <img src="@/assets/images/delete.png"/>
         </div>
         <!--设置修改形状-->
         <div v-if="!btn_visibile.hide_morph_buttons"
@@ -23,13 +23,13 @@
 
           <el-dropdown trigger="click" @command="handleCommand">
       <span class="el-dropdown-link">
-        <img src="flowable/editor-app/images/wrench.png"/>
+        <img src="@/assets/images/wrench.png"/>
         <!--下拉菜单<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
       </span>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-for="item in morphShapes" :key="item.id" :command="item">
                 <img width="16px;" height="16px;"
-                     :src="`/flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
+                     :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
                 {{item.name}}
               </el-dropdown-item>
             </el-dropdown-menu>
@@ -39,7 +39,7 @@
         <!--编辑-->
         <div v-if="!btn_visibile.hide_edit_buttons"
              class="Oryx_button" id="edit-button" @click="editShape">
-          <img src="flowable/editor-app/images/pencil.png"/>
+          <img src="@/assets/images/pencil.png"/>
         </div>
       </div>
 
@@ -56,7 +56,7 @@
              data-drag="true"
              v-draggable="{onStart:'startDragCallbackQuickMenu', onDrag:'dragCallbackQuickMenu',
            revert: 'invalid', helper: 'clone', opacity : 0.5}">
-          <img :src="`flowable/editor-app/stencilsets/${getStencilSetName()}/icons/${item.icon}`"/>
+          <img :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
         </div>
       </div>
 
@@ -65,9 +65,9 @@
 </template>
 
 <script>
-  import { mapState, mapMutations } from 'vuex'
   import ORYX_CONFIG from 'src/oryx/CONFIG'
   import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
+  import { EventBus } from 'src/EventBus'
   import { _debounce, getAdditionalIEZoom } from 'src/Util'
   import Locale from 'src/mixins/locale'
   import { draggable, droppable } from 'src/directives/drag-drop'
@@ -84,7 +84,10 @@
           hide_flow_add_btns: true,
           hide_morph_buttons: true,
           hide_edit_buttons: true
-        }
+        },
+        dragCanContain: false,
+        dragModeOver: false,
+        quickMenu: undefined
       }
     },
     mixins: [Locale],
@@ -102,9 +105,19 @@
           this.btn_visibile[btn.type] = btn.status
         })
       })
+
+      EventBus.$on('UPDATE_dragModeOver', (status) => {
+        this.dragModeOver = status
+        EventBus.$emit('UPDATE_dragModeOver_forDragItem', status)
+      })
+      EventBus.$on('UPDATE_dragCanContain', (status) => {
+        this.dragCanContain = status
+      })
+      EventBus.$on('UPDATE_quickMenu', (data) => {
+        this.quickMenu = data
+      })
     },
     computed: {
-      ...mapState('Flowable', ['dragCanContain', 'quickMenu']),
       modelData () {
         return this.editorManager ? this.editorManager.getBaseModelData() : []
       },
@@ -113,9 +126,9 @@
       }
     },
     methods: {
-      ...mapMutations('Flowable', [
-        'UPDATE_dragModeOver', 'UPDATE_dragCanContain',
-        'UPDATE_quickMenu']),
+      editShape () {
+        this.editorManager.edit(this.selectedShape.resourceId)
+      },
       fnScroll () {
         // Hides the resizer and quick menu items during scrolling
         const selectedElements = this.editorManager.getSelection()
@@ -382,31 +395,31 @@
         this.editorManager.dragCurrentParent = undefined
         this.editorManager.dragCurrentParentId = undefined
         this.editorManager.dragCurrentParentStencil = undefined
-        this.UPDATE_dragCanContain(undefined)
-        this.UPDATE_quickMenu(undefined)
+        EventBus.$emit('UPDATE_dragCanContain', undefined)
+        EventBus.$emit('UPDATE_quickMenu', undefined)
         this.editorManager.dropTargetElement = undefined
       },
       overCallback (event, ui) {
-        this.UPDATE_dragModeOver(true)
+        EventBus.$emit('UPDATE_dragModeOver', true)
       },
       outCallback (event, ui) {
-        this.UPDATE_dragModeOver(false)
+        EventBus.$emit('UPDATE_dragModeOver', false)
         console.log('out==============')
       },
       startDragCallbackQuickMenu (event, ui) {
-        this.UPDATE_dragModeOver(false)
-        this.UPDATE_quickMenu(true)
+        EventBus.$emit('UPDATE_dragModeOver', false)
+        EventBus.$emit('UPDATE_quickMenu', true)
       },
       dragCallbackQuickMenu (event, ui) {
         console.log('dragCallbackQuickMenu==============')
-        if (this.$store.state.dragModeOver != false) {
+        if (this.dragModeOver != false) {
           var coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY)
 
           var additionalIEZoom = 1
           if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
             var ua = navigator.userAgent
             if (ua.indexOf('MSIE') >= 0) {
-              //IE 10 and below
+              // IE 10 and below
               var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
               if (zoom !== 100) {
                 additionalIEZoom = zoom / 100
@@ -423,7 +436,7 @@
 
           if (aShapes.length <= 0) {
             if (event.helper) {
-              this.UPDATE_dragCanContain(false)
+              EventBus.$emit('UPDATE_dragCanContain', false)
               return false
             }
           }
@@ -472,14 +485,14 @@
             })
 
             if (!parentCandidate) {
-              this.UPDATE_dragCanContain(false)
+              EventBus.$emit('UPDATE_dragCanContain', false)
               return false
             }
 
             this.editorManager.dragCurrentParent = parentCandidate
             this.editorManager.dragCurrentParentId = parentCandidate.id
             this.editorManager.dragCurrentParentStencil = parentCandidate.getStencil().id()
-            this.UPDATE_dragCanContain(canContain)
+            EventBus.$emit('UPDATE_dragCanContain', canContain)
             this.editorManager.dropTargetElement = parentCandidate
             isValid = canContain
 
@@ -518,7 +531,7 @@
               this.editorManager.dragCurrentParent = parentCandidate
               this.editorManager.dragCurrentParentId = parentCandidate.id
               this.editorManager.dragCurrentParentStencil = parentCandidate.getStencil().id()
-              this.UPDATE_dragCanContain(canConnect)
+              EventBus.$emit('canContain', canConnect)
               this.editorManager.dropTargetElement = candidate
             }
 
