@@ -1,6 +1,4 @@
-/** Inspired by https://github.com/krasimir/EventBus/blob/master/src/EventBus.js */
-
-const FLOWABLE_CONFIG = {
+const DEFAULT_CONFIG = {
   UI_CONFIG: {
     'showRemovedProperties': false,
   },
@@ -191,4 +189,4 @@ const FLOWABLE_CONFIG = {
 }
 
 
-export default FLOWABLE_CONFIG
+export default DEFAULT_CONFIG

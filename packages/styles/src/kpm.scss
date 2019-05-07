@@ -472,13 +472,13 @@ text * {
 }
 
 .resizer_southeast {
-  background-image: url('~@/assets/images/se-handle-dark.gif');
+  background-image: url('./images/se-handle-dark.gif');
   cursor: se-resize;
   background-position: 4px 4px;
 }
 
 .resizer_northwest {
-  background-image: url('~@/assets/images/nw-handle-dark.gif');
+  background-image: url('./images/nw-handle-dark.gif');
   cursor: nw-resize;
   background-position: -2px -2px;
 }
@@ -726,7 +726,7 @@ div.propertySection {
 }
 
 .LoadingIndicator {
-  background-image: url('~@/assets/images/loading.gif');
+  background-image: url('./images/loading.gif');
 }
 
 .ValidateButton {

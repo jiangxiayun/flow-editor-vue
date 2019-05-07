@@ -12,25 +12,30 @@ Object.keys(navConf).forEach(header => {
 })
 
 
-let addComponent = router => {
+const addComponent = (router, prefix = '/docs') => {
   router.forEach(route => {
     if (route.items) {
-      addComponent(route.items)
+      addComponent(route.items, prefix + (route.path || ''))
       routes = routes.concat(route.items)
     } else {
-      if (route.name === 'site-index') {
-        route.component = r =>
-          require.ensure([], () => r(require(`./docs/introduce.md`)))
-      } else {
-        route.component = r =>
-          require.ensure([], () => r(require(`./docs/${route.name}.md`)))
+      if (route.path) {
+        route.path = prefix + route.path
       }
+      route.component = r =>
+        require.ensure([], () => r(require(`./docs/${route.name}.md`)))
     }
   })
 }
 addComponent(routes)
 
-let availableRoutes = routes.filter(item => item.path)
+// let availableRoutes = routes.filter(item => item.path)
+let availableRoutes = [{
+  path: '/docs',
+  name: 'docs',
+  redirect: '/docs/introduce',
+  component: () => import('./docs/docs.vue'),
+  children: routes.filter(item => item.path)
+}]
 
 const createRouter = () => new Router({
   routes: [
@@ -51,7 +56,7 @@ const createRouter = () => new Router({
     {
       path: '/list',
       name: 'list',
-      component: () => import('./views/Home.vue')
+      component: () => import('./views/list.vue')
     },
     {
       path: '/design/kpm/:id',
@@ -62,7 +67,21 @@ const createRouter = () => new Router({
       path: '/design/bpm/:id',
       name: 'design-bpm',
       component: () => import('./views/Design.vue')
-    }
+    },
+    // {
+    //   path: '/docs',
+    //   name: 'docs',
+    //   redirect: '/docs/introduce',
+    //   // component: { render (c) { return c('router-view') } },
+    //   component: () => import('./docs/docs.vue'),
+    //   children: [
+    //     {
+    //       path: 'introduce',
+    //       name: 'introduce',
+    //       component: () => import('./docs/introduce.md')
+    //     }
+    //   ]
+    // }
   ]
 })
 

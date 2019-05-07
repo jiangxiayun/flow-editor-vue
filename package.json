@@ -1,6 +1,6 @@
 {
   "name": "flow-editor-vue",
-  "version": "0.1.6",
+  "version": "0.1.9",
   "description": "基于flowable绘图工具oryx的流程引擎",
   "main": "lib/flowable_oryx.umd.min.js",
   "style": "lib/flowable_oryx.css",
@@ -19,7 +19,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lib": "vue-cli-service build --target lib --name flowable_oryx --dest lib src/index.js",
+    "lib": "vue-cli-service build --target lib --name flowable_oryx --dest lib src/index.js  && cp-cli packages/styles/lib lib/theme-chalk",
+    "lib:cplic": "cp-cli packages/styles/lib lib/theme-chalk",
     "lint": "vue-cli-service lint",
     "test:e2e": "vue-cli-service test:e2e",
     "test:unit": "vue-cli-service test:unit"
@@ -45,9 +46,11 @@
     "babel-eslint": "^10.0.1",
     "babel-plugin-component": "^1.1.1",
     "chai": "^4.1.2",
+    "cp-cli": "^2.0.0",
     "eslint": "^5.8.0",
     "eslint-plugin-vue": "^5.0.0",
     "gh-pages": "^2.0.1",
+    "highlight.js": "^9.15.6",
     "html-webpack-plugin": "^3.2.0",
     "markdown-it-container": "^2.0.0",
     "markdown-it-decorate": "^1.2.2",

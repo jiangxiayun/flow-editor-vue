@@ -1,0 +1,21 @@
+{
+  "name": "element-theme-chalk",
+  "version": "2.7.2",
+  "description": "Element component chalk theme.",
+  "main": "lib/index.css",
+  "style": "lib/index.css",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "scripts": {
+    "build": "gulp build"
+  },
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-cssmin": "^0.2.0",
+    "gulp-sass": "^4.0.2",
+    "gulp-autoprefixer": "^6.0.0"
+  },
+  "dependencies": {}
+}

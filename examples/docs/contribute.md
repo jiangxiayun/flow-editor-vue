@@ -8,12 +8,12 @@
 <!-- {.md} -->
 
 ```js
-git clone https://github.com/Eamonnzhang/vue-cards.git
+git clone https://gitee.com/learnjxy/flowable-front.git
 
-cd vue-cards
+cd flowable-front
 
 # 初始化项目、安装依赖
-npm run init
+npm install
 
 # 本地开发模式
 npm run dev
@@ -28,11 +28,11 @@ npm run dev:style
 
 ## 添加新组件和样式
 <!-- {.md} -->
-请按照<!-- {.md} --> `packages` 目录下的文件夹结构添加新的组件，如需新的样式请在 `packages/theme-chalk/src` 添加。
+请按照<!-- {.md} --> `packages` 目录下的文件夹结构添加新的组件，如需新的样式请在 `packages/styles/src` 添加。
 
 ## 添加组件示例和文档
 <!-- {.md} -->
-请在<!-- {.md} --> `examples/demos` 目录下添加新的组件示例。如需添加文档，请在 `examples/docs` 下添加新的文档，同时要在 `nav.config.json` 中添加新的路由才能预览。
+请在<!-- {.md} --> `examples/views` 目录下添加新的组件示例。如需添加文档，请在 `examples/docs` 下添加新的文档，同时要在 `nav.config.json` 中添加新的路由才能预览。
 
 ## 发布NPM包和文档
 <!-- {.md} -->

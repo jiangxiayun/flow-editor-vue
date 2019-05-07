@@ -1,10 +1,6 @@
 {
   "开发指南": [
     {
-      "name": "site-index",
-      "path": "/"
-    },
-    {
       "name": "introduce",
       "path": "/introduce",
       "desc": "介绍"
@@ -53,6 +49,50 @@
           "isMobile": "1",
           "name": "base-card",
           "path": "/base-card"
+        }
+      ]
+    }
+  ],
+  "API": [
+    {
+      "name": "editorManager",
+      "path": "/EditorManager",
+      "desc": "EditorManager",
+      "items": [
+        {
+          "desc": "Icon 图标",
+          "name": "icon",
+          "isAnchor": "1",
+          "path": "/icon"
+        }
+      ]
+    },
+    {
+      "name": "FLOW_OPTIONS",
+      "path": "/FLOW_OPTIONS",
+      "desc": "FLOW_OPTIONS",
+      "items": [
+        {
+          "desc": "Base 基础卡片",
+          "isAnchor": "1",
+          "name": "base-card",
+          "path": "/base-card"
+        }
+      ]
+    },
+    {
+      "name": "editorManager",
+      "path": "/EditorManager",
+      "desc": "vue组件里的使用"
+    },
+    {
+      "desc": "底层绘图插件oryx api整理",
+      "items": [
+        {
+          "desc": "Icon 图标",
+          "name": "icon",
+          "isAnchor": "1",
+          "path": "/icon"
         }
       ]
     }

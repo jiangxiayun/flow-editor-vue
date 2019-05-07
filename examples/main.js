@@ -3,7 +3,8 @@ import App from './App.vue'
 import router from './router'
 import './plugins/element.js'
 
-import flowEditor from './../src/index'
+import flowEditor from 'src/index'
+import 'packages/styles/src/index.scss'
 Vue.use(flowEditor)
 
 import demoBlock from '@/components/demo-block.vue'

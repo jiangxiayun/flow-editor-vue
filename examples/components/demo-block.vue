@@ -58,6 +58,7 @@ export default {
   padding: 10px 0;
   background-color: #fafbfc;
   margin-bottom: 10px;
+  cursor: pointer;
 }
 
 .docs-demo__code,

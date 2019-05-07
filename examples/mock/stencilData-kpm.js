@@ -956,7 +956,7 @@ export const AA = {
           'type': 'Text',
           'title': 'Request body',
           'value': '',
-          'description': 'Request body (For example- ${sampleBody}).',
+          'description': 'Request body (For example- ${sampleBody}).', // eslint-disable-line
           'popular': true
         }
       ]

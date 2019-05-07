@@ -84,7 +84,7 @@
   }
 </script>
 <style lang="scss">
-  @import "~packages/styles/index.css";
+
 </style>
 <style lang="scss" scoped>
   .paletteHelpWrapper {

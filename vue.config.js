@@ -3,6 +3,7 @@ function resolve (dir) {
   return path.join(__dirname, dir)
 }
 
+// 为markdown定义独特的标识符
 const MarkdownItContainer = require('markdown-it-container')
 const MarkdownItCheckBox = require('markdown-it-task-checkbox')
 const MarkdownItDec = require('markdown-it-decorate')
@@ -30,6 +31,7 @@ const vueMarkdown = {
       MarkdownItContainer,
       'demo',
       {
+        // 用于校验包含demo的代码块
         validate: params => params.trim().match(/^demo\s*(.*)$/),
         render: function (tokens, idx) {
           if (tokens[idx].nesting === 1) {
@@ -51,7 +53,6 @@ const vueMarkdown = {
 }
 
 module.exports = {
-  lintOnSave: false,
   publicPath: './',
   // 修改 src 目录 为 examples 目录
   pages: {
@@ -67,6 +68,18 @@ module.exports = {
       .set('@', resolve('examples'))
       .set('packages', resolve('packages'))
       .set('src', resolve('src'))
+    // config.module
+    //   .rule('js')
+    //   .include
+    //   .add('/packages')
+    //   .add('/src')
+    //   .end()
+    //   .use('babel')
+    //   .loader('babel-loader')
+    //   .tap(options => {
+    //     // 修改它的选项...
+    //     return options
+    //   })
     config.module
       .rule('md')
       .test(/\.md/)
@@ -78,13 +91,13 @@ module.exports = {
       .options(vueMarkdown)
   },
   // 修改webpack的配置
-  configureWebpack: {
-    // 把原本需要写在webpack.config.js中的配置代码 写在这里 会自动合并
-    externals: {
-      jquery: 'jQuery',
-      'ORYX': 'ORYX'
-    }
-  }
+  // configureWebpack: {
+  //   // 把原本需要写在webpack.config.js中的配置代码 写在这里 会自动合并
+  //   externals: {
+  //     jquery: 'jQuery',
+  //     'ORYX': 'ORYX'
+  //   }
+  // }
   // 注意：格式 ‘aaa’:‘ccc’,左边代表要引入资源包的名字，右边代表该模块在外面使用引用的名字
   // 例如 jQuery在外面的引用就为$
   /*

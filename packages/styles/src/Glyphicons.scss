@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'Glyphicons Halflings';
-  src: url('~@/assets/styles/fonts/glyphicons-halflings-regular.eot');
-  src: url('~@/assets/styles/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
-  url('~@/assets/styles/fonts/glyphicons-halflings-regular.woff') format('woff'),
-  url('~@/assets/styles/fonts/glyphicons-halflings-regular.ttf') format('truetype'),
-  url('~@/assets/styles/fonts/glyphicons-halflings-regular.svg#activitimodelerregular') format('svg');
+  src: url('./fonts/glyphicons-halflings-regular.eot');
+  src: url('./fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'),
+  url('./fonts/glyphicons-halflings-regular.woff') format('woff'),
+  url('./fonts/glyphicons-halflings-regular.ttf') format('truetype'),
+  url('./fonts/glyphicons-halflings-regular.svg#activitimodelerregular') format('svg');
   font-weight: normal;
   font-style: normal;
 }

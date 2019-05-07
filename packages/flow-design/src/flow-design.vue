@@ -25,6 +25,7 @@
   import propertySection from 'packages/property-section'
   import EditorManager from 'src/flowable/EditorManager'
   import Locale from 'src/mixins/locale'
+  import Default_Config from 'src/flowable/Default_Config'
 
   export default {
     name: 'flowEditor',
