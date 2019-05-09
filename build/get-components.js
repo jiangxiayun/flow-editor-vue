@@ -4,10 +4,7 @@ const fs = require('fs')
 const path = require('path')
 
 const excludes = [
-  'index.js',
-  'theme-chalk',
-  'mixins',
-  'utils',
+  'styles',
   '.DS_Store'
 ]
 

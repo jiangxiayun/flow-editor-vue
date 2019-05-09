@@ -8,7 +8,7 @@
         <div class="link">
           <router-link to="/design/kpm/1">示例</router-link>
           <a
-              href="https://gitee.com/learnjxy/flowable-front"
+              href="https://github.com/jiangxiayun/flow-editor-vue"
               target="_blank"
               class="github-link"
           >

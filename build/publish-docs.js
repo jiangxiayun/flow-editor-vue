@@ -1,6 +1,5 @@
 // 一键发布文档到本仓库的gh-pages分支。
 
-#!/usr/bin/env node
 const execSync = require('child_process').execSync
 const VERSION = require('../package.json').version
 const GIT_COMMIT = execSync('git rev-parse --short HEAD').toString().replace(/\n/, '')
@@ -14,12 +13,12 @@ const GIT_COMMIT = execSync('git rev-parse --short HEAD').toString().replace(/\n
 // execSync(`git checkout ${CURRENT_BRANCH}`)
 
 const ghpages = require('gh-pages')
-execSync('npm run build:docs')
+execSync('npm run build')
 ghpages.publish('dist', {
   user: {
-    name: 'EamonnZhang',
-    email: '5eamonn99@gmail.com'
+    name: 'IT豆',
+    email: '313726382@qq.com'
   },
-  repo: 'https://github.com/Eamonnzhang/vue-cards.git',
+  repo: 'https://github.com/jiangxiayun/flow-editor-vue.git',
   message: `[deploy] ${GIT_COMMIT} - [release] ${VERSION}`
 });

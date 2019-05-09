@@ -1,7 +1,7 @@
 {
-  "name": "element-theme-chalk",
-  "version": "2.7.2",
-  "description": "Element component chalk theme.",
+  "name": "flow-editor-vue-theme",
+  "version": "1.0.0",
+  "description": "flow-editor-vue component chalk theme.",
   "main": "lib/index.css",
   "style": "lib/index.css",
   "files": [
