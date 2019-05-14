@@ -12,12 +12,10 @@ import ORYX_Log from '../Log'
  */
 export default class Node extends Shape {
   /**
-   * Constructor
    * @param options {Object} A container for arguments.
    * @param stencil {Stencil}
    */
   constructor (options, stencil, facade) {
-    // arguments.callee.$.construct.apply(this, arguments);
     super(...arguments)
     this.isSelectable = true
     this.isMovable = true
@@ -28,11 +26,11 @@ export default class Node extends Shape {
     this._svgShapes = [] // array of all SVGShape objects of
     // SVG representation
 
-    //TODO vielleicht in shape verschieben?
+    // TODO vielleicht in shape verschieben?
     this.minimumSize = undefined // {width:..., height:...}
     this.maximumSize = undefined
 
-    //TODO vielleicht in shape oder uiobject verschieben?
+    // TODO vielleicht in shape oder uiobject verschieben?
     // vielleicht sogar isResizable ersetzen?
     this.isHorizontallyResizable = false
     this.isVerticallyResizable = false
@@ -285,7 +283,7 @@ export default class Node extends Shape {
 
     /** Resize */
 
-    //iterate over all relevant svg elements and update them
+    // iterate over all relevant svg elements and update them
     this._svgShapes.each(function (svgShape) {
       svgShape.update()
     })
@@ -294,11 +292,11 @@ export default class Node extends Shape {
   _dockerChanged () {
     let docker = this.dockers[0]
 
-    //set the bounds of the the association
+    // set the bounds of the the association
     this.bounds.centerMoveTo(docker.bounds.center())
 
     this._dockerUpdated = true
-    //this._update(true);
+    // this._update(true);
   }
 
   /**
@@ -510,7 +508,7 @@ export default class Node extends Shape {
   _init (svgDocument) {
     // arguments.callee.$._init.apply(this, arguments)
     super._init(svgDocument)
-    //outer most g node
+    // outer most g node
     let svgNode = svgDocument.getElementsByTagName('g')[0]
 
     // set all required attributes
@@ -748,7 +746,6 @@ export default class Node extends Shape {
 
   /**
    * Override the Method, that a docker is not shown
-   *
    */
   createDocker () {
     let docker = new ORYX_Controls.Docker({ eventHandlerCallback: this.eventHandlerCallback })

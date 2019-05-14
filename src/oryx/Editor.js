@@ -191,14 +191,14 @@ export default class Editor {
   loadScript (url, callback) {
     let script = document.createElement('script')
     script.type = 'text/javascript'
-    if (script.readyState) {  //IE
+    if (script.readyState) {  // IE
       script.onreadystatechange = function () {
         if (script.readyState == 'loaded' || script.readyState == 'complete') {
           script.onreadystatechange = null
           callback()
         }
       }
-    } else {  //Others
+    } else {  // Others
       script.onload = function () {
         callback()
       }
@@ -352,7 +352,7 @@ export default class Editor {
     this._canvas = new ORYX_Canvas({
       width: ORYX_Config.CustomConfigs.CANVAS_WIDTH,
       height: ORYX_Config.CustomConfigs.CANVAS_HEIGHT,
-      'eventHandlerCallback': this.handleEvents.bind(this),
+      eventHandlerCallback: this.handleEvents.bind(this),
       id: this.id,
       parentNode: div
     }, canvasStencil, this._getPluginFacade())
@@ -441,9 +441,7 @@ export default class Editor {
       this.commandStackExecuted = []
     }
 
-
-    this.commandStack = [].concat(this.commandStack)
-      .concat(commands)
+    this.commandStack = [].concat(this.commandStack).concat(commands)
 
     // Check if already executes
     if (this.commandExecuting) {
@@ -471,7 +469,6 @@ export default class Editor {
     delete this.commandStack
     delete this.commandStackExecuted
     delete this.commandExecuting
-
 
     this.updateSelection()
   }
@@ -783,10 +780,10 @@ export default class Editor {
   }
 
   disableEvent (eventType) {
-    if (eventType == ORYX_Config.EVENT_KEYDOWN) {
+    if (eventType === ORYX_Config.EVENT_KEYDOWN) {
       this._keydownEnabled = false
     }
-    if (eventType == ORYX_Config.EVENT_KEYUP) {
+    if (eventType === ORYX_Config.EVENT_KEYUP) {
       this._keyupEnabled = false
     }
     if (this.DOMEventListeners.keys().member(eventType)) {
@@ -926,7 +923,7 @@ export default class Editor {
     })
   }
 
-  setSelection (elements, subSelectionElement, force) {
+  setSelection (elements, subSelectionElement, force, event) {
     if (!elements) {
       elements = []
     }
@@ -953,15 +950,13 @@ export default class Editor {
       type: ORYX_Config.EVENT_SELECTION_CHANGED,
       elements: elements,
       subSelection: subSelectionElement,
-      force: !!force
+      force: !!force,
+      documentEvent: event
     })
   }
 
   updateSelection () {
     this.setSelection(this.selection, this._subSelection, true)
-    /*var s = this.selection;
-     this.setSelection();
-     this.setSelection(s);*/
   }
 
   getCanvas () {
@@ -1190,6 +1185,7 @@ export default class Editor {
    */
   _executeEventImmediately (eventObj) {
     if (this.DOMEventListeners.keys().member(eventObj.event.type)) {
+      // console.log(1, eventObj.event.type, this.DOMEventListeners.get(eventObj.event.type))
       this.DOMEventListeners.get(eventObj.event.type).each((function (value) {
         value(eventObj.event, eventObj.arg)
       }).bind(this))
@@ -1376,36 +1372,26 @@ export default class Editor {
     let noObjectsSelected = this.selection.length === 0
     let currentIsSelected = this.selection.member(elementController)
 
-    // Rule #1: When there is nothing selected, select the clicked object.
+    // Rule #1: 当前没有选中元素时，选中单击的对象。
     if (currentIsSelectable && noObjectsSelected) {
-      this.setSelection([elementController])
+      this.setSelection([elementController], null, false, event)
       ORYX_Log.trace('Rule #1 applied for mouse down on %0', element.id)
-
-      // Rule #3: When at least one element is selected, and there is no
-      // control key pressed, and the clicked object is not selected, select
-      // the clicked object.
     } else if (currentIsSelectable && !noObjectsSelected && !modifierKeyPressed && !currentIsSelected) {
-      this.setSelection([elementController])
-      //var objectType = elementController.readAttributes();
-      //alert(objectType[0] + ": " + objectType[1]);
-
+      // Rule #3: 如果画布当前有选中元素，同时control没有按下，且点击的元素之前未选中，
+      // 则设置当前点击元素为画布选中元素
+      this.setSelection([elementController], null, false, event)
       ORYX_Log.trace('Rule #3 applied for mouse down on %0', element.id)
-
-      // Rule #4: When the control key is pressed, and the current object is
-      // not selected, add it to the selection.
     } else if (currentIsSelectable && modifierKeyPressed && !currentIsSelected) {
+      // Rule #4: control键同时按下, 若点击元素之前未选中，则添加点击元素到画布选中元素集合中
       let newSelection = this.selection.clone()
       newSelection.push(elementController)
-      this.setSelection(newSelection)
-
+      this.setSelection(newSelection, null, false, event)
       ORYX_Log.trace('Rule #4 applied for mouse down on %0', element.id)
-      // Rule #6
     } else if (currentIsSelectable && currentIsSelected && modifierKeyPressed) {
+      // Rule #6: control键同时按下, 若点击元素之前已选中，则从画布选中元素集合中移除点击元素
       let newSelection = this.selection.clone()
-      this.setSelection(newSelection.without(elementController))
-
+      this.setSelection(newSelection.without(elementController), null, false, event)
       ORYX_Log.trace('Rule #6 applied for mouse down on %0', elementController.id)
-
       // Rule #5: When there is at least one object selected and no control
       // key pressed, we're dragging.
       /*} else if(currentIsSelectable && !noObjectsSelected
@@ -1414,52 +1400,48 @@ export default class Editor {
        if(this.log.isTraceEnabled())
        this.log.trace("Rule #5 applied for mouse down on "+element.id);
        */
+    } else if (!currentIsSelectable && !currentIsMovable) {
       // Rule #2: When clicked on something that is neither
       // selectable nor movable, clear the selection, and return.
-    } else if (!currentIsSelectable && !currentIsMovable) {
-      this.setSelection([])
+      this.setSelection([], null, false, event)
       ORYX_Log.trace('Rule #2 applied for mouse down on %0', element.id)
       return
-
+    } else if (!currentIsSelectable && currentIsMovable && !(elementController instanceof ORYX_Controls_Docker)) {
       // Rule #7: When the current object is not selectable but movable,
       // it is probably a control. Leave the selection unchanged but set
       // the movedObject to the current one and enable Drag. Dockers will
       // be processed in the dragDocker plugin.
-    } else if (!currentIsSelectable && currentIsMovable && !(elementController instanceof ORYX_Controls_Docker)) {
-
       // TODO: If there is any moveable elements, do this in a plugin
-      //ORYX.Core.UIEnableDrag(event, elementController);
+      // ORYX.Core.UIEnableDrag(event, elementController);
 
       ORYX_Log.trace('Rule #7 applied for mouse down on %0', element.id)
-
+    } else if (currentIsSelectable && currentIsSelected && !modifierKeyPressed) {
       // Rule #8: When the element is selectable and is currently selected and no
       // modifier key is pressed
-    } else if (currentIsSelectable && currentIsSelected && !modifierKeyPressed) {
       this._subSelection = this._subSelection != elementController ? elementController : undefined
-      this.setSelection(this.selection, this._subSelection)
+      this.setSelection(this.selection, this._subSelection, false, event)
       ORYX_Log.trace('Rule #8 applied for mouse down on %0', element.id)
     }
 
     // prevent event from bubbling, return.
-    //Event.stop(event);
+    // Event.stop(event);
     return
   }
 
   _handleMouseMove (event, uiObj) {
-    return;
+    return
   }
 
   _handleMouseUp (event, uiObj) {
     // get canvas.
     let canvas = this.getCanvas()
-
     // find the shape that is responsible for this elemement's id.
     let elementController = uiObj
 
     //get event position
     let evPos = this.eventCoordinates(event)
 
-    //Event.stop(event);
+    // Event.stop(event);
   }
 
   _handleMouseHover (event, uiObj) {

@@ -245,7 +245,7 @@ export default class AbstractPlugin {
    * @methodOf ORYX.Plugins.AbstractPlugin.prototype
    */
   enableReadOnlyMode () {
-    //Edges cannot be moved anymore
+    // Edges cannot be moved anymore
     this.facade.disableEvent(ORYX_Config.EVENT_MOUSEDOWN)
 
     // Stop the user from editing the diagram while the plugin is active

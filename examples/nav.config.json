@@ -53,46 +53,116 @@
       ]
     }
   ],
+  "配置项": [
+    {
+      "desc": "元素配置信息Stencil",
+      "name": "config-Stencil",
+      "path": "/config-Stencil"
+    }
+  ],
   "API": [
     {
       "name": "editorManager",
       "path": "/EditorManager",
-      "desc": "EditorManager",
-      "items": [
-        {
-          "desc": "Icon 图标",
-          "name": "icon",
-          "isAnchor": "1",
-          "path": "/icon"
-        }
-      ]
+      "desc": "EditorManager"
     },
     {
       "name": "FLOW_OPTIONS",
       "path": "/FLOW_OPTIONS",
-      "desc": "FLOW_OPTIONS",
-      "items": [
-        {
-          "desc": "Base 基础卡片",
-          "isAnchor": "1",
-          "name": "base-card",
-          "path": "/base-card"
-        }
-      ]
-    },
-    {
-      "name": "editorManager",
-      "path": "/EditorManager",
-      "desc": "vue组件里的使用"
+      "desc": "FLOW_OPTIONS"
     },
     {
       "desc": "底层绘图插件oryx api整理",
       "items": [
         {
-          "desc": "Icon 图标",
-          "name": "icon",
+          "desc": "ORYX",
+          "name": "oryx",
           "isAnchor": "1",
-          "path": "/icon"
+          "path": "/ORYX"
+        },
+        {
+          "desc": "Editor",
+          "name": "editor",
+          "isAnchor": "1",
+          "path": "/editor"
+        },
+        {
+          "desc": "core",
+          "name": "core",
+          "isAnchor": "1",
+          "path": "/core"
+        },
+        {
+          "desc": "core-UIObject",
+          "name": "UIObject",
+          "isAnchor": "1",
+          "path": "/core-UIObject"
+        },
+        {
+          "desc": "core-Edge",
+          "name": "edge",
+          "isAnchor": "1",
+          "path": "/core-Edge"
+        },
+        {
+          "desc": "core-SVG",
+          "name": "svg",
+          "isAnchor": "1",
+          "path": "/core-SVG"
+        },
+        {
+          "desc": "core-StencilSet",
+          "name": "stencilSet",
+          "isAnchor": "1",
+          "path": "/core-StencilSet"
+        },
+        {
+          "desc": "core-Shape",
+          "name": "shape",
+          "isAnchor": "1",
+          "path": "/core-Shape"
+        },
+        {
+          "desc": "core-Move",
+          "name": "move",
+          "isAnchor": "1",
+          "path": "/core-Move"
+        },
+        {
+          "desc": "core-Controls",
+          "name": "controls",
+          "isAnchor": "1",
+          "path": "/core-Controls"
+        },
+        {
+          "desc": "core-Canvas",
+          "name": "canvas",
+          "isAnchor": "1",
+          "path": "/core-Canvas"
+        },
+        {
+          "desc": "core-Bounds",
+          "name": "bounds",
+          "isAnchor": "1",
+          "path": "/core-Bounds"
+        },
+        {
+          "desc": "core-MoveDockersCommand",
+          "name": "moveDockersCommand",
+          "isAnchor": "1",
+          "path": "/core-MoveDockersCommand"
+        },
+        {
+          "desc": "core-AbstractShape",
+          "name": "abstractShape",
+          "isAnchor": "1",
+          "path": "/core-AbstractShape"
+        },
+        {
+          "desc": "Plugins",
+          "name": "plugins",
+          "isAnchor": "1",
+          "path": "/Plugins"
         }
       ]
     }

@@ -19,16 +19,13 @@ import { PathParser } from '../path_parser'
  *  translation gemacht wird, die sich auch auf alle kind UIObjects auswirkt,
  *  muessen die kinder hier beim verschieben speziell betrachtet werden.
  *  Das sollte ueberarbeitet werden.
- *
  */
 export default class Edge extends Shape {
   /**
-   * Constructor
    * @param {Object} options
    * @param {Stencil} stencil
    */
   constructor (options, stencil, facade) {
-    // arguments.callee.$.construct.apply(this, arguments);
     super(...arguments)
     this.isMovable = true
     this.isSelectable = true
@@ -753,7 +750,7 @@ export default class Edge extends Shape {
   }
 
   /**
-   * Returns the angle of the line between two dockers
+   * 返回两个Docker之间的线条角度
    * (0 - 359.99999999)
    */
   _getAngle (docker1, docker2) {
@@ -785,7 +782,6 @@ export default class Edge extends Shape {
   }
 
   add (shape) {
-    // arguments.callee.$.add.apply(this, arguments)
     super.add(shape)
 
     // If the new shape is a Docker which is not contained
@@ -936,7 +932,6 @@ export default class Edge extends Shape {
    * Removes an edge's child shape
    */
   remove (shape) {
-    // arguments.callee.$.remove.apply(this, arguments)
     super.remove(shape)
 
     if (this.attachedNodePositionData.get(shape.getId())) {
@@ -1215,7 +1210,6 @@ export default class Edge extends Shape {
    * @param {SVGDocument} svgDocument
    */
   _init (svgDocument) {
-    // arguments.callee.$._init.apply(this, arguments)
     super._init(svgDocument)
 
     let minPointX, minPointY, maxPointX, maxPointY

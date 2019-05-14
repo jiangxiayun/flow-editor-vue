@@ -12,8 +12,6 @@ import ORYX_Utils from '../Utils'
 export default class AbstractShape extends UIObject {
   constructor (options, stencil, facade) {
     super(options)
-    // arguments.callee.$.construct.apply(this, arguments);
-
     this.resourceId = ORYX_Utils.provideId() // Id of resource in DOM
 
     // stencil reference
@@ -34,7 +32,7 @@ export default class AbstractShape extends UIObject {
     // but which gets (de)serialized
     this.hiddenProperties = new Hash()
 
-    //Initialization of property map and initial value.
+    // Initialization of property map and initial value.
     this._stencil.properties().each((function (property) {
       let key = property.prefix() + '-' + property.id()
       this.properties.set(key, property.value())
@@ -52,7 +50,7 @@ export default class AbstractShape extends UIObject {
 
         // Raise an event, to show that the property has changed
         // required for plugins like processLink.js
-        //window.setTimeout( function(){
+        // window.setTimeout( function(){
 
         this._delegateEvent({
           type: ORYX_Config.EVENT_PROPERTY_CHANGED,
@@ -67,9 +65,7 @@ export default class AbstractShape extends UIObject {
     }
   }
 
-  layout () {
-
-  }
+  layout () {}
 
   /**
    * Returns the stencil object specifiing the type of the shape.
@@ -85,12 +81,11 @@ export default class AbstractShape extends UIObject {
   getChildShapeByResourceId (resourceId) {
     resourceId = ERDF.__stripHashes(resourceId)
     return this.getChildShapes(true).find(function (shape) {
-      return shape.resourceId == resourceId
+      return shape.resourceId === resourceId
     })
   }
 
   /**
-   *
    * @param {Object} deep
    * @param {Object} iterator
    */
@@ -122,7 +117,6 @@ export default class AbstractShape extends UIObject {
   }
 
   /**
-   *
    * @param {Object} deep
    * @param {Object} iterator
    */
@@ -147,7 +141,6 @@ export default class AbstractShape extends UIObject {
   }
 
   /**
-   *
    * @param {Object} deep
    * @param {Object} iterator
    */
@@ -172,8 +165,8 @@ export default class AbstractShape extends UIObject {
   }
 
   /**
-   * Returns a sorted array of ORYX.Core.Node objects.
-   * Ordered in z Order, the last object has the highest z Order.
+   * 返回已排序的oryx.core.node对象数组。
+   * 按Z 顺序排列，最后一个对象拥有最高层级。
    */
   // TODO deep iterator
   getAbstractShapesAtPosition () {
@@ -184,7 +177,6 @@ export default class AbstractShape extends UIObject {
         y = arguments[0].y
         break
       case 2:
-        //two or more arguments
         x = arguments[0]
         y = arguments[1]
         break

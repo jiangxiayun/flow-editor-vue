@@ -108,13 +108,16 @@
     overflow: auto;
     .nav {
       /*float: left;*/
-      width: 210px;
-      position: absolute;
+      width: 240px;
+      height: calc(100% - 140px);
+      top: 76px;
+      position: fixed;
+      overflow-y: auto;
     }
     .view {
       /*float: left;*/
       width: calc(100% - 215px);
-      padding: 20px 28px 28px 238px;
+      padding: 20px 28px 28px 280px;
     }
   }
 </style>

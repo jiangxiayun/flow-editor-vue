@@ -54,7 +54,9 @@ export default class SelectionFrame {
       this.show()
     }
 
-    Event.stop(event)
+    // 阻止事件继续冒泡
+    event.stopPropagation()
+    // Event.stop(event)
   }
 
   handleMouseUp (event) {

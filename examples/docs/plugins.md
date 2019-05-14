@@ -1,0 +1,26 @@
+AbstractPlugin
+AbstractLayouter：监听 ORYX_Config.EVENT_LAYOUT 事件
+Edit
+View ： 画布缩放
+Loading
+CanvasResize
+CanvasResizeButton
+RenameShapes
+ProcessLink
+Save
+SelectedRect
+DragDropResize
+GridLine
+ShapeHighlighting
+HighlightingSelectedShapes
+Resizer
+DragDocker
+AddDocker
+SelectionFrame
+Overlay
+KeysMove
+Layouter
+EdgeLayouter：节点间折线连接
+BPMN2_0
+Arrangement
+PoolAsProperty

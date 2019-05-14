@@ -111,7 +111,7 @@ export default class DragDocker {
       this.docker.show()
 
       // If the Dockers Parent is an Edge,
-      //  and the Docker is either the first or last Docker of the Edge
+      // and the Docker is either the first or last Docker of the Edge
       if (uiObj.parent instanceof ORYX_Edge &&
         (uiObj.parent.dockers.first() == uiObj || uiObj.parent.dockers.last() == uiObj)) {
 
@@ -144,7 +144,7 @@ export default class DragDocker {
       if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
         let ua = navigator.userAgent
         if (ua.indexOf('MSIE') >= 0) {
-          //IE 10 and below
+          // IE 10 and below
           let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
           if (zoom !== 100) {
             additionalIEZoom = zoom / 100

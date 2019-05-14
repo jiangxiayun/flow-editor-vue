@@ -8,6 +8,7 @@ import CreateCommand from './Command/CreateCommand'
 import MorphTo from './Command/MorphTo'
 import SetProperty from './Command/setProperty'
 import CommandClass from './Command/commandClass'
+import ORYX_Config from '../oryx/CONFIG'
 
 const FLOWABLE = jQuery.extend(true, {}, FLOWABLE_CONFIG)
 /**流程图编辑器 类
@@ -49,7 +50,7 @@ export default class EditorManager {
     this.setStencilData(config.stencilData)
     this.setShowStencilData()
 
-    this.setToolbarItems()
+    this.setToolbarItems(config.editorConfigs.TOOLBAR_CONFIG)
 
     const baseUrl = 'http://b3mn.org/stencilset/'
 
@@ -89,22 +90,27 @@ export default class EditorManager {
   getSelectedShape () { return this.selectedShape }
   getContainmentRules () { return this.containmentRules }
   getToolbarItems () { return this.toolbarItems }
-  setToolbarItems () {
-    let items = []
-    const toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items
-    for (let i = 0; i < toolbarItems.length; i++) {
-      if (this.modelData.model.modelType === 'form') {
-        if (!toolbarItems[i].disableInForm) {
-          items.push(toolbarItems[i])
-        }
-      } else {
-        items.push(toolbarItems[i])
-      }
-    }
-    this.toolbarItems = items
+  setToolbarItems (toolbars) {
+    // let items = []
+    // const toolbarItems = FLOWABLE.TOOLBAR_CONFIG.items
+    // for (let i = 0; i < toolbarItems.length; i++) {
+    //   if (this.modelData.model.modelType === 'form') {
+    //     if (!toolbarItems[i].disableInForm) {
+    //       items.push(toolbarItems[i])
+    //     }
+    //   } else {
+    //     items.push(toolbarItems[i])
+    //   }
+    // }
+    // this.toolbarItems = items
+    //
+    // console.log(8, items)
+    // console.log(9, toolbars.items)
+    this.toolbarItems = toolbars.items
+    this.secondaryToolbarItems = toolbars.secondaryItems
   }
 
-  getSecondaryItems () { return FLOWABLE.TOOLBAR_CONFIG.secondaryItems }
+  getSecondaryItems () { return this.secondaryToolbarItems }
 
   getModelId () { return this.modelId }
   setModelId (modelId) { this.modelId = modelId }
@@ -676,13 +682,23 @@ export default class EditorManager {
   }
 
   initRegisterOnEvent () {
+    this.registerOnEvent('oncontextmenu', (event) => {
+      console.log(888, event)
+    })
     this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
       let shapes = event.elements
+      // 控制 toolbar buttons 是否可用
+      this.updateToolbarButtonStatus(shapes)
+
+      let documentEvent = event.documentEvent
+      if (documentEvent && ORYX.CONFIG.CustomConfigs.CUSTOM_CONTEXTMENU) {
+        // console.log(99, documentEvent.button)
+        // if (documentEvent.button === 2) return
+      }
+
       // Listen to selection change events: show properties
       this.showShapeProperties(shapes)
       this.updateOryxButtonPosition(shapes)
-      // 控制 toolbar buttons 是否可用
-      this.updateToolbarButtonStatus(shapes)
     })
   }
   showShapeProperties (shapes) {
@@ -814,6 +830,42 @@ export default class EditorManager {
       this.selectedShape = null
     }
   }
+  getNodeOffset (selectedShape) {
+    const a = this.getCanvas().node.getScreenCTM() // 获取 svg对象 的转换矩阵CTM
+    let absoluteXY = selectedShape.absoluteXY()
+    absoluteXY.x *= a.a
+    absoluteXY.y *= a.d
+
+    let additionalIEZoom = 1
+    additionalIEZoom = ORYX.Utils.IEZoomBelow10(additionalIEZoom)
+
+    const canvasSection = jQuery('#canvasSection')
+    if (additionalIEZoom === 1) {
+      absoluteXY.y = absoluteXY.y - canvasSection.offset().top + 5
+      absoluteXY.x = absoluteXY.x - canvasSection.offset().left
+    } else {
+      let canvasOffsetLeft = canvasSection.offset().left
+      let canvasScrollLeft = canvasSection.scrollLeft()
+      let canvasScrollTop = canvasSection.scrollTop()
+
+      let offset = a.e - (canvasOffsetLeft * additionalIEZoom)
+      let additionaloffset = 0
+      if (offset > 10) {
+        additionaloffset = (offset / additionalIEZoom) - offset
+      }
+      absoluteXY.y = absoluteXY.y - (canvasSection.offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop)
+      absoluteXY.x = absoluteXY.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft)
+    }
+
+    let bounds = new ORYX.Core.Bounds(
+      a.e + absoluteXY.x,
+      a.f + absoluteXY.y,
+      a.e + absoluteXY.x + a.a * selectedShape.bounds.width(),
+      a.f + absoluteXY.y + a.d * selectedShape.bounds.height()
+    )
+
+    return bounds
+  }
   updateOryxButtonPosition (selectedElements) {
     FLOW_eventBus.dispatch(ORYX.CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
       { type: 'hide_shape_buttons', status: true }
@@ -825,39 +877,8 @@ export default class EditorManager {
     const shapes = selectedElements
     if (shapes && shapes.length === 1) {
       const selectedShape = shapes.first()
-      const a = this.getCanvas().node.getScreenCTM() // 获取 svg对象 的转换矩阵CTM
+      const bounds = this.getNodeOffset(selectedShape)
 
-      let absoluteXY = selectedShape.absoluteXY()
-      absoluteXY.x *= a.a
-      absoluteXY.y *= a.d
-
-      let additionalIEZoom = 1
-      additionalIEZoom = ORYX.Utils.IEZoomBelow10(additionalIEZoom)
-
-      const canvasSection = jQuery('#canvasSection')
-      if (additionalIEZoom === 1) {
-        absoluteXY.y = absoluteXY.y - canvasSection.offset().top + 5
-        absoluteXY.x = absoluteXY.x - canvasSection.offset().left
-      } else {
-        let canvasOffsetLeft = canvasSection.offset().left
-        let canvasScrollLeft = canvasSection.scrollLeft()
-        let canvasScrollTop = canvasSection.scrollTop()
-
-        let offset = a.e - (canvasOffsetLeft * additionalIEZoom)
-        let additionaloffset = 0
-        if (offset > 10) {
-          additionaloffset = (offset / additionalIEZoom) - offset
-        }
-        absoluteXY.y = absoluteXY.y - (canvasSection.offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop)
-        absoluteXY.x = absoluteXY.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft)
-      }
-
-      let bounds = new ORYX.Core.Bounds(
-        a.e + absoluteXY.x,
-        a.f + absoluteXY.y,
-        a.e + absoluteXY.x + a.a * selectedShape.bounds.width(),
-        a.f + absoluteXY.y + a.d * selectedShape.bounds.height()
-      )
       const shapeXY = bounds.upperLeft()
       const stencilItem = this.getStencilItemById(selectedShape.getStencil().idWithoutNs())
       let morphShapes = []

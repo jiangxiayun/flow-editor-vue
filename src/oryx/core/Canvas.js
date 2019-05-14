@@ -87,33 +87,6 @@ export default class Canvas extends AbstractShape {
         ['g', { 'class': 'svgcontainer' }]
       ])
 
-    /*
-     var off = 2 * ORYX.CONFIG.GRID_DISTANCE;
-     var size = 3;
-     var d = "";
-     for(var i = 0; i <= options.width; i += off)
-     for(var j = 0; j <= options.height; j += off)
-     d = d + "M" + (i - size) + " " + j + " l" + (2*size) + " 0 m" + (-size) + " " + (-size) + " l0 " + (2*size) + " m0" + (-size) + " ";
-
-     ORYX.Editor.graft("http://www.w3.org/2000/svg", this.node.firstChild.firstChild,
-     ['path', {d:d , stroke:'#000000', 'stroke-width':'0.15px'},]);
-     */
-
-    //Global definition of default font for shapes
-    //Definitions in the SVG definition of a stencil will overwrite these settings for
-    // that stencil.
-    /*if(navigator.platform.indexOf("Mac") > -1) {
-     this.node.setAttributeNS(null, 'stroke', 'black');
-     this.node.setAttributeNS(null, 'stroke-width', '0.5px');
-     this.node.setAttributeNS(null, 'font-family', 'Skia');
-     //this.node.setAttributeNS(null, 'letter-spacing', '2px');
-     this.node.setAttributeNS(null, 'font-size', ORYX.CONFIG.LABEL_DEFAULT_LINE_HEIGHT);
-     } else {
-     this.node.setAttributeNS(null, 'stroke', 'none');
-     this.node.setAttributeNS(null, 'font-family', 'Verdana');
-     this.node.setAttributeNS(null, 'font-size', ORYX.CONFIG.LABEL_DEFAULT_LINE_HEIGHT);
-     }*/
-
     this.node.setAttributeNS(null, 'stroke', 'none')
     this.node.setAttributeNS(null, 'font-family', 'Verdana, sans-serif')
     this.node.setAttributeNS(null, 'font-size-adjust', 'none')
@@ -126,27 +99,28 @@ export default class Canvas extends AbstractShape {
 
     this.addEventHandlers(this.rootNode.parentNode)
 
+
     // disable context menu
-    this.rootNode.oncontextmenu = function () {
+    this.rootNode.oncontextmenu = () => {
+      this.eventHandlerCallback({ type: 'oncontextmenu' })
       return false
     }
   }
-  focus () {
 
-  }
+  focus () {}
 
   setHightlightState (state) {
-    if (this.colHighlightEnabled && this.colHighlightState != state) {
-      if (state == 0) {
+    if (this.colHighlightEnabled && this.colHighlightState !== state) {
+      if (state === 0) {
         this.columnHightlight1.setAttribute('visibility', 'hidden')
         this.columnHightlight2.setAttribute('visibility', 'hidden')
-      } else if (state == 1) {
+      } else if (state === 1) {
         this.columnHightlight1.setAttribute('visibility', 'visible')
         this.columnHightlight2.setAttribute('visibility', 'hidden')
-      } else if (state == 2) {
+      } else if (state === 2) {
         this.columnHightlight1.setAttribute('visibility', 'hidden')
         this.columnHightlight2.setAttribute('visibility', 'visible')
-      } else if (state == 3) {
+      } else if (state === 3) {
         this.columnHightlight1.setAttribute('visibility', 'visible')
         this.columnHightlight2.setAttribute('visibility', 'visible')
       }
@@ -182,12 +156,7 @@ export default class Canvas extends AbstractShape {
     }
 
     this.nodes.invoke('_update')
-
     this.edges.invoke('_update', true)
-
-    /*this.children.each(function(child) {
-     child._update();
-     });*/
   }
 
   _traverseForUpdate (shape) {
@@ -209,7 +178,6 @@ export default class Canvas extends AbstractShape {
   layout () {}
 
   /**
-   *
    * @param {Object} deep
    * @param {Object} iterator
    */
@@ -313,13 +281,13 @@ export default class Canvas extends AbstractShape {
    * @param {UIObject} uiObject
    */
   remove (uiObject, silent) {
-    //if uiObject is a child of this object, remove it.
+    // if uiObject is a child of this object, remove it.
     if (this.children.member(uiObject)) {
-      //remove uiObject from children
+      // remove uiObject from children
       let parent = uiObject.parent
       this.children = this.children.without(uiObject)
 
-      //delete parent reference of uiObject
+      // delete parent reference of uiObject
       uiObject.parent = undefined
 
       // delete uiObject.node from this.node
@@ -332,7 +300,7 @@ export default class Canvas extends AbstractShape {
           uiObject.node = this.node.childNodes[0].childNodes[1].removeChild(uiObject.node)
           this.nodes = this.nodes.without(uiObject)
         }
-      } else {	//UIObject
+      } else {	// UIObject
         uiObject.node = this.node.removeChild(uiObject.node)
       }
 
@@ -521,7 +489,7 @@ export default class Canvas extends AbstractShape {
   }
 
   /**
-   * Updates the size of the canvas, regarding to the containg shapes.
+   * 更新画布的大小, regarding to the containg shapes.
    */
   updateSize () {
     // Check the size for the canvas
@@ -538,6 +506,28 @@ export default class Canvas extends AbstractShape {
       this.setSize({
         width: Math.max(this.bounds.width(), maxWidth),
         height: Math.max(this.bounds.height(), maxHeight)
+      })
+    }
+  }
+
+  setSize (size, dontSetBounds) {
+    if (!size || !size.width || !size.height) {
+      return
+    }
+
+    if (this.rootNode.parentNode) {
+      this.rootNode.parentNode.style.width = size.width + 'px'
+      this.rootNode.parentNode.style.height = size.height + 'px'
+    }
+
+    this.rootNode.setAttributeNS(null, 'width', size.width)
+    this.rootNode.setAttributeNS(null, 'height', size.height)
+
+    // this._htmlContainer.style.top = "-" + (size.height + 4) + 'px';
+    if (!dontSetBounds) {
+      this.bounds.set({
+        a: { x: 0, y: 0 },
+        b: { x: size.width / this.zoomLevel, y: size.height / this.zoomLevel }
       })
     }
   }
@@ -580,26 +570,6 @@ export default class Canvas extends AbstractShape {
       }
       return true
     })
-
-  }
-
-  setSize (size, dontSetBounds) {
-    if (!size || !size.width || !size.height) {
-      return
-    }
-
-    if (this.rootNode.parentNode) {
-      this.rootNode.parentNode.style.width = size.width + 'px'
-      this.rootNode.parentNode.style.height = size.height + 'px'
-    }
-
-    this.rootNode.setAttributeNS(null, 'width', size.width)
-    this.rootNode.setAttributeNS(null, 'height', size.height)
-
-    //this._htmlContainer.style.top = "-" + (size.height + 4) + 'px';
-    if (!dontSetBounds) {
-      this.bounds.set({ a: { x: 0, y: 0 }, b: { x: size.width / this.zoomLevel, y: size.height / this.zoomLevel } })
-    }
   }
 
   /**
@@ -704,7 +674,6 @@ export default class Canvas extends AbstractShape {
         index++
       }
     }
-
   }
 
   /**

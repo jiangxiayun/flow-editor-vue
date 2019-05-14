@@ -34,13 +34,14 @@
             <img v-if="!item.customIcon" width="16px;" height="16px;"
                  :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
             <!--<img v-if="item.customIcon" width="16px;" height="16px;"-->
-                 <!--:src="getImageUrl(item.icon)" />-->
+            <!--:src="getImageUrl(item.icon)" />-->
             {{item.name | translate}}
           </li>
           <!--ng-model="draggedElement"-->
         </ul>
       </div>
     </div>
+
     <!--ng-controller="ProcessNavigatorController"-->
     <div id="process-treeview-wrapper">
       <div class="process-treeview-header">

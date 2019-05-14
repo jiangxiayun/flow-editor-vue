@@ -19,19 +19,20 @@ export default class UIObject {
     this.isMovable = false			// Flag, if UIObject is movable.
 
     this.id = ORYX_Utils.provideId()	//get unique id
-    this.parent = undefined		//parent is defined, if this object is added to another uiObject.
-    this.node = undefined			//this is a reference to the SVG representation, either locally or in DOM.
-    this.children = []				//array for all add uiObjects
+    this.parent = undefined		// parent is defined, if this object is added to another uiObject.
+    this.node = undefined			// this is a reference to the SVG representation, either locally or in DOM.
+    this.children = []				// array for all add uiObjects
 
-    this.bounds = new Bounds()		//bounds with undefined values
+    this.bounds = new Bounds()		// bounds with undefined values
 
-    this._changedCallback = this._changed.bind(this)	//callback reference for calling _changed
-    this.bounds.registerCallback(this._changedCallback)	//set callback in bounds
+    this._changedCallback = this._changed.bind(this)	// callback reference for calling _changed
+    this.bounds.registerCallback(this._changedCallback)	// set callback in bounds
 
     if (options && options.eventHandlerCallback) {
       this.eventHandlerCallback = options.eventHandlerCallback
     }
   }
+
   /**
    * Sets isChanged flag to true. Callback for the bounds object.
    */
@@ -60,9 +61,7 @@ export default class UIObject {
   /**
    * Is called in update method, if isChanged is set to true. Sub classes should call the super class method.
    */
-  refresh () {
-
-  }
+  refresh () {}
 
   /**
    * @return {Array} Array of all child UIObjects.
@@ -136,26 +135,23 @@ export default class UIObject {
    * @param {UIObject} uiObject
    */
   add (uiObject) {
-    //add uiObject, if it is not already a child of this object
+    // add uiObject, if it is not already a child of this object
     if (!(this.children.member(uiObject))) {
-      //if uiObject is child of another parent, remove it from that parent.
+      // if uiObject is child of another parent, remove it from that parent.
       if (uiObject.parent) {
         uiObject.remove(uiObject)
       }
 
-      //add uiObject to children
+      // add uiObject to children
       this.children.push(uiObject)
-
-      //set parent reference
+      // set parent reference
       uiObject.parent = this
-
-      //add uiObject.node to this.node
+      // add uiObject.node to this.node
       uiObject.node = this.node.appendChild(uiObject.node)
-
-      //register callback to get informed, if child is changed
+      // register callback to get informed, if child is changed
       uiObject.bounds.registerCallback(this._changedCallback)
 
-      //uiObject.update();
+      // uiObject.update();
     } else {
       ORYX_Log.info('add: ORYX.Core.UIObject is already a child of this object.')
     }
@@ -167,27 +163,24 @@ export default class UIObject {
    * @param {UIObject} uiObject
    */
   remove (uiObject) {
-    //if uiObject is a child of this object, remove it.
+    // if uiObject is a child of this object, remove it.
     if (this.children.member(uiObject)) {
-      //remove uiObject from children
+      // remove uiObject from children
       this.children = this._uiObjects.without(uiObject)
 
-      //delete parent reference of uiObject
+      // delete parent reference of uiObject
       uiObject.parent = undefined
-
-      //delete uiObject.node from this.node
+      // delete uiObject.node from this.node
       uiObject.node = this.node.removeChild(uiObject.node)
-
-      //unregister callback to get informed, if child is changed
+      // unregister callback to get informed, if child is changed
       uiObject.bounds.unregisterCallback(this._changedCallback)
     } else {
       ORYX_Log.info('remove: ORYX.Core.UIObject is not a child of this object.')
     }
-
   }
 
   /**
-   * Calculates absolute bounds of this UIObject.
+   * 获取元素相对于画布左上角的 Bound 对象
    */
   absoluteBounds () {
     if (this.parent) {
@@ -201,7 +194,7 @@ export default class UIObject {
   }
 
   /**
-   * @return {Point} The absolute position of this UIObject.
+   * @return {Point} 获取 元素左上角 相对于画布的坐标.
    */
   absoluteXY () {
     if (this.parent) {
@@ -219,7 +212,7 @@ export default class UIObject {
   }
 
   /**
-   * @return {Point} The absolute position from the Center of this UIObject.
+   * @return {Point} 获取 元素中心点 相对于画布的坐标
    */
   absoluteCenterXY () {
     if (this.parent) {
@@ -228,7 +221,6 @@ export default class UIObject {
       result.x = pXY.x + this.bounds.center().x
       result.y = pXY.y + this.bounds.center().y
       return result
-
     } else {
       let result = {}
       result.x = this.bounds.center().x
@@ -265,7 +257,7 @@ export default class UIObject {
     node.addEventListener(ORYX_Config.EVENT_MOUSEUP, this._delegateEvent.bind(this), false)
     node.addEventListener(ORYX_Config.EVENT_MOUSEOVER, this._delegateEvent.bind(this), false)
     node.addEventListener(ORYX_Config.EVENT_MOUSEOUT, this._delegateEvent.bind(this), false)
-    node.addEventListener('click', this._delegateEvent.bind(this), false)
+    node.addEventListener(ORYX_Config.EVENT_CLICK, this._delegateEvent.bind(this), false)
     node.addEventListener(ORYX_Config.EVENT_DBLCLICK, this._delegateEvent.bind(this), false)
   }
 

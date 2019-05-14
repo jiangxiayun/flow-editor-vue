@@ -58,9 +58,7 @@ export default class Shape extends AbstractShape {
   /**
    * !!!Not called from any sub class!!!
    */
-  _update () {
-
-  }
+  _update () {}
 
   /**
    * Calls the super class refresh method
@@ -388,7 +386,6 @@ export default class Shape extends AbstractShape {
 
   /**
    * Hides all related labels
-   *
    */
   hideLabels () {
     this.getLabels().invoke('hide')
@@ -396,7 +393,6 @@ export default class Shape extends AbstractShape {
 
   /**
    * Shows all related labels
-   *
    */
   showLabels () {
     let labels = this.getLabels()
@@ -406,8 +402,8 @@ export default class Shape extends AbstractShape {
     })
   }
 
-  setOpacity (value, animate) {
-    value = Math.max(Math.min((typeof value == 'number' ? value : 1.0), 1.0), 0.0)
+  setOpacity (value) {
+    value = Math.max(Math.min((typeof value === 'number' ? value : 1.0), 1.0), 0.0)
 
     if (value !== 1.0) {
       value = String(value)
@@ -438,10 +434,6 @@ export default class Shape extends AbstractShape {
     } else {
       return undefined
     }
-  }
-
-  getParentShape () {
-    return this.parent
   }
 
   getIncomingShapes (iterator) {
@@ -492,6 +484,9 @@ export default class Shape extends AbstractShape {
     }
   }
 
+  getParentShape () {
+    return this.parent
+  }
   /**
    *
    * @param {Object} deep
@@ -529,7 +524,6 @@ export default class Shape extends AbstractShape {
     // parameter has to be an UIObject, but
     // must not be an Edge.
     if (uiObject instanceof UIObject && !(uiObject.getInstanceofType().includes('Edge'))) {
-
       if (!(this.children.member(uiObject))) {
         //if uiObject is child of another parent, remove it from that parent.
         if (uiObject.parent) {
@@ -543,7 +537,7 @@ export default class Shape extends AbstractShape {
           this.children.push(uiObject)
         }
 
-        //set parent reference
+        // set parent reference
         uiObject.parent = this
 
         // add uiObject.node to this.node depending on the type of uiObject
@@ -578,7 +572,7 @@ export default class Shape extends AbstractShape {
           uiObject.node = parent.appendChild(uiObject.node)
 
         this._changed()
-        //uiObject.bounds.registerCallback(this._changedCallback);
+        // uiObject.bounds.registerCallback(this._changedCallback);
 
 
         if (this.eventHandlerCallback && silent !== true)
@@ -597,17 +591,17 @@ export default class Shape extends AbstractShape {
    * @param {UIObject} uiObject
    */
   remove (uiObject, silent) {
-    //if uiObject is a child of this object, remove it.
+    // if uiObject is a child of this object, remove it.
     if (this.children.member(uiObject)) {
-      //remove uiObject from children
+      // remove uiObject from children
       let parent = uiObject.parent
 
       this.children = this.children.without(uiObject)
 
-      //delete parent reference of uiObject
+      // delete parent reference of uiObject
       uiObject.parent = undefined
 
-      //delete uiObject.node from this.node
+      // delete uiObject.node from this.node
       if (uiObject instanceof Shape) {
         let type = uiObject.getInstanceofType()
         if (type.includes('Edge')) {
@@ -633,7 +627,7 @@ export default class Shape extends AbstractShape {
         this.eventHandlerCallback({ type: ORYX_Config.EVENT_SHAPEREMOVED, shape: uiObject, parent: parent })
 
       this._changed()
-      //uiObject.bounds.unregisterCallback(this._changedCallback);
+      // uiObject.bounds.unregisterCallback(this._changedCallback);
     } else {
       ORYX_Log.warn('remove: ORYX.Core.UIObject is not a child of this object.')
     }
@@ -694,9 +688,8 @@ export default class Shape extends AbstractShape {
     let midPointY = 0
     let refPointX, refPointY
     // Get the UpperLeft and LowerRight
-    //var ul = bounds.upperLeft();
-    //var lr = bounds.lowerRight();
-
+    // var ul = bounds.upperLeft();
+    // var lr = bounds.lowerRight();
 
     while (true) {
       // Calculate the midpoint of the current to points
@@ -766,13 +759,10 @@ export default class Shape extends AbstractShape {
     return this.isPointIncluded.apply(this, arguments)
   }
 
-  _dockerChanged () {
-
-  }
+  _dockerChanged () {}
 
   /**
    * Create a Docker for this Edge
-   *
    */
   createDocker (index, position) {
     let docker = new ORYX_Controls.Docker({ eventHandlerCallback: this.eventHandlerCallback })

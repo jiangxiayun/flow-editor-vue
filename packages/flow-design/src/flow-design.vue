@@ -6,10 +6,8 @@
       <slot name="paletteWrapper" v-bind:editorManager="editorManager">
         <paletteWrapper :editorManager="editorManager"></paletteWrapper>
       </slot>
-
       <div id="contentCanvasWrapper" class="contentCanvasWrapper">
         <canvasWrapper :editorManager="editorManager"></canvasWrapper>
-
         <slot name="propertyWrapper" v-bind:editorManager="editorManager">
           <propertySection :editorManager="editorManager"></propertySection>
         </slot>
@@ -37,7 +35,18 @@
         editorHistory: [],
         undoStack: [],
         redoStack: [],
-        forceSelectionRefresh: false
+        forceSelectionRefresh: false,
+        list1: [
+          { name: "John", id: 1 },
+          { name: "Joao", id: 2 },
+          { name: "Jean", id: 3 },
+          { name: "Gerard", id: 4 }
+        ],
+        list2: [
+          { name: "Juan", id: 5 },
+          { name: "Edgard", id: 6 },
+          { name: "Johnson", id: 7 }
+        ]
       }
     },
     mixins: [Locale],
@@ -48,15 +57,34 @@
     },
     components: { toolbar, paletteWrapper, canvasWrapper, propertySection },
     created () {},
-    computed: {},
+    computed: {
+      createConfig () {
+        return Object.assign({}, Default_Config, this.config)
+      }
+    },
     mounted () {
-      // this.getJson()
       this.editorManager = new EditorManager({
-        ...this.config,
+        ...this.createConfig,
         elementsWithoutRenameAction: ['Lane', 'V-Lane']
       })
+
+      // 将用户在深层子组件里的自定义事件抛出
+      this.$on('Propagation', this.handleSaveBtn)
     },
-    methods: {}
+    methods: {
+      dropIntoCanvas (evt) {
+        console.log('dropIntoCanvas', evt.item.id)
+      },
+      dragStart (evt) {
+        console.log(11, evt)
+      },
+      dragMove (evt) {
+        console.log(22, evt)
+      },
+      handleSaveBtn (eventName, params) {
+        this.$emit(eventName, params)
+      },
+    }
   }
 </script>
 <style lang="scss">

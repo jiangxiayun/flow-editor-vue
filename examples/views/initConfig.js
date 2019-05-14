@@ -5,12 +5,20 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.SAVE',
         cssClass: 'editor-icon editor-icon-save',
-        action: 'FLOWABLE.TOOLBAR.ACTIONS.saveModel'
+        actionType: 'custom-defined',
+        action: 'btn-save-click'
       },
+      // {
+      //   type: 'button',
+      //   title: 'TOOLBAR.ACTION.SAVE',
+      //   cssClass: 'editor-icon editor-icon-save',
+      //   action: 'FLOWABLE.TOOLBAR.ACTIONS.saveModel'
+      // },
       {
         type: 'button',
-        titl: 'TOOLBAR.ACTION.VALIDATE',
+        title: 'TOOLBAR.ACTION.VALIDATE',
         cssClass: 'glyphicon glyphicon-ok',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.validate'
       },
       {
@@ -22,6 +30,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.CUT',
         cssClass: 'editor-icon editor-icon-cut',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.cut',
         enabled: false,
         enabledAction: 'element'
@@ -30,6 +39,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.COPY',
         cssClass: 'editor-icon editor-icon-copy',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.copy',
         enabled: false,
         enabledAction: 'element'
@@ -38,6 +48,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.PASTE',
         cssClass: 'editor-icon editor-icon-paste',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.paste',
         enabled: false
       },
@@ -45,6 +56,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.DELETE',
         cssClass: 'editor-icon editor-icon-delete',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.deleteItem',
         enabled: false,
         enabledAction: 'element'
@@ -58,6 +70,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.REDO',
         cssClass: 'editor-icon editor-icon-redo',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.redo',
         enabled: false
       },
@@ -65,6 +78,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.UNDO',
         cssClass: 'editor-icon editor-icon-undo',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.undo',
         enabled: false
       },
@@ -77,6 +91,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.ALIGNVERTICAL',
         cssClass: 'editor-icon editor-icon-align-vertical',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.alignVertical',
         enabled: false,
         enabledAction: 'element',
@@ -87,6 +102,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.ALIGNHORIZONTAL',
         cssClass: 'editor-icon editor-icon-align-horizontal',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.alignHorizontal',
         enabledAction: 'element',
         enabled: false,
@@ -97,6 +113,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.SAMESIZE',
         cssClass: 'editor-icon editor-icon-same-size',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.sameSize',
         enabledAction: 'element',
         enabled: false,
@@ -113,12 +130,14 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.ZOOMIN',
         cssClass: 'editor-icon editor-icon-zoom-in',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.zoomIn'
       },
       {
         type: 'button',
         title: 'TOOLBAR.ACTION.ZOOMOUT',
         cssClass: 'editor-icon editor-icon-zoom-out',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.zoomOut'
       },
       {
@@ -131,6 +150,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.ZOOMFIT',
         cssClass: 'editor-icon editor-icon-zoom-fit',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.zoomFit'
       },
       {
@@ -143,6 +163,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.BENDPOINT.ADD',
         cssClass: 'editor-icon editor-icon-bendpoint-add',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.addBendPoint',
         'id': 'add-bendpoint-button',
         'disableInForm': true
@@ -151,21 +172,10 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.BENDPOINT.REMOVE',
         cssClass: 'editor-icon editor-icon-bendpoint-remove',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.removeBendPoint',
         'id': 'remove-bendpoint-button',
         'disableInForm': true
-      },
-      {
-        type: 'separator',
-        title: '',
-        cssClass: 'toolbar-separator',
-        'disableInForm': true
-      },
-      {
-        type: 'button',
-        title: 'TOOLBAR.ACTION.HELP',
-        cssClass: 'glyphicon glyphicon-question-sign',
-        action: 'FLOWABLE.TOOLBAR.ACTIONS.help'
       }
     ],
     secondaryItems: [
@@ -173,6 +183,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'Close',
         cssClass: 'glyphicon glyphicon-remove',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.closeEditor'
       }
     ]
@@ -340,6 +351,7 @@ const FLOWABLE = {
     }
   },
   editorCustomConfigs: {
+    CUSTOM_CONTEXTMENU: true,
     /* UI */
     CANVAS_WIDTH: 1200,
     CANVAS_HEIGHT: 1050,

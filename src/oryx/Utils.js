@@ -98,15 +98,11 @@ const Utils = {
           for (var k in t[i]) {
             e.setAttributeNS(null, k, t[i][k])
           }
-        } else {
-
         }
       }
     }
     if (parent && parent.appendChild) {
       parent.appendChild(e)
-    } else {
-
     }
     return e // return the topmost created node
   },

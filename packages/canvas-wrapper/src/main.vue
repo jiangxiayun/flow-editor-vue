@@ -1,6 +1,10 @@
 <template>
   <!--画布区域-->
-  <div id="canvasHelpWrapper" class="canvasHelpWrapper">
+  <div id="canvasHelpWrapper" class="canvasHelpWrapper" @click="contextmenu_visibile = false">
+    <contextmenu v-show="contextmenu_visibile"
+    :top="contextmenu_top"
+    :left="contextmenu_left"
+    ></contextmenu>
     <div class="canvas-wrapper canvasSection" id="canvasSection"
          v-droppable="{onDrop:'dropCallback',onOver: 'overCallback', onOut: 'outCallback'}"
          data-model="droppedElement"
@@ -68,9 +72,10 @@
   import ORYX_CONFIG from 'src/oryx/CONFIG'
   import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
   import { EventBus } from 'src/EventBus'
-  import { _debounce, getAdditionalIEZoom } from 'src/Util'
+  import { _debounce, getAdditionalIEZoom, IEZoomBelow10 } from 'src/Util'
   import Locale from 'src/mixins/locale'
   import { draggable, droppable } from 'src/directives/drag-drop'
+  import contextmenu from '@/components/contextmenu'
 
   export default {
     name: 'canvasWrapper',
@@ -79,6 +84,9 @@
         morphShapes: [],
         currentSelectedMorph: null,
         newShape: null,
+        contextmenu_visibile: false,
+        contextmenu_top: '0',
+        contextmenu_left: '0',
         btn_visibile: {
           hide_shape_buttons: true,
           hide_flow_add_btns: true,
@@ -91,6 +99,7 @@
       }
     },
     mixins: [Locale],
+    components: { contextmenu },
     directives: {
       draggable,
       droppable
@@ -116,6 +125,7 @@
       EventBus.$on('UPDATE_quickMenu', (data) => {
         this.quickMenu = data
       })
+      this.handleContextmenu()
     },
     computed: {
       modelData () {
@@ -126,6 +136,23 @@
       }
     },
     methods: {
+      handleContextmenu () {
+        // disable context menu
+        document.getElementById('canvasHelpWrapper').oncontextmenu = (event) => {
+          const selectedElements = this.editorManager.getSelection()
+          if (selectedElements.length === 1 && selectedElements[0].getStencil().idWithoutNs() === 'UserTask') {
+            console.log(1111, selectedElements[0].getStencil().idWithoutNs())
+            this.contextmenu_visibile = true
+            let offset = this.editorManager.getNodeOffset(selectedElements[0])
+            this.contextmenu_top = `${offset.a.y}px`
+            this.contextmenu_left = `${offset.b.x + 5}px`
+          } else {
+            this.contextmenu_visibile = false
+          }
+
+          return false
+        }
+      },
       editShape () {
         this.editorManager.edit(this.selectedShape.resourceId)
       },
@@ -266,7 +293,7 @@
           { type: 'hide_edit_buttons', status: true }
         ])
 
-        // console.log('dragCanContain', this.dragCanContain)
+        console.log('dragCanContain', this.dragCanContain)
         if (this.dragCanContain) {
           let item = this.editorManager.getStencilItemById(ui.draggable[0].id)
           let pos = { x: event.pageX, y: event.pageY }
@@ -412,31 +439,19 @@
       },
       dragCallbackQuickMenu (event, ui) {
         console.log('dragCallbackQuickMenu==============')
-        if (this.dragModeOver != false) {
-          var coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY)
-
-          var additionalIEZoom = 1
-          if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-            var ua = navigator.userAgent
-            if (ua.indexOf('MSIE') >= 0) {
-              // IE 10 and below
-              var zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-              if (zoom !== 100) {
-                additionalIEZoom = zoom / 100
-              }
-            }
-          }
-
+        if (this.dragModeOver !== false) {
+          let coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY)
+          let additionalIEZoom = 1
+          additionalIEZoom = IEZoomBelow10(additionalIEZoom)
           if (additionalIEZoom !== 1) {
             coord.x = coord.x / additionalIEZoom
             coord.y = coord.y / additionalIEZoom
           }
 
-          var aShapes = this.editorManager.getCanvas().getAbstractShapesAtPosition(coord)
-
+          const aShapes = this.editorManager.getCanvas().getAbstractShapesAtPosition(coord)
           if (aShapes.length <= 0) {
             if (event.helper) {
-              EventBus.$emit('UPDATE_dragCanContain', false)
+              this.dragCanContain = false
               return false
             }
           }
@@ -445,7 +460,7 @@
             this.editorManager.getCanvas().setHightlightStateBasedOnX(coord.x)
           }
 
-          let stencil = undefined
+          let stencil
           let stencilSets = this.editorManager.getStencilSets().values()
           for (let i = 0; i < stencilSets.length; i++) {
             let stencilSet = stencilSets[i]
@@ -458,8 +473,8 @@
             }
 
             if (!stencil) {
-              var edges = stencilSet.edges()
-              for (var j = 0; j < edges.length; j++) {
+              const edges = stencilSet.edges()
+              for (let j = 0; j < edges.length; j++) {
                 if (edges[j].idWithoutNs() === event.target.id) {
                   stencil = edges[j]
                   break
@@ -485,18 +500,19 @@
             })
 
             if (!parentCandidate) {
-              EventBus.$emit('UPDATE_dragCanContain', false)
+              this.dragCanContain = false
               return false
             }
 
             this.editorManager.dragCurrentParent = parentCandidate
             this.editorManager.dragCurrentParentId = parentCandidate.id
             this.editorManager.dragCurrentParentStencil = parentCandidate.getStencil().id()
-            EventBus.$emit('UPDATE_dragCanContain', canContain)
             this.editorManager.dropTargetElement = parentCandidate
+            this.dragCanContain = canContain
             isValid = canContain
 
-          } else { //Edge
+          } else {
+            // Edge
             let shapes = this.editorManager.getSelection()
             if (shapes && shapes.length === 1) {
               let currentSelectedShape = shapes.first()
@@ -531,8 +547,8 @@
               this.editorManager.dragCurrentParent = parentCandidate
               this.editorManager.dragCurrentParentId = parentCandidate.id
               this.editorManager.dragCurrentParentStencil = parentCandidate.getStencil().id()
-              EventBus.$emit('canContain', canConnect)
               this.editorManager.dropTargetElement = candidate
+              this.dragCanContain = canConnect
             }
 
           }

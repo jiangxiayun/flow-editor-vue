@@ -26,7 +26,6 @@ export default function (Vue) {
       args = {}
     }
 
-    console.log(11, string, args)
     return string.replace(RE_NARGS, (match, prefix, i, index) => {
       let result
 

@@ -5,7 +5,7 @@
 
 export default class Bounds {
   constructor () {
-    this._changedCallbacks = [] //register a callback with changedCallacks.push(this.method.bind(this));
+    this._changedCallbacks = [] // register a callback with changedCallacks.push(this.method.bind(this));
     this.a = {}
     this.b = {}
     this.set.apply(this, arguments)
@@ -146,8 +146,6 @@ export default class Bounds {
           y: arguments[1] - currentPosition.y
         })
         break
-      default:
-      //TODO error
     }
   }
 
@@ -157,7 +155,6 @@ export default class Bounds {
    * or
    * @param {Number} x
    * @param {Number} y
-   *
    */
   moveBy () {
     let changed = false
@@ -184,8 +181,6 @@ export default class Bounds {
           this.b.y += y
         }
         break
-      default:
-      //TODO error
     }
 
     if (changed) {
@@ -193,8 +188,28 @@ export default class Bounds {
     }
   }
 
+  /**
+   * Moves the center point of this bounds to the new position.
+   * @param p {Point}
+   * or
+   * @param x {Number}
+   * @param y {Number}
+   */
+  centerMoveTo () {
+    let currentPosition = this.center()
+    switch (arguments.length) {
+      case 1:
+        this.moveBy(arguments[0].x - currentPosition.x, arguments[0].y - currentPosition.y)
+        break
+      case 2:
+        this.moveBy(arguments[0] - currentPosition.x, arguments[1] - currentPosition.y)
+        break
+    }
+  }
+
   /***
    * Includes the bounds b into the current bounds.
+   * 将边界B包含到当前边界中
    * @param {Bounds} b
    */
   include (b) {
@@ -212,7 +227,7 @@ export default class Bounds {
   }
 
   /**
-   * Relatively extends the bounds by p.
+   * 改变右下角坐标，拓展边界。
    * @param {Point} p
    */
   extend (p) {
@@ -228,7 +243,7 @@ export default class Bounds {
   }
 
   /**
-   * Widens the scope of the bounds by x.
+   * 将边界范围扩大x。中心的不变，4个角往四周平移x
    * @param {Number} x
    */
   widen (x) {
@@ -296,25 +311,6 @@ export default class Bounds {
     midpoint.x = (this.b.x - this.a.x) / 2.0
     midpoint.y = (this.b.y - this.a.y) / 2.0
     return midpoint
-  }
-
-  /**
-   * Moves the center point of this bounds to the new position.
-   * @param p {Point}
-   * or
-   * @param x {Number}
-   * @param y {Number}
-   */
-  centerMoveTo () {
-    let currentPosition = this.center()
-    switch (arguments.length) {
-      case 1:
-        this.moveBy(arguments[0].x - currentPosition.x, arguments[0].y - currentPosition.y)
-        break
-      case 2:
-        this.moveBy(arguments[0] - currentPosition.x, arguments[1] - currentPosition.y)
-        break
-    }
   }
 
   // isIncluded (point, offset)
