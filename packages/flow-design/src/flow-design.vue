@@ -7,7 +7,7 @@
         <paletteWrapper :editorManager="editorManager"></paletteWrapper>
       </slot>
       <div id="contentCanvasWrapper" class="contentCanvasWrapper">
-        <canvasWrapper :editorManager="editorManager"></canvasWrapper>
+        <canvasWrapper :editorManager="editorManager" :contextmenuList="contextmenuList"></canvasWrapper>
         <slot name="propertyWrapper" v-bind:editorManager="editorManager">
           <propertySection :editorManager="editorManager"></propertySection>
         </slot>
@@ -53,7 +53,8 @@
     props: {
       config: {
         type: Object
-      }
+      },
+      contextmenuList: Array
     },
     components: { toolbar, paletteWrapper, canvasWrapper, propertySection },
     created () {},
@@ -72,16 +73,8 @@
       this.$on('Propagation', this.handleSaveBtn)
     },
     methods: {
-      dropIntoCanvas (evt) {
-        console.log('dropIntoCanvas', evt.item.id)
-      },
-      dragStart (evt) {
-        console.log(11, evt)
-      },
-      dragMove (evt) {
-        console.log(22, evt)
-      },
       handleSaveBtn (eventName, params) {
+        // console.log(33, params)
         this.$emit(eventName, params)
       },
     }

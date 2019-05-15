@@ -15,7 +15,6 @@ function broadcast (componentName, eventName, params) {
 export default {
   methods: {
     dispatch (componentName, eventName, params) {
-      console.log(11122)
       let parent = this.$parent || this.$root
       let name = parent.$options.componentName || parent.$options._componentTag
       while (parent && (!name || name !== componentName)) {

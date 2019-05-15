@@ -135,7 +135,7 @@ export default class PoolAsProperty extends AbstractPlugin {
     let propertyKey = option.key
     let propertyValue = option.value
 
-    console.log('propertyKey', propertyKey)
+    console.log('propertyKey', option)
     let changed = false
     shapes.each(function (shape) {
       if ((shape.getStencil().id().endsWith('SequenceFlow')) &&

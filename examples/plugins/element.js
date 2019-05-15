@@ -15,7 +15,12 @@ import {
   Radio,
   Select,
   Option,
-  Tag
+  Tag,
+  Tree,
+  Tabs,
+  TabPane,
+  Form,
+  FormItem
 } from 'element-ui'
 
 Vue.use(Button)
@@ -34,5 +39,10 @@ Vue.use(Radio)
 Vue.use(Select)
 Vue.use(Option)
 Vue.use(Tag)
+Vue.use(Tree)
+Vue.use(Tabs)
+Vue.use(TabPane)
+Vue.use(Form)
+Vue.use(FormItem)
 
 Vue.prototype.$message = Message

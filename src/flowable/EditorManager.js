@@ -7,6 +7,7 @@ import ORYX from '../oryx'
 import CreateCommand from './Command/CreateCommand'
 import MorphTo from './Command/MorphTo'
 import SetProperty from './Command/setProperty'
+import setProperties from './Command/setProperties'
 import CommandClass from './Command/commandClass'
 import ORYX_Config from '../oryx/CONFIG'
 
@@ -20,6 +21,7 @@ export default class EditorManager {
     CreateCommand,
     MorphTo,
     SetProperty,
+    setProperties,
     CommandClass
   }
   TOOLBAR_ACTIONS = TOOLBAR_ACTIONS
@@ -28,7 +30,7 @@ export default class EditorManager {
     config = jQuery.extend(true, {}, config)
     // this.editorConfigs = jQuery.extend(true, FLOWABLE, config.editorConfigs)
     config.editorConfigs && ORYX.CONFIG.setCustomConfigs(config.editorConfigs)
-    this.property_config = config.editorConfigs.PROPERTY_CONFIG
+    // this.property_config = config.editorConfigs.PROPERTY_CONFIG
     this.treeFilteredElements = ['SubProcess', 'CollapsedSubProcess']
     this.canvasTracker = new Hash()
     this.structualIcons = {
@@ -400,35 +402,35 @@ export default class EditorManager {
   }
 
   renderProcessHierarchy () {
-    //only start calculating when the editor has done all his constructor work.
+    // only start calculating when the editor has done all his constructor work.
     if (!this.isEditorReady) {
       return false
     }
 
     if (!this.isLoading()) {
-      //the current implementation of has a lot of eventlisteners. when calling getTree() it could manipulate
-      //the canvastracker while the canvas is stille loading stuff.
+      // the current implementation of has a lot of eventlisteners. when calling getTree() it could manipulate
+      // the canvastracker while the canvas is stille loading stuff.
       //TODO: check if its possible to trigger the re-rendering by a single event instead of registering on 10 events...
       this.treeview = this.getTree()
     }
-
   }
   filterEvent (event) {
-    // this event is fired when the user changes a property by the property editor.
-    if (event.type === 'event-type-property-value-changed') {
-      if (event.property.key === 'oryx-overrideid' || event.property.key === 'oryx-name') {
+    // 当用户通过属性编辑器更改属性时会触发此事件。
+    if (event.type === ORYX.CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED) {
+      if (event.keys.includes('oryx-overrideid') || event.keys.includes('oryx-name')) {
         this.renderProcessHierarchy()
       }
-      //this event is fired when the stencil / shape's text is changed / updated.
+      // if (event.property.key === 'oryx-overrideid' || event.property.key === 'oryx-name') {
+      //   this.renderProcessHierarchy()
+      // }
     } else if (event.type === 'propertyChanged') {
+      // 当更新或修改 stencil / shape's text 时会触发此事件
       if (event.name === 'oryx-overrideid' || event.name === 'oryx-name') {
-
         this.renderProcessHierarchy()
       }
     } else if (event.type === ORYX.CONFIG.ACTION_DELETE_COMPLETED) {
       this.renderProcessHierarchy()
-      //for some reason the new tree does not trigger an ui update.
-      //$scope.$apply();
+      // for some reason the new tree does not trigger an ui update.
     } else if (event.type === 'event-type-item-dropped') {
       this.renderProcessHierarchy()
     }
@@ -500,7 +502,7 @@ export default class EditorManager {
   getCanvas () { return this.editor.getCanvas() }
   getRules () { return this.editor.getRules() }
   getEditor () {
-    //TODO: find out if we can avoid exposing the editor object to angular.
+    // TODO: find out if we can avoid exposing the editor object to angular.
     return this.editor
   }
   getTree () {
@@ -760,15 +762,15 @@ export default class EditorManager {
         }
 
         // First we check if there is a config for 'key-type' and then for 'type' alone
-        let propertyConfig = this.property_config[key + '-' + property.type()]
-        if (propertyConfig === undefined || propertyConfig === null) {
-          propertyConfig = this.property_config[property.type()]
-        }
+        // let propertyConfig = this.property_config[key + '-' + property.type()]
+        // if (propertyConfig === undefined || propertyConfig === null) {
+        //   propertyConfig = this.property_config[property.type()]
+        // }
 
-        if (propertyConfig === undefined || propertyConfig === null) {
-          console.log('WARNING: no property configuration defined for ' + key + ' of type ' + property.type())
-          console.warn('警告: 找不到 ' + key + ' of type ' + property.type() + '属性所对应的组件')
-        } else {
+        // if (propertyConfig === undefined || propertyConfig === null) {
+        //   console.log('WARNING: no property configuration defined for ' + key + ' of type ' + property.type())
+        //   console.warn('警告: 找不到 ' + key + ' of type ' + property.type() + '属性所对应的组件')
+        // } else {
           if (selectedShape.properties.get(key) === 'true') {
             selectedShape.properties.set(key, true)
           }
@@ -787,7 +789,8 @@ export default class EditorManager {
             'value': selectedShape.properties.get(key)
           }
 
-          if ((currentProperty.type === 'complex' || currentProperty.type === 'multiplecomplex') && currentProperty.value && currentProperty.value.length > 0) {
+          if ((currentProperty.type === 'complex' || currentProperty.type === 'multiplecomplex') &&
+            currentProperty.value && currentProperty.value.length > 0) {
             try {
               currentProperty.value = JSON.parse(currentProperty.value)
             } catch (err) {
@@ -795,19 +798,19 @@ export default class EditorManager {
             }
           }
 
-          if (propertyConfig.readModeTemplateUrl !== undefined && propertyConfig.readModeTemplateUrl !== null) {
-            currentProperty.readModeTemplateUrl = propertyConfig.readModeTemplateUrl
-          }
-          if (propertyConfig.writeModeTemplateUrl !== null && propertyConfig.writeModeTemplateUrl !== null) {
-            currentProperty.writeModeTemplateUrl = propertyConfig.writeModeTemplateUrl
-          }
-
-          if (propertyConfig.templateUrl !== undefined && propertyConfig.templateUrl !== null) {
-            currentProperty.templateUrl = propertyConfig.templateUrl
-            currentProperty.hasReadWriteMode = false
-          } else {
-            currentProperty.hasReadWriteMode = true
-          }
+          // if (propertyConfig.readModeTemplateUrl !== undefined && propertyConfig.readModeTemplateUrl !== null) {
+          //   currentProperty.readModeTemplateUrl = propertyConfig.readModeTemplateUrl
+          // }
+          // if (propertyConfig.writeModeTemplateUrl !== null && propertyConfig.writeModeTemplateUrl !== null) {
+          //   currentProperty.writeModeTemplateUrl = propertyConfig.writeModeTemplateUrl
+          // }
+          //
+          // if (propertyConfig.templateUrl !== undefined && propertyConfig.templateUrl !== null) {
+          //   currentProperty.templateUrl = propertyConfig.templateUrl
+          //   currentProperty.hasReadWriteMode = false
+          // } else {
+          //   currentProperty.hasReadWriteMode = true
+          // }
 
           if (currentProperty.value === undefined
             || currentProperty.value === null
@@ -816,7 +819,7 @@ export default class EditorManager {
           }
 
           selectedItem.properties.push(currentProperty)
-        }
+        // }
       }
 
       this.selectedItem = selectedItem

@@ -1,16 +1,23 @@
 <template>
   <!--画布区域-->
-  <div id="canvasHelpWrapper" class="canvasHelpWrapper" @click="contextmenu_visibile = false">
-    <contextmenu v-show="contextmenu_visibile"
-    :top="contextmenu_top"
-    :left="contextmenu_left"
-    ></contextmenu>
+  <div id="canvasHelpWrapper" class="canvasHelpWrapper" @click="clickSvgDown">
+    <!--<contextmenu v-show="contextmenu_visibile"-->
+    <!--:top="contextmenu_top"-->
+    <!--:left="contextmenu_left"-->
+    <!--&gt;</contextmenu>-->
+    <ul class="contextmenu"
+        v-show="contextmenu_visibile"
+        :style="{top: contextmenu_top, left: contextmenu_left}">
+      <li v-for="item in contextmenuList" :key="item.action"
+          @click="clickCommand(item)"
+          class="command" >{{item.name}}</li>
+    </ul>
     <div class="canvas-wrapper canvasSection" id="canvasSection"
          v-droppable="{onDrop:'dropCallback',onOver: 'overCallback', onOut: 'outCallback'}"
          data-model="droppedElement"
          data-drop="true"
          @scroll.passive="fnScroll">
-      <div class="canvas-message" id="model-modified-date"></div>
+      <div class="canvas-message" id="model-modified-date"> {{contextmenuList}}</div>
 
       <div id="flow_op_btns" v-show="!btn_visibile.hide_shape_buttons">
         <!--删除按钮-->
@@ -75,7 +82,8 @@
   import { _debounce, getAdditionalIEZoom, IEZoomBelow10 } from 'src/Util'
   import Locale from 'src/mixins/locale'
   import { draggable, droppable } from 'src/directives/drag-drop'
-  import contextmenu from '@/components/contextmenu'
+  // import contextmenu from '@/components/contextmenu'
+  import Emitter from 'src/mixins/emitter'
 
   export default {
     name: 'canvasWrapper',
@@ -87,6 +95,7 @@
         contextmenu_visibile: false,
         contextmenu_top: '0',
         contextmenu_left: '0',
+        contextmenu_visibile_willshow: false,
         btn_visibile: {
           hide_shape_buttons: true,
           hide_flow_add_btns: true,
@@ -98,14 +107,18 @@
         quickMenu: undefined
       }
     },
-    mixins: [Locale],
-    components: { contextmenu },
+    mixins: [Locale, Emitter],
+    // components: { contextmenu },
     directives: {
       draggable,
       droppable
     },
     props: {
-      editorManager: {}
+      editorManager: {},
+      contextmenuList: {
+        type: Array,
+        default: () => []
+      }
     },
     mounted () {
       // 隐藏画布节点的快捷按钮
@@ -136,21 +149,35 @@
       }
     },
     methods: {
+      clickCommand (item) {
+        // this.dispatch('flowEditor', item.action, this.currentShape)
+        this.dispatch('flowEditor', 'clickContextmenuCommand', {action: item, shape: this.currentShape})
+      },
+      clickSvgDown () {
+        this.contextmenu_visibile = false
+        this.contextmenu_visibile_willshow = false
+      },
       handleContextmenu () {
         // disable context menu
         document.getElementById('canvasHelpWrapper').oncontextmenu = (event) => {
           const selectedElements = this.editorManager.getSelection()
-          if (selectedElements.length === 1 && selectedElements[0].getStencil().idWithoutNs() === 'UserTask') {
-            console.log(1111, selectedElements[0].getStencil().idWithoutNs())
-            this.contextmenu_visibile = true
-            let offset = this.editorManager.getNodeOffset(selectedElements[0])
-            this.contextmenu_top = `${offset.a.y}px`
-            this.contextmenu_left = `${offset.b.x + 5}px`
-          } else {
-            this.contextmenu_visibile = false
-          }
-
+          // 用户自定义按钮事件，以$emit抛出 buttonClicked.action 事件
+          this.dispatch('flowEditor', 'oncontextmenu', { selectedElements })
+          this.setContextmenuPosition(selectedElements)
           return false
+        }
+      },
+      setContextmenuPosition (selectedElements) {
+        if (selectedElements.length === 1 && selectedElements[0].getStencil().idWithoutNs() === 'UserTask') {
+          console.log(1111, selectedElements[0].getStencil().idWithoutNs())
+          this.currentShape = selectedElements[0]
+          let offset = this.editorManager.getNodeOffset(selectedElements[0])
+          this.contextmenu_top = `${offset.a.y}px`
+          this.contextmenu_left = `${offset.b.x + 5}px`
+          this.contextmenu_visibile = true
+        } else {
+          this.contextmenu_visibile = false
+          this.contextmenu_visibile_willshow = false
         }
       },
       editShape () {
@@ -165,6 +192,11 @@
         this.subSelectionElements = subSelectionElements
         if (selectedElements && selectedElements.length > 0) {
           this.selectedElementBeforeScrolling = selectedElements[0]
+        }
+
+        if (this.contextmenu_visibile) {
+          this.contextmenu_visibile = false
+          this.contextmenu_visibile_willshow = true
         }
         this.btn_visibile.hide_shape_buttons = true
 
@@ -192,6 +224,7 @@
         // this.editorManager.setSelection([])
         // needed cause it checks for element changes and does nothing if the elements are the same
         // this.editorManager.setSelection(this.selectedElements, this.subSelectionElements)
+        this.contextmenu_visibile_willshow && this.setContextmenuPosition(this.selectedElements)
         this.editorManager.updateOryxButtonPosition(this.selectedElements)
         this.selectedElements = undefined
         this.subSelectionElements = undefined

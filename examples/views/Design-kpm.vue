@@ -1,6 +1,11 @@
 <template>
-  <div id="aaaaa">
-    <flowEditor :config="config" @btn-save-click="handleSaveBtn">
+  <div>
+    {{contextmenuList}}
+    <flowEditor :config="config"
+                :contextmenuList="contextmenuList"
+                @btn-save-click="handleSaveBtn"
+                @oncontextmenu="handleContextmenu"
+                @clickContextmenuCommand="handleContextmenuCommand">
 
       <template slot="paletteWrapper" slot-scope="scope">
         <div id="paletteHelpWrapper" class="paletteHelpWrapper" v-if="scope.editorManager">
@@ -74,6 +79,22 @@
 
   </span>
     </el-dialog>
+
+    <!--节点属性编辑弹窗-->
+    <el-dialog
+        :title="writeDialog.title"
+        :visible.sync="writeDialog.visible"
+        width="90%"
+        :before-close="handlepropertyWriteClose">
+      {{selectedItem.properties}}
+      <component v-bind:is="writeDialog.componentTemplate"
+                 :property="selectedItem.properties"
+                 @updateProperty="updatePropertyInModel"></component>
+      <!--<span slot="footer" class="dialog-footer">-->
+    <!--<el-button @click="handlepropertyWriteClose">取 消</el-button>-->
+    <!--<el-button type="primary" @click="propertyWriteSave">确 定</el-button>-->
+  <!--</span>-->
+    </el-dialog>
   </div>
 
 </template>
@@ -83,6 +104,9 @@
   import { AA } from '@/mock/stencilData-kpm.js'
   import { mockData } from '@/mock/mockData.js'
   import configure from './initConfig'
+  import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
+  import quoteActivity from '@/components/taskEdit/quoteActivity'
+  import activityTabsEdit from '@/components/taskEdit/activityTabsEdit'
 
   const flowSaveData = localStorage.getItem('flowSaveData')
   const flowSaveDataFinally = flowSaveData ? JSON.parse(flowSaveData) : {
@@ -107,6 +131,35 @@
       'modelType': 'model'
     }
   }
+
+  const TaskNoneQuote =  [
+    {
+      name: '新建活动',
+      action: 'createQuote',
+      type: 'dialog',
+      dialogTitle: '活动引用',
+      // componentTemplate: 'quoteActivity'
+      componentTemplate: 'activityTabsEdit'
+    }
+  ]
+  const TaskPreReference =  [
+    {
+      name: '编辑主活动',
+      action: 'editActivityBase',
+      type: 'dialog',
+      dialogTitle: '活动主数据快速维护',
+      componentTemplate: 'activityTabsEdit'
+    }
+  ]
+  const TaskQuoted =  [
+    {
+      name: '编辑/查看',
+      action: 'modifyActivity',
+      type: 'dialog',
+      dialogTitle: '活动场景数据维护',
+      componentTemplate: 'activityTabsEdit'
+    }
+  ]
 
   export default {
     name: 'Editor',
@@ -163,14 +216,28 @@
             ]
           },
           editorConfigs: configure
+        },
+        contextmenuList: [],
+        selectedItem: {},
+        currentShapeMode: 'read',
+        writeDialog: {
+          visible: false,
+          componentTemplate: null
         }
       }
     },
-    components: { propertySection },
+    components: { propertySection, quoteActivity, activityTabsEdit },
     created () {},
     computed: {},
     mounted () {
       // this.$on('btn-save-click', this.handleSaveBtn);
+      FLOW_eventBus.addListener('event-type-selection-changed', (event) => {
+        if (this.currentShapeMode !== 'write') {
+          console.log(4444, event.selectedItem)
+          this.selectedItem = event.selectedItem
+          this.selectedShape = event.selectedShape
+        }
+      })
     },
     methods: {
       handleSaveBtn (editor) {
@@ -279,6 +346,108 @@
       },
       close () {
         this.saveVisible = false
+      },
+      handleContextmenu ({selectedElements}) {
+        if (selectedElements.length === 1 && selectedElements[0].getStencil().idWithoutNs() === 'UserTask') {
+          const task = selectedElements[0]
+          switch (task.properties.get('quote')) {
+            case 'Pre-reference':
+              this.contextmenuList = TaskPreReference
+              break
+            case 'quoted':
+              this.contextmenuList = TaskQuoted
+              break
+            default:
+              this.contextmenuList = TaskNoneQuote
+          }
+        }
+      },
+      handleContextmenuCommand (params) {
+        if (params.action.type === 'dialog') {
+          this.writeDialog = {
+            visible: true,
+            title: params.action.dialogTitle,
+            componentTemplate: params.action.componentTemplate
+          }
+        }
+
+      },
+      propertyWriteSave () {
+        this.writeDialog.visible = false
+        this.currentShapeMode = 'read'
+      },
+      handlepropertyWriteClose () {
+        this.currentShapeMode = 'read'
+        this.writeDialog.visible = false
+      },
+      /* Click handler for clicking a property */
+      propertyClicked (property) {
+        if (!(this.currentShapeType.endsWith('Lane') && this.laneEnableValue &&
+          this.laneValueAry.includes(property.key) && property.key != this.laneEnableValue)) {
+          if (!property.hidden) {
+            property.mode = 'write'
+          }
+          this.currentShapeMode = 'write'
+        }
+      },
+      /* Method available to all sub controllers (for property controllers) to update the internal Oryx model */
+      updatePropertyInModel ({ properties, shapeId }) {
+        let shape = this.selectedShape
+        // Some updates may happen when selected shape is already changed, so when an additional
+        // shapeId is supplied, we need to make sure the correct shape is updated (current or previous)
+        if (shapeId) {
+          if (shape.id != shapeId && this.previousSelectedShape && this.previousSelectedShape.id == shapeId) {
+            shape = this.previousSelectedShape
+          } else {
+            shape = null
+          }
+        }
+
+        if (!shape) {
+          return
+        }
+
+        const _this = this
+
+        let keys = Object.keys(properties)
+        let changedProperties = []  // 提取有变动的属性
+        keys.map(key => {
+          // let newValue = property.value
+          let newValue = properties[key]
+          let oldValue = shape.properties.get(key)
+          if (newValue != oldValue) {
+            changedProperties.push({
+              key,
+              oldValue,
+              newValue
+            })
+          }
+        })
+
+        if (changedProperties.length > 0) {
+          this.editorManager.assignCommand('setProperties',
+            changedProperties, shape, _this.editorManager.getEditor())
+          this.editorManager.handleEvents({
+            type: 'propertyWindow.propertyChanged',
+            elements: [shape],
+            key: keys
+          })
+
+          // Switch the property back to read mode, now the update is done
+          this.currentShapeMode = 'read'
+          const event = {
+            type: 'event-type-property-value-changed',
+            // property: property,
+            // oldValue: oldValue,
+            // newValue: newValue,
+            properties: changedProperties,
+            keys: keys
+          }
+
+          this.editorManager.dispatchFlowEvent(event.type, event)
+        } else {
+          this.currentShapeMode = 'read'
+        }
       }
     }
   }
