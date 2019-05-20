@@ -3,7 +3,6 @@ import ORYX_Config from '../CONFIG'
 import ORYX_Log from '../Log'
 import ORYX_Editor from '../Editor'
 import { DataManager } from '../Kickstart'
-import ORYX_Node from '../core/Node'
 
 /**
  This abstract plugin class can be used to build plugins on.
@@ -38,15 +37,13 @@ export default class AbstractPlugin {
    Overwrite to handle load event. TODO: Document params!!!
    @methodOf ORYX.Plugins.AbstractPlugin.prototype
    */
-  onLoaded () {
-  }
+  onLoaded () {}
 
   /**
    Overwrite to handle selection changed event. TODO: Document params!!!
    @methodOf ORYX.Plugins.AbstractPlugin.prototype
    */
-  onSelectionChanged () {
-  }
+  onSelectionChanged () {}
 
   /**
    Show overlay on given shape.
@@ -69,7 +66,6 @@ export default class AbstractPlugin {
    @param {String} [svgNode="NW"] The svg node position where the overlay should be placed
    */
   showOverlay (shapes, attributes, svgNode, svgNodePosition) {
-
     if (!(shapes instanceof Array)) {
       shapes = [shapes]
     }
@@ -118,7 +114,6 @@ export default class AbstractPlugin {
    @param {String} stylesheet URL of a stylesheet which should be used for transforming data.
    */
   doTransform (data, stylesheet) {
-
     if (!stylesheet || !data) {
       return ''
     }
@@ -154,7 +149,6 @@ export default class AbstractPlugin {
     } catch (error) {
       return -1
     }
-
   }
 
   /**
@@ -274,11 +268,12 @@ export default class AbstractPlugin {
 
   /**
    * Extracts RDF from DOM.
+   * 从DOM中提取RDF。
    * @methodOf ORYX.Plugins.AbstractPlugin.prototype
    * @type {String} Extracted RFD. Null if there are transformation errors.
    */
   getRDFFromDOM () {
-    //convert to RDF
+    // convert to RDF
     try {
       let xsl = ''
       let source = ORYX_Config.PATH + 'lib/extract-rdf.xsl'

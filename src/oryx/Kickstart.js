@@ -2,7 +2,7 @@ import ERDF from './ERDF'
 import ORYX_CONFIG from './CONFIG'
 import ORYX_Canvas from './core/Canvas'
 
-//TODO kann kickstart sich vielleicht auch um die erzeugung von paketen/
+// TODO kann kickstart sich vielleicht auch um die erzeugung von paketen/
 // namespaces k�mmern? z.b. requireNamespace("ORYX.Core.SVG");
 const Kickstart = {
   started: false,
@@ -12,7 +12,6 @@ const Kickstart = {
   load: function () {
     Kickstart.kick()
   },
-
   kick: function () {
     //console.profile("loading");
     if (!Kickstart.started) {
@@ -497,7 +496,6 @@ const ResourceManager = {
  * @class DataManager
  */
 const DataManager = {
-
   /**
    * The init method should be called once in the DataManagers lifetime.
    * It causes the DataManager to initialize itself, the erdf parser, do all
@@ -541,7 +539,6 @@ const DataManager = {
    * @param {Object} shape
    */
   __synchronizeShape: function (shape) {
-
     var r = ResourceManager.getResource(shape.resourceId)
     var serialize = shape.serialize()
 
@@ -661,6 +658,8 @@ const DataManager = {
   },
 
   __renderCanvas: function (facade) {
+    console.log(887799)
+
     const canvas = facade.getCanvas()
     const stencilSets = facade.getStencilSets()
     const shapes = canvas.getChildShapes(true)
@@ -717,7 +716,6 @@ const DataManager = {
 
   __counter: 0,
   __provideId: function () {
-
     while ($(RESOURCE_ID_PREFIX + DataManager.__counter))
       DataManager.__counter++
 
@@ -725,12 +723,10 @@ const DataManager = {
   },
 
   serializeDOM: function (facade) {
-
     return DataManager.__persistDOM(facade)
   },
 
   syncGlobal: function (facade) {
-
     return DataManager.__syncglobal(facade)
   },
 
@@ -1116,7 +1112,6 @@ const DataManager = {
 // 在当前窗口上将kickstart注册为新的onload事件侦听器。
 // previous listener(s) are triggered to launch with kickstart.
 Event.observe(window, 'load', Kickstart.load)
-
 
 Kickstart.register(DataManager.init)
 

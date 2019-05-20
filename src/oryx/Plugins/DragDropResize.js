@@ -48,11 +48,10 @@ export default class DragDropResize extends AbstractPlugin {
       this.hLine = new GridLine(containerNode, GridLine.DIR_HORIZONTAL)
     }
 
-    // Get a HTML-ContainerNode
-    containerNode = this.facade.getCanvas().getHTMLContainer()
-
     this.scrollNode = this.facade.getCanvas().rootNode.parentNode.parentNode
 
+    // Get a HTML-ContainerNode
+    containerNode = this.facade.getCanvas().getHTMLContainer()
     // Create the southeastern button for resizing
     this.resizerSE = new Resizer(containerNode, 'southeast', this.facade)
     this.resizerSE.registerOnResize(this.onResize.bind(this)) // register the resize callback
@@ -342,108 +341,6 @@ export default class DragDropResize extends AbstractPlugin {
   }
 
   /**
-   * On Key Mouse Up
-   */
-  handleMouseUp (event) {
-    // disable containment highlighting
-    this.facade.raiseEvent({
-      type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
-      highlightId: 'dragdropresize.contain'
-    })
-
-    this.facade.raiseEvent({
-      type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
-      highlightId: 'dragdropresize.attached'
-    })
-
-    // If Dragging is finished
-    if (this.dragEnable) {
-      // and update the current selection
-      if (!this.dragIntialized) {
-        // Do Method after Dragging
-        this.afterDrag()
-
-        // Check if the Shape is allowed to dock to the other Shape
-        if (this.isAttachingAllowed &&
-          this.toMoveShapes.length == 1 && this.toMoveShapes[0] instanceof ORYX_Node &&
-          this.toMoveShapes[0].dockers.length > 0) {
-
-          // Get the position and the docker
-          let position = this.facade.eventCoordinates(event)
-          let docker = this.toMoveShapes[0].dockers[0]
-
-
-          // Command-Pattern for dragging several Shapes
-          class dockCommand extends ORYX_Command{
-            constructor (docker, position, newDockedShape, facade) {
-              super()
-              this.docker = docker
-              this.newPosition = position
-              this.newDockedShape = newDockedShape
-              this.newParent = newDockedShape.parent || facade.getCanvas()
-              this.oldPosition = docker.parent.bounds.center()
-              this.oldDockedShape = docker.getDockedShape()
-              this.oldParent = docker.parent.parent || facade.getCanvas()
-              this.facade = facade
-
-              if (this.oldDockedShape) {
-                this.oldPosition = docker.parent.absoluteBounds().center()
-              }
-            }
-            execute() {
-              this.dock(this.newDockedShape, this.newParent, this.newPosition)
-              // Raise Event for having the docked shape on top of the other shape
-              this.facade.raiseEvent({ type: ORYX_Config.EVENT_ARRANGEMENT_TOP, excludeCommand: true })
-            }
-            rollback () {
-              this.dock(this.oldDockedShape, this.oldParent, this.oldPosition)
-            }
-            dock (toDockShape, parent, pos) {
-              // Add to the same parent Shape
-              parent.add(this.docker.parent)
-              // Set the Docker to the new Shape
-              this.docker.setDockedShape(undefined)
-              this.docker.bounds.centerMoveTo(pos)
-              this.docker.setDockedShape(toDockShape)
-              // this.docker.update();
-
-              this.facade.setSelection([this.docker.parent])
-              this.facade.getCanvas().update()
-              this.facade.updateSelection()
-            }
-          }
-          // Instanziate the dockCommand
-          const commands = [new dockCommand(docker, position, this.containmentParentNode, this.facade)]
-          this.facade.executeCommands(commands)
-          // Check if adding is allowed to the other Shape
-        } else if (this.isAddingAllowed) {
-          // Refresh all Shapes --> Set the new Bounds
-          this.refreshSelectedShapes()
-        }
-
-        this.facade.updateSelection()
-
-        // this.currentShapes.each(function(shape) {shape.update()})
-        // Raise Event: Dragging is finished
-        this.facade.raiseEvent({ type: ORYX_Config.EVENT_DRAGDROP_END })
-      }
-      if (this.vLine)
-        this.vLine.hide()
-      if (this.hLine)
-        this.hLine.hide()
-    }
-
-    // Disable
-    this.dragEnable = false
-
-    // UnRegister on Global Mouse-UP/-Move Event
-    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.callbackMouseUp, true)
-    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.callbackMouseMove, false)
-
-    return
-  }
-
-  /**
    * On Key Mouse Move
    */
   handleMouseMove (event) {
@@ -473,7 +370,6 @@ export default class DragDropResize extends AbstractPlugin {
 
       // Do method before Drag
       this.beforeDrag()
-
       this._currentUnderlyingNodes = []
     }
 
@@ -492,10 +388,8 @@ export default class DragDropResize extends AbstractPlugin {
       // Snap the current position to the nearest Snap-Point 辅助线吸附
       position = this.snapToGrid(position)
     } else {
-      if (this.vLine)
-        this.vLine.hide()
-      if (this.hLine)
-        this.hLine.hide()
+      this.vLine && this.vLine.hide()
+      this.hLine && this.hLine.hide()
     }
 
     // Adjust the point by the zoom faktor
@@ -607,6 +501,108 @@ export default class DragDropResize extends AbstractPlugin {
     // Event.stop(event);
     return
   }
+  /**
+   * On Key Mouse Up
+   */
+  handleMouseUp (event) {
+    // disable containment highlighting
+    this.facade.raiseEvent({
+      type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
+      highlightId: 'dragdropresize.contain'
+    })
+
+    this.facade.raiseEvent({
+      type: ORYX_Config.EVENT_HIGHLIGHT_HIDE,
+      highlightId: 'dragdropresize.attached'
+    })
+
+    // If Dragging is finished
+    if (this.dragEnable) {
+      // and update the current selection
+      if (!this.dragIntialized) {
+        // Do Method after Dragging
+        this.afterDrag()
+
+        // Check if the Shape is allowed to dock to the other Shape
+        if (this.isAttachingAllowed &&
+          this.toMoveShapes.length == 1 && this.toMoveShapes[0] instanceof ORYX_Node &&
+          this.toMoveShapes[0].dockers.length > 0) {
+
+          // Get the position and the docker
+          let position = this.facade.eventCoordinates(event)
+          let docker = this.toMoveShapes[0].dockers[0]
+
+
+          // Command-Pattern for dragging several Shapes
+          class dockCommand extends ORYX_Command{
+            constructor (docker, position, newDockedShape, facade) {
+              super()
+              this.docker = docker
+              this.newPosition = position
+              this.newDockedShape = newDockedShape
+              this.newParent = newDockedShape.parent || facade.getCanvas()
+              this.oldPosition = docker.parent.bounds.center()
+              this.oldDockedShape = docker.getDockedShape()
+              this.oldParent = docker.parent.parent || facade.getCanvas()
+              this.facade = facade
+
+              if (this.oldDockedShape) {
+                this.oldPosition = docker.parent.absoluteBounds().center()
+              }
+            }
+            execute() {
+              this.dock(this.newDockedShape, this.newParent, this.newPosition)
+              // Raise Event for having the docked shape on top of the other shape
+              this.facade.raiseEvent({ type: ORYX_Config.EVENT_ARRANGEMENT_TOP, excludeCommand: true })
+            }
+            rollback () {
+              this.dock(this.oldDockedShape, this.oldParent, this.oldPosition)
+            }
+            dock (toDockShape, parent, pos) {
+              // Add to the same parent Shape
+              parent.add(this.docker.parent)
+              // Set the Docker to the new Shape
+              this.docker.setDockedShape(undefined)
+              this.docker.bounds.centerMoveTo(pos)
+              this.docker.setDockedShape(toDockShape)
+              // this.docker.update();
+
+              this.facade.setSelection([this.docker.parent])
+              this.facade.getCanvas().update()
+              this.facade.updateSelection()
+            }
+          }
+          // Instanziate the dockCommand
+          const commands = [new dockCommand(docker, position, this.containmentParentNode, this.facade)]
+          this.facade.executeCommands(commands)
+          // Check if adding is allowed to the other Shape
+        } else if (this.isAddingAllowed) {
+          // Refresh all Shapes --> Set the new Bounds
+          this.refreshSelectedShapes()
+        }
+
+        this.facade.updateSelection()
+
+        // this.currentShapes.each(function(shape) {shape.update()})
+        // Raise Event: Dragging is finished
+        this.facade.raiseEvent({ type: ORYX_Config.EVENT_DRAGDROP_END })
+      }
+      if (this.vLine)
+        this.vLine.hide()
+      if (this.hLine)
+        this.hLine.hide()
+    }
+
+    // Disable
+    this.dragEnable = false
+
+    // UnRegister on Global Mouse-UP/-Move Event
+    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.callbackMouseUp, true)
+    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.callbackMouseMove, false)
+
+    return
+  }
+
 
   //	/**
   //	 * Rollbacks the docked shape of an edge, if the edge is not movable.
@@ -880,9 +876,7 @@ export default class DragDropResize extends AbstractPlugin {
   /**
    * Finished the Dragging
    */
-  afterDrag () {
-
-  }
+  afterDrag () {}
 
   /**
    * Show all Labels at these shape
@@ -1015,9 +1009,7 @@ export default class DragDropResize extends AbstractPlugin {
     return ul
   }
 
-  showGridLine () {
-
-  }
+  showGridLine () {}
 
   /**
    * 重新绘制所选区域的矩形

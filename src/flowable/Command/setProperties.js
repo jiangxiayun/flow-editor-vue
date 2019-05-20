@@ -1,21 +1,26 @@
 import ORYX from 'src/oryx'
 
 export default class setProperties extends ORYX.Core.Command {
-  constructor (key, oldValue, newValue, shape, facade) {
+  constructor (values, shape, facade) {
     super()
-    this.key = key
-    this.oldValue = oldValue
-    this.newValue = newValue
+    this.values = values
     this.shape = shape
     this.facade = facade
   }
   execute () {
-    this.shape.setProperty(this.key, this.newValue)
+    this.values.map(item => {
+      let { key, newValue } = item
+      this.shape.setProperty(key, newValue)
+    })
+
     this.facade.getCanvas().update()
     this.facade.updateSelection()
   }
   rollback () {
-    this.shape.setProperty(this.key, this.oldValue)
+    this.values.map(item => {
+      let { key, oldValue } = item
+      this.shape.setProperty(key, oldValue)
+    })
     this.facade.getCanvas().update()
     this.facade.updateSelection()
   }

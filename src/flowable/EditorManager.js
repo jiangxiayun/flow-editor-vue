@@ -9,7 +9,6 @@ import MorphTo from './Command/MorphTo'
 import SetProperty from './Command/setProperty'
 import setProperties from './Command/setProperties'
 import CommandClass from './Command/commandClass'
-import ORYX_Config from '../oryx/CONFIG'
 
 const FLOWABLE = jQuery.extend(true, {}, FLOWABLE_CONFIG)
 /**流程图编辑器 类
@@ -678,9 +677,6 @@ export default class EditorManager {
 
   dispatchFlowEvent (type, event) {
     FLOW_eventBus.dispatch(type, event)
-  }
-  flowToolbarEvent (services) {
-    this.TOOLBAR_ACTIONS.deleteItem(services)
   }
 
   initRegisterOnEvent () {

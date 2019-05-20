@@ -510,7 +510,8 @@ export default class Editor {
     if (jsonObject.stencilset.namespace && jsonObject.stencilset.namespace !== this.getCanvas().getStencil().stencilSet().namespace()) {
       let wrongSS = 'The stencil set of the imported file ({0}) does not match to the loaded stencil set ({1}).'
       alert(String.format(wrongSS, jsonObject.stencilset.namespace, this.getCanvas().getStencil().stencilSet().namespace()))
-      // alert(String.format(ORYX.I18N.JSONImport.wrongSS, jsonObject.stencilset.namespace, this.getCanvas().getStencil().stencilSet().namespace()))
+      // alert(String.format(ORYX.I18N.JSONImport.wrongSS, jsonObject.stencilset.namespace,
+      // this.getCanvas().getStencil().stencilSet().namespace()))
       return null
     } else {
       class commandClass extends ORYX_Command {
@@ -525,6 +526,7 @@ export default class Editor {
           this.selection = this.facade.getSelection()
           this.loadSerialized = loadSerializedCB
         }
+
         execute () {
           if (!this.shapes) {
             // Import the shapes out of the serialization
@@ -571,6 +573,7 @@ export default class Editor {
           this.facade.getCanvas().updateSize()
 
         }
+
         rollback () {
           let selection = this.facade.getSelection()
           this.shapes.each(function (shape) {
@@ -587,6 +590,7 @@ export default class Editor {
           this.facade.setSelection(selection)
         }
       }
+
       const command = new commandClass(jsonObject,
         this.loadSerialized.bind(this),
         noSelectionAfterImport,
@@ -1008,9 +1012,17 @@ export default class Editor {
     let sset = ORYX_StencilSet.stencilSet(option.namespace)
     // Create an New Shape, dependents on an Edge or a Node
     if (sset.stencil(shapetype).type() == 'node') {
-      newShapeObject = new ORYX_Node({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
+      newShapeObject = new ORYX_Node(
+        { 'eventHandlerCallback': this.handleEvents.bind(this) },
+        sset.stencil(shapetype),
+        this._getPluginFacade()
+      )
     } else {
-      newShapeObject = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(shapetype), this._getPluginFacade())
+      newShapeObject = new ORYX_Edge(
+        { 'eventHandlerCallback': this.handleEvents.bind(this) },
+        sset.stencil(shapetype),
+        this._getPluginFacade()
+      )
     }
 
     // when there is a template, inherit the properties.
@@ -1032,7 +1044,11 @@ export default class Editor {
     // If there is create a shape and in the argument there is given an ConnectingType and is instance of an edge
     if (option.connectingType && option.connectedShape && !(newShapeObject instanceof ORYX_Edge)) {
       // there will be create a new Edge
-      con = new ORYX_Edge({ 'eventHandlerCallback': this.handleEvents.bind(this) }, sset.stencil(option.connectingType), this._getPluginFacade())
+      con = new ORYX_Edge(
+        { 'eventHandlerCallback': this.handleEvents.bind(this) },
+        sset.stencil(option.connectingType),
+        this._getPluginFacade()
+      )
 
       // And both endings dockers will be referenced to the both shapes
       con.dockers.first().setDockedShape(option.connectedShape)
@@ -1045,7 +1061,7 @@ export default class Editor {
 
       // The Edge will be added to the canvas and be updated
       canvas.add(con)
-      //con.update();
+      // con.update();
     }
 
     // Move the new Shape to the position
@@ -1061,7 +1077,6 @@ export default class Editor {
 
       let start = newShapeObject.dockers.first()
       let end = newShapeObject.dockers.last()
-
       if (start.getDockedShape() && end.getDockedShape()) {
         let startPoint = start.getAbsoluteReferencePoint()
         let endPoint = end.getAbsoluteReferencePoint()
@@ -1485,29 +1500,13 @@ export default class Editor {
     return svgPoint.matrixTransform(matrix.inverse())
   }
 
+  // 将屏幕坐标变换成svg坐标
   eventCoordinatesXY (x, y) {
     let canvas = this.getCanvas()
-
     let svgPoint = canvas.node.ownerSVGElement.createSVGPoint()
     svgPoint.x = x
     svgPoint.y = y
-
-    let additionalIEZoom = 1
-    if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-      let ua = navigator.userAgent
-      if (ua.indexOf('MSIE') >= 0) {
-        // IE 10 and below
-        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-        if (zoom !== 100) {
-          additionalIEZoom = zoom / 100
-        }
-      }
-    }
-
-    if (additionalIEZoom !== 1) {
-      svgPoint.x = svgPoint.x * additionalIEZoom
-      svgPoint.y = svgPoint.y * additionalIEZoom
-    }
+    svgPoint = ORYX_Utils.pointHandleBelow10(svgPoint)
 
     let matrix = canvas.node.getScreenCTM()
     return svgPoint.matrixTransform(matrix.inverse())

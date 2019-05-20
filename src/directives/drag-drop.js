@@ -39,7 +39,12 @@ const ngDragDropService = {
 
 
 export function draggable (el, binding, vnode) {
-  let dragSettings, jqyouiOptions, zIndex
+  let dragSettings = {
+    onStart: binding.value.onStart,
+    onDrag: binding.value.onDrag,
+    onStop: binding.value.onStop
+  }
+  let jqyouiOptions, zIndex
 
   if (el.dataset.drag) {
     jqyouiOptions = {
@@ -54,11 +59,6 @@ export function draggable (el, binding, vnode) {
       .draggable(jqyouiOptions)
       .draggable({
         start: function (event, ui) {
-          dragSettings = {
-            onStart: binding.value.onStart,
-            onDrag: binding.value.onDrag
-          }
-
           ngDragDropService.draggableScope = vnode
           zIndex = element.css('z-index')
           let q = jqyouiOptions.helper ? ui.helper : element
@@ -100,9 +100,11 @@ export function droppable (el, binding, vnode) {
       .droppable({ disabled: false })
       .droppable({
         over: function (event, ui) {
+          // 当可接受的元素拖拽到可放置的区域
           ngDragDropService.callEventCallback(vnode, dropSettings.onOver, event, ui)
         },
         out: function (event, ui) {
+          // 当可接受的元素移出可放置的区域
           ngDragDropService.callEventCallback(vnode, dropSettings.onOut, event, ui)
         },
         drop: function (event, ui) {

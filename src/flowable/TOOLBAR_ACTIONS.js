@@ -1,207 +1,19 @@
 import ORYX from '../oryx'
-import { t } from 'src/locale'
-
-// 帮助提示
-const EDITOR_TOUR = {
-  /*
-   * General 'getting started' tutorial for the Editor.
-   */
-  gettingStarted: function ($scope, useLocalStorage) {
-    const _this = this
-    let userName
-    if (!$scope.account) {
-      userName = '开发者'
-    } else if ($scope.account.firstName) {
-      userName = $scope.account.firstName
-    } else {
-      userName = $scope.account.fullname
-    }
-
-    const translations = [
-      t('TOUR.WELCOME-TITLE', { userName: userName }),
-      t('TOUR.WELCOME-CONTENT'),
-      t('TOUR.PALETTE-TITLE'),
-      t('TOUR.PALETTE-CONTENT'),
-      t('TOUR.CANVAS-TITLE'),
-      t('TOUR.CANVAS-CONTENT'),
-      t('TOUR.DRAGDROP-TITLE'),
-      t('TOUR.DRAGDROP-CONTENT'),
-      t('TOUR.PROPERTIES-TITLE'),
-      t('TOUR.PROPERTIES-CONTENT'),
-      t('TOUR.TOOLBAR-TITLE'),
-      t('TOUR.TOOLBAR-CONTENT'),
-      t('TOUR.END-TITLE'),
-      t('TOUR.END-CONTENT')
-    ]
-    // We're using a hack here due to https://github.com/sorich87/bootstrap-tour/issues/85:
-    // when clicking next in the tour, it always sets the 'display' css property to 'none'
-    // The hack is simple: before the next step is shown, we reset the 'display' property to 'block'
-
-    const tourStepDomElements = ['body', '#paletteHelpWrapper',
-      '#canvasHelpWrapper', '#propertiesHelpWrapper', '#editor-header']
-
-    const tour = new Tour({
-      name: 'activitiEditorTour',
-      storage: (useLocalStorage ? window.localStorage : false),
-      container: 'body',
-      backdrop: true,
-      keyboard: true,
-      steps: [
-        {
-          orphan: true,
-          title: translations[0],
-          content: translations[1],
-          template: _this._buildStepTemplate(false, true, false, 300),
-          onNext: _this._buildOnNextFunction(tourStepDomElements[0])
-        },
-        {
-          element: tourStepDomElements[1],
-          title: translations[2],
-          content: translations[3],
-          template: _this._buildStepTemplate(false, true, false, 400, 'flowable/images/tour/open-group.gif'),
-          onNext: _this._buildOnNextFunction(tourStepDomElements[1])
-        },
-        {
-          element: tourStepDomElements[2],
-          title: translations[4],
-          content: translations[5],
-          placement: 'left',
-          template: _this._buildStepTemplate(false, true, false),
-          onNext: _this._buildOnNextFunction(tourStepDomElements[2])
-        },
-        {
-          orphan: true,
-          title: translations[6],
-          content: translations[7],
-          template: _this._buildStepTemplate(false, true, false, 720, 'flowable/images/tour/tour-dnd.gif'),
-          onNext: _this._buildOnNextFunction(tourStepDomElements[0])
-        },
-        {
-          element: tourStepDomElements[3],
-          title: translations[8],
-          content: translations[9],
-          placement: 'top',
-          template: _this._buildStepTemplate(false, true, false, 400),
-          onNext: _this._buildOnNextFunction(tourStepDomElements[3])
-        },
-        {
-          element: tourStepDomElements[4],
-          title: translations[10],
-          content: translations[11],
-          placement: 'bottom',
-          template: _this._buildStepTemplate(false, true, false, 400),
-          onNext: _this._buildOnNextFunction(tourStepDomElements[4])
-        },
-        {
-          orphan: true,
-          title: translations[12],
-          content: translations[13],
-          template: _this._buildStepTemplate(false, false, true, 400),
-          onNext: _this._buildOnNextFunction(tourStepDomElements[0])
-        }
-      ],
-      onEnd: _this._buildOnEndFunction(tourStepDomElements)
-    })
-    tour.init()
-    tour.start()
-  },
-
-  /*
-   * Tutorial showing how to use the bendpoint functionality for sequenceflow
-   */
-  sequenceFlowBendpoint: function ($scope, useLocalStorage) {
-    const _this = this
-    const translations = [
-      t('FEATURE-TOUR.BENDPOINT.TITLE'), t('FEATURE-TOUR.BENDPOINT.DESCRIPTION')
-    ]
-    // We're using a hack here due to https://github.com/sorich87/bootstrap-tour/issues/85:
-    // when clicking next in the tour, it always sets the 'display' css property to 'none'
-    // The hack is simple: before the next step is shown, we reset the 'display' property to 'block'
-
-    const tourStepDomElements = ['body']
-    const tour = new Tour({
-      name: 'bendpointTour',
-      storage: (useLocalStorage ? window.localStorage : false),
-      container: 'body',
-      backdrop: true,
-      keyboard: true,
-      steps: [
-        {
-          orphan: true,
-          title: translations[0],
-          content: translations[1],
-          template: _this._buildStepTemplate(false, false, true, 500, 'flowable/images/tour/sequenceflow-bendpoint.gif'),
-          onNext: _this._buildOnNextFunction(tourStepDomElements[0])
-        }
-      ],
-      onEnd: _this._buildOnEndFunction(tourStepDomElements)
-    })
-
-    tour.init()
-    tour.start()
-  },
-
-  _buildStepTemplate: function (addPrevButton, addNextButton, addEndTourButton, optionalForcedWidth, image) {
-    let width = 200
-    if (optionalForcedWidth) {
-      width = optionalForcedWidth
-    }
-
-    let template =
-      '<div class=\'popover tour\' style=\'max-width:' + width + 'px\'>' +
-      '<div class=\'arrow\'></div>' +
-      '<h3 class=\'popover-title\'></h3>' +
-      '<div class=\'popover-content\'></div>' +
-      '<div class=\'popover-navigation\'>'
-    if (image) {
-      template = template + '<div><img src=\'' + image + '\' style=\'border 1px solid black;margin:5px 0 5px 0;\'></img></div>'
-    }
-    if (addPrevButton) {
-      template = template + '<button class=\'btn btn-sm btn-default \' data-role=\'prev\'>« Prev</button>'
-    }
-    if (addNextButton) {
-      template = template + '<button class=\'btn btn-sm btn-default\' data-role=\'next\' style=\'float:right\'">Next »</button>'
-    }
-    if (addEndTourButton) {
-      template = template + '<button class=\'btn btn-warning btn-sm\' data-role=\'end\' style=\'float:right\'">Got it!</button>'
-    }
-
-    template = template + '</div>' + '</nav>' + '</div>'
-    return template
-  },
-
-  _buildOnNextFunction: function (selector) {
-    return function () {
-      jQuery(selector).each(function (i, obj) {
-        obj.style.display = 'block'
-      })
-    }
-  },
-
-  _buildOnEndFunction: function (selectors) {
-    return function () {
-      for (let elementsToResetIndex = 0; elementsToResetIndex < selectors.length; elementsToResetIndex++) {
-        jQuery(selectors[elementsToResetIndex]).each(function (i, obj) {
-          obj.style.display = 'block'
-        })
-      }
-    }
-  }
-}
+// import { t } from 'src/locale'
 
 const ACTIONS = {
-  closeEditor: function (services) {
-    if (services.editorManager && services.editorManager.getStencilData()) {
-      const stencilNameSpace = services.editorManager.getStencilData().namespace
-      if (stencilNameSpace !== undefined &&
-        stencilNameSpace !== null &&
-        stencilNameSpace.indexOf('cmmn1.1') !== -1) {
-        services.$location.path('/casemodels')
-        return
-      }
-    }
-    services.$location.path('/processes')
-  },
+  // closeEditor: function (services) {
+  //   if (services.editorManager && services.editorManager.getStencilData()) {
+  //     const stencilNameSpace = services.editorManager.getStencilData().namespace
+  //     if (stencilNameSpace !== undefined &&
+  //       stencilNameSpace !== null &&
+  //       stencilNameSpace.indexOf('cmmn1.1') !== -1) {
+  //       services.$location.path('/casemodels')
+  //       return
+  //     }
+  //   }
+  //   services.$location.path('/processes')
+  // },
   // navigateToProcess: function (processId) {
   //   const navigateEvent = {
   //     type: FLOWABLE.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS,
@@ -345,9 +157,6 @@ const ACTIONS = {
     this._getOryxEditPlugin(services).editDelete()
   },
   addBendPoint: function (services) {
-    // Show the tutorial the first time
-    EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, true)
-
     const dockerPlugin = this._getOryxDockerPlugin(services)
     let enableAdd = !dockerPlugin.enabledAdd()
     dockerPlugin.setEnableAdd(enableAdd)
@@ -359,8 +168,6 @@ const ACTIONS = {
     }
   },
   removeBendPoint: function (services) {
-    // Show the tutorial the first time
-    EDITOR_TOUR.sequenceFlowBendpoint(services.$scope, true)
     const dockerPlugin = this._getOryxDockerPlugin(services)
     let enableRemove = !dockerPlugin.enabledRemove()
     dockerPlugin.setEnableRemove(enableRemove)
@@ -409,9 +216,6 @@ const ACTIONS = {
 
   sameSize: function (services) {
     this._getOryxArrangmentPlugin(services).alignShapes([ORYX.CONFIG.EDITOR_ALIGN_SIZE])
-  },
-  help: function (services) {
-    EDITOR_TOUR.gettingStarted(services.$scope)
   },
   /**
    * Helper method: fetches the Oryx View plugin from the provided scope,

@@ -303,7 +303,6 @@ export default class BPMN2_0 extends AbstractPlugin {
   constructor (facade) {
     super(facade)
     this.facade = facade
-
     this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDOCKER_DOCKED, this.handleDockerDocked.bind(this))
     this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
     this.facade.registerOnEvent('layout.bpmn2_0.subprocess', this.handleSubProcess.bind(this))
@@ -578,9 +577,10 @@ export default class BPMN2_0 extends AbstractPlugin {
 
   /**
    * DragDocker.Docked Handler
-   *
    */
   handleDockerDocked (options) {
+    console.log(67788)
+
     let namespace = this.getNamespace()
     let edge = options.parent
     let edgeSource = options.target
@@ -1034,6 +1034,7 @@ export default class BPMN2_0 extends AbstractPlugin {
       return false
     })
 
+    console.log(888888)
     const commands = [new ORYX_Command_Move(
       elements, offset, null, this.currentSelection, this
     )]

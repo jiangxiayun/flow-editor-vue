@@ -5,6 +5,7 @@
 
 import AbstractLayouter from './AbstractLayouter'
 import ORYX_Edge from '../core/Edge'
+import ORYX_Config from '../CONFIG'
 
 class EdgeLayouter extends AbstractLayouter {
   /**
@@ -25,8 +26,12 @@ class EdgeLayouter extends AbstractLayouter {
 
   constructor (facade) {
     super(facade)
+    this.facade.registerOnEvent('add_edge_layout', this.doAddEdgeLayout.bind(this))
   }
 
+  doAddEdgeLayout ({node, edge, offset}) {
+    this.layoutEdges(node, [edge], offset)
+  }
   /**
    * Layout a set on edges
    * @param {Object} edges

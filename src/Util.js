@@ -138,18 +138,3 @@ export function _throttle (fn, interval = 200) {
   }
 }
 
-
-export function IEZoomBelow10 (z) {
-  if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-    let ua = navigator.userAgent
-    if (ua.indexOf('MSIE') >= 0) {
-      // IE 10 and below
-      let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-      if (zoom !== 100) {
-        z = zoom / 100
-        return z
-      }
-    }
-  }
-  return z
-}

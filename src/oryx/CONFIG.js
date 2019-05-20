@@ -71,7 +71,7 @@ const ORYX_CONFIG = {
   /* Specify offset of header */
   OFFSET_HEADER: 61,
 
-  /* Show grid line while dragging */
+  /* 拖动时显示对齐辅助线 */
   SHOW_GRIDLINE: true,
 
   /* Editor-Mode */

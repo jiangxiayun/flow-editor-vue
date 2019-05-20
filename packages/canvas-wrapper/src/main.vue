@@ -17,7 +17,7 @@
          data-model="droppedElement"
          data-drop="true"
          @scroll.passive="fnScroll">
-      <div class="canvas-message" id="model-modified-date"> {{contextmenuList}}</div>
+      <div class="canvas-message" id="model-modified-date"> {{contextmenuList}}{{dragModeOver}}</div>
 
       <div id="flow_op_btns" v-show="!btn_visibile.hide_shape_buttons">
         <!--删除按钮-->
@@ -79,7 +79,7 @@
   import ORYX_CONFIG from 'src/oryx/CONFIG'
   import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
   import { EventBus } from 'src/EventBus'
-  import { _debounce, getAdditionalIEZoom, IEZoomBelow10 } from 'src/Util'
+  import { _debounce, getAdditionalIEZoom } from 'src/Util'
   import Locale from 'src/mixins/locale'
   import { draggable, droppable } from 'src/directives/drag-drop'
   // import contextmenu from '@/components/contextmenu'
@@ -150,7 +150,6 @@
     },
     methods: {
       clickCommand (item) {
-        // this.dispatch('flowEditor', item.action, this.currentShape)
         this.dispatch('flowEditor', 'clickContextmenuCommand', {action: item, shape: this.currentShape})
       },
       clickSvgDown () {
@@ -169,7 +168,6 @@
       },
       setContextmenuPosition (selectedElements) {
         if (selectedElements.length === 1 && selectedElements[0].getStencil().idWithoutNs() === 'UserTask') {
-          console.log(1111, selectedElements[0].getStencil().idWithoutNs())
           this.currentShape = selectedElements[0]
           let offset = this.editorManager.getNodeOffset(selectedElements[0])
           this.contextmenu_top = `${offset.a.y}px`
@@ -254,7 +252,7 @@
         })
       }, 200),
       deleteShape () {
-        this.editorManager.flowToolbarEvent({ '$scope': this, 'editorManager': this.editorManager })
+        this.editorManager.TOOLBAR_ACTIONS.deleteItem({ '$scope': this, 'editorManager': this.editorManager })
       },
       morphShape () {
         var shapes = this.editorManager.getSelection()
@@ -459,27 +457,20 @@
         EventBus.$emit('UPDATE_quickMenu', undefined)
         this.editorManager.dropTargetElement = undefined
       },
-      overCallback (event, ui) {
+      overCallback () {
         EventBus.$emit('UPDATE_dragModeOver', true)
       },
-      outCallback (event, ui) {
+      outCallback () {
         EventBus.$emit('UPDATE_dragModeOver', false)
         console.log('out==============')
       },
-      startDragCallbackQuickMenu (event, ui) {
+      startDragCallbackQuickMenu () {
         EventBus.$emit('UPDATE_dragModeOver', false)
         EventBus.$emit('UPDATE_quickMenu', true)
       },
       dragCallbackQuickMenu (event, ui) {
-        console.log('dragCallbackQuickMenu==============')
-        if (this.dragModeOver !== false) {
+        if (this.dragModeOver) {
           let coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY)
-          let additionalIEZoom = 1
-          additionalIEZoom = IEZoomBelow10(additionalIEZoom)
-          if (additionalIEZoom !== 1) {
-            coord.x = coord.x / additionalIEZoom
-            coord.y = coord.y / additionalIEZoom
-          }
 
           const aShapes = this.editorManager.getCanvas().getAbstractShapesAtPosition(coord)
           if (aShapes.length <= 0) {

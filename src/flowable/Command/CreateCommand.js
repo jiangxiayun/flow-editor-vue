@@ -69,6 +69,19 @@ export default class CreateCommand extends ORYX.Core.Command {
         }
         this.sourceRefPos = this.shape.dockers.first().referencePoint
         this.targetRefPos = this.shape.dockers.last().referencePoint
+
+        console.log(445, this.shape.dockers)
+        let sourceCenterPoint = this.shape.dockers.first()._dockedShape.bounds.center()
+        let targetCenterPoint = this.shape.dockers.last()._dockedShape.bounds.center()
+        this.facade.handleEvents({
+          type: 'add_edge_layout',
+          node: this.currentReference,
+          edge: this.shape,
+          offset: {
+            x: targetCenterPoint.x - sourceCenterPoint.x,
+            y: targetCenterPoint.y - sourceCenterPoint.y,
+          }
+        })
       } else if (this.edge) {
         this.sourceRefPos = this.edge.dockers.first().referencePoint
         this.targetRefPos = this.edge.dockers.last().referencePoint
