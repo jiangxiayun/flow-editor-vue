@@ -1041,9 +1041,9 @@ export default class Editor {
     // Set the position
     let point = option.position ? option.position : { x: 100, y: 200 }
     let con
-    // If there is create a shape and in the argument there is given an ConnectingType and is instance of an edge
+    // 如果有创建形状并且在参数中有给定的ConnectingType，并且newShapeObject不是边的实例
     if (option.connectingType && option.connectedShape && !(newShapeObject instanceof ORYX_Edge)) {
-      // there will be create a new Edge
+      // 此操作会自动创建一条连接线
       con = new ORYX_Edge(
         { 'eventHandlerCallback': this.handleEvents.bind(this) },
         sset.stencil(option.connectingType),
@@ -1059,6 +1059,17 @@ export default class Editor {
       con.dockers.last().setDockedShape(newShapeObject)
       con.dockers.last().setReferencePoint(newShapeObject.getDefaultMagnet().bounds.center())
 
+      let preb = option.connectedShape.bounds.center()
+
+      this.handleEvents({
+        type: 'add_edge_layout',
+        node: newShapeObject,
+        edge: con,
+        offset: {
+          x: point.x - preb.x,
+          y: point.y - preb.y,
+        }
+      })
       // The Edge will be added to the canvas and be updated
       canvas.add(con)
       // con.update();
@@ -1090,7 +1101,7 @@ export default class Editor {
 
     } else {
       let b = newShapeObject.bounds
-      if (newShapeObject instanceof ORYX_Node && newShapeObject.dockers.length == 1) {
+      if (newShapeObject instanceof ORYX_Node && newShapeObject.dockers.length === 1) {
         b = newShapeObject.dockers.first().bounds
       }
 

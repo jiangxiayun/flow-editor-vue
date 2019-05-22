@@ -44,8 +44,8 @@ export default class DragDropResize extends AbstractPlugin {
 
     // Show grid line if enabled
     if (ORYX_Config.SHOW_GRIDLINE) {
-      this.vLine = new GridLine(containerNode, GridLine.DIR_VERTICAL)
-      this.hLine = new GridLine(containerNode, GridLine.DIR_HORIZONTAL)
+      this.vLine = new GridLine(containerNode, 'ver')
+      this.hLine = new GridLine(containerNode, 'hor')
     }
 
     this.scrollNode = this.facade.getCanvas().rootNode.parentNode.parentNode

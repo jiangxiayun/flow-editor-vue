@@ -45,4 +45,4 @@ Vue.use(TabPane)
 Vue.use(Form)
 Vue.use(FormItem)
 
-Vue.prototype.$message = Message
+// Vue.prototype.$message = Message

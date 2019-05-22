@@ -17,7 +17,7 @@
          data-model="droppedElement"
          data-drop="true"
          @scroll.passive="fnScroll">
-      <div class="canvas-message" id="model-modified-date"> {{contextmenuList}}{{dragModeOver}}</div>
+      <div class="canvas-message" id="model-modified-date"></div>
 
       <div id="flow_op_btns" v-show="!btn_visibile.hide_shape_buttons">
         <!--删除按钮-->
@@ -517,7 +517,7 @@
               containedStencil: stencil
             })
 
-            let parentCandidate = aShapes.reverse().find(function (candidate) {
+            let parentCandidate = aShapes.reverse().find((candidate) => {
               return (this.editorManager.instanceofCanvas(candidate)
                 || this.editorManager.instanceofNode(candidate)
                 || this.editorManager.instanceofEdge(candidate))

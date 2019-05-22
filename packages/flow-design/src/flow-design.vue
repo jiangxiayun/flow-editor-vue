@@ -1,5 +1,5 @@
 <template>
-  <div id="main" class="editor-main-wrapper" :style="{height: wrapperHeight}">
+  <div id="editor-main-wrapper" class="editor-main-wrapper" :style="{height: wrapperHeight}">
     <!--头部操作按钮-->
     <toolbar :editor="editor" :editorManager="editorManager"></toolbar>
     <div class="flow-content-box">

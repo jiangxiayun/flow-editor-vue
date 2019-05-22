@@ -59,6 +59,11 @@ const createRouter = () => new Router({
       component: () => import('./views/list.vue')
     },
     {
+      path: '/view',
+      name: 'view',
+      component: () => import('./views/view.vue')
+    },
+    {
       path: '/design/kpm/:id',
       name: 'design-kpm',
       component: () => import('./views/Design-kpm.vue')

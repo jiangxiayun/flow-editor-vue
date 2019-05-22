@@ -1,7 +1,10 @@
 const path = require('path')
+
 function resolve (dir) {
   return path.join(__dirname, dir)
 }
+
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 // 为markdown定义独特的标识符
 const MarkdownItContainer = require('markdown-it-container')
@@ -91,13 +94,36 @@ module.exports = {
       .options(vueMarkdown)
   },
   // 修改webpack的配置
-  // configureWebpack: {
-  //   // 把原本需要写在webpack.config.js中的配置代码 写在这里 会自动合并
-  //   externals: {
-  //     jquery: 'jQuery',
-  //     'ORYX': 'ORYX'
-  //   }
-  // }
+  configureWebpack: config => {
+    // 把原本需要写在webpack.config.js中的配置代码 写在这里 会自动合并
+    // externals: {
+    //   jquery: 'jQuery',
+    //   'ORYX': 'ORYX'
+    // }
+    if (process.env.NODE_ENV === 'production') {
+      // 为生产环境修改配置...
+      let optimization = [new UglifyJsPlugin({
+        uglifyOptions: {
+          warnings: false,
+          compress: {
+            drop_console: true, // console
+            drop_debugger: true,
+            pure_funcs: ['console.log', 'console.error'] // 移除console
+          },
+          output:{
+            comments: false, // 去掉注释内容
+          }
+        },
+        sourceMap: false,
+        parallel: true,
+      })]
+
+      config.plugins = config.plugins.concat(optimization)
+      // Object.assign(config, {
+      //   optimization
+      // })
+    }
+  }
   // 注意：格式 ‘aaa’:‘ccc’,左边代表要引入资源包的名字，右边代表该模块在外面使用引用的名字
   // 例如 jQuery在外面的引用就为$
   /*

@@ -244,6 +244,37 @@ const ACTIONS = {
       $scope.oryxDockerPlugin = new ORYX.Plugins.AddDocker(editorManager.getEditor())
     }
     return $scope.oryxDockerPlugin
+  },
+  fullScreen: function () {
+    // var e, t = document.querySelector('html')
+    // e = t
+    const e = document.getElementById('editor-main-wrapper')
+    // 当前全屏显示的DOM元素。
+    if (document.fullscreenElement || document.mozFullScreenElement ||
+      document.webkitFullscreenElement || document.msFullscreenElement) {
+      // 退出全屏
+      if (document.exitFullscreen) {
+        document.exitFullscreen()
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen()
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen()
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen()
+      }
+    } else {
+      // 进入全屏
+      if (e.requestFullscreen) {
+        e.requestFullscreen()
+      } else if (e.msRequestFullscreen) {
+        e.msRequestFullscreen()
+      } else if (e.mozRequestFullScreen) {
+        e.mozRequestFullScreen()
+      } else if (document.documentElement.webkitRequestFullscreen) {
+        // 参数 Element.ALLOW_KEYBOARD_INPUT 使全屏状态中可以键盘输入。
+        e.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT)
+      }
+    }
   }
 }
 

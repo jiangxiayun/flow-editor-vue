@@ -1,6 +1,6 @@
 <template>
   <div>
-    {{contextmenuList}}
+    <!--{{contextmenuList}}-->
     <flowEditor :config="config"
                 :contextmenuList="contextmenuList"
                 @btn-save-click="handleSaveBtn"
@@ -212,7 +212,7 @@
               { name: 'Plugins.Layouter.EdgeLayouter' },
               { name: 'Plugins.BPMN2_0' },
               { name: 'Plugins.RenameShapes' },
-              { name: 'Plugins.PoolAsProperty' }
+              // { name: 'Plugins.PoolAsProperty' }
             ]
           },
           editorConfigs: configure
@@ -233,7 +233,7 @@
       // this.$on('btn-save-click', this.handleSaveBtn);
       FLOW_eventBus.addListener('event-type-selection-changed', (event) => {
         if (this.currentShapeMode !== 'write') {
-          console.log(4444, event.selectedItem)
+          // console.log(4444, event.selectedItem)
           this.selectedItem = event.selectedItem
           this.selectedShape = event.selectedShape
         }
