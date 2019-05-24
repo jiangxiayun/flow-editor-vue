@@ -2,6 +2,7 @@ import ORYX_Utils from '../Utils'
 import ORYX_Config from '../CONFIG'
 
 export default class CanvasResizeButton {
+  UI_CONFIG = ORYX_Config.CustomConfigs.UI_CONFIG
   I18N = {
     RESIZE: {
       // tipGrow: 'Increase canvas size:',
@@ -117,10 +118,10 @@ export default class CanvasResizeButton {
       let w = canvas.bounds.width()
       let h = canvas.bounds.height()
 
-      if (position === 'N' && (h - ORYX_Config.CustomConfigs.CANVAS_RESIZE_INTERVAL > ORYX_Config.CustomConfigs.CANVAS_MIN_HEIGHT)) buttonShrink.show()
-      else if (position === 'E' && (w - ORYX_Config.CustomConfigs.CANVAS_RESIZE_INTERVAL > ORYX_Config.CustomConfigs.CANVAS_MIN_WIDTH)) buttonShrink.show()
-      else if (position === 'S' && (h - ORYX_Config.CustomConfigs.CANVAS_RESIZE_INTERVAL > ORYX_Config.CustomConfigs.CANVAS_MIN_HEIGHT)) buttonShrink.show()
-      else if (position === 'W' && (w - ORYX_Config.CustomConfigs.CANVAS_RESIZE_INTERVAL > ORYX_Config.CANVAS_MIN_WIDTH)) buttonShrink.show()
+      if (position === 'N' && (h - this.UI_CONFIG.CANVAS_RESIZE_INTERVAL > this.UI_CONFIG.CANVAS_MIN_HEIGHT)) buttonShrink.show()
+      else if (position === 'E' && (w - this.UI_CONFIG.CANVAS_RESIZE_INTERVAL > this.UI_CONFIG.CANVAS_MIN_WIDTH)) buttonShrink.show()
+      else if (position === 'S' && (h - this.UI_CONFIG.CANVAS_RESIZE_INTERVAL > this.UI_CONFIG.CANVAS_MIN_HEIGHT)) buttonShrink.show()
+      else if (position === 'W' && (w - this.UI_CONFIG.CANVAS_RESIZE_INTERVAL > this.UI_CONFIG.CANVAS_MIN_WIDTH)) buttonShrink.show()
       else buttonShrink.hide()
     }).bind(this)
 

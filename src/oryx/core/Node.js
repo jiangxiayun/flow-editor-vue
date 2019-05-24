@@ -506,7 +506,6 @@ export default class Node extends Shape {
    * @param {SVGDocument} svgDocument
    */
   _init (svgDocument) {
-    // arguments.callee.$._init.apply(this, arguments)
     super._init(svgDocument)
     // outer most g node
     let svgNode = svgDocument.getElementsByTagName('g')[0]

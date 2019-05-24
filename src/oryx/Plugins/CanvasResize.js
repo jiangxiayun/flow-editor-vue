@@ -89,7 +89,7 @@ export default class CanvasResize {
   }
 
   resize (position, shrink) {
-    let extentionSize = ORYX_Config.CustomConfigs.CANVAS_RESIZE_INTERVAL
+    let extentionSize = ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_RESIZE_INTERVAL
     if (shrink) extentionSize = -extentionSize
     const command = new commandClass(position, extentionSize, this.facade)
     this.facade.executeCommands([command])

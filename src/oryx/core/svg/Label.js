@@ -3,9 +3,7 @@ import ORYX_Utils from '../../Utils'
 import ORYX_Log from '../../Log'
 /**
  * @classDescription Class for adding text to a shape.
- *
  */
-
 
 export default class Label {
   _characterSets = [
@@ -23,12 +21,13 @@ export default class Label {
     'il'
   ]
   _characterSetValues = [15, 14, 13, 11, 10, 9, 8, 7, 6, 5, 4, 3]
+
+  OFFSET_EDGE_LABEL_TOP = ORYX_CONFIG.CustomConfigs.UI_CONFIG.OFFSET_EDGE_LABEL_TOP
+  OFFSET_EDGE_LABEL_BOTTOM = ORYX_CONFIG.CustomConfigs.UI_CONFIG.OFFSET_EDGE_LABEL_BOTTOM
   /**
    * @param options {Object} : textElement
    */
   constructor (options) {
-    // arguments.callee.$.construct.apply(this, arguments)
-
     if (!options.textElement) {
       throw 'Label: No parameter textElement.'
     } else if (!ORYX_Utils.checkClassType(options.textElement, SVGTextElement)) {
@@ -39,6 +38,7 @@ export default class Label {
     this.node = options.textElement
     this.node.setAttributeNS(null, 'stroke-width', '0pt')
     this.node.setAttributeNS(null, 'letter-spacing', '0px')
+    // this.strokeColor = this.node.getAttributeNS(null, 'stroke')
 
     this.shapeId = options.shapeId
     // if the text element already has an id, don't change it.
@@ -62,7 +62,6 @@ export default class Label {
     this._rotate = null
     this._rotationPoint = null
 
-    // this.anchors = [];
     this.anchorLeft = null
     this.anchorRight = null
     this.anchorTop = null
@@ -110,15 +109,13 @@ export default class Label {
     }
 
     // get offset top
-    this.offsetTop = this.node.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'offsetTop') ||
-      ORYX_CONFIG.CustomConfigs.OFFSET_EDGE_LABEL_TOP
+    this.offsetTop = this.node.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'offsetTop') || this.OFFSET_EDGE_LABEL_TOP
     if (this.offsetTop) {
       this.offsetTop = parseInt(this.offsetTop)
     }
 
     // get offset top
-    this.offsetBottom = this.node.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'offsetBottom') ||
-      ORYX_CONFIG.CustomConfigs.OFFSET_EDGE_LABEL_BOTTOM
+    this.offsetBottom = this.node.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'offsetBottom') || this.OFFSET_EDGE_LABEL_BOTTOM
     if (this.offsetBottom) {
       this.offsetBottom = parseInt(this.offsetBottom)
     }
@@ -159,7 +156,7 @@ export default class Label {
       }
     }
 
-    //if no alignment defined, set default alignment
+    // if no alignment defined, set default alignment
     if (!this._verticalAlign) {
       this._verticalAlign = 'bottom'
     }
@@ -491,14 +488,14 @@ export default class Label {
         this.node.setAttributeNS(null, 'y', y)
         this.node.removeAttributeNS(null, 'fill-opacity')
 
-        //this.node.setAttributeNS(null, 'font-size', this._fontSize);
-        //this.node.setAttributeNS(ORYX.CONFIG.ORYX_CONFIG.NAMESPACE_ORYX, 'align', this._horizontalAlign + " " +
+        // this.node.setAttributeNS(null, 'font-size', this._fontSize);
+        // this.node.setAttributeNS(ORYX.CONFIG.ORYX_CONFIG.NAMESPACE_ORYX, 'align', this._horizontalAlign + " " +
         // this._verticalAlign);
 
         this.oldX = x
         this.oldY = y
 
-        //set rotation
+        // set rotation
         if (!this.position && !this.getReferencePoint()) {
           if (this._rotate !== undefined) {
             if (this._rotationPoint)
@@ -511,7 +508,7 @@ export default class Label {
         }
 
         let textLines = this._text.split('\n')
-        while (textLines.last() == '') {
+        while (textLines.last() === '') {
           textLines.pop()
         }
 
@@ -931,8 +928,7 @@ export default class Label {
    * @param {SVGElement} node
    */
   getInheritedFontSize (node) {
-    if (!node || !node.getAttributeNS)
-      return
+    if (!node || !node.getAttributeNS) return
 
     let attr = node.getAttributeNS(null, 'font-size')
     if (attr) {
@@ -945,11 +941,11 @@ export default class Label {
   getFontSize (node) {
     let tspans = this.node.getElementsByTagNameNS(ORYX_CONFIG.NAMESPACE_SVG, 'tspan')
 
-    //trying to get an inherited font-size attribute
-    //NO CSS CONSIDERED!
+    // trying to get an inherited font-size attribute
+    // NO CSS CONSIDERED!
     let fontSize = this.getInheritedFontSize(this.node)
     if (!fontSize) {
-      //because this only works in firefox 3, all other browser use the default line height
+      // because this only works in firefox 3, all other browser use the default line height
       if (tspans[0] && /Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && new Number(RegExp.$1) >= 3) {
         fontSize = tspans[0].getExtentOfChar(0).height
       } else {
@@ -1006,7 +1002,6 @@ export default class Label {
   }
 
   /**
-   *
    * @param {Object} obj
    */
   deserialize (obj, shape) {
@@ -1047,11 +1042,9 @@ export default class Label {
   }
 
   /**
-   *
    * @return {Object}
    */
   serialize () {
-
     // On edge position
     if (this.getEdgePosition()) {
       if (this.getOriginEdgePosition() !== this.getEdgePosition()) {

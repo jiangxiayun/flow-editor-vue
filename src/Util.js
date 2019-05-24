@@ -53,10 +53,7 @@ export function _internalCreateModal (modalConfig, $modal, $scope) {
 }
 
 export function extendDeep (parent, child) {
-
-  let proxy = null
-
-  proxy = JSON.stringify(parent) // 把parent对象转换成字符串
+  let proxy = JSON.stringify(parent) // 把parent对象转换成字符串
   proxy = JSON.parse(proxy) // 把字符串转换成对象，这是parent的一个副本
 
   child = child || {}
@@ -138,3 +135,11 @@ export function _throttle (fn, interval = 200) {
   }
 }
 
+// 深度合并对象
+// export function deepObjectMerge (FirstOBJ, SecondOBJ) {
+//   for (let key in SecondOBJ) {
+//     FirstOBJ[key] = FirstOBJ[key] && FirstOBJ[key].toString() === "[object Object]" ?
+//       deepObjectMerge(FirstOBJ[key], SecondOBJ[key]) : FirstOBJ[key] = SecondOBJ[key];
+//   }
+//   return FirstOBJ;
+// }

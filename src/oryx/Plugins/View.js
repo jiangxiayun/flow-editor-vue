@@ -53,7 +53,7 @@ export default class View {
     /* Register zoom in */
     this.facade.offer({
       'name': this.I18N.View.zoomIn,
-      'functionality': this.zoom.bind(this, [1.0 + ORYX_Config.CustomConfigs.ZOOM_OFFSET]),
+      'functionality': this.zoom.bind(this, [1.0 + ORYX_Config.CustomConfigs.UI_CONFIG.ZOOM_OFFSET]),
       'group': this.I18N.View.group,
       'icon': ORYX_Config.PATH + 'images/magnifier_zoom_in.png',
       'description': this.I18N.View.zoomInDesc,
@@ -68,7 +68,7 @@ export default class View {
     /* Register zoom out */
     this.facade.offer({
       'name': this.I18N.View.zoomOut,
-      'functionality': this.zoom.bind(this, [1.0 - ORYX_Config.CustomConfigs.ZOOM_OFFSET]),
+      'functionality': this.zoom.bind(this, [1.0 - ORYX_Config.CustomConfigs.UI_CONFIG.ZOOM_OFFSET]),
       'group': this.I18N.View.group,
       'icon': ORYX_Config.PATH + 'images/magnifier_zoom_out.png',
       'description': this.I18N.View.zoomOutDesc,

@@ -97,6 +97,7 @@ class DeleteCommand extends Command {
 export default class Edit {
   ClipBoard = ClipBoard
   DeleteCommand = DeleteCommand
+  UI_CONFIG = ORYX_Config.CustomConfigs.UI_CONFIG
 
   I18N = {
     Edit: {
@@ -406,18 +407,18 @@ export default class Edit {
 
 
     // Iterate over top-level shapes
-    canvas.eachChild(function (shape, parent) {
+    canvas.eachChild(function(shape, parent) {
       // All top-level shapes should get an offset in their bounds
       // Move the shape occording to COPY_MOVE_OFFSET
       if (this.clipboard.useOffset) {
         shape.bounds = {
           lowerRight: {
-            x: shape.bounds.lowerRight.x + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
-            y: shape.bounds.lowerRight.y + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET
+            x: shape.bounds.lowerRight.x + this.UI_CONFIG.COPY_MOVE_OFFSET,
+            y: shape.bounds.lowerRight.y + this.UI_CONFIG.COPY_MOVE_OFFSET
           },
           upperLeft: {
-            x: shape.bounds.upperLeft.x + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
-            y: shape.bounds.upperLeft.y + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET
+            x: shape.bounds.upperLeft.x + this.UI_CONFIG.COPY_MOVE_OFFSET,
+            y: shape.bounds.upperLeft.y + this.UI_CONFIG.COPY_MOVE_OFFSET
           }
         }
       }
@@ -450,8 +451,8 @@ export default class Edit {
             }
           } else if (this.clipboard.useOffset) {
             return {
-              x: docker.x + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
-              y: docker.y + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
+              x: docker.x + this.UI_CONFIG.COPY_MOVE_OFFSET,
+              y: docker.y + this.UI_CONFIG.COPY_MOVE_OFFSET,
               getDocker: docker.getDocker
             }
           } else {
@@ -473,8 +474,8 @@ export default class Edit {
 
           if (this.clipboard.useOffset) {
             return {
-              x: docker.x + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
-              y: docker.y + ORYX_Config.CustomConfigs.COPY_MOVE_OFFSET,
+              x: docker.x + this.UI_CONFIG.COPY_MOVE_OFFSET,
+              y: docker.y + this.UI_CONFIG.COPY_MOVE_OFFSET,
               getDocker: docker.getDocker
             }
           } else {

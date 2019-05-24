@@ -168,8 +168,8 @@ export default class Editor {
       canvasParent.parentNode.setAttributeNS(null, 'align', 'center')
       canvasParent.setAttributeNS(null, 'align', 'left')
       this.getCanvas().setSize({
-        width: ORYX_Config.CustomConfigs.CANVAS_WIDTH,
-        height: ORYX_Config.CustomConfigs.CANVAS_HEIGHT
+        width: ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_WIDTH,
+        height: ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_HEIGHT
       })
     }
   }
@@ -350,8 +350,8 @@ export default class Editor {
 
     // create the canvas
     this._canvas = new ORYX_Canvas({
-      width: ORYX_Config.CustomConfigs.CANVAS_WIDTH,
-      height: ORYX_Config.CustomConfigs.CANVAS_HEIGHT,
+      width: ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_WIDTH,
+      height: ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_HEIGHT,
       eventHandlerCallback: this.handleEvents.bind(this),
       id: this.id,
       parentNode: div

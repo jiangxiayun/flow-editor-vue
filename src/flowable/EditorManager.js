@@ -1,4 +1,3 @@
-import FLOWABLE_CONFIG from './FLOWABLE_Config'
 import TOOLBAR_ACTIONS from './TOOLBAR_ACTIONS'
 import FLOW_eventBus from './FLOW_eventBus'
 import { findGroup, addGroup } from '../Util'
@@ -10,7 +9,6 @@ import SetProperty from './Command/setProperty'
 import setProperties from './Command/setProperties'
 import CommandClass from './Command/commandClass'
 
-const FLOWABLE = jQuery.extend(true, {}, FLOWABLE_CONFIG)
 /**流程图编辑器 类
  * @params modelData: 流程图实例数据
  * @params stencilData: 流程元素/组件
@@ -27,9 +25,7 @@ export default class EditorManager {
   constructor (config) {
     this.listeners = {}
     config = jQuery.extend(true, {}, config)
-    // this.editorConfigs = jQuery.extend(true, FLOWABLE, config.editorConfigs)
-    config.editorConfigs && ORYX.CONFIG.setCustomConfigs(config.editorConfigs)
-    // this.property_config = config.editorConfigs.PROPERTY_CONFIG
+    // config.editorConfigs && ORYX.CONFIG.setCustomConfigs(config.editorConfigs)
     this.treeFilteredElements = ['SubProcess', 'CollapsedSubProcess']
     this.canvasTracker = new Hash()
     this.structualIcons = {
@@ -689,7 +685,7 @@ export default class EditorManager {
       this.updateToolbarButtonStatus(shapes)
 
       let documentEvent = event.documentEvent
-      if (documentEvent && ORYX.CONFIG.CustomConfigs.CUSTOM_CONTEXTMENU) {
+      if (documentEvent && ORYX.CONFIG.CustomConfigs.UI_CONFIG.CUSTOM_CONTEXTMENU) {
         // console.log(99, documentEvent.button)
         // if (documentEvent.button === 2) return
       }
@@ -771,7 +767,7 @@ export default class EditorManager {
             selectedShape.properties.set(key, true)
           }
 
-          if (FLOWABLE.UI_CONFIG.showRemovedProperties === false && property.isHidden()) {
+          if (ORYX.CONFIG.CustomConfigs.UI_CONFIG.showRemovedProperties === false && property.isHidden()) {
             continue
           }
 
@@ -840,7 +836,7 @@ export default class EditorManager {
 
     const canvasSection = jQuery('#canvasSection')
     if (additionalIEZoom === 1) {
-      absoluteXY.y = absoluteXY.y - canvasSection.offset().top + 5
+      absoluteXY.y = absoluteXY.y - canvasSection.offset().top
       absoluteXY.x = absoluteXY.x - canvasSection.offset().left
     } else {
       let canvasOffsetLeft = canvasSection.offset().left
@@ -899,15 +895,17 @@ export default class EditorManager {
         hide_morph_buttons = false
       }
 
-      let flow_op_btns = document.getElementById('flow_op_btns')
-      flow_op_btns.style.left = x + 'px'
-      flow_op_btns.style.top = (shapeXY.y + bounds.height() + 2) + 'px'
+      if (ORYX.CONFIG.CustomConfigs.UI_CONFIG.Oryx_button_left_bottom) {
+        let flow_op_btns = document.getElementById('flow_op_btns')
+        flow_op_btns.style.left = x + 'px'
+        flow_op_btns.style.top = (shapeXY.y + bounds.height() + 2) + 'px'
+      }
 
       let editable = selectedShape._stencil._jsonStencil.id.endsWith('CollapsedSubProcess')
       hide_edit_buttons = !editable
 
       if (stencilItem && (stencilItem.canConnect || stencilItem.canConnectAssociation)) {
-        let quickButtonX = shapeXY.x + bounds.width() + 5
+        let quickButtonX = shapeXY.x + bounds.width() + 7
         let quickButtonY = shapeXY.y
         let flow_add_btns = document.getElementById('flow_add_btns')
         flow_add_btns.style.left = quickButtonX + 'px'

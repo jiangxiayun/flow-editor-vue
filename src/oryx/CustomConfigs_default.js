@@ -1,8 +1,37 @@
-/** Inspired by https://github.com/krasimir/EventBus/blob/master/src/EventBus.js */
-
-const FLOWABLE_CONFIG = {
+const DEFAULT_CONFIG = {
   UI_CONFIG: {
-    'showRemovedProperties': false,
+    showRemovedProperties: false,
+    CUSTOM_CONTEXTMENU: false, // 是否自定义上下文
+    Oryx_button_left_bottom: false,  // 节点选中时左下角悬浮快捷键是否展示
+    CANVAS_WIDTH: 1200,
+    CANVAS_HEIGHT: 1050,
+    CANVAS_RESIZE_INTERVAL: 100,
+    CANVAS_MIN_WIDTH: 800,
+    CANVAS_MIN_HEIGHT: 300,
+    CANVAS_BACKGROUND_COLOR: 'none',
+    SelectedRect_Border_color: '#E70012', // 选中标记虚线框的border颜色
+    SELECTED_AREA_PADDING: 5,  // 选中标记虚线框的 padding 像素
+    GRID_DISTANCE: 30,
+    GRID_ENABLED: true,
+    ZOOM_OFFSET: 0.1,
+    DEFAULT_SHAPE_MARGIN: 60,
+    SCALERS_SIZE: 7,
+    MINIMUM_SIZE: 20,
+    MAXIMUM_SIZE: 10000,
+    OFFSET_MAGNET: 15,
+    OFFSET_EDGE_LABEL_TOP: 8,
+    OFFSET_EDGE_LABEL_BOTTOM: 8,
+    OFFSET_EDGE_BOUNDS: 5,
+    COPY_MOVE_OFFSET: 30,
+
+    BORDER_OFFSET: 14,
+
+    MAX_NUM_SHAPES_NO_GROUP: 20, // Updated so the form editor shows all elements at once
+
+    SHAPEMENU_CREATE_OFFSET_CORNER: 30,
+    SHAPEMENU_CREATE_OFFSET: 45,
+
+    NODE_ICON_TYPE: 'images' // images, iconfont
   },
   HEADER_CONFIG: {
     'showAppTitle': true,
@@ -190,5 +219,5 @@ const FLOWABLE_CONFIG = {
   }
 }
 
+export default DEFAULT_CONFIG
 
-export default FLOWABLE_CONFIG

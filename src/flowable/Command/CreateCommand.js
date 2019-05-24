@@ -2,6 +2,8 @@ import ORYX from 'src/oryx'
 import ORYX_Config from '../../oryx/CONFIG'
 
 export default class CreateCommand extends ORYX.Core.Command {
+  UI_CONFIG = ORYX_Config.CustomConfigs.UI_CONFIG
+
   constructor (option, currentReference, position, facade) {
     super()
     this.option = option
@@ -94,25 +96,25 @@ export default class CreateCommand extends ORYX.Core.Command {
 
       var pos = bc.center()
       if (containedStencil.defaultAlign() === 'north') {
-        pos.y -= (bc.height() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET + (bs.height() / 2)
+        pos.y -= (bc.height() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET + (bs.height() / 2)
       } else if (containedStencil.defaultAlign() === 'northeast') {
-        pos.x += (bc.width() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.width() / 2)
-        pos.y -= (bc.height() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.height() / 2)
+        pos.x += (bc.width() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.width() / 2)
+        pos.y -= (bc.height() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.height() / 2)
       } else if (containedStencil.defaultAlign() === 'southeast') {
-        pos.x += (bc.width() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.width() / 2)
-        pos.y += (bc.height() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.height() / 2)
+        pos.x += (bc.width() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.width() / 2)
+        pos.y += (bc.height() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.height() / 2)
       } else if (containedStencil.defaultAlign() === 'south') {
-        pos.y += (bc.height() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET + (bs.height() / 2)
+        pos.y += (bc.height() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET + (bs.height() / 2)
       } else if (containedStencil.defaultAlign() === 'southwest') {
-        pos.x -= (bc.width() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.width() / 2)
-        pos.y += (bc.height() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.height() / 2)
+        pos.x -= (bc.width() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.width() / 2)
+        pos.y += (bc.height() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.height() / 2)
       } else if (containedStencil.defaultAlign() === 'west') {
-        pos.x -= (bc.width() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET + (bs.width() / 2)
+        pos.x -= (bc.width() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET + (bs.width() / 2)
       } else if (containedStencil.defaultAlign() === 'northwest') {
-        pos.x -= (bc.width() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.width() / 2)
-        pos.y -= (bc.height() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.height() / 2)
+        pos.x -= (bc.width() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.width() / 2)
+        pos.y -= (bc.height() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER + (bs.height() / 2)
       } else {
-        pos.x += (bc.width() / 2) + ORYX.CONFIG.CustomConfigs.SHAPEMENU_CREATE_OFFSET + (bs.width() / 2)
+        pos.x += (bc.width() / 2) + this.UI_CONFIG.SHAPEMENU_CREATE_OFFSET + (bs.width() / 2)
       }
 
       // Move shape to the new position

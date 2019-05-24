@@ -58,7 +58,7 @@ export default class ShapeHighlighting {
 
       // Set like this
       let bo = options.elements[0].absoluteBounds()
-      let strWidth = options.strokewidth ? options.strokewidth : ORYX_Config.CustomConfigs.BORDER_OFFSET
+      let strWidth = options.strokewidth ? options.strokewidth : ORYX_Config.CustomConfigs.UI_CONFIG.BORDER_OFFSET
 
       node.setAttributeNS(null, 'd', this.getPathRectangle(bo.a, bo.b, strWidth))
       node.setAttributeNS(null, 'stroke', options.color ? options.color : ORYX_Config.SELECTION_HIGHLIGHT_COLOR)
@@ -76,7 +76,7 @@ export default class ShapeHighlighting {
       }
       node.setAttributeNS(null, 'stroke', options.color ? options.color : ORYX_Config.SELECTION_HIGHLIGHT_COLOR)
       node.setAttributeNS(null, 'stroke-opacity', options.opacity ? options.opacity : 0.2)
-      node.setAttributeNS(null, 'stroke-width', ORYX_Config.CustomConfigs.OFFSET_EDGE_BOUNDS)
+      node.setAttributeNS(null, 'stroke-width', ORYX_Config.CustomConfigs.UI_CONFIG.OFFSET_EDGE_BOUNDS)
     } else {
       // If not, set just the corners
       let path = this.getPathByElements(options.elements)
@@ -96,7 +96,7 @@ export default class ShapeHighlighting {
     }
 
     // Get the padding and the size
-    let padding = ORYX_Config.CustomConfigs.SELECTED_AREA_PADDING
+    let padding = ORYX_Config.CustomConfigs.UI_CONFIG.SELECTED_AREA_PADDING
     let path = ''
 
     // Get thru all Elements

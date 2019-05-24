@@ -107,6 +107,7 @@
   import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
   import quoteActivity from '@/components/taskEdit/quoteActivity'
   import activityTabsEdit from '@/components/taskEdit/activityTabsEdit'
+  import customPlugin from './customPlugin'
 
   const flowSaveData = localStorage.getItem('flowSaveData')
   const flowSaveDataFinally = flowSaveData ? JSON.parse(flowSaveData) : {
@@ -213,6 +214,7 @@
               { name: 'Plugins.BPMN2_0' },
               { name: 'Plugins.RenameShapes' },
               // { name: 'Plugins.PoolAsProperty' }
+              { name: 'customPlugin', plugin: customPlugin, type: 'custom' },
             ]
           },
           editorConfigs: configure

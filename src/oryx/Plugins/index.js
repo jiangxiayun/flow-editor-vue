@@ -52,7 +52,7 @@ const Plugins = {
   BPMN2_0: BPMN2_0,
   Arrangement: Arrangement,
   PoolAsProperty: PoolAsProperty,
-  getProperties: function(props) {
+  getProperties: function (props) {
     if (!props) return []
     let arry = []
     props.forEach((prop) => {
@@ -67,7 +67,7 @@ const Plugins = {
     })
     return arry
   },
-  _loadPlugins: function(config) {
+  _loadPlugins: function (config) {
     // Get the globale Properties
     let globalProperties = this.getProperties(config.properties)
 
@@ -77,6 +77,10 @@ const Plugins = {
       if (!plugin.name) {
         ORYX_Log.error('A plugin is not providing a name. Ingnoring this plugin.')
         return
+      }
+      if (plugin.type === 'custom' && plugin.plugin) {
+        Plugins[plugin.name] = plugin.plugin
+        plugin.name = ` Plugins.${plugin.name}`
       }
       pluginData.set('name', plugin.name)
       // Get all private Properties

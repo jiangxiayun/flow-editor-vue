@@ -1,3 +1,5 @@
+import DEFAULT_CONFIG from './CustomConfigs_default'
+
 // oryx constants.
 const ORYX_CONFIGURATION_DELAY = 100
 const ORYX_CONFIGURATION_WAIT_ATTEMPTS = 10
@@ -309,37 +311,16 @@ const ORYX_CONFIG = {
     RAZIEL: "http://b3mn.org/Raziel",
     SCHEMA: ""
   },
-  CustomConfigs: {
-    /* UI */
-    CANVAS_WIDTH: 1200,
-    CANVAS_HEIGHT: 1050,
-    CANVAS_RESIZE_INTERVAL: 100,
-    CANVAS_MIN_WIDTH: 800,
-    CANVAS_MIN_HEIGHT: 300,
-    SELECTED_AREA_PADDING: 4,
-    CANVAS_BACKGROUND_COLOR: 'none',
-    GRID_DISTANCE: 30,
-    GRID_ENABLED: true,
-    ZOOM_OFFSET: 0.1,
-    DEFAULT_SHAPE_MARGIN: 60,
-    SCALERS_SIZE: 7,
-    MINIMUM_SIZE: 20,
-    MAXIMUM_SIZE: 10000,
-    OFFSET_MAGNET: 15,
-    OFFSET_EDGE_LABEL_TOP: 8,
-    OFFSET_EDGE_LABEL_BOTTOM: 8,
-    OFFSET_EDGE_BOUNDS: 5,
-    COPY_MOVE_OFFSET: 30,
-
-    BORDER_OFFSET: 14,
-
-    MAX_NUM_SHAPES_NO_GROUP: 20, // Updated so the form editor shows all elements at once
-
-    SHAPEMENU_CREATE_OFFSET_CORNER: 30,
-    SHAPEMENU_CREATE_OFFSET: 45,
-  },
+  CustomConfigs: {},
   setCustomConfigs: function (configs) {
-    this.CustomConfigs = Object.assign(this.CustomConfigs, configs.editorCustomConfigs)
+    let keys = Object.keys(configs)
+    for(let key in DEFAULT_CONFIG) {
+      if (keys.includes(key)) {
+        DEFAULT_CONFIG[key] = Object.assign({}, DEFAULT_CONFIG[key], configs[key])
+      }
+    }
+    this.CustomConfigs = DEFAULT_CONFIG
+    console.log(111, DEFAULT_CONFIG)
   }
 }
 

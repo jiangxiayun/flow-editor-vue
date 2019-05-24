@@ -23,7 +23,7 @@
   import propertySection from 'packages/property-section'
   import EditorManager from 'src/flowable/EditorManager'
   import Locale from 'src/mixins/locale'
-  import Default_Config from 'src/flowable/Default_Config'
+  import ORYX_CONFIG from 'src/oryx/CONFIG'
 
   export default {
     name: 'flowEditor',
@@ -57,15 +57,13 @@
       contextmenuList: Array
     },
     components: { toolbar, paletteWrapper, canvasWrapper, propertySection },
-    created () {},
-    computed: {
-      createConfig () {
-        return Object.assign({}, Default_Config, this.config)
-      }
+    created () {
+      ORYX_CONFIG.setCustomConfigs(this.config.editorConfigs)
     },
+    computed: {},
     mounted () {
       this.editorManager = new EditorManager({
-        ...this.createConfig,
+        ...this.config,
         elementsWithoutRenameAction: ['Lane', 'V-Lane']
       })
 

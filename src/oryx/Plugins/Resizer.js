@@ -230,7 +230,7 @@ export default class Resizer {
     this.bounds = bounds
 
     if (!min) {
-      min = { width: ORYX_Config.CustomConfigs.MINIMUM_SIZE, height: ORYX_Config.CustomConfigs.MINIMUM_SIZE }
+      min = { width: ORYX_Config.CustomConfigs.UI_CONFIG.MINIMUM_SIZE, height: ORYX_Config.CustomConfigs.UI_CONFIG.MINIMUM_SIZE }
     }
 
     if (!max) {

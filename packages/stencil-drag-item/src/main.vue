@@ -7,8 +7,9 @@
        data-drag="true"
        data-model="draggedElement">
     <slot>
-      <img v-if="!item.customIcon" width="16px;" height="16px;"
-           :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
+      <img v-if="UI_CONFIG.NODE_ICON_TYPE === 'images'"
+           :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)" width="16px;" height="16px;"/>
+      <i v-else-if="UI_CONFIG.NODE_ICON_TYPE === 'iconfont'" class="iconfont" :class="item.icon"></i>
       <span>{{item.name}}</span>
     </slot>
   </div>
@@ -26,7 +27,8 @@
         dragModeOver_drag: false,
         dragModeOver: false,
         myArray: [],
-        drag: false
+        drag: false,
+        UI_CONFIG: ORYX_CONFIG.CustomConfigs.UI_CONFIG
       }
     },
     directives: { draggable },

@@ -249,6 +249,7 @@ export default class RenameShapes {
   }
 
   hide (e) {
+    console.log('EVENT_MOUSEDOWN')
     if (this.shownTextField && (!e || e.target !== this.shownTextField)) {
       let newValue = this.shownTextField.value
       if (newValue !== this.oldValueText) {

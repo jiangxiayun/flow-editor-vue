@@ -19,40 +19,43 @@
          @scroll.passive="fnScroll">
       <div class="canvas-message" id="model-modified-date"></div>
 
-      <div id="flow_op_btns" v-show="!btn_visibile.hide_shape_buttons">
-        <!--删除按钮-->
-        <div class="Oryx_button" id="delete-button"
-             :title="t('BUTTON.ACTION.DELETE.TOOLTIP')"
-             @click="deleteShape">
-          <img src="@/assets/images/delete.png"/>
-        </div>
-        <!--设置修改形状-->
-        <div v-if="!btn_visibile.hide_morph_buttons"
-             class="Oryx_button" id="morph-button"
-             :title="t('BUTTON.ACTION.MORPH.TOOLTIP')"
-             @click="morphShape">
+      <template v-if="UI_CONFIG.Oryx_button_left_bottom">
+        <div id="flow_op_btns" v-show="!btn_visibile.hide_shape_buttons">
+          <!--删除按钮-->
+          <div class="Oryx_button" id="delete-button"
+               :title="t('BUTTON.ACTION.DELETE.TOOLTIP')"
+               @click="deleteShape">
+            <img src="@/assets/images/delete.png"/>
+          </div>
+          <!--设置修改形状-->
+          <div v-if="!btn_visibile.hide_morph_buttons"
+               class="Oryx_button" id="morph-button"
+               :title="t('BUTTON.ACTION.MORPH.TOOLTIP')"
+               @click="morphShape">
 
-          <el-dropdown trigger="click" @command="handleCommand">
+            <el-dropdown trigger="click" @command="handleCommand">
       <span class="el-dropdown-link">
         <img src="@/assets/images/wrench.png"/>
         <!--下拉菜单<i class="el-icon-arrow-down el-icon&#45;&#45;right"></i>-->
       </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item v-for="item in morphShapes" :key="item.id" :command="item">
-                <img width="16px;" height="16px;"
-                     :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
-                {{item.name}}
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item v-for="item in morphShapes" :key="item.id" :command="item">
+                  <img v-if="UI_CONFIG.NODE_ICON_TYPE === 'images'"
+                       :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)" width="16px;" height="16px;"/>
+                  <i v-else-if="UI_CONFIG.NODE_ICON_TYPE === 'iconfont'" class="iconfont" :class="item.icon"></i>
+                  {{item.name}}
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
 
+          </div>
+          <!--编辑-->
+          <div v-if="!btn_visibile.hide_edit_buttons"
+               class="Oryx_button" id="edit-button" @click="editShape">
+            <img src="@/assets/images/pencil.png"/>
+          </div>
         </div>
-        <!--编辑-->
-        <div v-if="!btn_visibile.hide_edit_buttons"
-             class="Oryx_button" id="edit-button" @click="editShape">
-          <img src="@/assets/images/pencil.png"/>
-        </div>
-      </div>
+      </template>
 
       <!--v-draggable="{onStart:'startDragCallbackQuickMenu', onDrag:'dragCallbackQuickMenu',-->
       <!--revert: 'invalid', helper: 'clone', opacity : 0.5}"-->
@@ -67,7 +70,9 @@
              data-drag="true"
              v-draggable="{onStart:'startDragCallbackQuickMenu', onDrag:'dragCallbackQuickMenu',
            revert: 'invalid', helper: 'clone', opacity : 0.5}">
-          <img :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
+          <img v-if="UI_CONFIG.NODE_ICON_TYPE === 'images'"
+               :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
+          <i v-else-if="UI_CONFIG.NODE_ICON_TYPE === 'iconfont'" class="iconfont" :class="item.icon"></i>
         </div>
       </div>
 
@@ -104,7 +109,8 @@
         },
         dragCanContain: false,
         dragModeOver: false,
-        quickMenu: undefined
+        quickMenu: undefined,
+        UI_CONFIG: ORYX_CONFIG.CustomConfigs.UI_CONFIG
       }
     },
     mixins: [Locale, Emitter],
@@ -138,7 +144,9 @@
       EventBus.$on('UPDATE_quickMenu', (data) => {
         this.quickMenu = data
       })
-      this.handleContextmenu()
+      if (this.UI_CONFIG.CUSTOM_CONTEXTMENU) {
+        this.handleContextmenu()
+      }
     },
     computed: {
       modelData () {

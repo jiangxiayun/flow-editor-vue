@@ -30,11 +30,9 @@
               jqyoui-draggable="{onStart:'startDragCallback', onDrag:'dragCallback'}"
               data-jqyoui-options="{revert: 'invalid', helper: 'clone', opacity : 0.5}">
 
-            <img :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)" width="16px;" height="16px;"/>
-            <img v-if="!item.customIcon" width="16px;" height="16px;"
-                 :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)"/>
-            <!--<img v-if="item.customIcon" width="16px;" height="16px;"-->
-            <!--:src="getImageUrl(item.icon)" />-->
+            <img v-if="UI_CONFIG.NODE_ICON_TYPE === 'images'"
+                 :src="require(`@/assets/images/bpmn2.0/icons/${item.icon}`)" width="16px;" height="16px;"/>
+            <i v-else-if="UI_CONFIG.NODE_ICON_TYPE === 'iconfont'" class="iconfont" :class="item.icon"></i>
             {{item.name | translate}}
           </li>
           <!--ng-model="draggedElement"-->
@@ -70,6 +68,7 @@
 </template>
 
 <script>
+  import ORYX_CONFIG from 'src/oryx/CONFIG'
   import stencilItemTemplate from 'packages/stencil-item'
   import processTreeList from 'packages/process-tree-list'
   import rootStencilItemTemplate from 'packages/root-stencil-item'
@@ -78,6 +77,7 @@
     name: "paletteHelpWrapper",
     data () {
       return {
+        UI_CONFIG: ORYX_CONFIG.CustomConfigs.UI_CONFIG,
         treeview: {},
         isEditorReady: false,
         diyStencilItem: [

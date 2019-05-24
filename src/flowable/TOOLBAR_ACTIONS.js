@@ -195,10 +195,10 @@ const ACTIONS = {
   },
   // 缩放
   zoomIn: function (services) {
-    this._getOryxViewPlugin(services).zoom([1.0 + ORYX.CONFIG.CustomConfigs.ZOOM_OFFSET])
+    this._getOryxViewPlugin(services).zoom([1.0 + ORYX.CONFIG.CustomConfigs.UI_CONFIG.ZOOM_OFFSET])
   },
   zoomOut: function (services) {
-    this._getOryxViewPlugin(services).zoom([1.0 - ORYX.CONFIG.CustomConfigs.ZOOM_OFFSET])
+    this._getOryxViewPlugin(services).zoom([1.0 - ORYX.CONFIG.CustomConfigs.UI_CONFIG.ZOOM_OFFSET])
   },
   zoomActual: function (services) {
     this._getOryxViewPlugin(services).setAFixZoomLevel(1)
