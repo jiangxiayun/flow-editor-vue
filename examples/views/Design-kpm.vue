@@ -13,7 +13,7 @@
             <template v-for="group in scope.editorManager.showStencilData">
               <div :key="group.id" v-if="group.visible && group.items" class="stencil-group">
                 <p class="group-name">{{group.name}}</p>
-                <ul>
+                <ul :key="group.id" v-if="group.visible && group.items">
                   <li v-for="item in group.paletteItems" :key="item.id">
                     <stencil-drag-item :item="item" :editorManager="scope.editorManager"></stencil-drag-item>
                   </li>

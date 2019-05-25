@@ -893,6 +893,13 @@ export default class Shape extends AbstractShape {
         element.setAttributeNS(null, 'fill', fill)
       }
 
+      // 替换 filter 的id
+      let filter = element.getAttributeNS(null, 'filter')
+      if (filter && filter.include('url(#')) {
+        filter = filter.replace(/url\(#/g, 'url(#' + this.id)
+        element.setAttributeNS(null, 'filter', filter)
+      }
+
       if (element.hasChildNodes()) {
         for (let i = 0; i < element.childNodes.length; i++) {
           idIndex = this._adjustIds(element.childNodes[i], idIndex)

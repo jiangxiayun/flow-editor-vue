@@ -13,6 +13,7 @@ import ORYX_Config from '../CONFIG'
 import ORYX_Utils from '../Utils'
 
 export default class DragDropResize extends AbstractPlugin {
+  UI_CONFIG = ORYX_Config.CustomConfigs.UI_CONFIG
   /**
    *  @param {Object} Facade: The Facade of the Editor
    */
@@ -245,7 +246,7 @@ export default class DragDropResize extends AbstractPlugin {
       }
 
       // If Snap-To-Grid is enabled, the Snap-Point will be calculate
-      if (ORYX_Config.CustomConfigs.GRID_ENABLED) {
+      if (this.UI_CONFIG.GRID_ENABLED) {
         // Reset all points
         this.distPoints = []
 
@@ -384,7 +385,7 @@ export default class DragDropResize extends AbstractPlugin {
 
     // If not the Control-Key are pressed
     let modifierKeyPressed = event.shiftKey || event.ctrlKey
-    if (ORYX_Config.CustomConfigs.GRID_ENABLED && !modifierKeyPressed) {
+    if (this.UI_CONFIG.GRID_ENABLED && !modifierKeyPressed) {
       // Snap the current position to the nearest Snap-Point 辅助线吸附
       position = this.snapToGrid(position)
     } else {
@@ -990,7 +991,7 @@ export default class DragDropResize extends AbstractPlugin {
       if (this.vLine && gridX)
         this.vLine.update(gridX)
     } else {
-      ul.x = (position.x - (position.x % (ORYX_Config.CustomConfigs.GRID_DISTANCE / 2)))
+      ul.x = (position.x - (position.x % (this.UI_CONFIG.GRID_DISTANCE / 2)))
       if (this.vLine)
         this.vLine.hide()
     }
@@ -1001,7 +1002,7 @@ export default class DragDropResize extends AbstractPlugin {
       if (this.hLine && gridY)
         this.hLine.update(gridY)
     } else {
-      ul.y = (position.y - (position.y % (ORYX_Config.CustomConfigs.GRID_DISTANCE / 2)))
+      ul.y = (position.y - (position.y % (this.UI_CONFIG.GRID_DISTANCE / 2)))
       if (this.hLine)
         this.hLine.hide()
     }

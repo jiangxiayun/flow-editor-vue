@@ -369,7 +369,7 @@ export default class Node extends Shape {
     if (isOverEl) {
       // If there is an arguments with the absoluteBounds
       let absBounds = this.absoluteBounds()
-      absBounds.widen(ORYX_Config.CustomConfigs.BORDER_OFFSET)
+      absBounds.widen(ORYX_Config.CustomConfigs.UI_CONFIG.BORDER_OFFSET)
 
       if (!absBounds.isIncluded(pointX, pointY)) {
         return true

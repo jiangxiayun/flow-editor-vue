@@ -19,7 +19,6 @@ export default class SVGShape {
    * @param svgElem {SVGElement} An SVGElement that is a basic shape or a path.
    */
   constructor (svgElem) {
-    // arguments.callee.$.construct.apply(this, arguments);
     this.type = null
     this.element = svgElem
     this.x = undefined
@@ -51,7 +50,7 @@ export default class SVGShape {
   }
 
   /**
-   * 初始化上面声明的所有属性。.
+   * 初始化上面声明的所有属性。
    */
   init () {
     /**initialize position and size*/
@@ -85,10 +84,8 @@ export default class SVGShape {
 
     } else if (ORYX_Utils.checkClassType(this.element, SVGCircleElement)) {
       this.type = 'Circle'
-
       let cx = undefined
       let cy = undefined
-      //var r = undefined;
 
       const cxAttr = this.element.getAttributeNS(null, 'cx')
       if (cxAttr) {
@@ -96,15 +93,14 @@ export default class SVGShape {
       } else {
         throw 'Missing attribute in element ' + this.element
       }
-      const cyAttr = this.element.getAttributeNS(null, 'cy')
+      let cyAttr = this.element.getAttributeNS(null, 'cy')
       if (cyAttr) {
         cy = parseFloat(cyAttr)
       } else {
         throw 'Missing attribute in element ' + this.element
       }
-      const rAttr = this.element.getAttributeNS(null, 'r')
+      let rAttr = this.element.getAttributeNS(null, 'r')
       if (rAttr) {
-        //r = parseFloat(rAttr);
         this.radiusX = parseFloat(rAttr)
       } else {
         throw 'Missing attribute in element ' + this.element
@@ -116,28 +112,27 @@ export default class SVGShape {
 
     } else if (ORYX_Utils.checkClassType(this.element, SVGEllipseElement)) {
       this.type = 'Ellipse'
-
       let cx = undefined
       let cy = undefined
-      const cxAttr = this.element.getAttributeNS(null, 'cx')
+      let cxAttr = this.element.getAttributeNS(null, 'cx')
       if (cxAttr) {
         cx = parseFloat(cxAttr)
       } else {
         throw 'Missing attribute in element ' + this.element
       }
-      const cyAttr = this.element.getAttributeNS(null, 'cy')
+      let cyAttr = this.element.getAttributeNS(null, 'cy')
       if (cyAttr) {
         cy = parseFloat(cyAttr)
       } else {
         throw 'Missing attribute in element ' + this.element
       }
-      const rxAttr = this.element.getAttributeNS(null, 'rx')
+      let rxAttr = this.element.getAttributeNS(null, 'rx')
       if (rxAttr) {
         this.radiusX = parseFloat(rxAttr)
       } else {
         throw 'Missing attribute in element ' + this.element
       }
-      const ryAttr = this.element.getAttributeNS(null, 'ry')
+      let ryAttr = this.element.getAttributeNS(null, 'ry')
       if (ryAttr) {
         this.radiusY = parseFloat(ryAttr)
       } else {
@@ -150,30 +145,29 @@ export default class SVGShape {
 
     } else if (ORYX_Utils.checkClassType(this.element, SVGLineElement)) {
       this.type = 'Line'
-
       let x1 = undefined
       let y1 = undefined
       let x2 = undefined
       let y2 = undefined
-      const x1Attr = this.element.getAttributeNS(null, 'x1')
+      let x1Attr = this.element.getAttributeNS(null, 'x1')
       if (x1Attr) {
         x1 = parseFloat(x1Attr)
       } else {
         throw 'Missing attribute in element ' + this.element
       }
-      const y1Attr = this.element.getAttributeNS(null, 'y1')
+      let y1Attr = this.element.getAttributeNS(null, 'y1')
       if (y1Attr) {
         y1 = parseFloat(y1Attr)
       } else {
         throw 'Missing attribute in element ' + this.element
       }
-      const x2Attr = this.element.getAttributeNS(null, 'x2')
+      let x2Attr = this.element.getAttributeNS(null, 'x2')
       if (x2Attr) {
         x2 = parseFloat(x2Attr)
       } else {
         throw 'Missing attribute in element ' + this.element
       }
-      const y2Attr = this.element.getAttributeNS(null, 'y2')
+      let y2Attr = this.element.getAttributeNS(null, 'y2')
       if (y2Attr) {
         y2 = parseFloat(y2Attr)
       } else {
@@ -187,7 +181,6 @@ export default class SVGShape {
     } else if (ORYX_Utils.checkClassType(this.element, SVGPolylineElement) ||
       ORYX_Utils.checkClassType(this.element, SVGPolygonElement)) {
       this.type = 'Polyline'
-
       let pointsArray = []
       if (this.element.points && this.element.points.numberOfItems) {
         for (let i = 0, size = this.element.points.numberOfItems; i < size; i++) {
@@ -229,7 +222,6 @@ export default class SVGShape {
 
     } else if (ORYX_Utils.checkClassType(this.element, SVGPathElement)) {
       this.type = 'Path'
-
       this.editPathParser = new PathParser()
       this.editPathHandler = new EditPathHandler()
       this.editPathParser.setHandler(this.editPathHandler)
@@ -243,9 +235,6 @@ export default class SVGShape {
       this.oldY = handler.minY
       this.oldWidth = handler.maxX - handler.minX
       this.oldHeight = handler.maxY - handler.minY
-
-      // delete parser
-      // delete handler
     } else {
       throw 'Element is not a shape.'
     }
@@ -298,20 +287,12 @@ export default class SVGShape {
     if (ORYX_Utils.checkClassType(this.element, SVGPathElement)) {
       const allowDockersAttr = this.element.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'allowDockers')
       if (allowDockersAttr) {
-        if (allowDockersAttr.toLowerCase() === 'no') {
-          this.allowDockers = false
-        } else {
-          this.allowDockers = true
-        }
+        this.allowDockers = allowDockersAttr.toLowerCase() !== 'no'
       }
 
       const resizeMarkerMidAttr = this.element.getAttributeNS(ORYX_CONFIG.NAMESPACE_ORYX, 'resizeMarker-mid')
       if (resizeMarkerMidAttr) {
-        if (resizeMarkerMidAttr.toLowerCase() === 'yes') {
-          this.resizeMarkerMid = true
-        } else {
-          this.resizeMarkerMid = false
-        }
+        this.resizeMarkerMid = resizeMarkerMidAttr.toLowerCase() === 'yes'
       }
     }
 
@@ -508,16 +489,16 @@ export default class SVGShape {
       }
 
       // Check if fill or stroke is set
-      var fill = elem.getAttributeNS(null, 'fill')
-      var stroke = elem.getAttributeNS(null, 'stroke')
-      if (fill && fill == 'none' && stroke && stroke == 'none') {
+      let fill = elem.getAttributeNS(null, 'fill')
+      let stroke = elem.getAttributeNS(null, 'stroke')
+      if (fill && fill === 'none' && stroke && stroke === 'none') {
         this.visible = false
       } else {
         // Check if displayed
-        var attr = elem.getAttributeNS(null, 'display')
+        let attr = elem.getAttributeNS(null, 'display')
         if (!attr)
           this.visible = this.isVisible(elem.parentNode)
-        else if (attr == 'none')
+        else if (attr === 'none')
           this.visible = false
         else
           this.visible = true

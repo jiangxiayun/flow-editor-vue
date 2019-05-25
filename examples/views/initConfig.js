@@ -181,7 +181,7 @@ const FLOWABLE = {
     ]
   },
   UI_CONFIG: {
-    CUSTOM_CONTEXTMENU: false,
+    CUSTOM_CONTEXTMENU: true,
     /* UI */
     CANVAS_WIDTH: 1200,
     CANVAS_HEIGHT: 1050,

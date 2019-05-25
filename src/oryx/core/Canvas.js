@@ -21,9 +21,6 @@ export default class Canvas extends AbstractShape {
    */
   zoomLevel = 1
 
-  /**
-   * Constructor
-   */
   constructor (options, stencil, facade) {
     // arguments.callee.$.construct.apply(this, arguments);
     super(...arguments)
@@ -98,7 +95,6 @@ export default class Canvas extends AbstractShape {
     this.bounds.set(0, 0, options.width, options.height)
 
     this.addEventHandlers(this.rootNode.parentNode)
-
 
     // disable context menu
     this.rootNode.oncontextmenu = () => {
