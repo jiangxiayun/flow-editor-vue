@@ -981,7 +981,6 @@ export default class Editor {
    */
   // 创建图形元素
   createShape (option) {
-    console.log(12, option)
     // If there is no argument, throw an exception
     if (!option || !option.type || !option.namespace) {
       throw 'To create a new shape you have to give an argument with type and namespace'
@@ -1010,7 +1009,6 @@ export default class Editor {
     let shapetype = option.type
     // Get the stencil set
     let sset = ORYX_StencilSet.stencilSet(option.namespace)
-    // Create an New Shape, dependents on an Edge or a Node
     if (sset.stencil(shapetype).type() == 'node') {
       newShapeObject = new ORYX_Node(
         { 'eventHandlerCallback': this.handleEvents.bind(this) },

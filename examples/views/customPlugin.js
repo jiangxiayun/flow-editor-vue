@@ -27,7 +27,7 @@ export default class KPM_Plugin {
       return
     }
 
-    alert(877)
+    // alert(877)
   }
 
   getCenterPosition (svgNode, shape) {

@@ -17,6 +17,7 @@
 
 <script>
   import ORYX_CONFIG from 'src/oryx/CONFIG'
+  import ORYX_UTIL from 'src/oryx/Utils'
   import { draggable } from 'src/directives/drag-drop'
   import { EventBus } from 'src/EventBus'
 
@@ -68,18 +69,7 @@
         if (this.dragModeOver_drag !== false) {
           const coord = this.editorManager.eventCoordinatesXY(event.pageX, event.pageY)
 
-          let additionalIEZoom = 1
-          if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-            let ua = navigator.userAgent
-            if (ua.indexOf('MSIE') >= 0) {
-              // IE 10 and below
-              let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-              if (zoom !== 100) {
-                additionalIEZoom = zoom / 100
-              }
-            }
-          }
-
+          let additionalIEZoom = ORYX_UTIL.IEZoomBelow10(1)
           if (additionalIEZoom !== 1) {
             coord.x = coord.x / additionalIEZoom
             coord.y = coord.y / additionalIEZoom
@@ -100,7 +90,9 @@
 
           // console.log('aShapes', aShapes)
           const item = this.editorManager.getStencilItemById(event.target.id)
-          if (aShapes.length == 1 && this.editorManager.instanceofCanvas(aShapes[0])) {
+
+          if (aShapes.length === 1 && this.editorManager.instanceofCanvas(aShapes[0])) {
+            // 鼠标位置只有画布元素
             let parentCandidate = aShapes[0]
 
             if (item.id === 'Lane' || item.id === 'V-Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
@@ -136,16 +128,15 @@
             return false
 
           } else {
-            // console.log(22, item)
+            // 鼠标位置有其他节点
             let parentCandidate = aShapes.reverse().find((candidate) => {
-              // return (candidate instanceof ORYX.Core.Canvas
-              //   || candidate instanceof ORYX.Core.Node
-              //   || candidate instanceof ORYX.Core.Edge);
-
+              // return (this.editorManager.instanceofCanvas(candidate)
+              //   || (item.id.endsWith('Lane') ? this.editorManager.instanceofNode(candidate) :
+              //     (this.editorManager.instanceofNode(candidate) && !(candidate.getStencil().id().endsWith('Lane') ||
+              //       candidate.getStencil().id().endsWith('Pool'))))
+              //   || this.editorManager.instanceofEdge(candidate))
               return (this.editorManager.instanceofCanvas(candidate)
-                || (item.id.endsWith('Lane') ? this.editorManager.instanceofNode(candidate) :
-                  (this.editorManager.instanceofNode(candidate) && !(candidate.getStencil().id().endsWith('Lane') ||
-                    candidate.getStencil().id().endsWith('Pool'))))
+                || this.editorManager.instanceofNode(candidate)
                 || this.editorManager.instanceofEdge(candidate))
             })
             // console.log('parentCandidate', parentCandidate)
@@ -191,10 +182,12 @@
               // check if the draggable is a boundary event and the parent an Activity
               let _canContain = false
               let parentStencilId = parentCandidate.getStencil().id()
-              if (this.editorManager.dragCurrentParentId && this.editorManager.dragCurrentParentId === parentCandidate.id) {
+              if (this.editorManager.dragCurrentParentId &&
+                this.editorManager.dragCurrentParentId === parentCandidate.id) {
                 return false
               }
 
+              // 节点包含关系判断
               let parentItem = this.editorManager.getStencilItemById(parentCandidate.getStencil().idWithoutNs())
               if (parentItem.roles.indexOf('Activity') > -1) {
                 if (item.roles.indexOf('IntermediateEventOnActivityBoundary') > -1
@@ -211,15 +204,21 @@
                 if (item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
                   _canContain = true
                 }
-              } else if (parentCandidate.getStencil().idWithoutNs() === 'Pool') {
-                if (item.id === 'Lane') {
+              } else if (parentCandidate.getStencil().id().endsWith('Pool')) {
+                if (item.id.endsWith('Lane')) {
                   _canContain = true
                 }
-              } else if (parentCandidate.getStencil().idWithoutNs() === 'V-Pool') {
-                if (item.id === 'V-Lane') {
+              } else if (parentCandidate.getStencil().id().endsWith('Lane')) {
+                if (item.id.endsWith('Lane')) {
+                  parentCandidate = parentCandidate.parent
                   _canContain = true
                 }
               }
+              // else if (parentCandidate.getStencil().idWithoutNs() === 'V-Pool') {
+              //   if (item.id === 'V-Lane') {
+              //     _canContain = true
+              //   }
+              // }
 
               if (_canContain) {
                 this.editorManager.handleEvents({
@@ -236,7 +235,6 @@
                 })
               } else {
                 let containmentRules = this.editorManager.containmentRules
-
                 for (let i = 0; i < containmentRules.length; i++) {
                   let rule = containmentRules[i]
                   if (rule.role === parentItem.id) {

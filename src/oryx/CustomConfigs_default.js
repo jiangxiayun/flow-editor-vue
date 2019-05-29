@@ -31,7 +31,13 @@ const DEFAULT_CONFIG = {
     SHAPEMENU_CREATE_OFFSET_CORNER: 30,
     SHAPEMENU_CREATE_OFFSET: 45,
 
-    NODE_ICON_TYPE: 'images' // images, iconfont
+    NODE_ICON_TYPE: 'images', // images, iconfont
+    HOR_POOL_TITLE_HEIGHT: 40,
+    HOR_LANE_TITLE_WIDTH: 110,
+    HOR_LANE_INIT_HEIGHT: 250,
+    HOR_LANE_MINSIZE: 65,
+    VER_LANE_MINSIZE: 110
+
   },
   HEADER_CONFIG: {
     'showAppTitle': true,
