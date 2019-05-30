@@ -1121,16 +1121,10 @@ export default class Editor {
           b: { x: b.b.x, y: canvas.bounds.height() }
         }
         newShapeObject.bounds.set(po)
-      } else if (nodeTypeId === 'V-Lane') {
-        let po = {
-          a: { x: b.a.x, y: 30 },
-          b: { x: b.b.x, y: canvas.bounds.height() }
-        }
-        newShapeObject.bounds.set(po)
-      } else if (nodeTypeId === 'Pool') {
+      }  else if (nodeTypeId === 'Pool') {
         let po = {
           a: { x: 0, y: b.a.y },
-          b: { x: canvas.bounds.width(), y: b.b.y }
+          b: { x: canvas.bounds.width() - 10, y: b.b.y }
         }
         newShapeObject.bounds.set(po)
       }

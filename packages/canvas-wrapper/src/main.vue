@@ -236,6 +236,7 @@
         this.subSelectionElements = undefined
 
         function handleDisplayProperty (obj) {
+          console.log(jQuery(obj).position())
           if (jQuery(obj).position().top > 0) {
             obj.style.display = 'block'
           } else {
@@ -252,12 +253,8 @@
         jQuery('.resizer_northwest').each(function (i, obj) {
           handleDisplayProperty(obj)
         })
-        jQuery('.resizer_south').each(function (i, obj) {
-          handleDisplayProperty(obj)
-        })
-        jQuery('.resizer_north').each(function (i, obj) {
-          handleDisplayProperty(obj)
-        })
+        jQuery('.resizer_south').css('display', 'block')
+        jQuery('.resizer_north').css('display', 'block')
       }, 200),
       deleteShape () {
         this.editorManager.TOOLBAR_ACTIONS.deleteItem({ '$scope': this, 'editorManager': this.editorManager })

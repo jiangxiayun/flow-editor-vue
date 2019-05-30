@@ -58,18 +58,19 @@ export default class RenameShapes {
       })
     })
     // If there are no referenced labels --> return
-    if (labels.length == 0) {
+    if (labels.length === 0) {
       return
     }
 
+    console.log(22, labels)
     // Define the nearest label
-    let nearestLabel = labels.length <= 1 ? labels[0] : null
-    if (!nearestLabel) {
-      nearestLabel = labels.find(function (label) {
-        let el = label.id.split('_')
-        return el[el.length - 1] === 'name'
-      })
-    }
+    let nearestLabel = labels.length === 1 ? labels[0] : null
+    // if (!nearestLabel) {
+    //   nearestLabel = labels.find(function (label) {
+    //     let el = label.id.split('_')
+    //     return el[el.length - 1] === 'name'
+    //   })
+    // }
     if (!nearestLabel) {
       nearestLabel = labels.find(function (label) {
         return label.node == evt.target || label.node == evt.target.parentNode
@@ -96,18 +97,17 @@ export default class RenameShapes {
         }
 
         evtCoord.y += $('editor-header').clientHeight - $('canvasSection').scrollTop - 5
-
         evtCoord.x -= $('canvasSection').scrollLeft
 
         let trans = this.facade.getCanvas().rootNode.lastChild.getScreenCTM()
         evtCoord.x *= trans.a
         evtCoord.y *= trans.d
 
-        let diff = labels.collect(function (label) {
-          let center = this.getCenterPosition(label.node)
+        let diff = labels.collect((label) => {
+          let center = this.getCenterPosition(label.node, shape)
           let len = Math.sqrt(Math.pow(center.x - evtCoord.x, 2) + Math.pow(center.y - evtCoord.y, 2))
           return { diff: len, label: label }
-        }.bind(this))
+        })
 
         diff.sort(function (a, b) {
           return a.diff > b.diff
@@ -199,7 +199,8 @@ export default class RenameShapes {
     let hasParent = true
     let searchShape = shape
     while (hasParent) {
-      if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram' || searchShape.getParentShape().getStencil().idWithoutNs() === 'CMMNDiagram') {
+      if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram' ||
+        searchShape.getParentShape().getStencil().idWithoutNs() === 'CMMNDiagram') {
         hasParent = false
       } else {
         let parentXY = searchShape.getParentShape().bounds.upperLeft()
@@ -220,7 +221,7 @@ export default class RenameShapes {
     if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
       let ua = navigator.userAgent
       if (ua.indexOf('MSIE') >= 0) {
-        //IE 10 and below
+        // IE 10 and below
         let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
         if (zoom !== 100) {
           additionalIEZoom = zoom / 100
@@ -249,7 +250,6 @@ export default class RenameShapes {
   }
 
   hide (e) {
-    console.log('EVENT_MOUSEDOWN')
     if (this.shownTextField && (!e || e.target !== this.shownTextField)) {
       let newValue = this.shownTextField.value
       if (newValue !== this.oldValueText) {

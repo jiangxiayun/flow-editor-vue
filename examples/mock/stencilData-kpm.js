@@ -4,74 +4,61 @@ export const AA = {
   'description': 'BPMN process editor',
   'propertyPackages': [
     {
-      'name': 'outputpackage',
-      'properties': [
-        {
-          'id': 'output',
-          'type': 'Complex',
-          'title': '输出',
-          'value': '',
-          'description': '活动输出内容',
-          'popular': true,
-          'refToView': 'text_output'
-        }
-      ]
-    },
-    {
-      'name': 'inputpackage',
-      'properties': [
-        {
-          'id': 'input',
-          'type': 'Complex',
-          'title': '输入',
-          'value': '',
-          'description': '活动输入内容',
-          'popular': true,
-          'refToView': 'text_input'
-        }
-      ]
-    },
-    {
-      'name': 'departmentpackage',
-      'properties': [
-        {
-          'id': 'department',
-          'type': 'Complex',
-          'title': '部门',
-          'value': '',
-          'description': '选择活动节点所在部门',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'activerolepackage',
-      'properties': [
-        {
-          'id': 'activerole',
-          'type': 'Complex',
-          'title': '角色',
-          'value': '',
-          'description': '选择活动节点所属角色',
-          'popular': true,
-          'refToView': 'text_role'
-        }
-      ]
-    },
-    {
-      'name': 'activesystempackage',
-      'properties': [
-        {
-          'id': 'activesystem',
-          'type': 'select',
-          'title': '系统',
-          'value': '',
-          'description': '选择活动节点落地系统',
-          'popular': true,
-          'refToView': 'text_system'
-        }
-      ]
-    },
+    'name': 'outputpackage',
+    'properties': [{
+      'id': 'output',
+      'type': 'Complex',
+      'title': '输出',
+      'value': '',
+      'description': '活动输出内容',
+      'popular': true,
+      'refToView': 'text_output'
+    }]
+  }, {
+    'name': 'inputpackage',
+    'properties': [{
+      'id': 'input',
+      'type': 'Complex',
+      'title': '输入',
+      'value': '',
+      'description': '活动输入内容',
+      'popular': true,
+      'refToView': 'text_input'
+    }]
+  }, {
+    'name': 'departmentpackage',
+    'properties': [{
+      'id': 'department',
+      'type': 'Complex',
+      'title': '部门',
+      'value': '',
+      'description': '选择活动节点所在部门',
+      'popular': true
+    }]
+  }, {
+    'name': 'activerolepackage',
+    'properties': [{
+      'id': 'activerole',
+      'type': 'Complex',
+      'title': '角色',
+      'value': '',
+      'description': '选择活动节点所属角色',
+      'popular': true,
+      'refToView': 'text_role'
+    }]
+  }, {
+    'name': 'activesystempackage',
+    'properties': [{
+      'id': 'activesystem',
+      'type': 'select',
+      'title': '系统',
+      'value': '',
+      'description': '选择活动节点落地系统',
+      'popular': true,
+      'refToView': 'text_system'
+    }
+    ]
+  },
     {
       'name': 'numberepackage',
       'properties': [
@@ -384,7 +371,7 @@ export const AA = {
           'type': 'multiplecomplex',
           'title': 'Event listeners',
           'value': '',
-          'description': "Listeners for any event happening in the Flowable Engine. It's also possible to rethrow the event as a signal, message or error event",
+          'description': 'Listeners for any event happening in the Flowable Engine. It\'s also possible to rethrow the event as a signal, message or error event',
           'popular': true
         }
       ]
@@ -852,7 +839,7 @@ export const AA = {
           'type': 'Text',
           'title': 'Cc',
           'value': '',
-          'description': "The cc's of the e-mail. Multiple recipients are defined in a comma-separated list",
+          'description': 'The cc\'s of the e-mail. Multiple recipients are defined in a comma-separated list',
           'popular': true
         }
       ]
@@ -865,7 +852,7 @@ export const AA = {
           'type': 'Text',
           'title': 'Bcc',
           'value': '',
-          'description': "The bcc's of the e-mail. Multiple recipients are defined in a comma-separated list",
+          'description': 'The bcc\'s of the e-mail. Multiple recipients are defined in a comma-separated list',
           'popular': true
         }
       ]
@@ -878,7 +865,7 @@ export const AA = {
           'type': 'Text',
           'title': 'Text',
           'value': '',
-          'description': "The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative.",
+          'description': 'The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don\'t support rich content. The client will then fall back to this text-only alternative.',
           'popular': true
         }
       ]
@@ -1801,9 +1788,7 @@ export const AA = {
         'formreferencepackage',
         'formpropertiespackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'sequence_start',
         'Startevents_all',
@@ -1835,9 +1820,7 @@ export const AA = {
         'activerolepackage',
         'activesystempackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'Activity',
         'sequence_start',
@@ -1870,9 +1853,7 @@ export const AA = {
         'activerolepackage',
         'activesystempackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'Activity',
         'sequence_start',
@@ -1900,9 +1881,7 @@ export const AA = {
         'exclusivedefinitionpackage',
         'sequencefloworderpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'sequence_start',
         'GatewaysMorph',
@@ -1928,9 +1907,7 @@ export const AA = {
         'exclusivedefinitionpackage',
         'sequencefloworderpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'sequence_start',
         'GatewaysMorph',
@@ -1954,9 +1931,7 @@ export const AA = {
         'documentationpackage',
         'executionlistenerspackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'EndEventsMorph',
         'sequence_end',
@@ -1994,12 +1969,8 @@ export const AA = {
         'process_potentialstartergrouppackage',
         'process_iseagerexecutionfetchpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
-      'roles': [
-
-      ]
+      'hiddenPropertyPackages': [],
+      'roles': []
     },
 
     {
@@ -2027,9 +1998,7 @@ export const AA = {
         'multiinstance_conditionpackage',
         'istransactionpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'Activity',
         'sequence_start',
@@ -2062,9 +2031,7 @@ export const AA = {
         'multiinstance_conditionpackage',
         'istransactionpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'Activity',
         'sequence_start',
@@ -2106,7 +2073,7 @@ export const AA = {
       'id': 'Lane',
       'title': '泳道',
       'description': 'A lane to stucture the process definition',
-      'view': "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"600\" height=\"250\" version=\"1.0\"><defs></defs><g pointer-events=\"none\"><defs></defs><rect id=\"border\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"600\" height=\"250\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" stroke-opacity=\"0.3\" pointer-events=\"stroke\"/><rect id=\"caption\" oryx:anchors=\"left top bottom\" x=\"0\" y=\"0\" width=\"110\" height=\"250\" stroke=\"#A4BDD7\" stroke-width=\"1\" fill=\"#eff5f9\" class=\"stripable-element-force\" pointer-events=\"all\"/><line id=\"bottom_line\" oryx:resize=\"vertical horizontal\" oryx:align=\"bottom left\" visibility=\"visible\" fill=\"none\" stroke=\"#4694AE\" x1=\"1\" y1=\"250\" x2=\"600\" y2=\"250\" stroke-width=\"1\"/><text x=\"55\" y=\"125\" font-size=\"12\" id=\"text_name\" oryx:align=\"middle center\" oryx:anchors=\"left\" oryx:fittoelem=\"caption\" fill=\"black\" stroke=\"black\"></text></g></svg>\n",
+      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:oryx="http://www.b3mn.org/oryx" xmlns:xlink="http://www.w3.org/1999/xlink" width="600" height="250" version="1.0"><defs></defs><g pointer-events="none"><defs></defs><rect id="border" class="stripable-element-force" oryx:resize="vertical horizontal" x="0" y="0" width="600" height="250" fill="none" stroke-width="10" stroke="white" stroke-opacity="0.3" pointer-events="stroke"/><rect id="caption" oryx:anchors="left top bottom" x="0" y="0" width="110" height="250" stroke="#A4BDD7" stroke-width="1" fill="#eff5f9" class="stripable-element-force" pointer-events="all"/><line id="bottom_line" oryx:resize="vertical horizontal" oryx:align="bottom left" visibility="visible" fill="none" stroke="#4694AE" x1="1" y1="250" x2="600" y2="250" stroke-width="1"/><text x="55" y="125" font-size="12" id="text_name" oryx:align="middle center" oryx:anchors="left" oryx:fittoelem="caption" fill="black" stroke="black"></text></g></svg>\n',
       'icon': 'swimlane/lane.png',
       'groups': [
         '水平泳道'
@@ -2119,9 +2086,7 @@ export const AA = {
         'activerolepackage',
         'activesystempackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'PoolChild',
         'canContainArtifacts',
@@ -2149,9 +2114,7 @@ export const AA = {
         'documentationpackage',
         'process_idpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'canContainArtifacts',
         'all'
@@ -2162,7 +2125,7 @@ export const AA = {
       'id': 'V-Lane',
       'title': 'V-泳道',
       'description': 'A lane to stucture the process definition',
-      'view': "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"250\" height=\"600\" version=\"1.0\"><defs></defs><g pointer-events=\"none\"><defs><radialGradient id=\"background\" cx=\"0%\" cy=\"10%\" r=\"200%\" fx=\"20%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"0\"/></radialGradient></defs><rect id=\"border_invisible\" class=\"stripable-element-force\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"250\" height=\"600\" fill=\"none\" stroke-width=\"10\" stroke=\"white\" visibility=\"hidden\" pointer-events=\"stroke\"/><rect id=\"border\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"250\" height=\"600\" stroke=\"black\" stroke-width=\"1\" fill=\"none\" pointer-events=\"none\"/><rect id=\"caption\" oryx:anchors=\"top left right\" x=\"0\" y=\"1\" width=\"248\" height=\"30\" stroke=\"black\" stroke-width=\"0\" fill=\"white\" visibility=\"hidden\" class=\"stripable-element-force\" pointer-events=\"all\"/><path stroke=\"black\" stroke-width=\"1\" fill=\"none\" d=\"M 0,31 L 250,31\" stroke-dasharray = '10' oryx:anchors=\"top left right\" oryx:fittoelem=\"caption\" id=\"captionDisableAntialiasing\" /><text x=\"125\" y=\"13\" font-size=\"12\" id=\"text_name\" oryx:align=\"middle center\" oryx:anchors=\"top\" oryx:fittoelem=\"caption\" fill=\"black\" stroke=\"black\"></text></g></svg>",
+      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:oryx="http://www.b3mn.org/oryx" xmlns:xlink="http://www.w3.org/1999/xlink" width="250" height="600" version="1.0"><defs></defs><g pointer-events="none"><rect id="border_invisible" class="stripable-element-force" oryx:resize="vertical horizontal" x="0" y="0" width="250" height="600" fill="none" stroke-width="10" stroke="white" stroke-opacity="0.3" visibility="hidden" pointer-events="stroke"/><line class="left_dasharray_line" oryx:align="top left" oryx:resize="vertical horizontal" stroke-dasharray=\'10\' fill="none" stroke="#4694AE" x1="1" y1="40" x2="1" y2="600" stroke-width="1"/><rect id="caption" oryx:anchors="top left right" x="0" y="1" width="248" height="38" stroke="#A4BDD7" stroke-width="0" fill="#eff5f9" pointer-events="all"/><line class="right_boder" oryx:align="top right" oryx:anchors="top" oryx:resize="vertical horizontal" oryx:fittoelem="caption" visibility="hidden" fill="none" stroke="#4694AE" x1="250" y1="0" x2="248" y2="600" stroke-width="1"/><path class="left_jian" stroke="#4694AE" stroke-width="1" fill="none" d="M 1,0 L 6,20 L 1,40" oryx:anchors="top left" oryx:fittoelem="caption" /><text x="125" y="20" font-size="12" id="text_name" oryx:align="middle center" oryx:anchors="top" oryx:fittoelem="caption" fill="#333333"></text></g></svg>\n',
       'icon': 'swimlane/lane.png',
       'groups': [
         '垂直泳道'
@@ -2172,9 +2135,7 @@ export const AA = {
         'namepackage',
         'documentationpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'V-PoolChild',
         'canContainArtifacts',
@@ -2205,9 +2166,7 @@ export const AA = {
         'defaultflowpackage',
         'skipexpressionpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'ConnectingObjectsMorph',
         'all'
@@ -2233,9 +2192,7 @@ export const AA = {
         'namepackage',
         'documentationpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'ConnectingObjectsMorph',
         'all'
@@ -2261,9 +2218,7 @@ export const AA = {
         'namepackage',
         'documentationpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'ConnectingObjectsMorph',
         'all'
@@ -2289,9 +2244,7 @@ export const AA = {
         'namepackage',
         'documentationpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'ConnectingObjectsMorph',
         'all'
@@ -2313,9 +2266,7 @@ export const AA = {
         'documentationpackage',
         'textpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'all'
       ]
@@ -2335,9 +2286,7 @@ export const AA = {
         'namepackage',
         'documentationpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'all'
       ]

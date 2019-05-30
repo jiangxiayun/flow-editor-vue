@@ -15,17 +15,17 @@ class ResizeLanesCommand extends Command {
     this.plugin = plugin
     this.shape = shape
     this.changes
-
     this.pool = pool
     this.parent = parent
     this.shapeChildren = []
+    this.Lane_type = shape.getStencil().idWithoutNs()
 
     /*
      * The Bounds have to be stored
      * separate because they would
      * otherwise also be influenced
      */
-    this.shape.getChildShapes().each(function (childShape) {
+    this.shape.getChildShapes().each((childShape) => {
       this.shapeChildren.push({
         shape: childShape,
         bounds: {
@@ -39,39 +39,30 @@ class ResizeLanesCommand extends Command {
           }
         }
       })
-    }.bind(this))
+    })
 
     this.shapeUpperLeft = this.shape.bounds.upperLeft()
-
-    // If there is no parent,
-    // correct the abs position with the parents abs.
-    /*if (!this.shape.parent) {
-     var pAbs = parent.absoluteXY();
-     this.shapeUpperLeft.x += pAbs.x;
-     this.shapeUpperLeft.y += pAbs.y;
-     }*/
     this.parentHeight = this.parent.bounds.height()
-
   }
 
   getLeafLanes (lane) {
-    let childLanes = this.plugin.getLanes(lane).map(function (child) {
-      return this.getLeafLanes(child)
-    }.bind(this)).flatten()
+    let childLanes = this.plugin.getLanes(lane)
+    let { horLanes, verLanes } = childLanes
+    if (this.Lane_type === 'Lane') {
+      childLanes = horLanes.map((child) => this.getLeafLanes(child)).flatten()
+    } else {
+      childLanes = verLanes.map((child) => this.getLeafLanes(child)).flatten()
+    }
     return childLanes.length > 0 ? childLanes : [lane]
   }
 
   findNewLane () {
-    let lanes = this.plugin.getLanes(this.parent)
     let leafLanes = this.getLeafLanes(this.parent)
-    /*leafLanes = leafLanes.sort(function(a,b){
-     var aupl = a.absoluteXY().y;
-     var bupl = b.absoluteXY().y;
-     return aupl < bupl ? -1 : (aupl > bupl ? 1 : 0)
-     })*/
-    this.lane = leafLanes.find(function (l) {
-      return l.bounds.upperLeft().y >= this.shapeUpperLeft.y
-    }.bind(this)) || leafLanes.last()
+    if (this.Lane_type === 'Lane') {
+      this.lane = leafLanes.find((l) => l.bounds.upperLeft().y >= this.shapeUpperLeft.y) || leafLanes.last()
+    } else {
+      this.lane = leafLanes.find((l) => l.bounds.upperLeft().x >= this.shapeUpperLeft.x) || leafLanes.last()
+    }
     this.laneUpperLeft = this.lane.bounds.upperLeft()
   }
 
@@ -97,75 +88,78 @@ class ResizeLanesCommand extends Command {
       let depthChange = this.plugin.getDepth(this.lane, this.parent) - 1
       this.changes = $H({})
 
-      // Selected lane is BELOW the removed lane
-      if (laUpL.y >= shUpL.y) {
-        this.lane.getChildShapes().each(function (childShape) {
+      let lane_title_width = ORYX_Config.CustomConfigs.UI_CONFIG.HOR_LANE_TITLE_WIDTH
+      if (this.Lane_type === 'Lane') {
+        // Selected lane is BELOW the removed lane
+        if (laUpL.y >= shUpL.y) {
+          this.lane.getChildShapes().each((childShape) => {
+            // Cache the changes for rollback
+            let childShapeId = childShape.getId()
+            if (!this.changes[childShapeId]) {
+              this.changes[childShapeId] = this.computeChanges(
+                childShape, this.lane, this.lane, this.shape.bounds.height()
+              )
+            }
 
-          /*
-           * Cache the changes for rollback
-           */
-          if (!this.changes[childShape.getId()]) {
-            this.changes[childShape.getId()] = this.computeChanges(childShape, this.lane, this.lane, this.shape.bounds.height())
-          }
+            childShape.bounds.moveBy(0, this.shape.bounds.height())
+          })
 
-          childShape.bounds.moveBy(0, this.shape.bounds.height())
-        }.bind(this))
+          this.plugin.hashChildShapes(this.lane)
+          let lane_title_width = ORYX_Config.CustomConfigs.UI_CONFIG.HOR_LANE_TITLE_WIDTH
+          this.shapeChildren.each((shapeChild) => {
+            shapeChild.shape.bounds.set(shapeChild.bounds)
+            shapeChild.shape.bounds.moveBy((shUpL.x - lane_title_width) - (depthChange * lane_title_width), 0)
 
-        this.plugin.hashChildShapes(this.lane)
-        this.shapeChildren.each(function (shapeChild) {
-          shapeChild.shape.bounds.set(shapeChild.bounds)
-          shapeChild.shape.bounds.moveBy((shUpL.x - 30) - (depthChange * 30), 0)
+            // Cache the changes for rollback
+            if (!this.changes[shapeChild.shape.getId()]) {
+              this.changes[shapeChild.shape.getId()] = this.computeChanges(shapeChild.shape, this.shape, this.lane, 0)
+            }
 
-          /*
-           * Cache the changes for rollback
-           */
-          if (!this.changes[shapeChild.shape.getId()]) {
-            this.changes[shapeChild.shape.getId()] = this.computeChanges(shapeChild.shape, this.shape, this.lane, 0)
-          }
+            this.lane.add(shapeChild.shape)
+          })
 
-          this.lane.add(shapeChild.shape)
+          this.lane.bounds.moveBy(0, shUpL.y - laUpL.y)
 
-        }.bind(this))
+          // Selected lane is ABOVE the removed lane
+        } else if (shUpL.y > laUpL.y) {
+          this.shapeChildren.each((shapeChild) => {
+            shapeChild.shape.bounds.set(shapeChild.bounds)
+            shapeChild.shape.bounds.moveBy((shUpL.x - lane_title_width) - (depthChange * lane_title_width),
+              this.lane.bounds.height())
 
-        this.lane.bounds.moveBy(0, shUpL.y - laUpL.y)
+            // Cache the changes for rollback
+            if (!this.changes[shapeChild.shape.getId()]) {
+              this.changes[shapeChild.shape.getId()] = this.computeChanges(shapeChild.shape, this.shape, this.lane, 0)
+            }
 
-        // Selected lane is ABOVE the removed lane
-      } else if (shUpL.y > laUpL.y) {
-        this.shapeChildren.each(function (shapeChild) {
-          shapeChild.shape.bounds.set(shapeChild.bounds)
-          shapeChild.shape.bounds.moveBy((shUpL.x - 30) - (depthChange * 30), this.lane.bounds.height())
-
-          /*
-           * Cache the changes for rollback
-           */
-          if (!this.changes[shapeChild.shape.getId()]) {
-            this.changes[shapeChild.shape.getId()] = this.computeChanges(shapeChild.shape, this.shape, this.lane, 0)
-          }
-
-          this.lane.add(shapeChild.shape)
-
-        }.bind(this))
+            this.lane.add(shapeChild.shape)
+          })
+        }
+      } else {
+        // Selected lane is BELOW Or RIGHT the removed lane
       }
 
     }
 
-    /*
-     * Adjust the height of the lanes
-     */
-    // Get the height values
-    let oldHeight = this.lane.bounds.height()
-    let newHeight = this.lane.length === 1 ? this.parentHeight : this.lane.bounds.height() + this.shape.bounds.height()
+    if (this.Lane_type === 'Lane') {
+      /*
+       * Adjust the height of the lanes
+       */
+      // Get the height values
+      let oldHeight = this.lane.bounds.height()
+      let newHeight = this.lane.length === 1 ? this.parentHeight : this.lane.bounds.height() + this.shape.bounds.height()
 
-    // Set height
-    this.setHeight(newHeight, oldHeight, this.parent, this.parentHeight, true)
+      // Set height
+      this.setHeight(newHeight, oldHeight, this.parent, this.parentHeight, true)
 
-    // Cache all sibling lanes
-    //this.changes[this.shape.getId()] = this.computeChanges(this.shape, this.parent, this.parent, 0);
-    this.plugin.getLanes(this.parent).each(function (childLane) {
-      if (!this.changes[childLane.getId()] && childLane !== this.lane && childLane !== this.shape) {
-        this.changes[childLane.getId()] = this.computeChanges(childLane, this.parent, this.parent, 0)
-      }
-    }.bind(this))
+      // Cache all sibling lanes
+      // this.changes[this.shape.getId()] = this.computeChanges(this.shape, this.parent, this.parent, 0);
+      this.plugin.getLanes(this.parent).horLanes.each(function (childLane) {
+        if (!this.changes[childLane.getId()] && childLane !== this.lane && childLane !== this.shape) {
+          this.changes[childLane.getId()] = this.computeChanges(childLane, this.parent, this.parent, 0)
+        }
+      }.bind(this))
+    }
 
     // Update
     this.update()
@@ -178,7 +172,7 @@ class ResizeLanesCommand extends Command {
     this.plugin.hashedBounds[this.pool.id][this.lane.id] = this.lane.absoluteBounds()
 
     // Adjust child lanes
-    this.plugin.adjustHeight(this.plugin.getLanes(parent), this.lane)
+    this.plugin.adjustHeight(this.plugin.getLanes(parent).horLanes, this.lane)
 
     if (store === true) {
       // Store changes
@@ -265,12 +259,11 @@ class ResizeLanesCommand extends Command {
   }
 
   computeChanges (shape, oldParent, parent, yOffset, oldHeight, newHeight) {
-
-    oldParent = this.changes[shape.getId()] ? this.changes[shape.getId()].oldParent : oldParent
-    let oldPosition = this.changes[shape.getId()] ? this.changes[shape.getId()].oldPosition : shape.bounds.upperLeft()
+    let id = shape.getId()
+    oldParent = this.changes[id] ? this.changes[id].oldParent : oldParent
+    let oldPosition = this.changes[id] ? this.changes[id].oldPosition : shape.bounds.upperLeft()
 
     let sUl = shape.bounds.upperLeft()
-
     let pos = { x: sUl.x, y: sUl.y + yOffset }
 
     let changes = {
@@ -361,10 +354,11 @@ export default class BPMN2_0 extends AbstractPlugin {
       }
     }
 
-    // 防止选中了某个泳池内所有的泳道，但没有选中该泳池
-    if (selection.any((s) => s instanceof ORYX_Node && s.getStencil().id().endsWith('Lane'))) {
+    // 防止选中了某个泳池内所有的横泳道，但没有选中该泳池
+    // 注意：泳池内必须有一个横泳道
+    if (selection.any((s) => s instanceof ORYX_Node && s.getStencil().idWithoutNs() === 'Lane')) {
       // 当前所有选中的lanes
-      let lanes = selection.findAll((s) => s instanceof ORYX_Node && s.getStencil().id().endsWith('Lane'))
+      let lanes = selection.findAll((s) => s instanceof ORYX_Node && s.getStencil().idWithoutNs() === 'Lane')
 
       let pools = []
       lanes.each((lane) => pools.push(this.getParentPool(lane)))
@@ -373,9 +367,9 @@ export default class BPMN2_0 extends AbstractPlugin {
       pools = pools.filter((pool) => {
         // pool的所有子lane
         let childLanes = this.getLanes(pool, true)
-        let allChildLanes = [...childLanes.horLanes, ...childLanes.verLanes ]
+        let horLanes = childLanes.horLanes
         // 如果所有的子lane都被选中
-        if (allChildLanes.all((lane) => lanes.includes(lane)) && !selection.includes(pool)) {
+        if (horLanes.all((lane) => lanes.includes(lane)) && !selection.includes(pool)) {
           return true
         } else {
           return false
@@ -388,68 +382,59 @@ export default class BPMN2_0 extends AbstractPlugin {
       }
     }
   }
-
+  // 判断是否是末级lane
+  isLeafFn (leaf) {
+    return !leaf.getChildNodes().any((r) => r.getStencil().id().endsWith('Lane'))
+  }
   handleShapeRemove (option) {
     let sh = option.shape
     let parent = option.parent
 
-    // if (sh instanceof ORYX_Node && sh.getStencil().idWithoutNs() === 'Lane' && this.facade.isExecutingCommands()) {
     if (sh instanceof ORYX_Node && sh.getStencil().id().endsWith('Lane') && this.facade.isExecutingCommands()) {
       let pool = this.getParentPool(parent)
       if (pool && pool.parent) {
-
-        let isLeafFn = function (leaf) {
-          return !leaf.getChildNodes().any(function (r) {
-            // return r.getStencil().idWithoutNs() === 'Lane'
-            return r.getStencil().id().endsWith('Lane')
-          })
-        }
-
-        let isLeaf = isLeafFn(sh)
-        let parentHasMoreLanes = parent.getChildNodes().any(function (r) {
-          // return r.getStencil().idWithoutNs() === 'Lane'
-          return r.getStencil().id().endsWith('Lane')
-        })
+        let isLeaf = this.isLeafFn(sh)
+        let parentHasMoreLanes = parent.getChildNodes().any((r) => r.getStencil().id().endsWith('Lane'))
 
         if (isLeaf && parentHasMoreLanes) {
           let command = new ResizeLanesCommand(sh, parent, pool, this)
           this.facade.executeCommands([command])
-        } else if (!isLeaf &&
-          !this.facade.getSelection().any(function (select) { // Find one of the selection, which is a lane and child of "sh" and is a leaf lane
-            // return select instanceof ORYX_Node && select.getStencil().idWithoutNs() === 'Lane' &&
-            //   select.isParent(sh) && isLeafFn(select)
+        } else if (!isLeaf) {
+          // Find one of the selection, which is a lane and child of "sh" and is a leaf lane
+          let a = this.facade.getSelection().any((select) => {
             return select instanceof ORYX_Node && select.getStencil().id().endsWith('Lane') &&
-              select.isParent(sh) && isLeafFn(select)
-          })) {
-          class CommandB extends Command {
-            constructor (shape, facade) {
-              super()
-              this.children = shape.getChildNodes(true)
-              this.facade = facade
-            }
+              select.isParent(sh) && this.isLeafFn(select)
+          })
+          if (!a) {
+            class CommandB extends Command {
+              constructor (shape, facade) {
+                super()
+                this.children = shape.getChildNodes(true)
+                this.facade = facade
+              }
 
-            execute () {
-              this.children.each(function (child) {
-                child.bounds.moveBy(30, 0)
-              })
-              //this.facade.getCanvas().update();
-            }
+              execute () {
+                this.children.each(function (child) {
+                  child.bounds.moveBy(30, 0)
+                })
+                //this.facade.getCanvas().update();
+              }
 
-            rollback () {
-              this.children.each(function (child) {
-                child.bounds.moveBy(-30, 0)
-              })
-              //this.facade.getCanvas().update();
+              rollback () {
+                this.children.each(function (child) {
+                  child.bounds.moveBy(-30, 0)
+                })
+                //this.facade.getCanvas().update();
+              }
             }
+            this.facade.executeCommands([new CommandB(sh, this.facade)])
           }
-
-          this.facade.executeCommands([new CommandB(sh, this.facade)])
-
         } else if (isLeaf && !parentHasMoreLanes && parent == pool) {
           parent.add(sh)
         }
       }
     }
+
   }
 
   hashChildShapes (shape) {
@@ -605,6 +590,7 @@ export default class BPMN2_0 extends AbstractPlugin {
    * @param {Object} event
    */
   handleLayoutPool (event) {
+    console.log(123)
     let pool = event.shape
     let selection = this.facade.getSelection()
     let currentShape = (selection.include(pool) ? pool : selection.first()) || pool
@@ -632,6 +618,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     let { horLanes, verLanes } = lanes
 
     let allLanes = this.getLanes(pool, true)
+    let allLanesArry = [...allLanes.horLanes, ...allLanes.verLanes]
     let allHorLanes = allLanes.horLanes
     let considerForDockers = allLanes.horLanes.clone()
     let hashedPositions = new Map()
@@ -639,26 +626,15 @@ export default class BPMN2_0 extends AbstractPlugin {
       hashedPositions.set(lane.id, lane.bounds.upperLeft())
     })
 
-    let l = horLanes.length
-    let lasterLane = horLanes[l - 1]
-    let bottomLine = lasterLane.node.getElementsByTagName('line')
-    let lasterLaneVisible = bottomLine[0].getAttributeNS(null, 'visibility')
-    // 当目前最后一个 H-lane 的 bottomLine 不是隐藏的
-    if (lasterLaneVisible && lasterLaneVisible !== 'hidden') {
-      allHorLanes.each((lane) => {
-        let line = lane.node.getElementsByTagName('line')
-        line[0].removeAttributeNS(null, 'visibility')
-      })
-      bottomLine[0].setAttributeNS(null, 'visibility', 'hidden')
-    }
+    this.setLaneLineView(horLanes, verLanes)
 
     let deletedLanes = []
     let addedLanes = []
     // Get all new lanes
     let i = -1
-    while (++i < allHorLanes.length) {
-      if (!this.hashedBounds[pool.id][allHorLanes[i].id]) {
-        addedLanes.push(allHorLanes[i])
+    while (++i < allLanesArry.length) {
+      if (!this.hashedBounds[pool.id][allLanesArry[i].id]) {
+        addedLanes.push(allLanesArry[i])
       }
     }
     if (addedLanes.length > 0) {
@@ -669,7 +645,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     let resourceIds = $H(this.hashedBounds[pool.id]).keys()
     i = -1
     while (++i < resourceIds.length) {
-      if (!allHorLanes.any((lane) => lane.id === resourceIds[i])) {
+      if (!allLanesArry.any((lane) => lane.id === resourceIds[i])) {
         deletedLanes.push(this.hashedBounds[pool.id][resourceIds[i]])
         selection = selection.without((r) => r.id === resourceIds[i])
       }
@@ -681,18 +657,8 @@ export default class BPMN2_0 extends AbstractPlugin {
     let poolTypeId = pool.getStencil().idWithoutNs()
     // 有新增或者删除 lane
     if (deletedLanes.length > 0 || addedLanes.length > 0) {
-      if (addedLanes.length === 1 && allHorLanes.length === 1 && poolTypeId === 'Pool') {
-        // Set height from the pool
-        height = this.adjustHeight(horLanes, pool)
-      } else {
-        height = this.updateHeight(pool)
-      }
-      // Set width from the pool
-      if (poolTypeId === 'V-Pool') {
-        width = this.updateVPoolWidth(lanes, pool)
-      } else {
-        width = this.adjustWidth(horLanes, pool.bounds.width())
-      }
+      height = this.updateHeight(pool)
+      width = this.adjustWidth(lanes, pool)
       // pool.update()
     } else if (pool == currentShape) {
       /**
@@ -703,17 +669,10 @@ export default class BPMN2_0 extends AbstractPlugin {
       let xy = pool.bounds
       this.adjustPoolBothendsLanes(pool, horLanes, oldXY, xy)
 
-      if (poolTypeId === 'V-Pool') {
-        // width = this.updateVPoolWidth(lanes, pool)
-        // width = this.adjustVLaneWidth(lanes, undefined, pool.bounds.width())
-        width = pool.bounds.width()
-      } else {
-        // Set height from the pool
-        // height = this.adjustHeight(lanes, undefined, pool.bounds.height())
-        height = pool.bounds.height()
-        // Set width from the pool
-        width = this.adjustWidth(horLanes, pool.bounds.width())
-      }
+      // Set height from the pool
+      height = pool.bounds.height()
+      // Set width from the pool
+      width = this.adjustWidth(lanes, pool)
     } else {
       /**‚
        * Set width/height depending on containing lanes
@@ -726,6 +685,7 @@ export default class BPMN2_0 extends AbstractPlugin {
         x = oldXY.x - xy.x
         y = oldXY.y - xy.y
 
+        let currentShapeType = currentShape.getStencil().idWithoutNs()
         let changedLaneOldxy = this.hashedBounds[pool.id][currentShape.id]
         let changedLanexy = currentShape.absoluteBounds()
         let modifyLane
@@ -733,32 +693,57 @@ export default class BPMN2_0 extends AbstractPlugin {
         // this.facade.getCanvas().update()
         // this.facade.setSelection([shape])
 
-        // 拖拽lane顶
-        if (changedLaneOldxy.a.y !== changedLanexy.a.y) {
-          if (index > 0) {
-            // 除了第一个，默认是对其上一个Lane的尺寸缩放
-            modifyLane = horLanes[index - 1]
-            modifyLane.bounds.extend({ x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y })
-            // currentShape.bounds = this.hashedBounds[pool.id][currentShape.id]
-            currentShape.bounds.extend({ x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y })
-            currentShape.bounds.moveBy({ x: 0, y: changedLaneOldxy.a.y - changedLanexy.a.y })
-            currentShape = modifyLane
-            y = 0
-            // this.facade.setSelection([modifyLane])
+        if (currentShapeType === 'V-Lane') {
+          if (changedLaneOldxy.a.x !== changedLanexy.a.x) {
+            if (index > 0) {
+              modifyLane = verLanes [index - 1]
+              modifyLane.bounds.extend({ x: changedLanexy.a.x - changedLaneOldxy.a.x, y: 0 })
+              currentShape.bounds.extend({ x: changedLanexy.a.x - changedLaneOldxy.a.x, y: 0 })
+              currentShape.bounds.moveBy({ x: changedLaneOldxy.a.x - changedLanexy.a.x, y: 0 })
+              currentShape = modifyLane
+              x = 0
+            }
+            effectBound = {
+              a: { x: changedLaneOldxy.a.x, y: 0 },
+              b: { x: pool.bounds.b.x, y: pool.bounds.b.y }
+            }
+            moveOffset = { x: changedLanexy.a.x - changedLaneOldxy.a.x, y: 0 }
+          } else if (changedLaneOldxy.b.x !== changedLanexy.b.x){
+            effectBound = {
+              a: { x: changedLaneOldxy.b.x, y: 0 },
+              b: { x: pool.bounds.b.x, y: pool.bounds.b.y }
+            }
+            moveOffset = { x: changedLanexy.b.x - changedLaneOldxy.b.x, y: 0 }
           }
 
-          // 确定影响范围，联动范围内的节点
-          effectBound = {
-            a: { x: 0, y: changedLaneOldxy.a.y },
-            b: { x: pool.bounds.b.x, y: pool.bounds.b.y }
+        } else {
+          // 拖拽lane顶
+          if (changedLaneOldxy.a.y !== changedLanexy.a.y) {
+            if (index > 0) {
+              // 除了第一个，默认是对其上一个Lane的尺寸缩放
+              modifyLane = horLanes[index - 1]
+              modifyLane.bounds.extend({ x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y })
+              // currentShape.bounds = this.hashedBounds[pool.id][currentShape.id]
+              currentShape.bounds.extend({ x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y })
+              currentShape.bounds.moveBy({ x: 0, y: changedLaneOldxy.a.y - changedLanexy.a.y })
+              currentShape = modifyLane
+              y = 0
+              // this.facade.setSelection([modifyLane])
+            }
+
+            // 确定影响范围，联动范围内的节点
+            effectBound = {
+              a: { x: 0, y: changedLaneOldxy.a.y },
+              b: { x: pool.bounds.b.x, y: pool.bounds.b.y }
+            }
+            moveOffset = { x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y }
+          } else if (changedLaneOldxy.b.y !== changedLanexy.b.y) {
+            effectBound = {
+              a: { x: 0, y: changedLaneOldxy.b.y },
+              b: { x: pool.bounds.b.x, y: pool.bounds.b.y }
+            }
+            moveOffset = { x: 0, y: changedLanexy.b.y - changedLaneOldxy.b.y }
           }
-          moveOffset = { x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y }
-        } else if (changedLaneOldxy.b.y !== changedLanexy.b.y) {
-          effectBound = {
-            a: { x: 0, y: changedLaneOldxy.b.y },
-            b: { x: pool.bounds.b.x, y: pool.bounds.b.y }
-          }
-          moveOffset = { x: 0, y: changedLanexy.b.y - changedLaneOldxy.b.y }
         }
 
         // Adjust all other lanes beneath this lane
@@ -780,91 +765,21 @@ export default class BPMN2_0 extends AbstractPlugin {
         // }
 
       }
-      console.log(11, effectBound)
-      console.log(22, moveOffset)
 
       // Cache all bounds
-      let changes = allHorLanes.map((lane) => {
+      let changes = allLanesArry.map((lane) => {
         return {
           shape: lane,
           bounds: lane.bounds.clone()
         }
       })
       // Get height and adjust child heights
-      height = this.adjustHeight(horLanes, currentShape)
+      height = this.updateHeight(pool)
+      // height = this.adjustHeight(horLanes, currentShape)
       // Check if something has changed and maybe create a command
       this.checkForChanges(allHorLanes, changes)
       // Set width from the current shape
-      width = pool.bounds.width()
-      // width = this.adjustWidth(lanes, currentShape.bounds.width() + (this.getDepth(currentShape, pool) * 30))
-
-
-      // this.facade.getCanvas().update()
-      // this.facade.setSelection([shape])
-
-      // let modifyLane
-      // let index = currentShape.orderSort
-      // let changedLaneOldxy = this.hashedBounds[pool.id][currentShape.id]
-      // let changedLanexy = currentShape.absoluteBounds()
-
-      // if (poolTypeId === 'V-Pool') {
-      //   if (changedLaneOldxy.a.x !== changedLanexy.a.x) {
-      //     if (index > 0) {
-      //       modifyLane = verLanes [index - 1]
-      //       modifyLane.bounds.extend({ x: changedLanexy.a.x - changedLaneOldxy.a.x, y: 0 })
-      //       this.hashedBounds[pool.id][modifyLane.id] = modifyLane.absoluteBounds()
-      //       currentShape.bounds.extend({ x: changedLanexy.a.x - changedLaneOldxy.a.x, y: 0 })
-      //       currentShape.bounds.moveBy({ x: changedLaneOldxy.a.x - changedLanexy.a.x, y: 0 })
-      //       this.hashedBounds[pool.id][currentShape.id] = currentShape.absoluteBounds()
-      //       currentShape = modifyLane
-      //       x = 0
-      //     }
-      //   }
-      //   effectBound = {
-      //     a: { x: changedLaneOldxy.a.x, y: 30 },
-      //     b: { x: pool.bounds.b.x, y: pool.bounds.b.y }
-      //   }
-      //   moveOffset = { x: changedLanexy.a.x - changedLaneOldxy.a.x, y: 0 }
-      //   width = this.updateVPoolWidth(lanes, pool)
-      // } else {
-      //   // 拖拽lane顶
-      //   if (changedLaneOldxy.a.y !== changedLanexy.a.y) {
-      //     if (index > 0) {
-      //       // 除了第一个，默认是对其上一个Lane的尺寸缩放
-      //       modifyLane = horLanes[index - 1]
-      //       modifyLane.bounds.extend({ x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y })
-      //       this.hashedBounds[pool.id][modifyLane.id] = modifyLane.absoluteBounds()
-      //       currentShape.bounds.extend({ x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y })
-      //       currentShape.bounds.moveBy({ x: 0, y: changedLaneOldxy.a.y - changedLanexy.a.y })
-      //       this.hashedBounds[pool.id][currentShape.id] = currentShape.absoluteBounds()
-      //       currentShape = modifyLane
-      //       y = 0
-      //     }
-      //   }
-      //   // let allLanes = this.getLanes(pool, true)
-      //   changes = allHorLanes.map(function (lane) {
-      //     return {
-      //       shape: lane,
-      //       bounds: lane.bounds.clone()
-      //     }
-      //   })
-      //   allHorLanes.each(function (lane) {
-      //     hashedPositions.set(lane.id, lane.bounds.upperLeft())
-      //   })
-      //
-      //   effectBound = {
-      //     a: { x: 30, y: changedLaneOldxy.a.y },
-      //     b: { x: pool.bounds.b.x, y: pool.bounds.b.y }
-      //   }
-      //   moveOffset = { x: 0, y: changedLanexy.a.y - changedLaneOldxy.a.y }
-      //   // Get height and adjust child heights
-      //   height = this.adjustHeight(lanes, currentShape)
-      //   // Check if something has changed and maybe create a command
-      //   this.checkForChanges(allHorLanes, changes)
-      //   // Set width from the current shape
-      //   width = pool.bounds.width()
-      //   // width = this.adjustWidth(lanes, currentShape.bounds.width() + (this.getDepth(currentShape, pool) * 30))
-      // }
+      width = this.adjustWidth(lanes, pool)
     }
 
     this.setDimensions(pool, width, height, x, y)
@@ -877,7 +792,7 @@ export default class BPMN2_0 extends AbstractPlugin {
       let poolHashedPositions = this.hashedPositions[pool.id]
       if (poolHashedPositions) {
         let a = Array.from(poolHashedPositions.keys())
-        if (a.some((key, i) => (allHorLanes[i] || {}).id !== key)) {
+        if (a.some((key, i) => (allLanesArry[i] || {}).id !== key)) {
           class LanesHasBeenReordered extends Command {
             constructor (originPosition, newPosition, lanes, plugin, poolId) {
               super()
@@ -909,11 +824,11 @@ export default class BPMN2_0 extends AbstractPlugin {
           }
 
           let hp2 = new Hash()
-          allHorLanes.each(function (lane) {
+          allLanesArry.each(function (lane) {
             hp2.set(lane.id, lane.bounds.upperLeft())
           })
 
-          let command = new LanesHasBeenReordered(hashedPositions, hp2, allHorLanes, this, pool.id)
+          let command = new LanesHasBeenReordered(hashedPositions, hp2, allLanesArry, this, pool.id)
           this.facade.executeCommands([command])
         }
       }
@@ -923,9 +838,9 @@ export default class BPMN2_0 extends AbstractPlugin {
     this.hashedPositions[pool.id] = hashedPositions
 
     i = -1
-    while (++i < allHorLanes.length) {
+    while (++i < allLanesArry.length) {
       // Cache positions
-      let lane = allHorLanes[i]
+      let lane = allLanesArry[i]
       this.hashedBounds[pool.id][lane.id] = lane.absoluteBounds()
 
       // Cache also the bounds of child shapes, mainly for child subprocesses
@@ -953,6 +868,41 @@ export default class BPMN2_0 extends AbstractPlugin {
     }.bind(this))
   }
 
+
+  setLaneLineView (horLanes, verLanes) {
+    if (horLanes.length <= 0) return
+    let l = horLanes.length
+    let lasterLane = horLanes[l - 1]
+    let bottomLine = lasterLane.node.getElementsByTagName('line')
+    let lasterLaneVisible = bottomLine[0].getAttributeNS(null, 'visibility')
+    // 当目前最后一个 H-lane 的 bottomLine 不是隐藏的
+    if (lasterLaneVisible && lasterLaneVisible !== 'hidden') {
+      horLanes.each((lane) => {
+        let line = lane.node.getElementsByTagName('line')
+        line[0].removeAttributeNS(null, 'visibility')
+      })
+      bottomLine[0].setAttributeNS(null, 'visibility', 'hidden')
+    }
+
+    let v = verLanes.length
+    if (verLanes.length <= 0) return
+    let firstVL = verLanes[0]
+    let lasterVL = verLanes[v - 1]
+    verLanes.each((lane) => {
+      let dasharray = lane.node.getElementsByClassName('left_dasharray_line')
+      let right = lane.node.getElementsByClassName('right_boder')
+      let left = lane.node.getElementsByClassName('left_jian')
+      dasharray[0].removeAttributeNS(null, 'visibility')
+      right[0].setAttributeNS(null, 'visibility', 'hidden')
+      left[0].removeAttributeNS(null, 'visibility')
+    })
+    let dasharrayLine = firstVL.node.getElementsByClassName('left_dasharray_line')
+    let left = firstVL.node.getElementsByClassName('left_jian')
+    dasharrayLine[0].setAttributeNS(null, 'visibility', 'hidden')
+    left[0].setAttributeNS(null, 'visibility', 'hidden')
+    let right = lasterVL.node.getElementsByClassName('right_boder')
+    right[0].setAttributeNS(null, 'visibility', 'visible')
+  }
   /**
    * Lookup if some bounds has changed
    * @param {Object} lanes
@@ -1172,9 +1122,9 @@ export default class BPMN2_0 extends AbstractPlugin {
     } else if (laneType === 'V-Lane') {
       shape.bounds.set(
         shape.bounds.a.x,
-        30,
+        0,
         width ? shape.bounds.a.x + width : shape.bounds.b.x,
-        height ? shape.bounds.a.y + height - 30 : shape.bounds.b.y
+        height ? 0 + height : shape.bounds.b.y
       )
     } else {
       // Pool
@@ -1259,15 +1209,29 @@ export default class BPMN2_0 extends AbstractPlugin {
     return width
   }
 
-  adjustWidth (lanes, width) {
+  adjustWidth (lanes = {}, pool) {
+    let { horLanes, verLanes } = lanes
+    let pool_height = pool.bounds.height()
+    let pool_width = pool.bounds.width()
+    let width = this.HOR_LANE_TITLE_WIDTH
+
+    verLanes.map((lane) => {
+      this.setLanePosition(lane, width)
+      this.setDimensions(lane, null, pool_height)
+      width += lane.bounds.width()
+    })
+
+    width = width > pool_width ? width : pool_width
+
     // Set width to each lane
-    (lanes || []).each((lane) => {
+    horLanes.map((lane) => {
       this.setDimensions(lane, width)
       // this.adjustWidth(this.getLanes(lane), width - 30)
     })
     return width
   }
 
+  // 所有横泳道更新bounds 并更新泳池的bounds，返回泳池的总高度
   adjustHeight (lanes, changedLane, propagateHeight) {
     let oldHeight = 0
     if (!changedLane && propagateHeight) {
@@ -1284,7 +1248,6 @@ export default class BPMN2_0 extends AbstractPlugin {
       if (lanes[i] === changedLane) {
         console.log('!!!!!!!!!!!!!!!')
         // Propagate new height down to the children
-        // this.adjustHeight(this.getLanes(lanes[i]).horLanes, undefined, lanes[i].bounds.height())
 
         lanes[i].bounds.set({ x: 0, y: height }, {
           x: lanes[i].bounds.width(),
@@ -1299,13 +1262,6 @@ export default class BPMN2_0 extends AbstractPlugin {
         this.setDimensions(lanes[i], null, tempHeight)
         this.setLanePosition(lanes[i], null, height)
       } else {
-        // Get height from children
-        // let tempHeight = this.adjustHeight(this.getLanes(lanes[i]).horLanes, changedLane, propagateHeight)
-        // if (!tempHeight) {
-        //   tempHeight = lanes[i].bounds.height()
-        // }
-        let tempHeight = lanes[i].bounds.height()
-        // this.setDimensions(lanes[i], null, tempHeight)
         this.setLanePosition(lanes[i], null, height)
       }
 
@@ -1315,10 +1271,11 @@ export default class BPMN2_0 extends AbstractPlugin {
     return height
   }
 
+  // 所有横泳道更新bounds 并更新泳池的bounds，返回泳池的总高度
   updateHeight (root) {
     let lanes = this.getLanes(root)
     let { horLanes, verLanes } = lanes
-    if (horLanes.length === 0 || root.getStencil().idWithoutNs() === 'V-Pool') {
+    if (horLanes.length === 0) {
       return root.bounds.height()
     }
     let height = this.HOR_POOL_TITLE_HEIGHT
