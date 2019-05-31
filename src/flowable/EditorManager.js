@@ -525,7 +525,7 @@ export default class EditorManager {
   }
 
   edit (resourceId) {
-    //Save the current canvas in the canvastracker if it is the root process.
+    // Save the current canvas in the canvastracker if it is the root process.
     this.syncCanvasTracker()
 
     this.loading = true
@@ -944,6 +944,7 @@ export default class EditorManager {
       if (results && results[2]) {
         editorManager.edit(decodeURIComponent(results[2].replace(/\+/g, ' ')))
       }
+      console.log(88888)
     })
     FLOW_eventBus.addListener(ORYX.CONFIG.EVENT_TYPE_UNDO_REDO_RESET, function () {
       if (this.items) {

@@ -644,13 +644,26 @@ export default class DragDropResize extends AbstractPlugin {
     // a child of one of the selected shapes with the highest z Order.
     // The result is a shape or the canvas
     this.containmentParentNode = underlyingNodes.reverse().find((function (node) {
-      return (node instanceof ORYX_Canvas) ||
-        (((node instanceof ORYX_Node) || ((node instanceof ORYX_Edge) && !noEdges))
-          && (!(this.currentShapes.member(node) ||
-            this.currentShapes.any(function (shape) {
-              return (shape.children.length > 0 && shape.getChildNodes(true).member(node))
-            }))) && !(node.getStencil().id().endsWith('Lane') || node.getStencil().id().endsWith('Pool')))
-        // && !(node.getStencil().id().endsWith('Lane') || node.getStencil().id().endsWith('Pool'))
+      if (node instanceof ORYX_Canvas) {
+        return true
+      } else if (((node instanceof ORYX_Node) || ((node instanceof ORYX_Edge) && !noEdges))){
+        // 要求鼠标位置下的元素不在选中元素内
+        if (this.currentShapes.member(node)) {
+          return false
+        }
+        // 要求鼠标位置下的子元素不在选中元素内
+        if (this.currentShapes.any((shape) => {
+          return (shape.children.length > 0 && shape.getChildNodes(true).member(node));
+        })) {
+          return false
+        }
+
+        // 要求鼠标位置不在Lane 、Pool元素内
+        if (node.getStencil().id().endsWith('Lane') || node.getStencil().id().endsWith('Pool')) {
+          return false
+        }
+        return true
+      }
     }).bind(this))
 
     if (checkIfAttachable) {

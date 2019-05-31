@@ -83,7 +83,7 @@ export default class RenameShapes {
         if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
           let ua = navigator.userAgent
           if (ua.indexOf('MSIE') >= 0) {
-            //IE 10 and below
+            // IE 10 and below
             let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
             if (zoom !== 100) {
               additionalIEZoom = zoom / 100
@@ -103,14 +103,14 @@ export default class RenameShapes {
         evtCoord.x *= trans.a
         evtCoord.y *= trans.d
 
-        let diff = labels.collect((label) => {
-          let center = this.getCenterPosition(label.node, shape)
+        let diff = labels.map((label) => {
+          let center = this.getCenterPositionself(label.node, shape)
           let len = Math.sqrt(Math.pow(center.x - evtCoord.x, 2) + Math.pow(center.y - evtCoord.y, 2))
           return { diff: len, label: label }
         })
 
         diff.sort(function (a, b) {
-          return a.diff > b.diff
+          return a.diff - b.diff
         })
 
         nearestLabel = diff[0].label
@@ -120,13 +120,14 @@ export default class RenameShapes {
     // Get the particular property for the label
     let prop = props.find(function (item) {
       return item.refToView().any(function (toView) {
-        return nearestLabel.id == shape.id + toView
+        return nearestLabel.id === shape.id + toView
       })
     })
 
     // Get the center position from the nearest label
     let width = Math.min(Math.max(100, shape.bounds.width()), 200)
     let center = this.getCenterPosition(nearestLabel.node, shape)
+    console.log('center', center)
     center.x -= (width / 2)
     let propId = prop.prefix() + '-' + prop.id()
     let textInput = document.createElement('textarea')
@@ -187,6 +188,34 @@ export default class RenameShapes {
     // Disable the keydown in the editor (that when hitting the delete button, the shapes not get deleted)
     this.facade.disableEvent(ORYX_Config.EVENT_KEYDOWN)
   }
+  getCenterPositionself (svgNode, shape) {
+    if (!svgNode) {
+      return { x: 0, y: 0 }
+    }
+    // console.log('=====', svgNode.getBBox())
+
+    let scale = this.facade.getCanvas().node.getScreenCTM()
+    let absoluteXY = shape.absoluteBounds().upperLeft()
+    let bbox = svgNode.getBBox()
+    let center = {}
+    if (bbox.x || bbox.width) {
+      center = {
+        x: absoluteXY.x + bbox.x + bbox.width / 2 +  + scale.e,
+        y: absoluteXY.y + bbox.y + bbox.height / 2 + scale.f
+      }
+
+      center.x *= scale.a
+      center.y *= scale.d
+    } else {
+      let x =  svgNode.getAttributeNS(null, 'x')
+      let y =  svgNode.getAttributeNS(null, 'y')
+      center = {
+        x: absoluteXY.x + Number(x),
+        y: absoluteXY.y + Number(y)
+      }
+    }
+    return center
+  }
 
   getCenterPosition (svgNode, shape) {
     if (!svgNode) {
@@ -196,26 +225,46 @@ export default class RenameShapes {
     let scale = this.facade.getCanvas().node.getScreenCTM()
     let absoluteXY = shape.bounds.upperLeft()
 
-    let hasParent = true
-    let searchShape = shape
-    while (hasParent) {
-      if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram' ||
-        searchShape.getParentShape().getStencil().idWithoutNs() === 'CMMNDiagram') {
-        hasParent = false
-      } else {
-        let parentXY = searchShape.getParentShape().bounds.upperLeft()
-        absoluteXY.x += parentXY.x
-        absoluteXY.y += parentXY.y
-        searchShape = searchShape.getParentShape()
+    let center = null
+    let fittoelemSign = false
+    let fittoelem = svgNode.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'fittoelem')
+    if (fittoelem) {
+      let rects = shape.node.getElementsByTagName('rect')
+      let ClientRect = null
+      for (let i = 0; i < rects.length; i++) {
+        if (rects[i].getAttributeNS(null, 'id') === shape.id + fittoelem) {
+          ClientRect = rects[i].getBoundingClientRect()
+          center = {
+            x: ClientRect.x + ClientRect.width / 2,
+            y: ClientRect.y + ClientRect.height / 2
+          }
+          fittoelemSign = true
+          // return center
+        }
       }
     }
+    if (!fittoelemSign) {
+      let hasParent = true
+      let searchShape = shape
+      while (hasParent) {
+        if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram' ||
+          searchShape.getParentShape().getStencil().idWithoutNs() === 'CMMNDiagram') {
+          hasParent = false
+        } else {
+          let parentXY = searchShape.getParentShape().bounds.upperLeft()
+          absoluteXY.x += parentXY.x
+          absoluteXY.y += parentXY.y
+          searchShape = searchShape.getParentShape()
+        }
+      }
 
-    let center = shape.bounds.midPoint()
-    center.x += absoluteXY.x + scale.e
-    center.y += absoluteXY.y + scale.f
+      center = shape.bounds.midPoint()
+      center.x += absoluteXY.x + scale.e
+      center.y += absoluteXY.y + scale.f
 
-    center.x *= scale.a
-    center.y *= scale.d
+      center.x *= scale.a
+      center.y *= scale.d
+    }
 
     let additionalIEZoom = 1
     if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {

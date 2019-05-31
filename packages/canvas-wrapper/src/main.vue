@@ -59,7 +59,8 @@
 
       <!--v-draggable="{onStart:'startDragCallbackQuickMenu', onDrag:'dragCallbackQuickMenu',-->
       <!--revert: 'invalid', helper: 'clone', opacity : 0.5}"-->
-      <div id="flow_add_btns" v-show="!(btn_visibile.hide_shape_buttons || btn_visibile.hide_flow_add_btns)">
+      <div id="flow_add_btns" v-show="!(btn_visibile.hide_shape_buttons || btn_visibile.hide_flow_add_btns
+      || contextmenu_visibile)">
         <div v-for="item in quickMenuItems"
              class="Oryx_button"
              :key="item.id"

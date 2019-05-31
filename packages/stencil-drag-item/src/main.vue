@@ -136,12 +136,16 @@
               //       candidate.getStencil().id().endsWith('Pool'))))
               //   || this.editorManager.instanceofEdge(candidate))
               return (this.editorManager.instanceofCanvas(candidate)
-                || this.editorManager.instanceofNode(candidate)
+                || (item.id.endsWith('Lane') ? this.editorManager.instanceofNode(candidate) : (
+                  this.editorManager.instanceofNode(candidate) && !(candidate.getStencil().id().endsWith('Lane') ||
+                    candidate.getStencil().id().endsWith('Pool'))
+                ))
                 || this.editorManager.instanceofEdge(candidate))
             })
             // console.log('parentCandidate', parentCandidate)
             if (this.editorManager.instanceofCanvas(parentCandidate)) {
-              if (item.id === 'Lane' || item.id === 'V-Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
+              if (item.id === 'Lane' || item.id === 'V-Lane' || item.id === 'BoundaryErrorEvent' ||
+                item.id === 'BoundaryMessageEvent' ||
                 item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
                 item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
                 item.id === 'EntryCriterion') {

@@ -24,7 +24,7 @@
               stroke="#666666" stroke-width="1" fill="#ffffff"/>
         <line id="number_path" oryx:resize="vertical horizontal" fill="none" stroke="#666666" x1="0" y1="23" x2="137"
               y2="23" stroke-width="1"/>
-        <text font-size="12" id="text_number" x="10" y="16" oryx:align="top left" stroke="#333333"
+        <text font-size="12" id="text_number" x="10" y="6" oryx:align="top left" stroke="#333333"
               oryx:fittoelem="text_frame">22
         </text>
         <text font-size="12" id="text_name" x="68" y="36" oryx:align="middle center" oryx:fittoelem="text_frame"

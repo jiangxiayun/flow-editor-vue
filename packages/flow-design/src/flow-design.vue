@@ -24,6 +24,7 @@
   import EditorManager from 'src/flowable/EditorManager'
   import Locale from 'src/mixins/locale'
   import ORYX_CONFIG from 'src/oryx/CONFIG'
+  import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
 
   export default {
     name: 'flowEditor',
@@ -35,18 +36,7 @@
         editorHistory: [],
         undoStack: [],
         redoStack: [],
-        forceSelectionRefresh: false,
-        list1: [
-          { name: "John", id: 1 },
-          { name: "Joao", id: 2 },
-          { name: "Jean", id: 3 },
-          { name: "Gerard", id: 4 }
-        ],
-        list2: [
-          { name: "Juan", id: 5 },
-          { name: "Edgard", id: 6 },
-          { name: "Johnson", id: 7 }
-        ]
+        forceSelectionRefresh: false
       }
     },
     mixins: [Locale],
@@ -66,7 +56,9 @@
         ...this.config,
         elementsWithoutRenameAction: ['Lane', 'V-Lane']
       })
-
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, () => {
+        this.handleSaveBtn('editorInitCompleted', this.editorManager)
+      })
       // 将用户在深层子组件里的自定义事件抛出
       this.$on('Propagation', this.handleSaveBtn)
     },
