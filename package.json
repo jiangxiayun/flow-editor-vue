@@ -1,6 +1,6 @@
 {
   "name": "flow-editor-vue",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "基于flowable绘图工具oryx的流程引擎",
   "main": "lib/flowable_oryx.umd.min.js",
   "style": "lib/flowable_oryx.css",
@@ -45,7 +45,7 @@
     "@vue/cli-plugin-e2e-cypress": "^3.4.0",
     "@vue/cli-plugin-eslint": "^3.4.0",
     "@vue/cli-plugin-unit-mocha": "^3.4.0",
-    "@vue/cli-service": "^3.4.0",
+    "@vue/cli-service": "^3.8.0",
     "@vue/test-utils": "^1.0.0-beta.20",
     "babel-eslint": "^10.0.1",
     "babel-plugin-component": "^1.1.1",

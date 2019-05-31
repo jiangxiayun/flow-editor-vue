@@ -25,6 +25,7 @@ export default class EditorManager {
   constructor (config) {
     this.listeners = {}
     config = jQuery.extend(true, {}, config)
+    this.paramsConfig = config
     // config.editorConfigs && ORYX.CONFIG.setCustomConfigs(config.editorConfigs)
     this.treeFilteredElements = ['SubProcess', 'CollapsedSubProcess']
     this.canvasTracker = new Hash()
@@ -47,7 +48,7 @@ export default class EditorManager {
     this.setStencilData(config.stencilData)
     this.setShowStencilData()
 
-    this.setToolbarItems(config.editorConfigs.TOOLBAR_CONFIG)
+    this.setToolbarItems(ORYX.CONFIG.CustomConfigs.TOOLBAR_CONFIG)
 
     const baseUrl = 'http://b3mn.org/stencilset/'
 
@@ -169,18 +170,21 @@ export default class EditorManager {
     return this.showStencilData
   }
   setShowStencilData () {
-    let quickMenuDefinition = undefined
-    let ignoreForPaletteDefinition = undefined
+    let quickMenu = undefined
+    let ignoreNode = undefined
     const data = this.stencilData
     if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
-      quickMenuDefinition = ['HumanTask', 'Association']
-      ignoreForPaletteDefinition = ['CasePlanModel']
+      quickMenu = ['HumanTask', 'Association']
+      ignoreNode = ['CasePlanModel']
     } else {
-      quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway',
+      quickMenu = ['UserTask2', 'EndNoneEvent', 'ExclusiveGateway',
         'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
         'SequenceFlow', 'Association']
-      ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask']
+      ignoreNode = ['SequenceFlow', 'MessageFlow', 'Association',
+        'DataAssociation', 'DataStore', 'SendTask', 'UserTask']
     }
+    let quickMenuDefinition = this.paramsConfig.editorConfigs.quickMenuDefinition || quickMenu
+    let ignoreForPaletteDefinition = this.paramsConfig.editorConfigs.ignoreForPaletteDefinition || ignoreNode
 
     let quickMenuItems = []
     let morphRoles = []

@@ -182,6 +182,7 @@ const FLOWABLE = {
   },
   UI_CONFIG: {
     CUSTOM_CONTEXTMENU: true,
+    CUSTOM_CONTEXTMENU_NODES: ['UserTask', 'UserTask2', 'FlowBox'],
     /* UI */
     CANVAS_WIDTH: 1200,
     CANVAS_HEIGHT: 1050,
@@ -194,7 +195,11 @@ const FLOWABLE = {
     SCALERS_SIZE: 7,
     MINIMUM_SIZE: 20,
     MAXIMUM_SIZE: 10000,
-  }
+  },
+  quickMenuDefinition: ['UserTask2', 'EndNoneEvent', 'ExclusiveGateway',
+    'TextAnnotation', 'SequenceFlow', 'Association'],
+  ignoreForPaletteDefinition: ['SequenceFlow', 'MessageFlow', 'Association',
+    'DataAssociation', 'DataStore', 'SendTask', 'UserTask']
 }
 
 export default FLOWABLE

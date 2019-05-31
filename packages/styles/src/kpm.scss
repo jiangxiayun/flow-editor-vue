@@ -280,6 +280,7 @@ text * {
 .paletteHelpWrapper {
   width: 200px;
   transition: 0.3s width;
+  overflow: auto;
 }
 
 .stencils {

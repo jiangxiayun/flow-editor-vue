@@ -7,7 +7,8 @@
         <paletteWrapper :editorManager="editorManager"></paletteWrapper>
       </slot>
       <div id="contentCanvasWrapper" class="contentCanvasWrapper">
-        <canvasWrapper :editorManager="editorManager" :contextmenuList="contextmenuList"></canvasWrapper>
+        <canvasWrapper ref="canvasWrapper"
+                       :editorManager="editorManager" :contextmenuList="contextmenuList"></canvasWrapper>
         <slot name="propertyWrapper" v-bind:editorManager="editorManager">
           <propertySection :editorManager="editorManager"></propertySection>
         </slot>
@@ -67,6 +68,9 @@
         // console.log(33, params)
         this.$emit(eventName, params)
       },
+      showContextmenu () {
+        this.$refs.canvasWrapper.showContextmenu()
+      }
     }
   }
 </script>

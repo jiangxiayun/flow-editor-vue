@@ -162,18 +162,31 @@
         this.dispatch('flowEditor', 'clickContextmenuCommand', {action: item, shape: this.currentShape})
       },
       clickSvgDown () {
-        this.contextmenu_visibile = false
-        this.contextmenu_visibile_willshow = false
+        this.hideContextmenu()
       },
       handleContextmenu () {
         // disable context menu
         document.getElementById('canvasHelpWrapper').oncontextmenu = (event) => {
           const selectedElements = this.editorManager.getSelection()
+          this.selectedElements = selectedElements
           // 用户自定义按钮事件，以$emit抛出 buttonClicked.action 事件
           this.dispatch('flowEditor', 'oncontextmenu', { selectedElements })
-          this.setContextmenuPosition(selectedElements)
+          // this.setContextmenuPosition(selectedElements)
           return false
         }
+      },
+      showContextmenu () {
+        if (this.selectedElements.length === 1) {
+          this.currentShape = this.selectedElements[0]
+          let offset = this.editorManager.getNodeOffset(this.currentShape)
+          this.contextmenu_top = `${offset.a.y}px`
+          this.contextmenu_left = `${offset.b.x + 5}px`
+          this.contextmenu_visibile = true
+        }
+      },
+      hideContextmenu () {
+        this.contextmenu_visibile = false
+        this.contextmenu_visibile_willshow = false
       },
       setContextmenuPosition (selectedElements) {
         if (selectedElements.length === 1 && selectedElements[0].getStencil().idWithoutNs() === 'UserTask') {

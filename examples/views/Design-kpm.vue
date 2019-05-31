@@ -1,12 +1,10 @@
 <template>
   <div>
-    <!--{{contextmenuList}}-->
-    <flowEditor :config="config"
+    <flowEditor ref="flowEditor"
+                :config="config"
                 :contextmenuList="contextmenuList"
-                @btn-save-click="handleSaveBtn"
                 @oncontextmenu="handleContextmenu"
                 @clickContextmenuCommand="handleContextmenuCommand">
-
       <template slot="paletteWrapper" slot-scope="scope">
         <div id="paletteHelpWrapper" class="paletteHelpWrapper" v-if="scope.editorManager">
           <div class="stencils" id="paletteSection">
@@ -25,90 +23,37 @@
       </template>
 
       <template slot="propertyWrapper" slot-scope="scope">
-        <div></div>
+        <span>{{stateEditorManager(scope.editorManager)}}</span>
         <!--<propertySection :editorManager="scope.editorManager"></propertySection>-->
       </template>
     </flowEditor>
-
-    <el-dialog
-        title="保存模型"
-        :visible="saveVisible"
-        append-to-body
-        @close="close"
-        width="60%">
-      <div class="modal-body">
-        <div v-if="saveDialog.errorMessage && saveDialog.errorMessage.length > 0" class="alert error"
-             style="font-size: 14px; margin-top:20px">
-          <div class="popup-error" style="font-size: 14px">
-            <span class="glyphicon glyphicon-remove-circle"></span>
-            <span>{{saveDialog.errorMessage}}</span>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="nameField">名称</label>
-          <input type="text"
-                 :disabled="saveLoading || (error && error.conflictResolveAction == 'saveAs')"
-                 id="nameField"
-                 class="form-control"
-                 v-model.trim="saveDialog.name"/>
-        </div>
-        <div class="form-group">
-          <label for="keyField">Key</label>
-          <input type="text"
-                 :disabled="saveLoading || (error && error.conflictResolveAction == 'saveAs')"
-                 id="keyField"
-                 class="form-control"
-                 v-model.trim="saveDialog.key"/>
-        </div>
-        <div class="form-group">
-          <label for="docTextArea">描述</label>
-          <textarea id="docTextArea" :disabled="saveLoading" class="form-control"
-                    v-model="saveDialog.description"></textarea>
-        </div>
-
-      </div>
-
-      <span slot="footer" class="dialog-footer">
-        <div>
-          <el-button @click="close" :disabled="saveLoading">取消</el-button>
-          <el-button type="primary" @click="save"
-                     :disabled="saveLoading || saveDialog.name.length === 0 || saveDialog.key.length === 0">
-            保存
-          </el-button>
-        </div>
-
-  </span>
-    </el-dialog>
 
     <!--节点属性编辑弹窗-->
     <el-dialog
         :title="writeDialog.title"
         :visible.sync="writeDialog.visible"
+        :close-on-click-modal="false"
         width="90%"
-        :before-close="handlepropertyWriteClose">
+        :before-close="handlepropertyWriteClose">.paletteHelpWrapper
       {{selectedItem.properties}}
       <component v-bind:is="writeDialog.componentTemplate"
+                 :key="writeDialog.properties"
                  :property="selectedItem.properties"
-                 @updateProperty="updatePropertyInModel"></component>
-      <!--<span slot="footer" class="dialog-footer">-->
-    <!--<el-button @click="handlepropertyWriteClose">取 消</el-button>-->
-    <!--<el-button type="primary" @click="propertyWriteSave">确 定</el-button>-->
-  <!--</span>-->
+                 @updateProperty="updatePropertyInModel"
+                 @bubbleEvent="handlebubbleEvents"></component>
     </el-dialog>
   </div>
-
 </template>
 
 <script>
-  import propertySection from 'packages/property-section'
+  // import flowDesign from '@/components/flowable/flow-design'
+  import propertySection from './propertySection'
   import { AA } from '@/mock/stencilData-kpm.js'
   import { mockData } from '@/mock/mockData.js'
   import configure from './initConfig'
-  import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
-  import quoteActivity from '@/components/taskEdit/quoteActivity'
-  import activityTabsEdit from '@/components/taskEdit/activityTabsEdit'
-  import customPlugin from './customPlugin'
-
+  import EndFlowPlugin from './customPlugin'
+  import refActivity from '@/components/flow/ref_task'
+  import activityTabsEdit from '@/components/flow/edit_task'
   const flowSaveData = localStorage.getItem('flowSaveData')
   const flowSaveDataFinally = flowSaveData ? JSON.parse(flowSaveData) : {
     'modelId': '6609363a-3be5-11e9-afe0-82ad27eff10d',
@@ -133,31 +78,21 @@
     }
   }
 
-  const TaskNoneQuote =  [
+  const TaskNoneQuote = [
     {
       name: '新建活动',
       action: 'createQuote',
       type: 'dialog',
       dialogTitle: '活动引用',
-      // componentTemplate: 'quoteActivity'
-      componentTemplate: 'activityTabsEdit'
+      componentTemplate: 'refActivity'
     }
   ]
-  const TaskPreReference =  [
+  const TaskQuoted = [
     {
-      name: '编辑主活动',
-      action: 'editActivityBase',
-      type: 'dialog',
-      dialogTitle: '活动主数据快速维护',
-      componentTemplate: 'activityTabsEdit'
-    }
-  ]
-  const TaskQuoted =  [
-    {
-      name: '编辑/查看',
+      name: '查看/编辑',
       action: 'modifyActivity',
       type: 'dialog',
-      dialogTitle: '活动场景数据维护',
+      dialogTitle: '活动主数据维护',
       componentTemplate: 'activityTabsEdit'
     }
   ]
@@ -166,22 +101,8 @@
     name: 'Editor',
     data () {
       return {
-        saveVisible: false,
-        saveDialog: {
-          name: mockData.name,
-          key: mockData.key,
-          errorMessage: [],
-          description: mockData.description,
-          newVersion: false,
-          comment: '',
-          user: mockData.lastUpdatedBy,
-          lastUpdatedData: mockData.lastUpdated
-        },
-        saveLoading: false,
-        error: null,
         config: {
           type: 'flow',
-          // modelData: mockData,
           modelData: flowSaveDataFinally,
           stencilData: AA,
           pluginConfig: {
@@ -213,12 +134,14 @@
               { name: 'Plugins.Layouter.EdgeLayouter' },
               { name: 'Plugins.BPMN2_0' },
               { name: 'Plugins.RenameShapes' },
-              // { name: 'Plugins.PoolAsProperty' }
-              { name: 'customPlugin', plugin: customPlugin, type: 'custom' },
+              { name: 'Plugins.PoolAsProperty' },
+              { name: 'EndFlowPlugin', plugin: EndFlowPlugin, type: 'custom' }
             ]
           },
           editorConfigs: configure
         },
+        editorManager: null,
+        form: {},
         contextmenuList: [],
         selectedItem: {},
         currentShapeMode: 'read',
@@ -228,140 +151,32 @@
         }
       }
     },
-    components: { propertySection, quoteActivity, activityTabsEdit },
+    components: { propertySection, refActivity, activityTabsEdit },
     created () {},
-    computed: {},
-    mounted () {
-      // this.$on('btn-save-click', this.handleSaveBtn);
-      FLOW_eventBus.addListener('event-type-selection-changed', (event) => {
-        if (this.currentShapeMode !== 'write') {
-          // console.log(4444, event.selectedItem)
-          this.selectedItem = event.selectedItem
-          this.selectedShape = event.selectedShape
-        }
-      })
+    computed: {
+      modelData () {
+        return this.editorManager ? this.editorManager.getModel() : { properties: {} }
+      }
     },
+    mounted () {},
     methods: {
-      handleSaveBtn (editor) {
-        this.saveVisible = true
+      stateEditorManager (editor) {
         this.editorManager = editor
       },
-      save () {
-        this.saveLoading = true
-
-        let json = this.editorManager.getModel()
-        console.log(json)
-
-        // let params = {
-        //   modeltype: this.mockData.model.modelType,
-        //   json_xml: JSON.stringify(json),
-        //   name: this.saveDialog.name,
-        //   key: this.saveDialog.key,
-        //   description: this.saveDialog.description,
-        //   newversion: this.saveDialog.newVersion,
-        //   comment: this.saveDialog.comment
-        //   lastUpdated: this.modelMetaData.lastUpdated
-        // }
-
-        let params = {
-          modelId: '6609363a-3be5-11e9-afe0-82ad27eff10d',
-          name: '请假模型',
-          key: 'leave-model',
-          description: '请假模型',
-          lastUpdated: '2019-04-04T05:49:37.132+0000',
-          lastUpdatedBy: 'admin',
-          model: json
-        }
-
-        localStorage.setItem('flowSaveData', JSON.stringify(params))
-        // Fire event to all who is listening
-        // const saveEvent = {
-        //   type: FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED,
-        //   model: params,
-        //   modelId: this.modelMetaData.modelId,
-        //   eventType: 'update-model'
-        // }
-        // FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED, saveEvent)
-        this.saveLoading = false
-        // Update
-        console.log('$http', params)
-        // $http({
-        //   method: 'POST',
-        //   data: params,
-        //   ignoreErrors: true,
-        //   headers: {
-        //     'Accept': 'application/json',
-        //     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
-        //   },
-        //   transformRequest: function (obj) {
-        //     var str = []
-        //     for (var p in obj) {
-        //       str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]))
-        //     }
-        //     return str.join('&')
-        //   },
-        //   url: FLOWABLE.URL.putModel(this.modelMetaData.modelId)
-        // })
-        //   .success(function (data, status, headers, config) {
-        //     this.editorManager.handleEvents({
-        //       type: ORYX_CONFIG.EVENT_SAVED
-        //     })
-        //     this.modelData.name = this.saveDialog.name
-        //     this.modelData.key = this.saveDialog.key
-        //     this.modelData.lastUpdated = data.lastUpdated
-        //
-        //     this.status.loading = false
-        //     this.$hide()
-        //
-        //     // Fire event to all who is listening
-        //     var saveEvent = {
-        //       type: FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED,
-        //       model: params,
-        //       modelId: this.modelMetaData.modelId,
-        //       eventType: 'update-model'
-        //     }
-        //     FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED, saveEvent)
-        //
-        //     // Reset state
-        //     this.error = undefined
-        //     this.status.loading = false
-        //
-        //     // Execute any callback
-        //     if (successCallback) {
-        //       successCallback()
-        //     }
-        //
-        //   })
-        //   .error(function (data, status, headers, config) {
-        //     if (status == 409) {
-        //       this.error = {}
-        //       this.error.isConflict = true
-        //       this.error.userFullName = data.customData.userFullName
-        //       this.error.isNewVersionAllowed = data.customData.newVersionAllowed
-        //       this.error.saveAs = this.modelMetaData.name + '_2'
-        //     } else {
-        //       this.error = undefined
-        //       this.saveDialog.errorMessage = data.message
-        //     }
-        //     this.status.loading = false
-        //   })
-      },
-      close () {
-        this.saveVisible = false
-      },
-      handleContextmenu ({selectedElements}) {
-        if (selectedElements.length === 1 && selectedElements[0].getStencil().idWithoutNs() === 'UserTask') {
-          const task = selectedElements[0]
-          switch (task.properties.get('quote')) {
-            case 'Pre-reference':
-              this.contextmenuList = TaskPreReference
-              break
-            case 'quoted':
-              this.contextmenuList = TaskQuoted
-              break
-            default:
-              this.contextmenuList = TaskNoneQuote
+      handleContextmenu ({ selectedElements }) {
+        if (selectedElements.length === 1) {
+          let currentShape = selectedElements[0]
+          if (currentShape.getStencil().idWithoutNs() === 'UserTask' ||
+            currentShape.getStencil().idWithoutNs() === 'UserTask2') {
+            switch (currentShape.properties.get('refTask')) {
+              case 'quoted':
+                this.contextmenuList = TaskQuoted
+                break
+              default:
+                this.contextmenuList = TaskNoneQuote
+            }
           }
+          this.$refs.flowEditor.showContextmenu()
         }
       },
       handleContextmenuCommand (params) {
@@ -372,7 +187,6 @@
             componentTemplate: params.action.componentTemplate
           }
         }
-
       },
       propertyWriteSave () {
         this.writeDialog.visible = false
@@ -385,7 +199,7 @@
       /* Click handler for clicking a property */
       propertyClicked (property) {
         if (!(this.currentShapeType.endsWith('Lane') && this.laneEnableValue &&
-          this.laneValueAry.includes(property.key) && property.key != this.laneEnableValue)) {
+          this.laneValueAry.includes(property.key) && property.key !== this.laneEnableValue)) {
           if (!property.hidden) {
             property.mode = 'write'
           }
@@ -398,7 +212,7 @@
         // Some updates may happen when selected shape is already changed, so when an additional
         // shapeId is supplied, we need to make sure the correct shape is updated (current or previous)
         if (shapeId) {
-          if (shape.id != shapeId && this.previousSelectedShape && this.previousSelectedShape.id == shapeId) {
+          if (shape.id !== shapeId && this.previousSelectedShape && this.previousSelectedShape.id === shapeId) {
             shape = this.previousSelectedShape
           } else {
             shape = null
@@ -412,12 +226,12 @@
         const _this = this
 
         let keys = Object.keys(properties)
-        let changedProperties = []  // 提取有变动的属性
+        let changedProperties = [] // 提取有变动的属性
         keys.map(key => {
           // let newValue = property.value
           let newValue = properties[key]
           let oldValue = shape.properties.get(key)
-          if (newValue != oldValue) {
+          if (newValue !== oldValue) {
             changedProperties.push({
               key,
               oldValue,
@@ -450,10 +264,32 @@
         } else {
           this.currentShapeMode = 'read'
         }
+      },
+      handlebubbleEvents (type, params) {
+        switch (type) {
+          // 创建新活动主数据
+          case 'goToAddTask':
+            this.currentShapeMode = 'read'
+            console.log(TaskQuoted)
+            this.writeDialog = {
+              visible: true,
+              title: '新建活动主数据',
+              componentTemplate: 'activityTabsEdit'
+            }
+            break
+          // 引用活动
+          case 'goToRefTask':
+            this.writeDialog = {
+              visible: true,
+              title: '引用活动',
+              componentTemplate: 'refActivity'
+            }
+            break
+        }
       }
     }
   }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 
 </style>

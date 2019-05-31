@@ -1831,6 +1831,47 @@ export const AA = {
     },
     {
       'type': 'node',
+      'id': 'UserTask2',
+      'title': '活动节点',
+      'description': '活动节点',
+      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:oryx="http://www.b3mn.org/oryx" xmlns:xlink="http://www.w3.org/1999/xlink" width="138" height="74" version="1.0"><defs></defs><oryx:magnets><oryx:magnet oryx:cx="1" oryx:cy="18" oryx:anchors="left"/><oryx:magnet oryx:cx="1" oryx:cy="36" oryx:anchors="left"/><oryx:magnet oryx:cx="1" oryx:cy="54" oryx:anchors="left"/><oryx:magnet oryx:cx="34" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="68" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="102" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="135" oryx:cy="18" oryx:anchors="right"/><oryx:magnet oryx:cx="135" oryx:cy="36" oryx:anchors="right"/><oryx:magnet oryx:cx="135" oryx:cy="54" oryx:anchors="right"/><oryx:magnet oryx:cx="34" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="68" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="102" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="68" oryx:cy="36" oryx:default="yes"/></oryx:magnets><g pointer-events="fill" oryx:minimumSize="50 40"><rect id="text_frame" oryx:anchors="bottom top right left" x="1" y="1" width="135" height="71" rx="10" ry="10" stroke="none" stroke-width="0" fill="none"/><rect id="bg_frame" oryx:resize="vertical horizontal" x="0" y="0" width="136" height="72" rx="10" ry="10" stroke="#E70012" stroke-width="1" stroke-dasharray=\'5\' stroke-opacity="0.2" fill="#FFF8F8"/><line id="number_path" oryx:resize="vertical horizontal" fill="none" stroke="#E70012" stroke-dasharray=\'5\' stroke-opacity="0.2" x1="0" y1="23" x2="137" y2="23" stroke-width="1"/><text font-size="12" id="text_number" x="10" y="6" oryx:align="top left" stroke="#333333" oryx:fittoelem="text_frame">22</text><text font-size="12" id="text_name" x="68" y="36" oryx:align="middle center" oryx:fittoelem="text_frame" stroke="#333333">dd</text><line oryx:resize="vertical horizontal" fill="none" stroke="#E70012" stroke-dasharray=\'5\' stroke-opacity="0.2" x1="0" y1="47" x2="137" y2="47" stroke-width="1"/></g></svg>\n',
+      'icon': 'activity/list/type.user.png',
+      'groups': [
+        '基础元素'
+      ],
+      'layout': [
+        {
+          'type': 'layout.task'
+        }
+      ],
+      'propertyPackages': [
+        'numberepackage',
+        'overrideidpackage',
+        'namepackage',
+        'documentationpackage',
+        'usertaskassignmentpackage',
+        'outputpackage',
+        'inputpackage',
+        'important_levelpackage',
+        'attachmentpackage',
+        'departmentpackage',
+        'activerolepackage',
+        'activesystempackage'
+      ],
+      'hiddenPropertyPackages': [
+
+      ],
+      'roles': [
+        'Activity',
+        'sequence_start',
+        'sequence_end',
+        'ActivitiesMorph',
+        'all'
+      ]
+    },
+
+    {
+      'type': 'node',
       'id': 'FlowBox',
       'title': '盒子',
       'description': '流程盒子',
@@ -1862,7 +1903,6 @@ export const AA = {
         'all'
       ]
     },
-
     {
       'type': 'node',
       'id': 'ExclusiveGateway',
@@ -1938,7 +1978,6 @@ export const AA = {
         'all'
       ]
     },
-
     {
       'type': 'node',
       'id': 'BPMNDiagram',
@@ -1972,7 +2011,6 @@ export const AA = {
       'hiddenPropertyPackages': [],
       'roles': []
     },
-
     {
       'type': 'node',
       'id': 'flowBox',
