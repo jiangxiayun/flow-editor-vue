@@ -1476,31 +1476,7 @@ export default class Editor {
    * @return {SVGPoint} The event coordinates in the SVG document
    */
   eventCoordinates (event) {
-    let canvas = this.getCanvas()
-
-    let svgPoint = canvas.node.ownerSVGElement.createSVGPoint()
-    svgPoint.x = event.clientX
-    svgPoint.y = event.clientY
-
-    let additionalIEZoom = 1
-    if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-      let ua = navigator.userAgent
-      if (ua.indexOf('MSIE') >= 0) {
-        //IE 10 and below
-        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-        if (zoom !== 100) {
-          additionalIEZoom = zoom / 100
-        }
-      }
-    }
-
-    if (additionalIEZoom !== 1) {
-      svgPoint.x = svgPoint.x * additionalIEZoom
-      svgPoint.y = svgPoint.y * additionalIEZoom
-    }
-
-    let matrix = canvas.node.getScreenCTM()
-    return svgPoint.matrixTransform(matrix.inverse())
+    return this.eventCoordinatesXY(event.clientX, event.clientY)
   }
 
   // 将屏幕坐标变换成svg坐标

@@ -221,25 +221,16 @@
         this.btn_visibile.hide_shape_buttons = true
 
         jQuery('.resizer_southeast').each(function (i, obj) {
-          this.orginalResizerSEStyle = obj.style.display
           obj.style.display = 'none'
         })
         jQuery('.resizer_northwest').each(function (i, obj) {
-          this.orginalResizerNWStyle = obj.style.display
-          obj.style.display = 'none'
-        })
-        jQuery('.resizer_south').each(function (i, obj) {
-          this.orginalResizerNWStyle = obj.style.display
-          obj.style.display = 'none'
-        })
-        jQuery('.resizer_north').each(function (i, obj) {
-          this.orginalResizerNWStyle = obj.style.display
           obj.style.display = 'none'
         })
         this.editorManager.handleEvents({ type: ORYX_CONFIG.EVENT_CANVAS_SCROLL })
         this.fnHandleScrollDebounce()
       },
       fnHandleScrollDebounce: _debounce(function (_type, index, item) {
+        this.editorManager.handleEvents({ type: 'canvas.scrollEnd' })
         // Puts the quick menu items and resizer back when scroll is stopped.
         // this.editorManager.setSelection([])
         // needed cause it checks for element changes and does nothing if the elements are the same
@@ -249,26 +240,12 @@
         this.selectedElements = undefined
         this.subSelectionElements = undefined
 
-        function handleDisplayProperty (obj) {
-          console.log(jQuery(obj).position())
-          if (jQuery(obj).position().top > 0) {
-            obj.style.display = 'block'
-          } else {
-            obj.style.display = 'none'
-          }
-        }
-
-        // jQuery('.Oryx_button').each(function(i, obj) {
-        //   handleDisplayProperty(obj);
-        // });
-        jQuery('.resizer_southeast').each(function (i, obj) {
-          handleDisplayProperty(obj)
-        })
-        jQuery('.resizer_northwest').each(function (i, obj) {
-          handleDisplayProperty(obj)
-        })
-        jQuery('.resizer_south').css('display', 'block')
-        jQuery('.resizer_north').css('display', 'block')
+        // jQuery('.resizer_south').css('display', 'block')
+        // jQuery('.resizer_north').css('display', 'block')
+        // jQuery('.resizer_west').css('display', 'block')
+        // jQuery('.resizer_east').css('display', 'block')
+        // jQuery('.resizer_northwest').css('display', 'block')
+        // jQuery('.resizer_southeast').css('display', 'block')
       }, 200),
       deleteShape () {
         this.editorManager.TOOLBAR_ACTIONS.deleteItem({ '$scope': this, 'editorManager': this.editorManager })
@@ -320,7 +297,6 @@
         // const command = new MorphTo(this.currentSelectedShape, stencil, this.editorManager.getEditor())
         // this.editorManager.executeCommands([command])
         this.editorManager.assignCommand('MorphTo', this.currentSelectedShape, stencil, this.editorManager.getEditor())
-
       },
       dropCallback (event, ui) {
         this.editorManager.handleEvents({

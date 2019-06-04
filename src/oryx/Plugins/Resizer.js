@@ -12,8 +12,6 @@ export default class Resizer {
       ['div', { 'class': 'resizer_' + this.orientation, style: 'left:0px; top:0px;position:absolute;' }])
 
     this.node.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this), true)
-    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUp.bind(this), true)
-    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.handleMouseMove.bind(this), false)
 
     this.dragEnable = false
     this.offSetPosition = { x: 0, y: 0 }
@@ -34,7 +32,6 @@ export default class Resizer {
     // Calculate the Offset
     this.scrollNode = this.node.parentNode.parentNode.parentNode
   }
-
   handleMouseDown (event) {
     this.dragEnable = true
     this.offsetScroll = { x: this.scrollNode.scrollLeft, y: this.scrollNode.scrollTop }
@@ -48,14 +45,20 @@ export default class Resizer {
       value(this.bounds)
     }).bind(this))
 
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUp.bind(this), true)
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.handleMouseMove.bind(this), false)
   }
 
   handleMouseUp (event) {
+    console.log(899)
     this.dragEnable = false
     this.containmentParentNode = null
     this.resizeEndCallbacks.each((function (value) {
       value(this.bounds)
     }).bind(this))
+
+    // document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUp, true)
+    // document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.handleMouseMove, false)
   }
 
   handleMouseMove (event) {
@@ -273,7 +276,7 @@ export default class Resizer {
     if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
       let ua = navigator.userAgent
       if (ua.indexOf('MSIE') >= 0) {
-        //IE 10 and below
+        // IE 10 and below
         let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
         if (zoom !== 100) {
           additionalIEZoom = zoom / 100
@@ -308,20 +311,25 @@ export default class Resizer {
         upL.y += (a.d * this.bounds.height()) + 3
         break
       case 'north':
-        upL.x = 0
-        upL.y -= 3
+        // upL.x = 0
+        upL.y -= 5
+        this.node.style.width = this.bounds.width() + 'px'
         break
       case 'south':
-        upL.x = 0
-        upL.y += (a.d * this.bounds.height()) - 3
+        // upL.x = 0
+        upL.y += (a.d * this.bounds.height()) - 5
+        this.node.style.width = this.bounds.width() + 'px'
         break
       case 'west':
-        upL.x -= 3
-        upL.y = 0
+        upL.x -= 5
+        // upL.y = 0
+        this.node.style.height = this.bounds.height() + 'px'
         break
       case 'east':
-        upL.x += (a.a * this.bounds.width()) - 3
-        upL.y = 0
+        upL.x += (a.a * this.bounds.width()) - 5
+        // upL.y = 0
+        this.node.style.height = this.bounds.height() + 'px'
+
         break
     }
 

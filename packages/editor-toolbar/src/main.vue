@@ -55,7 +55,8 @@
     mixins: [Locale, Emitter],
     props: {
       editor: {},
-      editorManager: {}
+      editorManager: {},
+      interceptorsDraw: Function
     },
     computed: {
       items () {
@@ -88,22 +89,36 @@
           // 用户自定义按钮事件，以$emit抛出 buttonClicked.action 事件
           this.dispatch('flowEditor', buttonClicked.action, this.editorManager, true)
         } else if (buttonClicked.actionType === 'internal') {
-          // 插件预设事件
-          // Default behaviour
-          let services = {
-            '$scope': this,
-            '$rootScope': this.$parent,
-            'editorManager': this.editorManager
+          this.buttonClicked = buttonClicked
+          // 判断是否有事件拦截器
+          if (buttonClicked.interceptors && typeof this.interceptorsDraw === 'function') {
+            this.interceptorsDraw(this.doBtnActionAndBubble, buttonClicked.interceptorsType)
+          } else {
+            this.doBtnActionAndBubble()
           }
-          this.executeFunctionByName(buttonClicked.action, services)
-
-          // Other events
-          let event = {
-            type: ORYX_CONFIG.EVENT_TYPE_TOOLBAR_BUTTON_CLICKED,
-            toolbarItem: buttonClicked
-          }
-          this.editorManager.dispatchFlowEvent(event.type, event)
         }
+      },
+      doBtnAction () {
+        console.log(66, this.buttonClicked)
+        // 插件预设事件
+        // Default behaviour
+        let services = {
+          '$scope': this,
+          '$rootScope': this.$parent,
+          'editorManager': this.editorManager
+        }
+        console.log(55, services, this.buttonClicked.action)
+
+        this.executeFunctionByName(this.buttonClicked.action, services)
+      },
+      doBtnActionAndBubble () {
+        this.doBtnAction()
+        // Other events
+        let event = {
+          type: ORYX_CONFIG.EVENT_TYPE_TOOLBAR_BUTTON_CLICKED,
+          toolbarItem: this.buttonClicked
+        }
+        this.editorManager.dispatchFlowEvent(event.type, event)
       },
       toolbarSecondaryButtonClicked (buttonIndex) {
         let buttonClicked = this.secondaryItems[buttonIndex]
@@ -134,8 +149,14 @@
         })
 
         Mousetrap.bind('mod+v', () => {
-          const services = { '$scope': this, 'editorManager': this.editorManager }
-          this.editorManager.TOOLBAR_ACTIONS.paste(services)
+          this.buttonClicked = {
+            action:  'FLOWABLE.TOOLBAR.ACTIONS.paste'
+          }
+          if (typeof this.interceptorsDraw === 'function') {
+            this.interceptorsDraw(this.doBtnAction, 'paste')
+          } else {
+            this.doBtnAction()
+          }
           return false
         })
 

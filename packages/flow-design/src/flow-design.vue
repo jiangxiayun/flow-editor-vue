@@ -1,7 +1,7 @@
 <template>
   <div id="editor-main-wrapper" class="editor-main-wrapper" :style="{height: wrapperHeight}">
     <!--头部操作按钮-->
-    <toolbar :editor="editor" :editorManager="editorManager"></toolbar>
+    <toolbar :interceptors-draw="interceptorsDraw" :editor="editor" :editorManager="editorManager"></toolbar>
     <div class="flow-content-box">
       <slot name="paletteWrapper" v-bind:editorManager="editorManager">
         <paletteWrapper :editorManager="editorManager"></paletteWrapper>
@@ -45,7 +45,8 @@
       config: {
         type: Object
       },
-      contextmenuList: Array
+      contextmenuList: Array,
+      interceptorsDraw: Function
     },
     components: { toolbar, paletteWrapper, canvasWrapper, propertySection },
     created () {

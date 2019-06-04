@@ -136,7 +136,7 @@ const ACTIONS = {
     this._getOryxEditPlugin(services).editCut()
     for (let i = 0; i < services.$scope.items.length; i++) {
       let item = services.$scope.items[i]
-      if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste') {
+      if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste' || item.optionType === 'paste') {
         item.enabled = true
       }
     }
@@ -145,7 +145,7 @@ const ACTIONS = {
     this._getOryxEditPlugin(services).editCopy()
     for (let i = 0; i < services.$scope.items.length; i++) {
       let item = services.$scope.items[i]
-      if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste') {
+      if (item.action === 'FLOWABLE.TOOLBAR.ACTIONS.paste' || item.optionType === 'paste') {
         item.enabled = true
       }
     }

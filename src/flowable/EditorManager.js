@@ -916,6 +916,8 @@ export default class EditorManager {
         flow_add_btns.style.top = quickButtonY + 'px'
         hide_flow_add_btns = false
       }
+
+      // this.updateResizerPosition(shapeXY, bounds)
       FLOW_eventBus.dispatch(ORYX.CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, [
         { type: 'hide_shape_buttons', status: false },
         { type: 'hide_flow_add_btns', status: hide_flow_add_btns },
@@ -923,6 +925,28 @@ export default class EditorManager {
         { type: 'hide_edit_buttons', status: hide_edit_buttons },
       ])
     }
+  }
+  updateResizerPosition(point, bounds) {
+    let width = bounds.width()
+    let height = bounds.height()
+    let resizer_southeast = document.getElementsByClassName('resizer_southeast')[0]
+    resizer_southeast.style.left = point.x + width + 3 + 'px'
+    resizer_southeast.style.top = point.y + height + 3+ 'px'
+    let resizer_northwest = document.getElementsByClassName('resizer_northwest')[0]
+    resizer_northwest.style.left = point.x -13 + 'px'
+    resizer_northwest.style.top = point.y - 13 + 'px'
+    let resizer_south = document.getElementsByClassName('resizer_south')[0]
+    resizer_south.style.left = point.x + 'px'
+    resizer_south.style.top = point.y + height + 5 + 'px'
+    let resizer_north = document.getElementsByClassName('resizer_north')[0]
+    resizer_north.style.left = point.x + 'px'
+    resizer_north.style.top = point.y - 5 + 'px'
+    let resizer_west = document.getElementsByClassName('resizer_west')[0]
+    resizer_west.style.left = point.x - 5 + 'px'
+    resizer_west.style.top = point.y + 'px'
+    let resizer_east = document.getElementsByClassName('resizer_east')[0]
+    resizer_east.style.left = point.x + width + 5 + 'px'
+    resizer_east.style.top = point.y + 'px'
   }
   updateToolbarButtonStatus (elements) {
     for (let i = 0; i < this.toolbarItems.length; i++) {

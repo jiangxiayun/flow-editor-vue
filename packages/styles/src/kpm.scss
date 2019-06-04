@@ -513,35 +513,37 @@ text * {
   background-position: -2px -2px;
 }
 
+$pool_resizer_color: #57b908;
+
 .resizer_south {
   width: 100%;
-  height: 6px;
-  border-top: 1px solid #5581b9;
-  border-bottom: 1px solid #5581b9;
+  height: 10px;
+  border-top: 1px solid $pool_resizer_color;
+  border-bottom: 1px solid $pool_resizer_color;
   cursor: s-resize;
 }
 
 .resizer_north {
   width: 100%;
-  height: 6px;
-  border-bottom: 1px solid #5581b9;
-  border-top: 1px solid #5581b9;
+  height: 10px;
+  border-bottom: 1px solid $pool_resizer_color;
+  border-top: 1px solid $pool_resizer_color;
   cursor: n-resize;
 }
 
 .resizer_east {
   height: 100%;
-  width: 6px;
-  border-left: 1px solid #5581b9;
-  border-right: 1px solid #5581b9;
+  width: 10px;
+  border-left: 1px solid $pool_resizer_color;
+  border-right: 1px solid $pool_resizer_color;
   cursor: e-resize;
 }
 
 .resizer_west {
   height: 100%;
-  width: 6px;
-  border-left: 1px solid #5581b9;
-  border-right: 1px solid #5581b9;
+  width: 10px;
+  border-left: 1px solid $pool_resizer_color;
+  border-right: 1px solid $pool_resizer_color;
   cursor: w-resize;
 }
 

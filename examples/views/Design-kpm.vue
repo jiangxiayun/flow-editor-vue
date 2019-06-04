@@ -2,6 +2,9 @@
   <div>
     <flowEditor ref="flowEditor"
                 :config="config"
+                @btn-save-click="handleSaveBtn"
+                @btn-paste-click="handlePasteBtn"
+                :interceptors-draw="handlePasteBtn"
                 :contextmenuList="contextmenuList"
                 @oncontextmenu="handleContextmenu"
                 @clickContextmenuCommand="handleContextmenuCommand">
@@ -28,14 +31,64 @@
       </template>
     </flowEditor>
 
+    <el-dialog
+        title="保存模型"
+        :visible="saveVisible"
+        append-to-body
+        @close="close"
+        width="60%">
+      <div class="modal-body">
+        <div v-if="saveDialog.errorMessage && saveDialog.errorMessage.length > 0" class="alert error"
+             style="font-size: 14px; margin-top:20px">
+          <div class="popup-error" style="font-size: 14px">
+            <span class="glyphicon glyphicon-remove-circle"></span>
+            <span>{{saveDialog.errorMessage}}</span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="nameField">名称</label>
+          <input type="text"
+                 :disabled="saveLoading || (error && error.conflictResolveAction == 'saveAs')"
+                 id="nameField"
+                 class="form-control"
+                 v-model.trim="saveDialog.name"/>
+        </div>
+        <div class="form-group">
+          <label for="keyField">Key</label>
+          <input type="text"
+                 :disabled="saveLoading || (error && error.conflictResolveAction == 'saveAs')"
+                 id="keyField"
+                 class="form-control"
+                 v-model.trim="saveDialog.key"/>
+        </div>
+        <div class="form-group">
+          <label for="docTextArea">描述</label>
+          <textarea id="docTextArea" :disabled="saveLoading" class="form-control"
+                    v-model="saveDialog.description"></textarea>
+        </div>
+
+      </div>
+
+      <span slot="footer" class="dialog-footer">
+        <div>
+          <el-button @click="close" :disabled="saveLoading">取消</el-button>
+          <el-button type="primary" @click="save"
+                     :disabled="saveLoading || saveDialog.name.length === 0 || saveDialog.key.length === 0">
+            保存
+          </el-button>
+        </div>
+
+  </span>
+    </el-dialog>
+
     <!--节点属性编辑弹窗-->
     <el-dialog
         :title="writeDialog.title"
         :visible.sync="writeDialog.visible"
         :close-on-click-modal="false"
         width="90%"
-        :before-close="handlepropertyWriteClose">.paletteHelpWrapper
-      {{selectedItem.properties}}
+        :before-close="handlepropertyWriteClose">
+      {{selectedItem}}
       <component v-bind:is="writeDialog.componentTemplate"
                  :key="writeDialog.properties"
                  :property="selectedItem.properties"
@@ -50,6 +103,7 @@
   import propertySection from './propertySection'
   import { AA } from '@/mock/stencilData-kpm.js'
   import { mockData } from '@/mock/mockData.js'
+  import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
   import configure from './initConfig'
   import EndFlowPlugin from './customPlugin'
   import refActivity from '@/components/flow/ref_task'
@@ -124,6 +178,7 @@
               { name: 'Plugins.Save' },
               { name: 'Plugins.View' },
               { name: 'Plugins.DragDropResize' },
+              { name: 'Plugins.PoolResize' },
               { name: 'Plugins.HighlightingSelectedShapes' },
               { name: 'Plugins.DragDocker' },
               { name: 'Plugins.AddDocker' },
@@ -148,7 +203,20 @@
         writeDialog: {
           visible: false,
           componentTemplate: null
-        }
+        },
+        saveVisible: false,
+        saveDialog: {
+          name: mockData.name,
+          key: mockData.key,
+          errorMessage: [],
+          description: mockData.description,
+          newVersion: false,
+          comment: '',
+          user: mockData.lastUpdatedBy,
+          lastUpdatedData: mockData.lastUpdated
+        },
+        saveLoading: false,
+        error: null
       }
     },
     components: { propertySection, refActivity, activityTabsEdit },
@@ -158,8 +226,140 @@
         return this.editorManager ? this.editorManager.getModel() : { properties: {} }
       }
     },
-    mounted () {},
+    mounted () {
+      FLOW_eventBus.addListener('event-type-selection-changed', (event) => {
+        if (this.currentShapeMode !== 'write') {
+          this.selectedItem = event.selectedItem
+          this.selectedShape = event.selectedShape
+        }
+      })
+    },
     methods: {
+      handleSaveBtn (editor) {
+        this.saveVisible = true
+        this.editorManager = editor
+      },
+      save () {
+        this.saveLoading = true
+
+        let json = this.editorManager.getModel()
+        console.log(json)
+
+        // let params = {
+        //   modeltype: this.mockData.model.modelType,
+        //   json_xml: JSON.stringify(json),
+        //   name: this.saveDialog.name,
+        //   key: this.saveDialog.key,
+        //   description: this.saveDialog.description,
+        //   newversion: this.saveDialog.newVersion,
+        //   comment: this.saveDialog.comment
+        //   lastUpdated: this.modelMetaData.lastUpdated
+        // }
+
+        let params = {
+          modelId: '6609363a-3be5-11e9-afe0-82ad27eff10d',
+          name: '请假模型',
+          key: 'leave-model',
+          description: '请假模型',
+          lastUpdated: '2019-04-04T05:49:37.132+0000',
+          lastUpdatedBy: 'admin',
+          model: json
+        }
+
+        localStorage.setItem('flowSaveData', JSON.stringify(params))
+        // Fire event to all who is listening
+        // const saveEvent = {
+        //   type: FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED,
+        //   model: params,
+        //   modelId: this.modelMetaData.modelId,
+        //   eventType: 'update-model'
+        // }
+        // FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED, saveEvent)
+        this.saveLoading = false
+        // Update
+        console.log('$http', params)
+        // $http({
+        //   method: 'POST',
+        //   data: params,
+        //   ignoreErrors: true,
+        //   headers: {
+        //     'Accept': 'application/json',
+        //     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+        //   },
+        //   transformRequest: function (obj) {
+        //     var str = []
+        //     for (var p in obj) {
+        //       str.push(encodeURIComponent(p) + '=' + encodeURIComponent(obj[p]))
+        //     }
+        //     return str.join('&')
+        //   },
+        //   url: FLOWABLE.URL.putModel(this.modelMetaData.modelId)
+        // })
+        //   .success(function (data, status, headers, config) {
+        //     this.editorManager.handleEvents({
+        //       type: ORYX_CONFIG.EVENT_SAVED
+        //     })
+        //     this.modelData.name = this.saveDialog.name
+        //     this.modelData.key = this.saveDialog.key
+        //     this.modelData.lastUpdated = data.lastUpdated
+        //
+        //     this.status.loading = false
+        //     this.$hide()
+        //
+        //     // Fire event to all who is listening
+        //     var saveEvent = {
+        //       type: FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED,
+        //       model: params,
+        //       modelId: this.modelMetaData.modelId,
+        //       eventType: 'update-model'
+        //     }
+        //     FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_MODEL_SAVED, saveEvent)
+        //
+        //     // Reset state
+        //     this.error = undefined
+        //     this.status.loading = false
+        //
+        //     // Execute any callback
+        //     if (successCallback) {
+        //       successCallback()
+        //     }
+        //
+        //   })
+        //   .error(function (data, status, headers, config) {
+        //     if (status == 409) {
+        //       this.error = {}
+        //       this.error.isConflict = true
+        //       this.error.userFullName = data.customData.userFullName
+        //       this.error.isNewVersionAllowed = data.customData.newVersionAllowed
+        //       this.error.saveAs = this.modelMetaData.name + '_2'
+        //     } else {
+        //       this.error = undefined
+        //       this.saveDialog.errorMessage = data.message
+        //     }
+        //     this.status.loading = false
+        //   })
+      },
+      close () {
+        this.saveVisible = false
+      },
+      // handlePasteBtn (editor) {
+      //   console.log(8888)
+      //   // this.editorManager = editor
+      //   // let shapes = this.editorManager.getSelectedShape()
+      //   // console.log(112, shapes)
+      //
+      // },
+      handlePasteBtn(done, type) {
+        if (type === 'paste') {
+          this.$confirm('此操作将复制属性并创建新的活动主数据，确定创建吗？')
+            .then(_ => {
+              done()
+            })
+            .catch(_ => {})
+        } else {
+          done()
+        }
+      },
       stateEditorManager (editor) {
         this.editorManager = editor
       },
@@ -187,6 +387,49 @@
             componentTemplate: params.action.componentTemplate
           }
         }
+      },
+      // 切换元素类型
+      handleCommand () {
+        let morphShapes = []
+        const morphRoles = this.editorManager.morphRoles
+        console.log('morphRoles', morphRoles)
+        console.log('morphRoles', this.selectedShape.morphRole)
+        let currentSelectedShapeId = this.selectedShape.getStencil().idWithoutNs()
+        let stencilItem = this.editorManager.getStencilItemById(currentSelectedShapeId)
+
+        for (let i = 0; i < morphRoles.length; i++) {
+          if (morphRoles[i].role === stencilItem.morphRole) {
+            let ary = morphRoles[i].morphOptions.slice()
+            console.log('ary', ary)
+            for (let y = 0; y < ary.length; y++) {
+              if (ary[y].id === 'UserTask') {
+                morphShapes.push(ary[y])
+                break
+              }
+            }
+          }
+        }
+        let item = morphShapes[0]
+        console.log('item', morphShapes)
+
+        let stencil = undefined
+        const stencilSets = this.editorManager.getStencilSets().values()
+        const stencilId = item.genericTaskId || item.id
+
+        for (let i = 0; i < stencilSets.length; i++) {
+          let stencilSet = stencilSets[i]
+          let nodes = stencilSet.nodes()
+          for (let j = 0; j < nodes.length; j++) {
+            if (nodes[j].idWithoutNs() === stencilId) {
+              stencil = nodes[j]
+              break
+            }
+          }
+        }
+
+        if (!stencil) return
+        this.editorManager.assignCommand('MorphTo', this.selectedShape, stencil, this.editorManager.getEditor())
+        this.writeDialog.visible = false
       },
       propertyWriteSave () {
         this.writeDialog.visible = false
@@ -277,13 +520,17 @@
               componentTemplate: 'activityTabsEdit'
             }
             break
-          // 引用活动
+          // 返回引用活动
           case 'goToRefTask':
             this.writeDialog = {
               visible: true,
               title: '引用活动',
               componentTemplate: 'refActivity'
             }
+            break
+          // 引用某个具体活动
+          case 'refOneTask':
+            this.handleCommand()
             break
         }
       }

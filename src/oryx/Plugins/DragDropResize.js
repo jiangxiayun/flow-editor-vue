@@ -14,6 +14,7 @@ import ORYX_Utils from '../Utils'
 
 export default class DragDropResize extends AbstractPlugin {
   UI_CONFIG = ORYX_Config.CustomConfigs.UI_CONFIG
+
   /**
    *  @param {Object} Facade: The Facade of the Editor
    */
@@ -65,23 +66,6 @@ export default class DragDropResize extends AbstractPlugin {
     this.resizerNW.registerOnResizeEnd(this.onResizeEnd.bind(this)) // register the resize end callback
     this.resizerNW.registerOnResizeStart(this.onResizeStart.bind(this)) // register the resize start callback
 
-    this.resizerSouth = new Resizer(containerNode, 'south', this.facade)
-    this.resizerSouth.registerOnResize(this.onResize.bind(this))
-    this.resizerSouth.registerOnResizeEnd(this.onResizeEnd.bind(this))
-    this.resizerSouth.registerOnResizeStart(this.onResizeStart.bind(this))
-    this.resizerNorth = new Resizer(containerNode, 'north', this.facade)
-    this.resizerNorth.registerOnResize(this.onResize.bind(this))
-    this.resizerNorth.registerOnResizeEnd(this.onResizeEnd.bind(this))
-    this.resizerNorth.registerOnResizeStart(this.onResizeStart.bind(this))
-    this.resizerEast = new Resizer(containerNode, 'east', this.facade)
-    this.resizerEast.registerOnResize(this.onResize.bind(this))
-    this.resizerEast.registerOnResizeEnd(this.onResizeEnd.bind(this))
-    this.resizerEast.registerOnResizeStart(this.onResizeStart.bind(this))
-    this.resizerWest = new Resizer(containerNode, 'west', this.facade)
-    this.resizerWest.registerOnResize(this.onResize.bind(this))
-    this.resizerWest.registerOnResizeEnd(this.onResizeEnd.bind(this))
-    this.resizerWest.registerOnResizeStart(this.onResizeStart.bind(this))
-
     // For the Drag and Drop
     // Register on MouseDown-Event on a Shape
     this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this))
@@ -98,13 +82,9 @@ export default class DragDropResize extends AbstractPlugin {
     this.dragIntialized = false
     this.resizerSE.hide()
     this.resizerNW.hide()
-    this.resizerSouth.hide()
-    this.resizerNorth.hide()
-    this.resizerEast.hide()
-    this.resizerWest.hide()
 
     // If there is no elements
-    if (!elements || elements.length == 0) {
+    if (!elements || elements.length === 0) {
       // Hide all things and reset all variables
       this.selectedRect.hide()
       this.currentShapes = []
@@ -186,7 +166,7 @@ export default class DragDropResize extends AbstractPlugin {
       let elementInLane = []
       this.toMoveShapes.map((shape) => {
         if (shape instanceof ORYX_Node) {
-          let box = {a: {}, b: {}}
+          let box = { a: {}, b: {} }
           if (shape.getStencil().idWithoutNs() === 'Pool') {
             box = shape.bounds.clone()
             box.a.x += 30
@@ -215,33 +195,13 @@ export default class DragDropResize extends AbstractPlugin {
       if (elements.length === 1 && elements[0].isResizable) {
         let aspectRatio = elements[0].getStencil().fixedAspectRatio() ?
           elements[0].bounds.width() / elements[0].bounds.height() : undefined
-        let id = elements[0].getStencil().idWithoutNs()
-        // .getStencil().stencilSet().namespace()
-        if (id === 'Pool' || id === 'Lane') {
-          this.resizerSouth.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          // this.resizerSouth.setFullLineBounds(this.dragBounds)
-          this.resizerSouth.show()
-          this.resizerNorth.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          // this.resizerNorth.setFullLineBounds(this.dragBounds)
-          this.resizerNorth.show()
-        } else if (id === 'V-Pool' || id === 'V-Lane') {
-          this.resizerEast.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          this.resizerEast.show()
-          this.resizerWest.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          this.resizerWest.show()
-        } else {
-          // this.resizerSE.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          // this.resizerSE.show()
-          // this.resizerNW.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
-          // this.resizerNW.show()
-        }
+        this.resizerSE.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
+        this.resizerSE.show()
+        this.resizerNW.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
+        this.resizerNW.show()
       } else {
         this.resizerSE.setBounds(undefined)
         this.resizerNW.setBounds(undefined)
-        this.resizerSouth.setBounds(undefined)
-        this.resizerNorth.setBounds(undefined)
-        this.resizerEast.setBounds(undefined)
-        this.resizerWest.setBounds(undefined)
       }
 
       // If Snap-To-Grid is enabled, the Snap-Point will be calculate
@@ -358,10 +318,6 @@ export default class DragDropResize extends AbstractPlugin {
       // And hide the resizers and the highlighting
       this.resizerSE.hide()
       this.resizerNW.hide()
-      this.resizerSouth.hide()
-      this.resizerNorth.hide()
-      this.resizerEast.hide()
-      this.resizerWest.hide()
 
       // if only edges are selected, containmentParentNode must be the canvas
       this._onlyEdges = this.currentShapes.all(function (currentShape) {
@@ -431,7 +387,7 @@ export default class DragDropResize extends AbstractPlugin {
       this.toMoveShapes[0].dockers.length > 0
     // console.log(233, checkIfAttachable, underlyingNodes, this._currentUnderlyingNodes)
 
-    checkIfAttachable = checkIfAttachable && underlyingNodes.length != 1
+    checkIfAttachable = checkIfAttachable && underlyingNodes.length !== 1
 
     if (!checkIfAttachable &&
       underlyingNodes.length === this._currentUnderlyingNodes.length &&
@@ -501,6 +457,7 @@ export default class DragDropResize extends AbstractPlugin {
     // Event.stop(event);
     return
   }
+
   /**
    * On Key Mouse Up
    */
@@ -534,7 +491,7 @@ export default class DragDropResize extends AbstractPlugin {
 
 
           // Command-Pattern for dragging several Shapes
-          class dockCommand extends ORYX_Command{
+          class dockCommand extends ORYX_Command {
             constructor (docker, position, newDockedShape, facade) {
               super()
               this.docker = docker
@@ -550,14 +507,17 @@ export default class DragDropResize extends AbstractPlugin {
                 this.oldPosition = docker.parent.absoluteBounds().center()
               }
             }
-            execute() {
+
+            execute () {
               this.dock(this.newDockedShape, this.newParent, this.newPosition)
               // Raise Event for having the docked shape on top of the other shape
               this.facade.raiseEvent({ type: ORYX_Config.EVENT_ARRANGEMENT_TOP, excludeCommand: true })
             }
+
             rollback () {
               this.dock(this.oldDockedShape, this.oldParent, this.oldPosition)
             }
+
             dock (toDockShape, parent, pos) {
               // Add to the same parent Shape
               parent.add(this.docker.parent)
@@ -572,6 +532,7 @@ export default class DragDropResize extends AbstractPlugin {
               this.facade.updateSelection()
             }
           }
+
           // Instanziate the dockCommand
           const commands = [new dockCommand(docker, position, this.containmentParentNode, this.facade)]
           this.facade.executeCommands(commands)
@@ -631,6 +592,7 @@ export default class DragDropResize extends AbstractPlugin {
 
     return elements
   }
+
   /**
    *  Checks the containment and connection rules for the selected shapes.
    */
@@ -646,14 +608,14 @@ export default class DragDropResize extends AbstractPlugin {
     this.containmentParentNode = underlyingNodes.reverse().find((function (node) {
       if (node instanceof ORYX_Canvas) {
         return true
-      } else if (((node instanceof ORYX_Node) || ((node instanceof ORYX_Edge) && !noEdges))){
+      } else if (((node instanceof ORYX_Node) || ((node instanceof ORYX_Edge) && !noEdges))) {
         // 要求鼠标位置下的元素不在选中元素内
         if (this.currentShapes.member(node)) {
           return false
         }
         // 要求鼠标位置下的子元素不在选中元素内
         if (this.currentShapes.any((shape) => {
-          return (shape.children.length > 0 && shape.getChildNodes(true).member(node));
+          return (shape.children.length > 0 && shape.getChildNodes(true).member(node))
         })) {
           return false
         }
@@ -771,7 +733,7 @@ export default class DragDropResize extends AbstractPlugin {
 
     // If Resizing finished, the Shapes will be resize
     if (this.isResizing) {
-      class commandClass extends ORYX_Command{
+      class commandClass extends ORYX_Command {
         constructor (shape, newBounds, plugin) {
           super()
           this.shape = shape
@@ -779,15 +741,18 @@ export default class DragDropResize extends AbstractPlugin {
           this.newBounds = newBounds
           this.plugin = plugin
         }
+
         execute () {
           this.shape.bounds.set(this.newBounds.a, this.newBounds.b)
           this.update(this.getOffset(this.oldBounds, this.newBounds))
         }
+
         rollback () {
           this.shape.bounds.set(this.oldBounds.a, this.oldBounds.b)
           this.update(this.getOffset(this.newBounds, this.oldBounds))
         }
-        getOffset(b1, b2) {
+
+        getOffset (b1, b2) {
           return {
             x: b2.a.x - b1.a.x,
             y: b2.a.y - b1.a.y,
@@ -795,6 +760,7 @@ export default class DragDropResize extends AbstractPlugin {
             ys: b2.height() / b1.height()
           }
         }
+
         update (offset) {
           this.shape.getLabels().each(function (label) {
             label.changed()
@@ -834,7 +800,7 @@ export default class DragDropResize extends AbstractPlugin {
    * Prepare the Dragging
    */
   beforeDrag () {
-    class undockEdgeCommand extends ORYX_Command{
+    class undockEdgeCommand extends ORYX_Command {
       constructor (moveShapes) {
         super()
         this.dockers = moveShapes.collect(function (shape) {
@@ -845,11 +811,13 @@ export default class DragDropResize extends AbstractPlugin {
           } : undefined
         }).compact()
       }
+
       execute () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(undefined)
         })
       }
+
       rollback () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(el.dockedShape)

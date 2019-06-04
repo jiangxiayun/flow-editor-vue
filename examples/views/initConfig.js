@@ -44,6 +44,11 @@ const FLOWABLE = {
         cssClass: 'editor-icon editor-icon-paste',
         actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.paste',
+        // actionType: 'custom-defined',
+        // action: 'btn-paste-click',
+        optionType: 'paste',
+        interceptors: true,
+        interceptorsType: 'paste',
         enabled: false
       },
       {

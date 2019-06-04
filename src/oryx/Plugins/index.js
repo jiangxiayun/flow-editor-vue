@@ -10,6 +10,7 @@ import ProcessLink from './ProcessLink'
 import Save from './Save'
 import SelectedRect from './SelectedRect'
 import DragDropResize from './DragDropResize'
+import PoolResize from './PoolResize'
 import GridLine from './GridLine'
 import ShapeHighlighting from './ShapeHighlighting'
 import HighlightingSelectedShapes from './HighlightingSelectedShapes'
@@ -39,6 +40,7 @@ const Plugins = {
   Save: Save,
   SelectedRect: SelectedRect,
   DragDropResize: DragDropResize,
+  PoolResize: PoolResize,
   GridLine: GridLine,
   ShapeHighlighting: ShapeHighlighting,
   HighlightingSelectedShapes: HighlightingSelectedShapes,

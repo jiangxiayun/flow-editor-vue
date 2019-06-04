@@ -95,7 +95,7 @@ class DeleteCommand extends Command {
 }
 
 export default class Edit {
-  ClipBoard = ClipBoard
+  // ClipBoard = ClipBoard
   DeleteCommand = DeleteCommand
   UI_CONFIG = ORYX_Config.CustomConfigs.UI_CONFIG
 
@@ -115,7 +115,7 @@ export default class Edit {
 
   constructor (facade) {
     this.facade = facade
-    this.clipboard = new this.ClipBoard()
+    this.clipboard = new ClipBoard()
 
     // this.facade.registerOnEvent(ORYX.CONFIG.EVENT_KEYDOWN, this.keyHandler.bind(this));
 
@@ -502,8 +502,8 @@ export default class Edit {
     var selection = this.facade.getSelection()
 
     if (selection.length > 0) {
-      //only update the command stack if something was performed...
-      let clipboard = new this.ClipBoard()
+      // only update the command stack if something was performed...
+      let clipboard = new ClipBoard()
       clipboard.refresh(selection, this.getAllShapesToConsider(selection))
 
       const command = new this.DeleteCommand(clipboard, this.facade)
