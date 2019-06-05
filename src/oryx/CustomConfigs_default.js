@@ -36,7 +36,9 @@ const DEFAULT_CONFIG = {
     HOR_LANE_TITLE_WIDTH: 110,
     HOR_LANE_INIT_HEIGHT: 250,
     HOR_LANE_MINSIZE: 65,
-    VER_LANE_MINSIZE: 110
+    VER_LANE_MINSIZE: 110,
+
+    canNodesResize: true // 节点是否可缩放
 
   },
   HEADER_CONFIG: {

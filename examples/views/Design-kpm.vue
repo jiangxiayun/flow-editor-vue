@@ -178,6 +178,7 @@
               { name: 'Plugins.Save' },
               { name: 'Plugins.View' },
               { name: 'Plugins.DragDropResize' },
+              { name: 'Plugins.NodesResize' },
               { name: 'Plugins.PoolResize' },
               { name: 'Plugins.HighlightingSelectedShapes' },
               { name: 'Plugins.DragDocker' },

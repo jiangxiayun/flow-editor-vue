@@ -192,7 +192,7 @@ export default class DragDropResize extends AbstractPlugin {
       this.selectedRect.show()
 
       // Show the resize button, if there is only one element and this is resizeable
-      if (elements.length === 1 && elements[0].isResizable) {
+      if (elements.length === 1 && elements[0].isResizable && this.UI_CONFIG.canNodesResize) {
         let aspectRatio = elements[0].getStencil().fixedAspectRatio() ?
           elements[0].bounds.width() / elements[0].bounds.height() : undefined
         this.resizerSE.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
