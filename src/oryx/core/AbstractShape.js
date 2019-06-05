@@ -34,7 +34,8 @@ export default class AbstractShape extends UIObject {
 
     // Initialization of property map and initial value.
     this._stencil.properties().each((function (property) {
-      let key = property.prefix() + '-' + property.id()
+      // let key = property.prefix() + '-' + property.id()
+      let key = property.id()
       this.properties.set(key, property.value())
       this.propertiesChanged.set(key, true)
     }).bind(this))
@@ -42,7 +43,8 @@ export default class AbstractShape extends UIObject {
     // if super stencil was defined, also regard stencil's properties:
     if (stencil._jsonStencil.superId) {
       stencil.properties().each((function (property) {
-        let key = property.prefix() + '-' + property.id()
+        // let key = property.prefix() + '-' + property.id()
+        let key =property.id()
         let value = property.value()
         let oldValue = this.properties.get(key)
         this.properties.set(key, value)
@@ -221,7 +223,7 @@ export default class AbstractShape extends UIObject {
 
   /**
    *
-   * @param key {String} Must be 'prefix-id' of property
+   * @param key {String} Must be 'id' of property
    * @param value {Object} Can be of type String or Number according to property type.
    */
   setProperty (key, value, force) {
@@ -262,7 +264,6 @@ export default class AbstractShape extends UIObject {
 
   /**
    *
-   * @param {String} Must be 'prefix-id' of property
    * @param {Object} Can be of type String or Number according to property type.
    */
   setHiddenProperty (key, value) {
@@ -317,7 +318,8 @@ export default class AbstractShape extends UIObject {
       serializedObject.push({
         name: name,
         prefix: prefix,
-        value: this.properties.get(prefix + '-' + name),
+        // value: this.properties.get(prefix + '-' + name),
+        value: this.properties.get(name),
         type: 'literal'
       })
 
@@ -332,8 +334,10 @@ export default class AbstractShape extends UIObject {
 
     // Sort properties so that the hidden properties are first in the list
     serialize = serialize.sort(function (a, b) {
-      a = Number(this.properties.keys().member(a.prefix + '-' + a.name))
-      b = Number(this.properties.keys().member(b.prefix + '-' + b.name))
+      // a = Number(this.properties.keys().member(a.prefix + '-' + a.name))
+      // b = Number(this.properties.keys().member(b.prefix + '-' + b.name))
+      a = Number(this.properties.keys().member(a.name))
+      b = Number(this.properties.keys().member(b.name))
       return a > b ? 1 : (a < b ? -1 : 0)
     }.bind(this))
 
@@ -345,7 +349,8 @@ export default class AbstractShape extends UIObject {
       // Complex properties can be real json objects, encode them to a string
       if (Object.prototype.toString.call(value) === 'Object') value = JSON.stringify(value)
 
-      switch (prefix + '-' + name) {
+      // switch (prefix + '-' + name) {
+      switch (name) {
         case 'raziel-parent':
           // Set parent
           if (!this.parent) {
@@ -359,7 +364,8 @@ export default class AbstractShape extends UIObject {
           break
         default:
           // If list, eval as an array
-          let prop = this.getStencil().property(prefix + '-' + name)
+          // let prop = this.getStencil().property(prefix + '-' + name)
+          let prop = this.getStencil().property(name)
           if (prop && prop.isList() && typeof value === 'string') {
             if ((value || '').strip() && !value.startsWith('[') && !value.startsWith(']'))
               value = '["' + value.strip() + '"]'
@@ -367,10 +373,13 @@ export default class AbstractShape extends UIObject {
           }
 
           // Set property
-          if (this.properties.keys().member(prefix + '-' + name)) {
-            this.setProperty(prefix + '-' + name, value)
+          // if (this.properties.keys().member(prefix + '-' + name)) {
+          if (this.properties.keys().member(name)) {
+            // this.setProperty(prefix + '-' + name, value)
+            this.setProperty(name, value)
           } else if (!(name === 'bounds' || name === 'parent' || name === 'target' || name === 'dockers' || name === 'docker' || name === 'outgoing' || name === 'incoming')) {
-            this.setHiddenProperty(prefix + '-' + name, value)
+            // this.setHiddenProperty(prefix + '-' + name, value)
+            this.setHiddenProperty(name, value)
           }
 
       }

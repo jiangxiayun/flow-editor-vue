@@ -513,8 +513,7 @@ export default class Label {
         }
 
         if (this.node.ownerDocument) {
-          // Only reset the tspans if the text
-          // has changed or has to be wrapped
+          // Only reset the tspans if the text has changed or has to be wrapped
           if (this.fitToElemId || this._textHasChanged) {
             this.node.textContent = '' // Remove content
             textLines.each((function (textLine, index) {
@@ -598,18 +597,18 @@ export default class Label {
                 newtspan.setAttributeNS(null, 'x', this.invisibleRenderPoint)
                 newtspan.setAttributeNS(null, 'y', this.invisibleRenderPoint)
 
-                //insert tspan to text node
-                //this.node.insertBefore(newtspan, tspan);
+                // insert tspan to text node
+                // this.node.insertBefore(newtspan, tspan);
                 newtspans.push(newtspan)
                 startIndex = lastSeperatorIndex
               } else {
                 let curChar = tspan.textContent.charAt(i)
-                if (curChar == ' ' ||
-                  curChar == '-' ||
-                  curChar == '.' ||
-                  curChar == ',' ||
-                  curChar == ';' ||
-                  curChar == ':') {
+                if (curChar === ' ' ||
+                  curChar === '-' ||
+                  curChar === '.' ||
+                  curChar === ',' ||
+                  curChar === ';' ||
+                  curChar === ':') {
                   lastSeperatorIndex = i
                 }
               }

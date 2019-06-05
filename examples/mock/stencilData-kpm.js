@@ -4,152 +4,39 @@ export const AA = {
   'description': 'BPMN process editor',
   'propertyPackages': [
     {
-    'name': 'outputpackage',
-    'properties': [{
-      'id': 'output',
-      'type': 'Complex',
-      'title': '输出',
-      'value': '',
-      'description': '活动输出内容',
-      'popular': true,
-      'refToView': 'text_output'
-    }]
-  }, {
-    'name': 'inputpackage',
-    'properties': [{
-      'id': 'input',
-      'type': 'Complex',
-      'title': '输入',
-      'value': '',
-      'description': '活动输入内容',
-      'popular': true,
-      'refToView': 'text_input'
-    }]
-  }, {
-    'name': 'departmentpackage',
-    'properties': [{
-      'id': 'department',
-      'type': 'Complex',
-      'title': '部门',
-      'value': '',
-      'description': '选择活动节点所在部门',
-      'popular': true
-    }]
-  }, {
-    'name': 'activerolepackage',
-    'properties': [{
-      'id': 'activerole',
-      'type': 'Complex',
-      'title': '角色',
-      'value': '',
-      'description': '选择活动节点所属角色',
-      'popular': true,
-      'refToView': 'text_role'
-    }]
-  }, {
-    'name': 'activesystempackage',
-    'properties': [{
-      'id': 'activesystem',
-      'type': 'select',
-      'title': '系统',
-      'value': '',
-      'description': '选择活动节点落地系统',
-      'popular': true,
-      'refToView': 'text_system'
-    }
-    ]
-  },
+      'name': 'refTaskpackage',
+      'properties': [{
+        'id': 'refId',
+        'type': 'String',
+        'title': '引用',
+        'value': '',
+        'description': '引用活动的id',
+        'popular': true
+      }]
+    },
     {
       'name': 'numberepackage',
       'properties': [
         {
-          'id': 'number',
+          'id': 'nmb',
           'type': 'String',
-          'title': '编号',
+          'title': '序号',
           'value': '',
-          'description': '活动编号',
+          'description': '活动序号',
           'popular': true,
           'refToView': 'text_number'
         }
       ]
     },
     {
-      'name': 'important_levelpackage',
+      'name': 'codepackage',
       'properties': [
         {
-          'id': 'important_level',
-          'type': 'select',
-          'title': '重要度',
-          'value': 'None',
-          'description': '重要度',
-          'popular': true,
-          'refToView': 'important_sign'
-          // "refToView": "compensation"
-        }
-      ]
-    },
-    {
-      'name': 'attachmentpackage',
-      'properties': [
-        {
-          'id': 'attachment',
-          'type': 'Complex',
-          'title': '附件',
-          'value': '',
-          'description': '附件',
-          'popular': true,
-          'refToView': 'attachment_sign'
-        }
-      ]
-    },
-    {
-      'name': 'process_idpackage',
-      'properties': [
-        {
-          'id': 'process_id',
+          'id': 'code',
           'type': 'String',
-          'title': 'Process identifier',
-          'value': 'process',
-          'description': 'Unique identifier of the process definition.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'overrideidpackage',
-      'properties': [
-        {
-          'id': 'overrideid',
-          'type': 'String',
-          'title': 'Id',
+          'title': '活动编码',
           'value': '',
-          'description': 'Unique identifier of the element.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'ispropertyfortaskpackage',
-      'properties': [
-        {
-          'id': 'ispropertyfortask',
-          'type': 'Boolean',
-          'title': '是否关联节点属性',
-          'value': 'true',
-          'description': '泳道属性是否关联节点属性?',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'propertiesfortaskpackage',
-      'properties': [
-        {
-          'id': 'propertiesfortask',
-          'type': 'select',
-          'title': '关联属性',
-          'value': 'None',
-          'description': '选择关联属性',
+          'description': '活动编码',
           'popular': true
         }
       ]
@@ -162,1606 +49,260 @@ export const AA = {
           'type': 'String',
           'title': 'Name',
           'value': '',
-          'description': 'The descriptive name of the BPMN element.',
+          'description': '活动名称',
           'popular': true,
           'refToView': 'text_name'
         }
       ]
     },
     {
-      'name': 'documentationpackage',
+      'name': 'typepackage',
       'properties': [
         {
-          'id': 'documentation',
-          'type': 'Text',
-          'title': 'Documentation',
+          'id': 'type',
+          'type': 'Select',
+          'title': '活动类型',
           'value': '',
-          'description': 'The descriptive name of the BPMN element.',
+          'description': '活动类型',
           'popular': true
         }
       ]
     },
     {
-      'name': 'categorypackage',
+      'name': 'organizationpackage',
       'properties': [
         {
-          'id': 'categorydefinition',
+          'id': 'organization',
+          'type': 'Complex',
+          'title': '所属组织',
+          'value': '',
+          'description': '所属组织',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'roleIdpackage',
+      'properties': [
+        {
+          'id': 'roleId',
+          'type': 'Complex',
+          'title': '业务角色',
+          'value': '',
+          'description': '业务角色',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'datespackage',
+      'properties': [
+        {
+          'id': 'dates',
           'type': 'String',
-          'title': 'Category',
+          'title': '时间',
           'value': '',
-          'description': 'Category of the BPMN element.',
+          'description': '时间(天)',
+          'popular': true,
+          'refToView': 'text_dates'
+        }
+      ]
+    },
+    {
+      'name': 'authorpackage',
+      'properties': [
+        {
+          'id': 'author',
+          'type': 'Complex',
+          'title': '作者',
+          'value': '',
+          'description': '作者',
           'popular': true
         }
       ]
     },
     {
-      'name': 'process_authorpackage',
+      'name': 'canSystempackage',
       'properties': [
         {
-          'id': 'process_author',
-          'type': 'String',
-          'title': 'Process author',
-          'value': '',
-          'description': 'Author of the process definition.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'process_versionpackage',
-      'properties': [
-        {
-          'id': 'process_version',
-          'type': 'String',
-          'title': 'Process version string (documentation only)',
-          'value': '',
-          'description': 'Version identifier for documentation purpose.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'process_historylevelpackage',
-      'properties': [
-        {
-          'id': 'process_historylevel',
-          'type': 'flowable-processhistorylevel',
-          'title': 'Set a specific history level for this process definition',
-          'value': '',
-          'description': 'Set a specific history level for this process definition',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'isexecutablepackage',
-      'properties': [
-        {
-          'id': 'isexecutable',
+          'id': 'canSystem',
           'type': 'Boolean',
-          'title': 'Is executable',
+          'title': '能否系统化',
+          'value': '',
+          'description': '能否系统化',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'providerSystempackage',
+      'properties': [
+        {
+          'id': 'providerSystem',
+          'type': 'Complex',
+          'title': '落地系统',
+          'value': '',
+          'description': '落地系统',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'kcpFlagpackage',
+      'properties': [
+        {
+          'id': 'kcpFlag',
+          'type': 'Boolean',
+          'title': '是否KCP',
+          'value': '',
+          'description': '是否KCP',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'descriptionpackage',
+      'properties': [
+        {
+          'id': 'description',
+          'type': 'Text',
+          'title': '描述',
+          'value': '',
+          'description': '描述',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'inputpackage',
+      'properties': [{
+        'id': 'input',
+        'type': 'Text',
+        'title': '输入',
+        'value': '',
+        'description': '活动输入内容',
+        'popular': true
+      }]
+    },
+    {
+    'name': 'outputpackage',
+    'properties': [{
+      'id': 'output',
+      'type': 'Text',
+      'title': '输出',
+      'value': '',
+      'description': '活动输出内容',
+      'popular': true
+    }]
+  },
+    {
+    'name': 'standardpackage',
+    'properties': [{
+      'id': 'standard',
+      'type': 'List',
+      'title': '制度规范',
+      'value': '',
+      'description': '制度规范',
+      'popular': true
+    }]
+  },
+    {
+    'name': 'attachmentpackage',
+    'properties': [{
+      'id': 'attachment',
+      'type': 'List',
+      'title': '附件',
+      'value': '',
+      'description': '附件',
+      'popular': true
+    }]
+  },
+    {
+    'name': 'kpipackage',
+    'properties': [{
+      'id': 'kpi',
+      'type': 'List',
+      'title': '流程指标',
+      'value': '',
+      'description': '流程指标',
+      'popular': true
+    }
+    ]
+  },
+    {
+      'name': 'kcppackage',
+      'properties': [
+        {
+          'id': 'kcp',
+          'type': 'Text',
+          'title': '风控点',
+          'value': '',
+          'description': '风控点',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'importancepackage',
+      'properties': [
+        {
+          'id': 'importance',
+          'type': 'Select',
+          'title': '重要度',
+          'value': '',
+          'description': '重要度',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'maturitypackage',
+      'properties': [
+        {
+          'id': 'maturity',
+          'type': 'Select',
+          'title': '成熟度',
+          'value': '',
+          'description': '成熟度',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'riskpackage',
+      'properties': [
+        {
+          'id': 'risk',
+          'type': 'Select',
+          'title': '风险度',
+          'value': '',
+          'description': '风险度',
+          'popular': true
+        }
+      ]
+    },
+    {
+      'name': 'performancepackage',
+      'properties': [
+        {
+          'id': 'performance',
+          'type': 'Select',
+          'title': '绩效水平',
           'value': 'true',
-          'description': 'Is the process executable?',
+          'description': '绩效水平',
           'popular': true
         }
       ]
     },
     {
-      'name': 'process_potentialstarteruserpackage',
+      'name': 'recommendpackage',
       'properties': [
         {
-          'id': 'process_potentialstarteruser',
-          'type': 'String',
-          'title': 'Potential starter user',
-          'value': '',
-          'description': 'Which user, can start the process?',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'process_potentialstartergrouppackage',
-      'properties': [
-        {
-          'id': 'process_potentialstartergroup',
-          'type': 'String',
-          'title': 'Potential starter group',
-          'value': '',
-          'description': 'Which group, can start the process?',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'process_namespacepackage',
-      'properties': [
-        {
-          'id': 'process_namespace',
-          'type': 'String',
-          'title': 'Target namespace',
-          'value': 'http://www.flowable.org/processdef',
-          'description': 'Target namespace for the process definition.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'process_iseagerexecutionfetchpackage',
-      'properties': [
-        {
-          'id': 'iseagerexecutionfetch',
-          'type': 'Boolean',
-          'title': 'Eager execution fetching',
-          'value': 'false',
-          'description': 'Enable eager execution fetching for this process definition?',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'asynchronousdefinitionpackage',
-      'properties': [
-        {
-          'id': 'asynchronousdefinition',
-          'type': 'Boolean',
-          'title': 'Asynchronous',
-          'value': 'false',
-          'description': 'Define the activity as asynchronous.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'datapropertiespackage',
-      'properties': [
-        {
-          'id': 'dataproperties',
-          'type': 'Complex',
-          'title': 'Data Objects',
-          'value': '',
-          'description': 'Definition of the data object properties',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'exclusivedefinitionpackage',
-      'properties': [
-        {
-          'id': 'exclusivedefinition',
-          'type': 'Boolean',
-          'title': 'Exclusive',
-          'value': 'false',
-          'description': 'Define the activity as exclusive.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'executionlistenerspackage',
-      'properties': [
-        {
-          'id': 'executionlisteners',
-          'type': 'multiplecomplex',
-          'title': 'Execution listeners',
-          'value': '',
-          'description': 'Listeners for an activity, process, sequence flow, start and end event.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'tasklistenerspackage',
-      'properties': [
-        {
-          'id': 'tasklisteners',
-          'type': 'multiplecomplex',
-          'title': 'Task listeners',
-          'value': '',
-          'description': 'Listeners for a user task',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'eventlistenerspackage',
-      'properties': [
-        {
-          'id': 'eventlisteners',
-          'type': 'multiplecomplex',
-          'title': 'Event listeners',
-          'value': '',
-          'description': 'Listeners for any event happening in the Flowable Engine. It\'s also possible to rethrow the event as a signal, message or error event',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'usertaskassignmentpackage',
-      'properties': [
-        {
-          'id': 'usertaskassignment',
-          'type': 'Complex',
-          'title': 'Assignments',
-          'value': '',
-          'description': 'Assignment definition for the user task',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'formpropertiespackage',
-      'properties': [
-        {
-          'id': 'formproperties',
-          'type': 'Complex',
-          'title': 'Form properties',
-          'value': '',
-          'description': 'Definition of the form with a list of form properties',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'formkeydefinitionpackage',
-      'properties': [
-        {
-          'id': 'formkeydefinition',
-          'type': 'String',
-          'title': 'Form key',
-          'value': '',
-          'description': 'Form key that provides a reference to a form.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'duedatedefinitionpackage',
-      'properties': [
-        {
-          'id': 'duedatedefinition',
-          'type': 'String',
-          'title': 'Due date',
-          'value': '',
-          'description': 'Due date of the user task.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'prioritydefinitionpackage',
-      'properties': [
-        {
-          'id': 'prioritydefinition',
-          'type': 'String',
-          'title': 'Priority',
-          'value': '',
-          'description': 'Priority of the user task.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'servicetaskclasspackage',
-      'properties': [
-        {
-          'id': 'servicetaskclass',
-          'type': 'String',
-          'title': 'Class',
-          'value': '',
-          'description': 'Class that implements the service task logic.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'servicetaskexpressionpackage',
-      'properties': [
-        {
-          'id': 'servicetaskexpression',
+          'id': 'recommend',
           'type': 'Text',
-          'title': 'Expression',
+          'title': '改进计划',
           'value': '',
-          'description': 'Service task logic defined with an expression.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'servicetaskdelegateexpressionpackage',
-      'properties': [
-        {
-          'id': 'servicetaskdelegateexpression',
-          'type': 'Text',
-          'title': 'Delegate expression',
-          'value': '',
-          'description': 'Service task logic defined with a delegate expression.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'servicetaskfieldspackage',
-      'properties': [
-        {
-          'id': 'servicetaskfields',
-          'type': 'Complex',
-          'title': 'Class fields',
-          'value': '',
-          'description': 'Field extensions',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'servicetaskresultvariablepackage',
-      'properties': [
-        {
-          'id': 'servicetaskresultvariable',
-          'type': 'String',
-          'title': 'Result variable name',
-          'value': '',
-          'description': 'Process variable name to store the service task result.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'servicetaskresultvariablepackage',
-      'properties': [
-        {
-          'id': 'servicetaskUseLocalScopeForResultVariable',
-          'type': 'Boolean',
-          'title': 'Use local scope for result variable',
-          'value': 'false',
-          'description': 'Flag that marks that the used resultVariable needs to be saved as a local variable',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'servicetasktriggerablepackage',
-      'properties': [
-        {
-          'id': 'servicetasktriggerable',
-          'type': 'Boolean',
-          'title': 'Set service task to be triggerable',
-          'value': 'false',
-          'description': 'Sets the service task to be triggerable',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'scriptformatpackage',
-      'properties': [
-        {
-          'id': 'scriptformat',
-          'type': 'String',
-          'title': 'Script format',
-          'value': '',
-          'description': 'Script format of the script task.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'scripttextpackage',
-      'properties': [
-        {
-          'id': 'scripttext',
-          'type': 'Text',
-          'title': 'Script',
-          'value': '',
-          'description': 'Script text of the script task.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'scriptautostorevariablespackage',
-      'properties': [
-        {
-          'id': 'scriptautostorevariables',
-          'type': 'Boolean',
-          'title': 'Auto Store Variables',
-          'value': 'false',
-          'description': 'Automatically store all script variables to the process.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellcommandpackage',
-      'properties': [
-        {
-          'id': 'shellcommand',
-          'type': 'String',
-          'title': 'Command',
-          'value': '',
-          'description': 'Shell task command',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellarg1package',
-      'properties': [
-        {
-          'id': 'shellarg1',
-          'type': 'Text',
-          'title': 'Argument 1',
-          'value': '',
-          'description': 'Shell commnad arg 1',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellarg2package',
-      'properties': [
-        {
-          'id': 'shellarg2',
-          'type': 'Text',
-          'title': 'Argument 2',
-          'value': '',
-          'description': 'Shell commnad arg 2',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellarg3package',
-      'properties': [
-        {
-          'id': 'shellarg3',
-          'type': 'Text',
-          'title': 'Argument 3',
-          'value': '',
-          'description': 'Shell commnad arg 3',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellarg4package',
-      'properties': [
-        {
-          'id': 'shellarg4',
-          'type': 'Text',
-          'title': 'Argument 4',
-          'value': '',
-          'description': 'Shell commnad arg 4',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellarg5package',
-      'properties': [
-        {
-          'id': 'shellarg5',
-          'type': 'Text',
-          'title': 'Argument 5',
-          'value': '',
-          'description': 'Shell commnad arg 5',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellwaitpackage',
-      'properties': [
-        {
-          'id': 'shellwait',
-          'type': 'Text',
-          'title': 'Wait',
-          'value': '',
-          'description': 'Flag to wait for shell command execution end',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shelloutputvariablepackage',
-      'properties': [
-        {
-          'id': 'shelloutputvariable',
-          'type': 'Text',
-          'title': 'Output variable',
-          'value': '',
-          'description': 'Variable to store shell commnad output',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellerrorcodevariablepackage',
-      'properties': [
-        {
-          'id': 'shellerrorcodevariable',
-          'type': 'Text',
-          'title': 'Error code variable',
-          'value': '',
-          'description': 'Variable to store shell commnad error code',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellredirecterrorpackage',
-      'properties': [
-        {
-          'id': 'shellredirecterror',
-          'type': 'Text',
-          'title': 'Redirect error',
-          'value': '',
-          'description': 'If true merge error output with standard output',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shellcleanenvpackage',
-      'properties': [
-        {
-          'id': 'shellcleanenv',
-          'type': 'Text',
-          'title': 'Clean env',
-          'value': '',
-          'description': 'Clean shell execution environment',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'shelldirectorypackage',
-      'properties': [
-        {
-          'id': 'shelldirectory',
-          'type': 'Text',
-          'title': 'Directory',
-          'value': '',
-          'description': 'Shell process working directory',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'ruletask_rulespackage',
-      'properties': [
-        {
-          'id': 'ruletask_rules',
-          'type': 'String',
-          'title': 'Rules',
-          'value': '',
-          'description': 'Rules of the rule task.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'ruletask_variables_inputpackage',
-      'properties': [
-        {
-          'id': 'ruletask_variables_input',
-          'type': 'String',
-          'title': 'Input variables',
-          'value': '',
-          'description': 'Input variables of the rule task.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'ruletask_excludepackage',
-      'properties': [
-        {
-          'id': 'ruletask_exclude',
-          'type': 'Boolean',
-          'title': 'Exclude',
-          'value': 'false',
-          'description': 'Use the rules property as exclusion.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'ruletask_resultpackage',
-      'properties': [
-        {
-          'id': 'ruletask_result',
-          'type': 'String',
-          'title': 'Result variable',
-          'value': '',
-          'description': 'Result variable of the rule task.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtaskheaderspackage',
-      'properties': [
-        {
-          'id': 'mailtaskheaders',
-          'type': 'Text',
-          'title': 'Headers',
-          'value': '',
-          'description': 'Line separated Mail headers (For example - X-Attribute: value).',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtasktopackage',
-      'properties': [
-        {
-          'id': 'mailtaskto',
-          'type': 'Text',
-          'title': 'To',
-          'value': '',
-          'description': 'The recipients if the e-mail. Multiple recipients are defined in a comma-separated list.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtaskfrompackage',
-      'properties': [
-        {
-          'id': 'mailtaskfrom',
-          'type': 'Text',
-          'title': 'From',
-          'value': '',
-          'description': 'The sender e-mail address. If not provided, the default configured from address is used.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtasksubjectpackage',
-      'properties': [
-        {
-          'id': 'mailtasksubject',
-          'type': 'Text',
-          'title': 'Subject',
-          'value': '',
-          'description': 'The subject of the e-mail.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtaskccpackage',
-      'properties': [
-        {
-          'id': 'mailtaskcc',
-          'type': 'Text',
-          'title': 'Cc',
-          'value': '',
-          'description': 'The cc\'s of the e-mail. Multiple recipients are defined in a comma-separated list',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtaskbccpackage',
-      'properties': [
-        {
-          'id': 'mailtaskbcc',
-          'type': 'Text',
-          'title': 'Bcc',
-          'value': '',
-          'description': 'The bcc\'s of the e-mail. Multiple recipients are defined in a comma-separated list',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtasktextpackage',
-      'properties': [
-        {
-          'id': 'mailtasktext',
-          'type': 'Text',
-          'title': 'Text',
-          'value': '',
-          'description': 'The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don\'t support rich content. The client will then fall back to this text-only alternative.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtaskhtmlpackage',
-      'properties': [
-        {
-          'id': 'mailtaskhtml',
-          'type': 'Text',
-          'title': 'Html',
-          'value': '',
-          'description': 'A piece of HTML that is the content of the e-mail.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'mailtaskcharsetpackage',
-      'properties': [
-        {
-          'id': 'mailtaskcharset',
-          'type': 'String',
-          'title': 'Charset',
-          'value': '',
-          'description': 'Allows to change the charset of the email, which is necessary for many non-English languages. ',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskrequestmethodpackage',
-      'properties': [
-        {
-          'id': 'httptaskrequestmethod',
-          'type': 'flowable-http-request-method',
-          'title': 'Request method',
-          'value': '',
-          'description': 'Request method (For example - GET,POST,PUT etc).',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskrequesturlpackage',
-      'properties': [
-        {
-          'id': 'httptaskrequesturl',
-          'type': 'Text',
-          'title': 'Request URL',
-          'value': '',
-          'description': 'Request URL (For example - http://flowable.org).',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskrequestheaderspackage',
-      'properties': [
-        {
-          'id': 'httptaskrequestheaders',
-          'type': 'Text',
-          'title': 'Request headers',
-          'value': '',
-          'description': 'Line separated HTTP request headers (For example - Content-Type: application/json).',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskrequestbodypackage',
-      'properties': [
-        {
-          'id': 'httptaskrequestbody',
-          'type': 'Text',
-          'title': 'Request body',
-          'value': '',
-          'description': 'Request body (For example- ${sampleBody}).', // eslint-disable-line
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskrequestbodyencodingpackage',
-      'properties': [
-        {
-          'id': 'httptaskrequestbodyencoding',
-          'type': 'Text',
-          'title': 'Request body encoding',
-          'value': '',
-          'description': 'Request body encoding (For example- UTF-8).',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskrequesttimeoutpackage',
-      'properties': [
-        {
-          'id': 'httptaskrequesttimeout',
-          'type': 'String',
-          'title': 'Request timeout',
-          'value': '',
-          'description': 'Timeout in milliseconds for the request (For example - 5000).',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskdisallowredirectspackage',
-      'properties': [
-        {
-          'id': 'httptaskdisallowredirects',
-          'type': 'String',
-          'title': 'Disallow redirects',
-          'value': '',
-          'description': 'Flag to disallow HTTP redirects.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskfailstatuscodespackage',
-      'properties': [
-        {
-          'id': 'httptaskfailstatuscodes',
-          'type': 'String',
-          'title': 'Fail status codes',
-          'value': '',
-          'description': 'Comma separated list of HTTP response status codes to retry, for example 400,5XX.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskhandlestatuscodespackage',
-      'properties': [
-        {
-          'id': 'httptaskhandlestatuscodes',
-          'type': 'String',
-          'title': 'Handle status codes',
-          'value': '',
-          'description': 'Comma separated list of HTTP response status codes to ignore, for example 404,3XX.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskignoreexceptionpackage',
-      'properties': [
-        {
-          'id': 'httptaskignoreexception',
-          'type': 'String',
-          'title': 'Ignore exception',
-          'value': '',
-          'description': 'Flag to ignore exceptions.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptasksaveresponseparameterstransientpackage',
-      'properties': [
-        {
-          'id': 'httptasksaveresponseparameterstransient',
-          'type': 'String',
-          'title': 'Save response as a transient variable',
-          'value': '',
-          'description': 'Flag indicating to store the response variable(s) transient',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptasksaveresponseasjsonpackage',
-      'properties': [
-        {
-          'id': 'httptasksaveresponseasjson',
-          'type': 'String',
-          'title': 'Save response as JSON',
-          'value': '',
-          'description': 'Flag indicating to store the response variable as a JSON variable instead of a String',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'skipexpressionpackage',
-      'properties': [
-        {
-          'id': 'skipexpression',
-          'type': 'String',
-          'title': 'Skip expression',
-          'value': '',
-          'description': 'Skip an expression execution associated with task or association or not.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskresponsevariablenamepackage',
-      'properties': [
-        {
-          'id': 'httptaskresponsevariablename',
-          'type': 'String',
-          'title': 'Response variable name',
-          'value': '',
-          'description': 'Define the variable name to store the http response.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptasksaverequestvariablespackage',
-      'properties': [
-        {
-          'id': 'httptasksaverequestvariables',
-          'type': 'String',
-          'title': 'Save request variables',
-          'value': '',
-          'description': 'Flag to save request variables.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptasksaveresponseparameterspackage',
-      'properties': [
-        {
-          'id': 'httptasksaveresponseparameters',
-          'type': 'String',
-          'title': 'Save response status, headers',
-          'value': '',
-          'description': 'Flag to save response status, headers etc.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'httptaskresultvariableprefixpackage',
-      'properties': [
-        {
-          'id': 'httptaskresultvariableprefix',
-          'type': 'String',
-          'title': 'Result variable prefix',
-          'value': '',
-          'description': 'Prefix for the execution variable names.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivitycalledelementpackage',
-      'properties': [
-        {
-          'id': 'callactivitycalledelement',
-          'type': 'String',
-          'title': 'Called element',
-          'value': '',
-          'description': 'Process reference.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivitycalledelementtypepackage',
-      'properties': [
-        {
-          'id': 'callactivitycalledelementtype',
-          'type': 'flowable-calledelementtype',
-          'title': 'Called element type',
-          'value': 'key',
-          'description': 'Type of the used process reference.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivityinparameterspackage',
-      'properties': [
-        {
-          'id': 'callactivityinparameters',
-          'type': 'Complex',
-          'title': 'In parameters',
-          'value': '',
-          'description': 'Definition of the input parameters',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivityoutparameterspackage',
-      'properties': [
-        {
-          'id': 'callactivityoutparameters',
-          'type': 'Complex',
-          'title': 'Out parameters',
-          'value': '',
-          'description': 'Definition of the output parameters',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivityinheritvariablespackage',
-      'properties': [
-        {
-          'id': 'callactivityinheritvariables',
-          'type': 'Boolean',
-          'title': 'Inherit variables in sub process',
-          'value': 'false',
-          'description': 'Inherit parent process variables in the sub process.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivitysamedeploymentpackage',
-      'properties': [
-        {
-          'id': 'callactivitysamedeployment',
-          'type': 'Boolean',
-          'title': 'Start the referenced process from the same deployment.',
-          'value': 'false',
-          'description': 'Use the referenced process from the same deployment.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivityfallbacktodefaulttenantpackage',
-      'properties': [
-        {
-          'id': 'callactivityfallbacktodefaulttenant',
-          'type': 'Boolean',
-          'title': 'Fallback to default tenant',
-          'value': 'false',
-          'description': 'Look for the definition by key in the default tenant when current tenant search fails.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivityprocessinstancenamepackage',
-      'properties': [
-        {
-          'id': 'callactivityprocessinstancename',
-          'type': 'String',
-          'title': 'Process instance name',
-          'value': '',
-          'description': 'An expression that resolves to the name of the child process instance',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivityinheritbusinesskeypackage',
-      'properties': [
-        {
-          'id': 'callactivityinheritbusinesskey',
-          'type': 'Boolean',
-          'title': 'Inherit business key',
-          'value': 'false',
-          'description': 'Inherit the business key from the parent process.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivityuselocalscopeforoutparameterspackage',
-      'properties': [
-        {
-          'id': 'callactivityuselocalscopeforoutparameters',
-          'type': 'Boolean',
-          'title': 'Use local scope for out parameters',
-          'value': 'false',
-          'description': 'Use local variable scope for out parameters.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivitybusinesskeypackage',
-      'properties': [
-        {
-          'id': 'callactivitybusinesskey',
-          'type': 'String',
-          'title': 'Business key expression',
-          'value': '',
-          'description': 'An expression that resolves to a business key for the child process instance',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'callactivitycompleteasyncpackage',
-      'properties': [
-        {
-          'id': 'callactivitycompleteasync',
-          'type': 'Boolean',
-          'title': 'Complete asynchronously',
-          'value': '',
-          'description': 'If set, the child process ending and completing the call activity is done asynchronously. Useful when using parallel multi instance with a called process definition that has async tasks.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'cameltaskcamelcontextpackage',
-      'properties': [
-        {
-          'id': 'cameltaskcamelcontext',
-          'type': 'String',
-          'title': 'Camel context',
-          'value': '',
-          'description': 'An optional camel context definition, if left empty the default is used.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'muletaskendpointurlpackage',
-      'properties': [
-        {
-          'id': 'muletaskendpointurl',
-          'type': 'String',
-          'title': 'Endpoint url',
-          'value': '',
-          'description': 'A required endpoint url to sent the message to Mule.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'muletasklanguagepackage',
-      'properties': [
-        {
-          'id': 'muletasklanguage',
-          'type': 'String',
-          'title': 'Language',
-          'value': '',
-          'description': 'A required definition for the language to resolve the payload expression, like juel.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'muletaskpayloadexpressionpackage',
-      'properties': [
-        {
-          'id': 'muletaskpayloadexpression',
-          'type': 'Text',
-          'title': 'Payload expression',
-          'value': '',
-          'description': 'A required definition for the payload of the message sent to Mule.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'muletaskresultvariablepackage',
-      'properties': [
-        {
-          'id': 'muletaskresultvariable',
-          'type': 'String',
-          'title': 'Result variable',
-          'value': '',
-          'description': 'An optional result variable for the payload returned.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'conditionsequenceflowpackage',
-      'properties': [
-        {
-          'id': 'conditionsequenceflow',
-          'type': 'Complex',
-          'title': 'Flow condition',
-          'value': '',
-          'description': 'The condition of the sequence flow',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'defaultflowpackage',
-      'properties': [
-        {
-          'id': 'defaultflow',
-          'type': 'Boolean',
-          'title': 'Default flow',
-          'value': 'false',
-          'description': 'Define the sequence flow as default',
-          'popular': true,
-          'refToView': 'default'
-        }
-      ]
-    },
-    {
-      'name': 'conditionalflowpackage',
-      'properties': [
-        {
-          'id': 'conditionalflow',
-          'type': 'Boolean',
-          'title': 'Conditional flow',
-          'value': 'false',
-          'description': 'Define the sequence flow with a condition',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'timercycledefinitionpackage',
-      'properties': [
-        {
-          'id': 'timercycledefinition',
-          'type': 'String',
-          'title': 'Time cycle (e.g. R3/PT10H)',
-          'value': '',
-          'description': 'Define the timer with a ISO-8601 cycle.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'timerdatedefinitionpackage',
-      'properties': [
-        {
-          'id': 'timerdatedefinition',
-          'type': 'String',
-          'title': 'Time date in ISO-8601',
-          'value': '',
-          'description': 'Define the timer with a ISO-8601 date definition.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'timerdurationdefinitionpackage',
-      'properties': [
-        {
-          'id': 'timerdurationdefinition',
-          'type': 'String',
-          'title': 'Time duration (e.g. PT5M)',
-          'value': '',
-          'description': 'Define the timer with a ISO-8601 duration.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'timerenddatedefinitionpackage',
-      'properties': [
-        {
-          'id': 'timerenddatedefinition',
-          'type': 'String',
-          'title': 'Time End Date in ISO-8601',
-          'value': '',
-          'description': 'Define the timer with a ISO-8601 duration.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'messagerefpackage',
-      'properties': [
-        {
-          'id': 'messageref',
-          'type': 'String',
-          'title': 'Message reference',
-          'value': '',
-          'description': 'Define the message name.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'signalrefpackage',
-      'properties': [
-        {
-          'id': 'signalref',
-          'type': 'String',
-          'title': 'Signal reference',
-          'value': '',
-          'description': 'Define the signal name.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'errorrefpackage',
-      'properties': [
-        {
-          'id': 'errorref',
-          'type': 'String',
-          'title': 'Error reference',
-          'value': '',
-          'description': 'Define the error name.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'cancelactivitypackage',
-      'properties': [
-        {
-          'id': 'cancelactivity',
-          'type': 'Boolean',
-          'title': 'Cancel activity',
-          'value': 'true',
-          'description': 'Should the activity be cancelled',
-          'popular': true,
-          'refToView': [
-            'frame',
-            'frame2'
-          ]
-        }
-      ]
-    },
-    {
-      'name': 'initiatorpackage',
-      'properties': [
-        {
-          'id': 'initiator',
-          'type': 'String',
-          'title': 'Initiator',
-          'value': '',
-          'description': 'Initiator of the process.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'textpackage',
-      'properties': [
-        {
-          'id': 'text',
-          'type': 'String',
-          'title': 'Text',
-          'value': '',
-          'description': 'The text of the text annotation.',
-          'popular': true,
-          'refToView': 'text'
-        }
-      ]
-    },
-    {
-      'name': 'multiinstance_typepackage',
-      'properties': [
-        {
-          'id': 'multiinstance_type',
-          'type': 'flowable-multiinstance',
-          'title': 'Multi-instance type',
-          'value': 'None',
-          'description': 'Repeated activity execution (parallel or sequential) can be displayed through different loop types',
-          'popular': true,
-          'refToView': 'multiinstance'
-        }
-      ]
-    },
-    {
-      'name': 'multiinstance_cardinalitypackage',
-      'properties': [
-        {
-          'id': 'multiinstance_cardinality',
-          'type': 'String',
-          'title': 'Cardinality (Multi-instance)',
-          'value': '',
-          'description': 'Define the cardinality of multi instance.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'multiinstance_collectionpackage',
-      'properties': [
-        {
-          'id': 'multiinstance_collection',
-          'type': 'String',
-          'title': 'Collection (Multi-instance)',
-          'value': '',
-          'description': 'Define the collection for the multi instance.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'multiinstance_variablepackage',
-      'properties': [
-        {
-          'id': 'multiinstance_variable',
-          'type': 'String',
-          'title': 'Element variable (Multi-instance)',
-          'value': '',
-          'description': 'Define the element variable for the multi instance.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'multiinstance_conditionpackage',
-      'properties': [
-        {
-          'id': 'multiinstance_condition',
-          'type': 'String',
-          'title': 'Completion condition (Multi-instance)',
-          'value': '',
-          'description': 'Define the completion condition for the multi instance.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'isforcompensationpackage',
-      'properties': [
-        {
-          'id': 'isforcompensation',
-          'type': 'Boolean',
-          'title': 'Is for compensation',
-          'value': 'false',
-          'description': 'A flag that identifies whether this activity is intended for the purposes of compensation.',
-          'popular': true,
-          'refToView': 'compensation'
-        }
-      ]
-    },
-    {
-      'name': 'sequencefloworderpackage',
-      'properties': [
-        {
-          'id': 'sequencefloworder',
-          'type': 'Complex',
-          'title': 'Flow order',
-          'value': '',
-          'description': 'Order outgoing sequence flows.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'signaldefinitionspackage',
-      'properties': [
-        {
-          'id': 'signaldefinitions',
-          'type': 'multiplecomplex',
-          'title': 'Signal definitions',
-          'value': '',
-          'description': 'Signal definitions',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'messagedefinitionspackage',
-      'properties': [
-        {
-          'id': 'messagedefinitions',
-          'type': 'multiplecomplex',
-          'title': 'Message definitions',
-          'value': '',
-          'description': 'Message definitions',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'istransactionpackage',
-      'properties': [
-        {
-          'id': 'istransaction',
-          'type': 'Boolean',
-          'title': 'Is a transaction sub process',
-          'value': 'false',
-          'description': 'A flag that identifies whether this sub process is of type transaction.',
-          'popular': true,
-          'refToView': 'border'
-        }
-      ]
-    },
-    {
-      'name': 'formreferencepackage',
-      'properties': [
-        {
-          'id': 'formreference',
-          'type': 'Complex',
-          'title': 'Form reference',
-          'value': '',
-          'description': 'Reference to a form',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'terminateAllpackage',
-      'properties': [
-        {
-          'id': 'terminateAll',
-          'type': 'Boolean',
-          'title': 'Terminate all',
-          'value': 'false',
-          'description': 'Enable to terminate the process instance',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'decisiontaskdecisiontablereferencepackage',
-      'properties': [
-        {
-          'id': 'decisiontaskdecisiontablereference',
-          'type': 'Complex',
-          'title': 'Decision table reference',
-          'value': '',
-          'description': 'Set the decision table reference',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'decisiontaskthrowerroronnohitspackage',
-      'properties': [
-        {
-          'id': 'decisiontaskthrowerroronnohits',
-          'type': 'Boolean',
-          'title': 'Throw error if no rules were hit',
-          'value': 'false',
-          'description': 'Should an error be thrown if no rules of the decision table were hit and consequently no result was found.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'decisiontaskfallbacktodefaulttenantpackage',
-      'properties': [
-        {
-          'id': 'decisiontaskfallbacktodefaulttenant',
-          'type': 'Boolean',
-          'title': 'Fallback to default tenant',
-          'value': 'false',
-          'description': 'Find decision definition without tenant when previous attemps to find it with tenant failed.',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'interruptingpackage',
-      'properties': [
-        {
-          'id': 'interrupting',
-          'type': 'Boolean',
-          'title': 'Interrupting',
-          'value': 'true',
-          'description': 'Should all parent executions be terminated?',
-          'popular': true,
-          'refToView': [
-            'frame'
-          ]
-        }
-      ]
-    },
-    {
-      'name': 'completionconditionpackage',
-      'properties': [
-        {
-          'id': 'completioncondition',
-          'type': 'String',
-          'title': 'Completion condition',
-          'value': '',
-          'description': 'The completion condition for the adhoc sub process',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'orderingpackage',
-      'properties': [
-        {
-          'id': 'ordering',
-          'type': 'flowable-ordering',
-          'title': 'Ordering',
-          'value': 'Parallel',
-          'description': 'The ordering for the adhoc sub process',
-          'popular': true
-        }
-      ]
-    },
-    {
-      'name': 'cancelremaininginstancespackage',
-      'properties': [
-        {
-          'id': 'cancelremaininginstances',
-          'type': 'Boolean',
-          'title': 'Cancel remaining instances',
-          'value': 'true',
-          'description': 'Cancel the remaining instances for the adhoc sub process?',
+          'description': '改进计划',
           'popular': true
         }
       ]
@@ -1779,14 +320,7 @@ export const AA = {
         '基础元素'
       ],
       'propertyPackages': [
-        'overrideidpackage',
-        'namepackage',
-        'documentationpackage',
-        'executionlistenerspackage',
-        'initiatorpackage',
-        'formkeydefinitionpackage',
-        'formreferencepackage',
-        'formpropertiespackage'
+        'numberepackage'
       ],
       'hiddenPropertyPackages': [],
       'roles': [
@@ -1801,24 +335,37 @@ export const AA = {
       'id': 'UserTask',
       'title': '活动节点',
       'description': '扩展活动节点',
-      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:oryx="http://www.b3mn.org/oryx" xmlns:xlink="http://www.w3.org/1999/xlink" width="138" height="74" version="1.0"><defs></defs><oryx:magnets><oryx:magnet oryx:cx="1" oryx:cy="18" oryx:anchors="left"/><oryx:magnet oryx:cx="1" oryx:cy="36" oryx:anchors="left"/><oryx:magnet oryx:cx="1" oryx:cy="54" oryx:anchors="left"/><oryx:magnet oryx:cx="34" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="68" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="102" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="135" oryx:cy="18" oryx:anchors="right"/><oryx:magnet oryx:cx="135" oryx:cy="36" oryx:anchors="right"/><oryx:magnet oryx:cx="135" oryx:cy="54" oryx:anchors="right"/><oryx:magnet oryx:cx="34" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="68" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="102" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="68" oryx:cy="36" oryx:default="yes"/></oryx:magnets><g pointer-events="fill" oryx:minimumSize="50 40"><rect id="text_frame" oryx:anchors="bottom top right left" x="1" y="1" width="135" height="71" rx="10" ry="10" stroke="none" stroke-width="0" fill="none"/><rect id="bg_frame" oryx:resize="vertical horizontal" x="0" y="0" width="136" height="72" rx="10" ry="10" stroke="#666666" stroke-width="1" fill="#ffffff"/><line id="number_path" oryx:resize="vertical horizontal" fill="none" stroke="#666666" x1="0" y1="23" x2="137" y2="23" stroke-width="1"/><text font-size="12" id="text_number" x="10" y="6" oryx:align="top left" stroke="#333333" oryx:fittoelem="text_frame">22</text><text font-size="12" id="text_name" x="68" y="36" oryx:align="middle center" oryx:fittoelem="text_frame" stroke="#333333">dd</text><line oryx:resize="vertical horizontal" fill="none" stroke="#666666" x1="0" y1="47" x2="137" y2="47" stroke-width="1"/><text font-size="12" id="text_dates" x="10" y="63" oryx:align="bottom left" oryx:fittoelem="text_frame" fill="#999999">1</text><text font-size="12" id="text_system" x="126" y="63" oryx:align="bottom right" oryx:fittoelem="text_frame" fill="#999999">22222</text><g id="shenpi_sign"><circle id="shen_frame" cx="120" cy="11" r="10" stroke="#E70012" fill="#FFE9E9" fill-opacity="0.5" stroke-width="1"/><text font-size="12" x="120" y="15" oryx:align="center center" oryx:fittoelem="shen_frame" fill="#E70012">审</text></g></g></svg>\n',
+      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:oryx="http://www.b3mn.org/oryx" xmlns:xlink="http://www.w3.org/1999/xlink" width="138" height="74" version="1.0"><defs></defs><oryx:magnets><oryx:magnet oryx:cx="1" oryx:cy="18" oryx:anchors="left"/><oryx:magnet oryx:cx="1" oryx:cy="36" oryx:anchors="left"/><oryx:magnet oryx:cx="1" oryx:cy="54" oryx:anchors="left"/><oryx:magnet oryx:cx="34" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="68" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="102" oryx:cy="71" oryx:anchors="bottom"/><oryx:magnet oryx:cx="135" oryx:cy="18" oryx:anchors="right"/><oryx:magnet oryx:cx="135" oryx:cy="36" oryx:anchors="right"/><oryx:magnet oryx:cx="135" oryx:cy="54" oryx:anchors="right"/><oryx:magnet oryx:cx="34" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="68" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="102" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="68" oryx:cy="36" oryx:default="yes"/></oryx:magnets><g pointer-events="fill" oryx:minimumSize="50 40"><rect id="text_frame" oryx:anchors="bottom top right left" x="1" y="1" width="135" height="71" rx="10" ry="10" stroke="none" stroke-width="0" fill="none"/><rect id="bg_frame" oryx:resize="vertical horizontal" x="0" y="0" width="136" height="72" rx="10" ry="10" stroke="#666666" stroke-width="1" fill="#ffffff"/><line id="number_path" oryx:resize="vertical horizontal" fill="none" stroke="#666666" x1="0" y1="23" x2="137" y2="23" stroke-width="1"/><text font-size="12" id="text_number" x="10" y="6" oryx:align="top left" stroke="#333333" oryx:fittoelem="text_frame">22</text><text font-size="12" id="text_name" x="68" y="36" oryx:align="middle center" oryx:fittoelem="text_frame" stroke="#333333">dd</text><line oryx:resize="vertical horizontal" fill="none" stroke="#666666" x1="0" y1="47" x2="137" y2="47" stroke-width="1"/><text font-size="12" id="text_dates" x="10" y="63" oryx:align="bottom left" oryx:fittoelem="text_frame" fill="#999999"></text><text font-size="12" id="text_system" x="126" y="63" oryx:align="bottom right" oryx:fittoelem="text_frame" fill="#999999"></text><g id="shenpi_sign" display="none"><circle id="shen_frame" cx="120" cy="11" r="10" stroke="#E70012" fill="#FFE9E9" fill-opacity="0.5" stroke-width="1"/><text font-size="12" x="120" y="15" oryx:align="center center" oryx:fittoelem="shen_frame" fill="#E70012">审</text></g></g></svg>\n',
       'icon': 'activity/list/type.user.png',
       'groups': [
         '基础元素'
       ],
       'propertyPackages': [
+        'refTaskpackage',
         'numberepackage',
-        'overrideidpackage',
+        'codepackage',
         'namepackage',
-        'documentationpackage',
-        'usertaskassignmentpackage',
-        'outputpackage',
+        'typepackage',
+        'organizationpackage',
+        'roleIdpackage',
+        'datespackage',
+        'authorpackage',
+        'canSystempackage',
+        'providerSystempackage',
+        // 'systemNamepackage',
+        'kcpFlagpackage',
+        'descriptionpackage',
         'inputpackage',
-        'important_levelpackage',
+        'outputpackage',
+        'standardpackage',
         'attachmentpackage',
-        'departmentpackage',
-        'activerolepackage',
-        'activesystempackage'
+        'kpipackage',
+        'kcppackage',
+        'importancepackage',
+        'maturitypackage',
+        'riskpackage',
+        'performancepackage',
+        'recommendpackage'
       ],
       'hiddenPropertyPackages': [],
       'roles': [
@@ -1846,17 +393,8 @@ export const AA = {
       ],
       'propertyPackages': [
         'numberepackage',
-        'overrideidpackage',
         'namepackage',
-        'documentationpackage',
-        'usertaskassignmentpackage',
-        'outputpackage',
-        'inputpackage',
-        'important_levelpackage',
-        'attachmentpackage',
-        'departmentpackage',
-        'activerolepackage',
-        'activesystempackage'
+        'refTaskpackage',
       ],
       'hiddenPropertyPackages': [
 

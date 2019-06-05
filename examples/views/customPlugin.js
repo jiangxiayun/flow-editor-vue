@@ -1,4 +1,7 @@
 import ORYX from 'src/oryx'
+import ORYX_Config from '../../src/oryx/CONFIG'
+import ORYX_Node from '../../src/oryx/core/Node'
+import ORYX_Utils from '../../src/oryx/Utils'
 
 // 双击修改名称
 export default class KPM_Plugin {
@@ -7,6 +10,7 @@ export default class KPM_Plugin {
     this.facade = facade
     // this.facade.registerOnEvent(ORYX.CONFIG.EVENT_CANVAS_SCROLL, this.hideField.bind(this))
     this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DBLCLICK, this.actOnDBLClick.bind(this))
+    this.facade.registerOnEvent(ORYX_Config.EVENT_PROPERTY_CHANGED, this.propertyChanged.bind(this))
     // this.facade.offer({
     //   keyCodes: [{
     //     keyCode: 113, // F2-Key
@@ -17,6 +21,33 @@ export default class KPM_Plugin {
     // document.documentElement.addEventListener(ORYX.CONFIG.EVENT_MOUSEDOWN, this.hide.bind(this), true)
   }
 
+  propertyChanged (option, node) {
+    if (node.getStencil().idWithoutNs() === 'UserTask') {
+      let id = node.getStencil().id()
+      // adjust SVG to properties' values
+      if (option.name === 'systemName') {
+        let svgElemSystem = node.node.ownerDocument.getElementById(node.id + 'text_system')
+        if (svgElemSystem) {
+          let label =  node._labels.get(node.id + 'text_system')
+          if (option.value) {
+            label.text('2234234')
+          } else {
+            label.text('')
+          }
+        }
+      }
+      if (option.name === 'type') {
+        let svgElemShenpi= node.node.ownerDocument.getElementById(node.id + 'shenpi_sign')
+        if (svgElemShenpi) {
+          if (option.value === 1) {
+            svgElemShenpi.setAttributeNS(null, 'display', 'inherit')
+          } else {
+            svgElemShenpi.setAttributeNS(null, 'display', 'none')
+          }
+        }
+      }
+    }
+  }
   renamePerF2 () {
     let selectedShapes = this.facade.getSelection()
     this.actOnDBLClick(undefined, selectedShapes.first())

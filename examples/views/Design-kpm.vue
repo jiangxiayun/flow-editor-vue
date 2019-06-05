@@ -368,13 +368,9 @@
           let currentShape = selectedElements[0]
           if (currentShape.getStencil().idWithoutNs() === 'UserTask' ||
             currentShape.getStencil().idWithoutNs() === 'UserTask2') {
-            switch (currentShape.properties.get('refTask')) {
-              case 'quoted':
-                this.contextmenuList = TaskQuoted
-                break
-              default:
-                this.contextmenuList = TaskNoneQuote
-            }
+            let value = currentShape.properties.get('refId')
+            console.log(33, currentShape.properties)
+            this.contextmenuList = value ? TaskQuoted : TaskNoneQuote
           }
           this.$refs.flowEditor.showContextmenu()
         }
@@ -429,7 +425,6 @@
 
         if (!stencil) return
         this.editorManager.assignCommand('MorphTo', this.selectedShape, stencil, this.editorManager.getEditor())
-        this.writeDialog.visible = false
       },
       propertyWriteSave () {
         this.writeDialog.visible = false
@@ -531,6 +526,15 @@
           // 引用某个具体活动
           case 'refOneTask':
             this.handleCommand()
+            this.updatePropertyInModel({
+              properties: {
+                'refId': '123',
+                'name': '引用活动',
+                'type': 1,
+                'dates': '0.4 天'
+              }
+            })
+            this.writeDialog.visible = false
             break
         }
       }

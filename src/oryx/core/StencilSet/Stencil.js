@@ -132,13 +132,13 @@ export default class Stencil {
     if (this._jsonStencil.propertyPackages && this._jsonStencil.propertyPackages instanceof Array) {
       const hiddenPropertyPackages = this._jsonStencil.hiddenPropertyPackages
 
-      this._jsonStencil.propertyPackages.each((function (ppId) {
+      this._jsonStencil.propertyPackages.each((ppId) => {
         const pp = this._propertyPackages.get(ppId)
         if (pp) {
-          pp.each((function (prop) {
+          pp.each((prop) => {
             let oProp = new Property(prop, this._namespace, this)
-            let key = oProp.prefix() + '-' + oProp.id()
-            this._properties.set(key, oProp)
+            // let key = oProp.prefix() + '-' + oProp.id()
+            this._properties.set(oProp.id(), oProp)
 
             // Check if we need to hide this property (ie it is there for display purposes,
             // if the user has filled it in, but it can no longer be edited)
@@ -146,17 +146,17 @@ export default class Stencil {
               oProp.hide()
             }
 
-          }).bind(this))
+          } )
         }
-      }).bind(this))
+      })
     }
 
     // init properties
     if (this._jsonStencil.properties && this._jsonStencil.properties instanceof Array) {
       this._jsonStencil.properties.each((function (prop) {
         let oProp = new Property(prop, this._namespace, this)
-        let key = oProp.prefix() + '-' + oProp.id()
-        this._properties.set(key, oProp)
+        // let key = oProp.prefix() + '-' + oProp.id()
+        this._properties.set(oProp.id(), oProp)
       }).bind(this))
     }
 
@@ -267,7 +267,8 @@ export default class Stencil {
   addProperty (property, namespace) {
     if (property && namespace) {
       let oProp = new Property(property, namespace, this)
-      this._properties[oProp.prefix() + '-' + oProp.id()] = oProp
+      // this._properties[oProp.prefix() + '-' + oProp.id()] = oProp
+      this._properties[oProp.id()] = oProp
     }
   }
 
@@ -276,8 +277,10 @@ export default class Stencil {
       let oProp = this._properties.values().find(function (prop) {
         return (propertyId == prop.id())
       })
-      if (oProp)
-        delete this._properties[oProp.prefix() + '-' + oProp.id()]
+      if (oProp) {
+        // delete this._properties[oProp.prefix() + '-' + oProp.id()]
+        delete this._properties[oProp.id()]
+      }
     }
   }
 

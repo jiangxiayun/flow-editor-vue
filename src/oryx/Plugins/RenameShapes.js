@@ -129,7 +129,8 @@ export default class RenameShapes {
     let center = this.getCenterPosition(nearestLabel.node, shape)
     console.log('center', center)
     center.x -= (width / 2)
-    let propId = prop.prefix() + '-' + prop.id()
+    // let propId = prop.prefix() + '-' + prop.id()
+    let propId = prop.id()
     let textInput = document.createElement('textarea')
     textInput.id = 'shapeTextInput'
     textInput.style.position = 'absolute'
@@ -161,7 +162,7 @@ export default class RenameShapes {
           }
           execute () {
             this.el.setProperty(this.propId, this.newValue)
-            //this.el.update();
+            // this.el.update();
             this.facade.setSelection([this.el])
             this.facade.getCanvas().update()
             this.facade.updateSelection()

@@ -21,7 +21,7 @@ export default class Property {
     this._hidden = false
 
     jsonProp.id = jsonProp.id || ORYX_LOG.error('ORYX.Core.StencilSet.Property(construct): Id is not defined.')
-    jsonProp.id = jsonProp.id.toLowerCase()
+    // jsonProp.id = jsonProp.id.toLowerCase()
 
     if (!jsonProp.type) {
       ORYX_LOG.info('Type is not defined for stencil \'%0\', id \'%1\'. Falling back to \'String\'.', stencil, jsonProp.id)
@@ -30,7 +30,7 @@ export default class Property {
       jsonProp.type = jsonProp.type.toLowerCase()
     }
 
-    jsonProp.prefix = jsonProp.prefix || 'oryx'
+    // jsonProp.prefix = jsonProp.prefix || 'oryx'
     jsonProp.title = jsonProp.title || ''
     jsonProp.value = jsonProp.value || ''
     jsonProp.description = jsonProp.description || ''
@@ -46,14 +46,14 @@ export default class Property {
       this._jsonProp.refToView = []
     }
 
-    var globalMin = this.getMinForType(jsonProp.type)
+    let globalMin = this.getMinForType(jsonProp.type)
     if (jsonProp.min === undefined || jsonProp.min === null) {
       jsonProp.min = globalMin
     } else if (jsonProp.min < globalMin) {
       jsonProp.min = globalMin
     }
 
-    var globalMax = this.getMaxForType(jsonProp.type)
+    let globalMax = this.getMaxForType(jsonProp.type)
     if (jsonProp.max === undefined || jsonProp.max === null) {
       jsonProp.max = globalMax
     } else if (jsonProp.max > globalMax) {
@@ -64,7 +64,7 @@ export default class Property {
       jsonProp.fillOpacity = false
     }
 
-    if ('number' != typeof jsonProp.lightness) {
+    if ('number' !== typeof jsonProp.lightness) {
       jsonProp.lightness = 1
     } else {
       jsonProp.lightness = Math.max(0, Math.min(1, jsonProp.lightness))
@@ -98,7 +98,7 @@ export default class Property {
       jsonProp.inverseBoolean = false
     }
 
-    if (!jsonProp.directlyEditable && jsonProp.directlyEditable != false) {
+    if (!jsonProp.directlyEditable && jsonProp.directlyEditable !== false) {
       jsonProp.directlyEditable = true
     }
 
@@ -136,18 +136,18 @@ export default class Property {
         throw 'ORYX.Core.StencilSet.Property(construct): No property items defined.'
       }
       // extended by Kerstin (start)
-    } else if (jsonProp.type === ORYX_CINFIG.TYPE_COMPLEX || jsonProp.type == ORYX_CINFIG.TYPE_MULTIPLECOMPLEX) {
+    } else if (jsonProp.type === ORYX_CINFIG.TYPE_COMPLEX || jsonProp.type === ORYX_CINFIG.TYPE_MULTIPLECOMPLEX) {
       if (jsonProp.complexItems && jsonProp.complexItems instanceof Array) {
-        jsonProp.complexItems.each((function (jsonComplexItem) {
-          this._complexItems[jsonComplexItem.id.toLowerCase()] = new ComplexPropertyItem(jsonComplexItem, namespace, this)
-        }).bind(this))
+        jsonProp.complexItems.each((jsonComplexItem) => {
+          this._complexItems[jsonComplexItem.id] = new ComplexPropertyItem(jsonComplexItem, namespace, this)
+        })
       }
     }
     // extended by Kerstin (end)
   }
 
   getMinForType (type) {
-    if (type.toLowerCase() == ORYX_CINFIG.TYPE_INTEGER) {
+    if (type.toLowerCase() === ORYX_CINFIG.TYPE_INTEGER) {
       return -Math.pow(2, 31)
     } else {
       return -Number.MAX_VALUE + 1
@@ -155,7 +155,7 @@ export default class Property {
   }
 
   getMaxForType (type) {
-    if (type.toLowerCase() == ORYX_CINFIG.TYPE_INTEGER) {
+    if (type.toLowerCase() === ORYX_CINFIG.TYPE_INTEGER) {
       return Math.pow(2, 31) - 1
     } else {
       return Number.MAX_VALUE
@@ -365,7 +365,7 @@ export default class Property {
 
   complexItem (id) {
     if (id) {
-      return this._complexItems[id.toLowerCase()]
+      return this._complexItems[id]
     } else {
       return null
     }
