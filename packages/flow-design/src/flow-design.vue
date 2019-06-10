@@ -59,13 +59,20 @@
         elementsWithoutRenameAction: ['Lane', 'V-Lane']
       })
       FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, () => {
-        this.handleSaveBtn('editorInitCompleted', this.editorManager)
+        this.handlePopEvent('editorInitCompleted', this.editorManager)
+      })
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, (event) => {
+        this.handlePopEvent('selection-changed', event)
+        // if (this.currentShapeMode !== 'write') {
+        //   this.selectedItem = event.selectedItem
+        //   this.selectedShape = event.selectedShape
+        // }
       })
       // 将用户在深层子组件里的自定义事件抛出
-      this.$on('Propagation', this.handleSaveBtn)
+      this.$on('Propagation', this.handlePopEvent)
     },
     methods: {
-      handleSaveBtn (eventName, params) {
+      handlePopEvent (eventName, params) {
         // console.log(33, params)
         this.$emit(eventName, params)
       },

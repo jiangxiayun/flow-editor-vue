@@ -306,6 +306,20 @@ export const AA = {
           'popular': true
         }
       ]
+    },
+    {
+      "name": "defaultflowpackage",
+      "properties": [
+        {
+          "id": "defaultflow",
+          "type": "Boolean",
+          "title": "Default flow",
+          "value": "false",
+          "description": "Define the sequence flow as default",
+          "popular": true,
+          "refToView": "default"
+        }
+      ]
     }
   ],
   'stencils': [
