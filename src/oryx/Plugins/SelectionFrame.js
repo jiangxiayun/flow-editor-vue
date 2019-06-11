@@ -6,8 +6,10 @@ export default class SelectionFrame {
   constructor (facade) {
     this.facade = facade
     // Register on MouseEvents
+    this.handleMouseUpFun = this.handleMouseUp.bind(this)
     this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this))
-    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUp.bind(this), true)
+
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUpFun, true)
 
     // Some initiale variables
     this.position = { x: 0, y: 0 }
@@ -176,4 +178,7 @@ export default class SelectionFrame {
     this.node.style.height = size.height + 'px'
   }
 
+  clearAddEventListener () {
+    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUpFun, true)
+  }
 }

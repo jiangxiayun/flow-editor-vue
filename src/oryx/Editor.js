@@ -216,22 +216,20 @@ export default class Editor {
    *      errorCodes: NOTUSEINSTENCILSET, REQUIRESTENCILSET, NOTFOUND, YETACTIVATED
    */
   activatePluginByName (name, callback, loadTry) {
-    let match = this.getAvailablePlugins().find(function (value) {
-      return value.name == name
-    })
+    let match = this.getAvailablePlugins().find((value) => value.name === name)
     if (match && (!match.engaged || (match.engaged === 'false'))) {
       let loadedStencilSetsNamespaces = this.getStencilSets().keys()
       let facade = this._getPluginFacade()
-      let newPlugin
       const me = this
       ORYX_Log.debug('Initializing plugin \'%0\'', match.name)
 
-      if (!match.requires || !match.requires.namespaces || match.requires.namespaces.any(function (req) {
-        return loadedStencilSetsNamespaces.indexOf(req) >= 0
-      })) {
-        if (!match.notUsesIn || !match.notUsesIn.namespaces || !match.notUsesIn.namespaces.any(function (req) {
-          return loadedStencilSetsNamespaces.indexOf(req) >= 0
-        })) {
+      if (!match.requires
+        || !match.requires.namespaces
+        || match.requires.namespaces.any((req) => loadedStencilSetsNamespaces.indexOf(req) >= 0)) {
+
+        if (!match.notUsesIn
+          || !match.notUsesIn.namespaces
+          || !match.notUsesIn.namespaces.any((req) => loadedStencilSetsNamespaces.indexOf(req) >= 0 )) {
 
           try {
             let className = eval(match.name)
@@ -243,13 +241,16 @@ export default class Editor {
               newPlugin.registryChanged(me.pluginsData)
 
             // If there have an onSelection-Method it will pushed to the Editor Event-Handler
-            if (newPlugin.onSelectionChanged)
+            if (newPlugin.onSelectionChanged) {
               me.registerOnEvent(ORYX_Config.EVENT_SELECTION_CHANGED, newPlugin.onSelectionChanged.bind(newPlugin))
+            }
             this.loadedPlugins.push(newPlugin)
-            this.loadedPlugins.each(function (loaded) {
-              if (loaded.registryChanged)
+
+            this.loadedPlugins.each((loaded) => {
+              if (loaded.registryChanged) {
                 loaded.registryChanged(this.pluginsData)
-            }.bind(me))
+              }
+            })
             callback(true)
 
           } catch (e) {
@@ -286,9 +287,7 @@ export default class Editor {
 
     // Available Plugins will be initalize
     let facade = this._getPluginFacade()
-
-    Plugins.availablePlugins.each(function (value) {
-      ORYX_Log.debug('Initializing plugin \'%0\'', value.get('name'))
+    Plugins.availablePlugins.each((value) => {
       try {
         let className = eval(value.get('name'))
         // let className = value.get('name')
@@ -301,16 +300,17 @@ export default class Editor {
       } catch (e) {
         ORYX_Log.warn('Plugin %0 is not available %1', value.get('name'), e)
       }
-
     })
-    newPlugins.each(function (value) {
+    newPlugins.each((value) => {
       // If there is an GUI-Plugin, they get all Plugins-Offer-Meta-Data
-      if (value.registryChanged)
+      if (value.registryChanged) {
         value.registryChanged(me.pluginsData)
+      }
 
       // If there have an onSelection-Method it will pushed to the Editor Event-Handler
-      if (value.onSelectionChanged)
+      if (value.onSelectionChanged) {
         me.registerOnEvent(ORYX_Config.EVENT_SELECTION_CHANGED, value.onSelectionChanged.bind(value))
+      }
     })
 
     this.loadedPlugins = newPlugins
@@ -318,6 +318,69 @@ export default class Editor {
     this.setSelection()
   }
 
+  offer (pluginData) {
+    if (!this.pluginsData.member(pluginData)) {
+      this.pluginsData.push(pluginData)
+    }
+  }
+
+  /**
+   * It creates an new event or adds the callback, if already existing,
+   * for the key combination that the plugin passes in keyCodes attribute
+   * of the offer method.
+   *
+   * The new key down event fits the schema:
+   *    key.event[.metactrl][.alt][.shift].'thekeyCode'
+   */
+  registerPluginsOnKeyEvents () {
+    this.pluginsData.each((pluginData) => {
+      if (pluginData.keyCodes) {
+        pluginData.keyCodes.each((keyComb) => {
+          let eventName = 'key.event'
+
+          /* Include key action */
+          eventName += '.' + keyComb.keyAction
+
+          if (keyComb.metaKeys) {
+            /* Register on ctrl or apple meta key as meta key */
+            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_META_CTRL) > -1) {
+              eventName += '.' + ORYX_Config.META_KEY_META_CTRL
+            }
+
+            /* Register on alt key as meta key */
+            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_ALT) > -1) {
+              eventName += '.' + ORYX_Config.META_KEY_ALT
+            }
+
+            /* Register on shift key as meta key */
+            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_SHIFT) > -1) {
+              eventName += '.' + ORYX_Config.META_KEY_SHIFT
+            }
+          }
+
+          /* Register on the actual key */
+          if (keyComb.keyCode) {
+            eventName += '.' + keyComb.keyCode
+          }
+
+          /* Register the event */
+          ORYX_Log.debug('Register Plugin on Key Event: %0', eventName)
+          if (pluginData.toggle === true && pluginData.buttonInstance) {
+            this.registerOnEvent(eventName, () => {
+              pluginData.buttonInstance.toggle(!pluginData.buttonInstance.pressed) // Toggle
+              pluginData.functionality.call(
+                pluginData,
+                pluginData.buttonInstance,
+                pluginData.buttonInstance.pressed) // Call function
+            })
+          } else {
+            this.registerOnEvent(eventName, pluginData.functionality)
+          }
+
+        })
+      }
+    })
+  }
   /**
    * Creates the Canvas
    * @param {String} [stencilType] The stencil type used for creating the canvas.
@@ -849,70 +912,6 @@ export default class Editor {
     } catch (e) {
       ORYX_Log.warn('Requesting stencil set file failed. (' + e + ')')
     }
-  }
-
-  offer (pluginData) {
-    if (!this.pluginsData.member(pluginData)) {
-      this.pluginsData.push(pluginData)
-    }
-  }
-
-  /**
-   * It creates an new event or adds the callback, if already existing,
-   * for the key combination that the plugin passes in keyCodes attribute
-   * of the offer method.
-   *
-   * The new key down event fits the schema:
-   *    key.event[.metactrl][.alt][.shift].'thekeyCode'
-   */
-  registerPluginsOnKeyEvents () {
-    this.pluginsData.each(function (pluginData) {
-      if (pluginData.keyCodes) {
-        pluginData.keyCodes.each(function (keyComb) {
-          let eventName = 'key.event'
-
-          /* Include key action */
-          eventName += '.' + keyComb.keyAction
-
-          if (keyComb.metaKeys) {
-            /* Register on ctrl or apple meta key as meta key */
-            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_META_CTRL) > -1) {
-              eventName += '.' + ORYX_Config.META_KEY_META_CTRL
-            }
-
-            /* Register on alt key as meta key */
-            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_ALT) > -1) {
-              eventName += '.' + ORYX_Config.META_KEY_ALT
-            }
-
-            /* Register on shift key as meta key */
-            if (keyComb.metaKeys.indexOf(ORYX_Config.META_KEY_SHIFT) > -1) {
-              eventName += '.' + ORYX_Config.META_KEY_SHIFT
-            }
-          }
-
-          /* Register on the actual key */
-          if (keyComb.keyCode) {
-            eventName += '.' + keyComb.keyCode
-          }
-
-          /* Register the event */
-          ORYX_Log.debug('Register Plugin on Key Event: %0', eventName)
-          if (pluginData.toggle === true && pluginData.buttonInstance) {
-            this.registerOnEvent(eventName, function () {
-              pluginData.buttonInstance.toggle(!pluginData.buttonInstance.pressed) // Toggle
-              pluginData.functionality.call(
-                pluginData,
-                pluginData.buttonInstance,
-                pluginData.buttonInstance.pressed) // Call function
-            })
-          } else {
-            this.registerOnEvent(eventName, pluginData.functionality)
-          }
-
-        }.bind(this))
-      }
-    }.bind(this))
   }
 
   isEqual (a, b) {
@@ -1535,6 +1534,23 @@ export default class Editor {
         ORYX_Editor._resizefixTimeout = null
       }, 100)
     }
+  }
+
+  clearAllEventListeners () {
+    // 删除注册的插件和相关事件
+
+    this.loadedPlugins.forEach(value => {
+      // if (value.onSelectionChanged) {
+      //   this.unregisterOnEvent(ORYX_Config.EVENT_SELECTION_CHANGED, value.onSelectionChanged.bind(value))
+      // }
+      if (value.clearAddEventListener) {
+        value.clearAddEventListener.apply(value)
+      }
+    })
+    Plugins._clearPlugins()
+
+    this.DOMEventListeners = new Hash()
+    this._eventsQueue = []
   }
 }
 

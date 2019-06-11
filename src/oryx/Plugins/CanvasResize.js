@@ -78,10 +78,10 @@ class commandClass extends ORYX_Command {
 export default class CanvasResize {
   constructor (facade) {
     this.facade = facade
-    new CanvasResizeButton(this.facade.getCanvas(), 'N', this.resize.bind(this))
-    new CanvasResizeButton(this.facade.getCanvas(), 'W', this.resize.bind(this))
-    new CanvasResizeButton(this.facade.getCanvas(), 'E', this.resize.bind(this))
-    new CanvasResizeButton(this.facade.getCanvas(), 'S', this.resize.bind(this))
+    this.ResizeButton_N = new CanvasResizeButton(this.facade.getCanvas(), 'N', this.resize.bind(this))
+    this.ResizeButton_W = new CanvasResizeButton(this.facade.getCanvas(), 'W', this.resize.bind(this))
+    this.ResizeButton_E = new CanvasResizeButton(this.facade.getCanvas(), 'E', this.resize.bind(this))
+    this.ResizeButton_S = new CanvasResizeButton(this.facade.getCanvas(), 'S', this.resize.bind(this))
 
     // window.setTimeout(function () {
     //   jQuery(window).trigger('resize')
@@ -93,6 +93,13 @@ export default class CanvasResize {
     if (shrink) extentionSize = -extentionSize
     const command = new commandClass(position, extentionSize, this.facade)
     this.facade.executeCommands([command])
+  }
+
+  clearAddEventListener () {
+    this.ResizeButton_N.clearAddEventListener()
+    this.ResizeButton_W.clearAddEventListener()
+    this.ResizeButton_E.clearAddEventListener()
+    this.ResizeButton_S.clearAddEventListener()
   }
 }
 

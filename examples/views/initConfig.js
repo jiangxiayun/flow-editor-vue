@@ -200,7 +200,7 @@ const FLOWABLE = {
     SCALERS_SIZE: 7,
     MINIMUM_SIZE: 20,
     MAXIMUM_SIZE: 10000,
-    canNodesResize: false
+    canNodesResize: true
   },
   quickMenuDefinition: ['UserTask2', 'EndNoneEvent', 'ExclusiveGateway',
     'TextAnnotation', 'SequenceFlow', 'Association'],

@@ -99,7 +99,6 @@
         }
       },
       doBtnAction () {
-        console.log(66, this.buttonClicked)
         // 插件预设事件
         // Default behaviour
         let services = {
@@ -107,7 +106,6 @@
           '$rootScope': this.$parent,
           'editorManager': this.editorManager
         }
-        console.log(55, services, this.buttonClicked.action)
 
         this.executeFunctionByName(this.buttonClicked.action, services)
       },

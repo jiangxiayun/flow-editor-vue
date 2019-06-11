@@ -69,6 +69,7 @@ export default class DragDropResize extends AbstractPlugin {
     // For the Drag and Drop
     // Register on MouseDown-Event on a Shape
     this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this))
+    this.facade.registerOnEvent('canvas.scrollEnd', this.setResizes.bind(this))
   }
 
   /**
@@ -260,6 +261,17 @@ export default class DragDropResize extends AbstractPlugin {
     }
   }
 
+  setResizes () {
+    let elements = this.currentShapes
+    if (elements.length === 1 && elements[0].isResizable && this.UI_CONFIG.canNodesResize) {
+      let aspectRatio = elements[0].getStencil().fixedAspectRatio() ?
+        elements[0].bounds.width() / elements[0].bounds.height() : undefined
+      this.resizerSE.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
+      this.resizerSE.show()
+      this.resizerNW.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
+      this.resizerNW.show()
+    }
+  }
   /**
    * On Mouse Down
    */
@@ -296,7 +308,6 @@ export default class DragDropResize extends AbstractPlugin {
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.callbackMouseMove, false)
     // Register on Global Mouse-UP Event
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.callbackMouseUp, true)
-
     return
   }
 
@@ -1000,4 +1011,8 @@ export default class DragDropResize extends AbstractPlugin {
     this.selectedRect.resize(bounds)
   }
 
+  clearAddEventListener () {
+    this.resizerNW.clearAddEventListener()
+    this.resizerSE.clearAddEventListener()
+  }
 }

@@ -38,6 +38,9 @@ const FLOW_eventBus = {
       this.listeners[type] = newArray
     }
   },
+  removeAllListener: function () {
+    this.listeners = {}
+  },
   hasListener: function (type, callback, scope) {
     if (typeof this.listeners[type] !== 'undefined') {
       const numOfCallbacks = this.listeners[type].length

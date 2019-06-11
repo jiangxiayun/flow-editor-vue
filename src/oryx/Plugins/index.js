@@ -94,6 +94,9 @@ const Plugins = {
       availablePlugins.push(pluginData)
     })
     this.availablePlugins = availablePlugins
+  },
+  _clearPlugins: function () {
+    this.availablePlugins = []
   }
 }
 

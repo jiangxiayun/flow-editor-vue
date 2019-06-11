@@ -1,5 +1,6 @@
 <template>
   <div>
+    <button @click="clearAllEvents">移除所有事件</button>
     <flowEditor ref="flowEditor"
                 :config="config"
                 @btn-save-click="handleSaveBtn"
@@ -7,7 +8,8 @@
                 :interceptors-draw="handlePasteBtn"
                 :contextmenuList="contextmenuList"
                 @oncontextmenu="handleContextmenu"
-                @clickContextmenuCommand="handleContextmenuCommand">
+                @clickContextmenuCommand="handleContextmenuCommand"
+                @selection-changed="selectionChanged">
       <template slot="paletteWrapper" slot-scope="scope">
         <div id="paletteHelpWrapper" class="paletteHelpWrapper" v-if="scope.editorManager">
           <div class="stencils" id="paletteSection">
@@ -227,15 +229,16 @@
         return this.editorManager ? this.editorManager.getModel() : { properties: {} }
       }
     },
-    mounted () {
-      FLOW_eventBus.addListener('event-type-selection-changed', (event) => {
+    methods: {
+      selectionChanged (event) {
         if (this.currentShapeMode !== 'write') {
           this.selectedItem = event.selectedItem
           this.selectedShape = event.selectedShape
         }
-      })
-    },
-    methods: {
+      },
+      clearAllEvents () {
+        this.editorManager.clearAllEvents()
+      },
       handleSaveBtn (editor) {
         this.saveVisible = true
         this.editorManager = editor

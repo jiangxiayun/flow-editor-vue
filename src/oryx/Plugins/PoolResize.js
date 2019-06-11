@@ -1,16 +1,10 @@
 import AbstractPlugin from './AbstractPlugin'
-import SelectedRect from './SelectedRect'
-import GridLine from './GridLine'
 import Resizer from './Resizer'
 import ORYX_Edge from '../core/Edge'
 import ORYX_Node from '../core/Node'
-import ORYX_Shape from '../core/Shape'
-import ORYX_Canvas from '../core/Canvas'
 import ORYX_Command from '../core/Command'
 import ORYX_Command_Move from '../core/Move'
-import ORYX_Controls from '../core/Controls/index'
 import ORYX_Config from '../CONFIG'
-import ORYX_Utils from '../Utils'
 
 export default class DragDropResize extends AbstractPlugin {
   UI_CONFIG = ORYX_Config.CustomConfigs.UI_CONFIG
@@ -21,7 +15,6 @@ export default class DragDropResize extends AbstractPlugin {
   constructor (facade) {
     super(facade)
     this.facade = facade
-    // Initialize variables
     this.currentShape = null			// Current selected Shapes
     this.isResizing = false		// Flag: If there was currently resized
     this.offSetPosition = { x: 0, y: 0 }	// Offset of the Dragging
@@ -62,6 +55,8 @@ export default class DragDropResize extends AbstractPlugin {
    * On the Selection-Changed
    */
   setResizes () {
+    if (!this.currentShape) return
+
     let shape =  this.currentShape
     let type = shape.getStencil().idWithoutNs()
 
@@ -69,7 +64,7 @@ export default class DragDropResize extends AbstractPlugin {
       let newBounds = shape.absoluteBounds()
       this.dragBounds = newBounds
       let aspectRatio = shape.getStencil().fixedAspectRatio() ?
-        shape.bounds.width() / elements[0].bounds.height() : undefined
+        shape.bounds.width() / shape.bounds.height() : undefined
       switch (type) {
         case 'Lane':
           this.resizerSouth.setBounds(this.dragBounds, shape.minimumSize, shape.maximumSize, aspectRatio)

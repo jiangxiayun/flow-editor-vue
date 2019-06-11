@@ -11,7 +11,11 @@ export default class Resizer {
     this.node = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', $('canvasSection'),
       ['div', { 'class': 'resizer_' + this.orientation, style: 'left:0px; top:0px;position:absolute;' }])
 
-    this.node.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this), true)
+    this.handleMouseDownFun = this.handleMouseDown.bind(this)
+    this.handleMouseUpFun = this.handleMouseUp.bind(this)
+    this.handleMouseMoveFun = this.handleMouseMove.bind(this)
+
+    this.node.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDownFun, true)
 
     this.dragEnable = false
     this.offSetPosition = { x: 0, y: 0 }
@@ -45,20 +49,19 @@ export default class Resizer {
       value(this.bounds)
     }).bind(this))
 
-    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUp.bind(this), true)
-    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.handleMouseMove.bind(this), false)
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUpFun, true)
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.handleMouseMoveFun, false)
   }
 
   handleMouseUp (event) {
-    console.log(899)
     this.dragEnable = false
     this.containmentParentNode = null
     this.resizeEndCallbacks.each((function (value) {
       value(this.bounds)
     }).bind(this))
 
-    // document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUp, true)
-    // document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.handleMouseMove, false)
+    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUpFun, true)
+    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.handleMouseMoveFun, false)
   }
 
   handleMouseMove (event) {
@@ -337,5 +340,9 @@ export default class Resizer {
 
     this.node.style.left = this.position.x + 'px'
     this.node.style.top = this.position.y + 'px'
+  }
+
+  clearAddEventListener () {
+    this.node.removeEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDownFun, true)
   }
 }

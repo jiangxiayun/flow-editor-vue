@@ -46,17 +46,17 @@
       })
     },
     methods: {
-      dragStart (evt) {
-        console.log(1, evt.item)
-      },
-      dragMove (evt) {
-        console.log(2, evt)
-      },
-      dragEnd (evt) {
-        console.log(3, evt)
-      },
+      // dragStart (evt) {
+      //   console.log(1, evt.item)
+      // },
+      // dragMove (evt) {
+      //   console.log(2, evt)
+      // },
+      // dragEnd (evt) {
+      //   console.log(3, evt)
+      // },
       startDragCallback (event, ui) {
-        console.log('startDragCallback', ui)
+        // console.log('startDragCallback', ui)
         this.dragModeOver = false
         EventBus.$emit('UPDATE_dragModeOver', false)
         EventBus.$emit('UPDATE_quickMenu', false)
@@ -182,6 +182,7 @@
               return false
             }
 
+            console.log(887,item,  '!!!!', parentCandidate)
             if (item.type === 'node') {
               // check if the draggable is a boundary event and the parent an Activity
               let _canContain = false
@@ -278,12 +279,16 @@
               let canvasCandidate = this.editorManager.getCanvas()
               let canConnect = false
 
-              let targetStencil = this.editorManager.getStencilItemById(parentCandidate.getStencil().idWithoutNs())
+              let stencil = parentCandidate.getStencil()
+              let idWithoutNs = stencil.idWithoutNs()
+              let targetStencil = this.editorManager.getStencilItemById(idWithoutNs)
               if (targetStencil) {
                 let associationConnect = false
-                if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
+                if (idWithoutNs === 'Association' &&
+                  (curCan.getStencil().idWithoutNs() === 'TextAnnotation' ||
+                    curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
                   associationConnect = true
-                } else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
+                } else if (idWithoutNs === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
                   associationConnect = true
                 }
 

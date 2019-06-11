@@ -101,7 +101,6 @@
         contextmenu_visibile: false,
         contextmenu_top: '0',
         contextmenu_left: '0',
-        contextmenu_visibile_willshow: false,
         btn_visibile: {
           hide_shape_buttons: true,
           hide_flow_add_btns: true,
@@ -129,11 +128,7 @@
     },
     mounted () {
       // 隐藏画布节点的快捷按钮
-      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, (btns) => {
-        btns.map(btn => {
-          this.btn_visibile[btn.type] = btn.status
-        })
-      })
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, this.oryxBtnStatus)
 
       EventBus.$on('UPDATE_dragModeOver', (status) => {
         this.dragModeOver = status
@@ -158,6 +153,11 @@
       }
     },
     methods: {
+      oryxBtnStatus (btns) {
+        btns.map(btn => {
+          this.btn_visibile[btn.type] = btn.status
+        })
+      },
       clickCommand (item) {
         this.dispatch('flowEditor', 'clickContextmenuCommand', {action: item, shape: this.currentShape})
       },
@@ -171,7 +171,6 @@
           this.selectedElements = selectedElements
           // 用户自定义按钮事件，以$emit抛出 buttonClicked.action 事件
           this.dispatch('flowEditor', 'oncontextmenu', { selectedElements })
-          // this.setContextmenuPosition(selectedElements)
           return false
         }
       },
@@ -186,19 +185,6 @@
       },
       hideContextmenu () {
         this.contextmenu_visibile = false
-        this.contextmenu_visibile_willshow = false
-      },
-      setContextmenuPosition (selectedElements) {
-        if (selectedElements.length === 1 && selectedElements[0].getStencil().idWithoutNs() === 'UserTask') {
-          this.currentShape = selectedElements[0]
-          let offset = this.editorManager.getNodeOffset(selectedElements[0])
-          this.contextmenu_top = `${offset.a.y}px`
-          this.contextmenu_left = `${offset.b.x + 5}px`
-          this.contextmenu_visibile = true
-        } else {
-          this.contextmenu_visibile = false
-          this.contextmenu_visibile_willshow = false
-        }
       },
       editShape () {
         this.editorManager.edit(this.selectedShape.resourceId)
@@ -216,7 +202,6 @@
 
         if (this.contextmenu_visibile) {
           this.contextmenu_visibile = false
-          this.contextmenu_visibile_willshow = true
         }
         this.btn_visibile.hide_shape_buttons = true
 
@@ -231,33 +216,21 @@
       },
       fnHandleScrollDebounce: _debounce(function (_type, index, item) {
         this.editorManager.handleEvents({ type: 'canvas.scrollEnd' })
-        // Puts the quick menu items and resizer back when scroll is stopped.
-        // this.editorManager.setSelection([])
-        // needed cause it checks for element changes and does nothing if the elements are the same
-        // this.editorManager.setSelection(this.selectedElements, this.subSelectionElements)
-        this.contextmenu_visibile_willshow && this.setContextmenuPosition(this.selectedElements)
         this.editorManager.updateOryxButtonPosition(this.selectedElements)
         this.selectedElements = undefined
         this.subSelectionElements = undefined
-
-        // jQuery('.resizer_south').css('display', 'block')
-        // jQuery('.resizer_north').css('display', 'block')
-        // jQuery('.resizer_west').css('display', 'block')
-        // jQuery('.resizer_east').css('display', 'block')
-        // jQuery('.resizer_northwest').css('display', 'block')
-        // jQuery('.resizer_southeast').css('display', 'block')
       }, 200),
       deleteShape () {
         this.editorManager.TOOLBAR_ACTIONS.deleteItem({ '$scope': this, 'editorManager': this.editorManager })
       },
       morphShape () {
-        var shapes = this.editorManager.getSelection()
-        if (shapes && shapes.length == 1) {
+        const shapes = this.editorManager.getSelection()
+        if (shapes && shapes.length === 1) {
           this.currentSelectedShape = shapes.first()
           let currentSelectedShapeId = this.currentSelectedShape.getStencil().idWithoutNs()
-          var stencilItem = this.editorManager.getStencilItemById(currentSelectedShapeId)
+          const stencilItem = this.editorManager.getStencilItemById(currentSelectedShapeId)
 
-          var morphShapes = []
+          let morphShapes = []
           const morphRoles = this.editorManager.morphRoles
           // && morphRoles[i].id !== currentSelectedShapeId
           for (let i = 0; i < morphRoles.length; i++) {
@@ -319,7 +292,7 @@
           { type: 'hide_edit_buttons', status: true }
         ])
 
-        console.log('dragCanContain', this.dragCanContain)
+        // console.log('dragCanContain', this.dragCanContain)
         if (this.dragCanContain) {
           let item = this.editorManager.getStencilItemById(ui.draggable[0].id)
           let pos = { x: event.pageX, y: event.pageY }
@@ -408,7 +381,6 @@
               }
 
               // let command = new FLOWABLE_OPTIONS.CreateCommand(option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
-              //
               // this.editorManager.executeCommands([command])
               this.editorManager.assignCommand('CreateCommand', option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
             }
@@ -581,7 +553,7 @@
         }
       },
       quickAddItem (newItemId) {
-        console.log('Oryx_button:', newItemId)
+        // console.log('Oryx_button:', newItemId)
         let shapes = this.editorManager.getSelection()
         if (shapes && shapes.length === 1) {
           this.currentSelectedShape = shapes.first()
@@ -621,6 +593,9 @@
           this.editorManager.assignCommand('CreateCommand', option, undefined, undefined, this.editorManager.getEditor())
         }
       }
+    },
+    beforeDestroy () {
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_HIDE_SHAPE_BUTTONS, this.oryxBtnStatus)
     }
   }
 </script>

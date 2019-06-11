@@ -7,8 +7,8 @@ export default class HighlightingSelectedShapes {
     this.opacityLow = 0.4;
 
     // Register on Dragging-Events for show/hide of ShapeMenu
-    //this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DRAGDROP_START, this.hide.bind(this));
-    //this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DRAGDROP_END,  this.show.bind(this));
+    // this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DRAGDROP_START, this.hide.bind(this));
+    // this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DRAGDROP_END,  this.show.bind(this));
   }
 
   /**

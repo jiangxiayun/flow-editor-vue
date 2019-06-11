@@ -47,11 +47,11 @@
       </div>
       <div class="process-treeview-body" v-show="isEditorReady">
         <div class="process-treeview-process-title" :title="treeview.id"
-             :class="{'current-process': treeview.current}" >
+             :class="{'current-process': treeview.current}">
           Process: {{treeview.name}}
           <img v-show="!treeview.current"
                src="@/assets/images/pencil.png" class="pull-right"
-               @click="edit(treeview.id)" />
+               @click="edit(treeview.id)"/>
         </div>
         <ul class="process-treeview-list" v-if="treeview.children">
           <li v-for="child in treeview.children" :key="child.id">
@@ -74,7 +74,7 @@
   import rootStencilItemTemplate from 'packages/root-stencil-item'
 
   export default {
-    name: "paletteHelpWrapper",
+    name: 'paletteHelpWrapper',
     data () {
       return {
         UI_CONFIG: ORYX_CONFIG.CustomConfigs.UI_CONFIG,
@@ -86,12 +86,12 @@
             items: [],
             name: '自定义节点',
             paletteItems: [],
-            visible: true,
+            visible: true
           }
-        ],
+        ]
       }
     },
-    components: {stencilItemTemplate, processTreeList, rootStencilItemTemplate},
+    components: { stencilItemTemplate, processTreeList, rootStencilItemTemplate },
     props: {
       editorManager: {}
     },
@@ -102,23 +102,23 @@
     computed: {
       stencilItemGroups () {
         if (!this.editorManager) return []
-        const data = this.editorManager.getShowStencilData();
+        const data = this.editorManager.getShowStencilData()
         // console.log('stencilItemGroups', data)
         // console.log(888888888)
         return data
-      },
+      }
     },
     methods: {
       showSubProcess (child) {
-        const flowableShapes = this.editorManager.getChildShapeByResourceId(child.resourceId);
-        this.editorManager.setSelection([flowableShapes],[],true);
+        const flowableShapes = this.editorManager.getChildShapeByResourceId(child.resourceId)
+        this.editorManager.setSelection([flowableShapes], [], true)
       },
       edit (resourceId) {
-        this.editorManager.edit(resourceId);
+        this.editorManager.edit(resourceId)
       },
       expandedToggle (group) {
         let expanded = !group.expanded
-        this.$set(group, 'expanded',  expanded)
+        this.$set(group, 'expanded', expanded)
       }
     }
   }

@@ -35,7 +35,6 @@ export default class PoolAsProperty extends AbstractPlugin {
     // Register on over/out to show / hide a docker
     this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEOVER, this.handleMouseOver.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEOUT, this.handleMouseOut.bind(this))
-    // document.addEventListener('click', this.handleClick.bind(this))
   }
 
 

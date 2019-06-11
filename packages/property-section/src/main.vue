@@ -157,10 +157,25 @@
       // systemWriteTemplate
     },
     mounted () {
-      /*
-       * Listen to property updates and act upon them
-       */
-      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED, (event) => {
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.propertyValueChanged)
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, this.selectChanged)
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_DOUBLE_CLICK, this.doubleClick)
+    },
+    beforeDestroy () {
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED, this.propertyValueChanged)
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, this.selectChanged)
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_DOUBLE_CLICK, this.doubleClick)
+    },
+    computed: {
+      modelData () {
+        return this.editorManager ? this.editorManager.getBaseModelData() : {}
+      },
+      currentShapeType () {
+        return this.selectedShape ? this.selectedShape.getStencil().idWithoutNs() : null
+      }
+    },
+    methods: {
+      propertyValueChanged (event) {
         if (event.property && event.property.key) {
           // If the name property is been updated, we also need to change the title of the currently selected item
           if (event.property.key === 'oryx-name' && this.selectedItem !== undefined && this.selectedItem !== null) {
@@ -175,9 +190,8 @@
             this.laneEnableValue = event.property.noValue ? '' : event.property.key
           }
         }
-
-      })
-      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, (event) => {
+      },
+      selectChanged (event) {
         this.laneEnableValue = ''
         if (this.currentSelectedProperty.mode != 'write') {
           this.selectedItem = event.selectedItem
@@ -190,20 +204,10 @@
             }
           })
         }
-      })
-      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_DOUBLE_CLICK, (event, shape) => {
-        console.log(111, shape)
-      })
-    },
-    computed: {
-      modelData () {
-        return this.editorManager ? this.editorManager.getBaseModelData() : {}
       },
-      currentShapeType () {
-        return this.selectedShape ? this.selectedShape.getStencil().idWithoutNs() : null
-      }
-    },
-    methods: {
+      doubleClick (event, shape) {
+        console.log(111, shape)
+      },
       propertyWindowStateToggle () {
         this.propertyWindowState.collapsed = !this.propertyWindowState.collapsed
         setTimeout(function () {

@@ -58,27 +58,29 @@
         ...this.config,
         elementsWithoutRenameAction: ['Lane', 'V-Lane']
       })
-      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, () => {
-        this.handlePopEvent('editorInitCompleted', this.editorManager)
-      })
-      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, (event) => {
-        this.handlePopEvent('selection-changed', event)
-        // if (this.currentShapeMode !== 'write') {
-        //   this.selectedItem = event.selectedItem
-        //   this.selectedShape = event.selectedShape
-        // }
-      })
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, this.initCompleted)
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, this.selectChangeFun)
       // 将用户在深层子组件里的自定义事件抛出
       this.$on('Propagation', this.handlePopEvent)
     },
     methods: {
+      selectChangeFun (event) {
+        this.handlePopEvent('selection-changed', event)
+      },
+      initCompleted () {
+        this.handlePopEvent('editorInitCompleted', this.editorManager)
+      },
       handlePopEvent (eventName, params) {
-        // console.log(33, params)
         this.$emit(eventName, params)
       },
       showContextmenu () {
         this.$refs.canvasWrapper.showContextmenu()
       }
+    },
+    beforeDestroy () {
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, this.initCompleted)
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, this.selectChangeFun)
+      this.editorManager.clearAllEvents()
     }
   }
 </script>

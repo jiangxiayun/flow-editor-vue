@@ -54,7 +54,7 @@
     methods: {
       expandedToggle() {
         this.$emit('expandedToggle')
-      },
+      }
     }
   }
 </script>

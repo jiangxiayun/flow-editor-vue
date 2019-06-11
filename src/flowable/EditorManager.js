@@ -680,9 +680,6 @@ export default class EditorManager {
   }
 
   initRegisterOnEvent () {
-    this.registerOnEvent('oncontextmenu', (event) => {
-      console.log(888, event)
-    })
     this.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, (event) => {
       let shapes = event.elements
       // 控制 toolbar buttons 是否可用
@@ -1006,5 +1003,9 @@ export default class EditorManager {
 
       $window.location.href = '../editor/#/editor/' + event.processId
     })
+  }
+  clearAllEvents () {
+    FLOW_eventBus.removeAllListener()
+    this.editor.clearAllEventListeners()
   }
 }

@@ -16,7 +16,9 @@ export default class RenameShapes {
       }],
       functionality: this.renamePerF2.bind(this)
     })
-    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.hide.bind(this), true)
+    this.hideFun = this.hide.bind(this)
+    console.log(123)
+    document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.hideFun, true)
   }
   /**
    * This method handles the "F2" key down event. The selected shape are looked
@@ -323,5 +325,9 @@ export default class RenameShapes {
 
       this.facade.enableEvent(ORYX_Config.EVENT_KEYDOWN)
     }
+  }
+
+  clearAddEventListener () {
+    document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.hideFun, true)
   }
 }
