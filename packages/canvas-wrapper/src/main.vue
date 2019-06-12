@@ -477,6 +477,7 @@
           let candidate = aShapes.last()
 
           let isValid = false
+
           if (stencil.type() === 'node') {
             // check containment rules
             let canContain = this.editorManager.getRules().canContain({
@@ -513,16 +514,20 @@
               let targetStencil = this.editorManager.getStencilItemById(curCan.getStencil().idWithoutNs())
               if (targetStencil) {
                 let associationConnect = false
-                if (stencil.idWithoutNs() === 'Association' && (curCan.getStencil().idWithoutNs() === 'TextAnnotation' || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent')) {
+                if (stencil.idWithoutNs() === 'Association' &&
+                  (curCan.getStencil().idWithoutNs() === 'TextAnnotation'
+                    || curCan.getStencil().idWithoutNs() === 'BoundaryCompensationEvent'
+                    || curCan.getStencil().idWithoutNs() === 'FlowBox')) {
                   associationConnect = true
-                } else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
+                } else if (stencil.idWithoutNs() === 'DataAssociation'
+                  && curCan.getStencil().idWithoutNs() === 'DataStore') {
                   associationConnect = true
                 }
 
                 if (targetStencil.canConnectTo || associationConnect) {
                   while (!canConnect && curCan && !this.editorManager.instanceofCanvas(curCan)) {
                     candidate = curCan
-                    //check connection rules
+                    // check connection rules
                     canConnect = this.editorManager.getRules().canConnect({
                       sourceShape: currentSelectedShape,
                       edgeStencil: stencil,

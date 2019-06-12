@@ -173,7 +173,7 @@ export default class EditorManager {
     let quickMenu = undefined
     let ignoreNode = undefined
     const data = this.stencilData
-    if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+    if (data.namespace === 'http://b3mn.org/stencilset/cmmn1.1#') {
       quickMenu = ['HumanTask', 'Association']
       ignoreNode = ['CasePlanModel']
     } else {
@@ -254,21 +254,25 @@ export default class EditorManager {
       }
 
       if (!removed) {
-        if (quickMenuDefinition.indexOf(stencilItem.id) >= 0) {
-          quickMenuItems[quickMenuDefinition.indexOf(stencilItem.id)] = stencilItem
+        let index = quickMenuDefinition.indexOf(stencilItem.id)
+        if (index >= 0) {
+          quickMenuItems[index] = stencilItem
         }
       }
 
-      if (stencilItem.id === 'TextAnnotation' || stencilItem.id === 'BoundaryCompensationEvent') {
+      if (stencilItem.id === 'TextAnnotation'
+        || stencilItem.id === 'BoundaryCompensationEvent'
+        || stencilItem.id === 'FlowBox') {
         stencilItem.canConnectAssociation = true
       }
 
       for (let i = 0; i < data.stencils[stencilIndex].roles.length; i++) {
         let stencilRole = data.stencils[stencilIndex].roles[i]
-        if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+        if (data.namespace === 'http://b3mn.org/stencilset/cmmn1.1#') {
           if (stencilRole === 'association_start') {
             stencilItem.canConnect = true
           } else if (stencilRole === 'association_end') {
+            stencilItem.canConnectTo = true
             stencilItem.canConnectTo = true
           }
         } else {
@@ -306,7 +310,7 @@ export default class EditorManager {
     }
 
     for (let i = 0; i < stencilItemGroups_ary.length; i++) {
-      if (stencilItemGroups_ary[i].paletteItems && stencilItemGroups_ary[i].paletteItems.length == 0) {
+      if (stencilItemGroups_ary[i].paletteItems && stencilItemGroups_ary[i].paletteItems.length === 0) {
         stencilItemGroups_ary[i].visible = false
       }
     }
@@ -329,7 +333,6 @@ export default class EditorManager {
       }
     }
 
-    // this.UPDATE_quickMenuItems(availableQuickMenuItems)
     this.quickMenuItems = availableQuickMenuItems
     this.morphRoles = morphRoles
     // console.log('availableQuickMenuItems', availableQuickMenuItems)
@@ -359,6 +362,7 @@ export default class EditorManager {
 
     // this will be overwritten almost instantly.
     this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes))
+    console.log('config', config)
     this.editor = new ORYX.Editor(config)
 
     this.current = this.editor.id
@@ -748,9 +752,10 @@ export default class EditorManager {
       for (let i = 0; i < properties.length; i++) {
         let property = properties[i]
         if (!property.popular()) continue
-        let key = property.prefix() + '-' + property.id()
+        // let key = property.prefix() + '-' + property.id()
+        let key = property.id()
 
-        if (key === 'oryx-name') {
+        if (key === 'name') {
           selectedItem.title = selectedShape.properties.get(key)
         }
 
@@ -782,7 +787,9 @@ export default class EditorManager {
             'value': selectedShape.properties.get(key)
           }
 
-          if ((currentProperty.type === 'complex' || currentProperty.type === 'multiplecomplex') &&
+          if ((currentProperty.type === 'complex'
+            || currentProperty.type === 'multiplecomplex'
+            || currentProperty.type === 'List') &&
             currentProperty.value && currentProperty.value.length > 0) {
             try {
               currentProperty.value = JSON.parse(currentProperty.value)
@@ -807,7 +814,7 @@ export default class EditorManager {
 
           if (currentProperty.value === undefined
             || currentProperty.value === null
-            || currentProperty.value.length == 0) {
+            || currentProperty.value.length === 0) {
             currentProperty.noValue = true
           }
 
@@ -905,7 +912,9 @@ export default class EditorManager {
       let editable = selectedShape._stencil._jsonStencil.id.endsWith('CollapsedSubProcess')
       hide_edit_buttons = !editable
 
-      if (stencilItem && (stencilItem.canConnect || stencilItem.canConnectAssociation)) {
+      if (stencilItem &&
+        (stencilItem.canConnect
+          || (stencilItem.canConnectAssociation && stencilItem.id !== 'FlowBox'))) {
         let quickButtonX = shapeXY.x + bounds.width() + 7
         let quickButtonY = shapeXY.y
         let flow_add_btns = document.getElementById('flow_add_btns')

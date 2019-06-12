@@ -428,7 +428,6 @@ export default class Node extends Shape {
   }
 
   deserialize (data) {
-    // arguments.callee.$.deserialize.apply(this, arguments)
     super.deserialize(data)
     try {
       let deserializeEvent = this.getStencil().deserialize()
@@ -448,13 +447,10 @@ export default class Node extends Shape {
         }
       }
     }
-    catch (e) {
-    }
+    catch (e) {}
 
     // Set the outgoing shapes
-    let outgoing = data.findAll(function (ser) {
-      return (ser.prefix + '-' + ser.name) == 'raziel-outgoing'
-    })
+    let outgoing = data.findAll((ser) => (ser.prefix + '-' + ser.name) === 'raziel-outgoing')
     outgoing.each((function (obj) {
       // TODO: Look at Canvas
       if (!this.parent) {
@@ -466,12 +462,12 @@ export default class Node extends Shape {
 
       if (next) {
         if (next instanceof ORYX_Edge) {
-          //Set the first docker of the next shape
+          // Set the first docker of the next shape
           next.dockers.first().setDockedShape(this)
           next.dockers.first().setReferencePoint(next.dockers.first().bounds.center())
-        } else if (next.dockers.length > 0) { //next is a node and next has a docker
+        } else if (next.dockers.length > 0) { // next is a node and next has a docker
           next.dockers.first().setDockedShape(this)
-          //next.dockers.first().setReferencePoint({x: this.bounds.width() / 2.0, y: this.bounds.height() / 2.0});
+          // next.dockers.first().setReferencePoint({x: this.bounds.width() / 2.0, y: this.bounds.height() / 2.0});
         }
       }
 
@@ -479,9 +475,7 @@ export default class Node extends Shape {
 
     if (this.dockers.length === 1) {
       let dockerPos
-      dockerPos = data.find(function (entry) {
-        return (entry.prefix + '-' + entry.name === 'oryx-dockers')
-      })
+      dockerPos = data.find((entry) => (entry.prefix + '-' + entry.name === 'oryx-dockers'))
 
       if (dockerPos) {
         let points = dockerPos.value.replace(/,/g, ' ').split(' ').without('').without('#')
@@ -519,7 +513,7 @@ export default class Node extends Shape {
     attributeId.nodeValue = this.id
     svgNode.setAttributeNode(attributeId)
 
-    let stencilTargetNode = this.node.childNodes[0].childNodes[0] //<g class=me>"
+    let stencilTargetNode = this.node.childNodes[0].childNodes[0] // <g class=me>"
     svgNode = stencilTargetNode.appendChild(svgNode)
 
     // Add to the EventHandler

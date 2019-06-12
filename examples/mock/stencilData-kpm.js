@@ -99,7 +99,7 @@ export const AA = {
       'properties': [
         {
           'id': 'dates',
-          'type': 'String',
+          'type': 'StringComplex',
           'title': '时间',
           'value': '',
           'description': '时间(天)',
@@ -448,10 +448,6 @@ export const AA = {
       ],
       'hiddenPropertyPackages': [],
       'roles': [
-        'Activity',
-        'sequence_start',
-        'sequence_end',
-        'ActivitiesMorph',
         'all'
       ]
     },
@@ -565,39 +561,6 @@ export const AA = {
     },
     {
       'type': 'node',
-      'id': 'flowBox',
-      'title': 'Flow box',
-      'description': 'A sub process scope',
-      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?>\n<svg\n   xmlns="http://www.w3.org/2000/svg"\n   xmlns:svg="http://www.w3.org/2000/svg"\n   xmlns:oryx="http://www.b3mn.org/oryx"\n   xmlns:xlink="http://www.w3.org/1999/xlink"\n   width="200"\n   height="160"\n   version="1.0">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx="1" oryx:cy="50" oryx:anchors="left" />\n  \t<oryx:magnet oryx:cx="1" oryx:cy="80" oryx:anchors="left" />\n  \t<oryx:magnet oryx:cx="1" oryx:cy="110" oryx:anchors="left" />\n  \t\n  \t<oryx:magnet oryx:cx="70" oryx:cy="159" oryx:anchors="bottom" />\n  \t<oryx:magnet oryx:cx="100" oryx:cy="159" oryx:anchors="bottom" />\n  \t<oryx:magnet oryx:cx="130" oryx:cy="159" oryx:anchors="bottom" />\n  \t\n  \t<oryx:magnet oryx:cx="199" oryx:cy="50" oryx:anchors="right" />\n  \t<oryx:magnet oryx:cx="199" oryx:cy="80" oryx:anchors="right" />\n  \t<oryx:magnet oryx:cx="199" oryx:cy="110" oryx:anchors="right" />\n  \t\n  \t<oryx:magnet oryx:cx="70" oryx:cy="1" oryx:anchors="top" />\n  \t<oryx:magnet oryx:cx="100" oryx:cy="1" oryx:anchors="top" />\n  \t<oryx:magnet oryx:cx="130" oryx:cy="1" oryx:anchors="top" />\n  \t\n  \t<oryx:magnet oryx:cx="100" oryx:cy="80" oryx:default="yes" />\n  </oryx:magnets>\n  <g pointer-events="fill" oryx:minimumSize="120 100" oryx:maximumSize="" >\n    <rect id="text_frame" oryx:anchors="bottom top right left" x="0" y="0" width="190" height="160" rx="10" ry="10" stroke="none" stroke-width="0" fill="none" />\n\t<rect id="bg_frame" oryx:anchors="bottom top right left" x="0" y="0" width="200" height="160" rx="10" ry="10" stroke="#bbbbbb" stroke-width="1" fill="#ffffff" />\n\t<rect id="border" oryx:anchors="top bottom left right" oryx:resize="vertical horizontal" x="2.5" y="2.5" width="195" height="155" rx="8" ry="8" stroke="black" stroke-width="1" fill="none" />\n\t<text \n\t\tfont-size="12" \n\t\tid="text_name" \n\t\tx="8" \n\t\ty="10" \n\t\toryx:align="top left"\n\t\toryx:fittoelem="text_frame"\n\t\toryx:anchors="left top" \n\t\tstroke="#373e48">\n\t</text>\n\t\n\t<g \tid="parallel"\n\t\ttransform="translate(1)">\n\t\t<path \n\t\t\tid="parallelpath"\n\t\t\toryx:anchors="bottom" \n\t\t\tfill="none" stroke="#bbbbbb" d="M96 145 v10 M100 145 v10 M104 145 v10" \n\t\t\tstroke-width="2"\n\t\t/>\n\t</g>\n\t<g \tid="sequential"\n\t\ttransform="translate(1)">\n\t\t<path \n\t\t\tid="sequentialpath"\n\t\t\toryx:anchors="bottom" \n\t\t\tfill="none" stroke="#bbbbbb" stroke-width="2" d="M95,154h10 M95,150h10 M95,146h10"\n\t\t/>\n\t</g>\n  </g>\n</svg>',
-      'icon': 'activity/expanded.subprocess.png',
-      'groups': [
-        '流程盒子'
-      ],
-      'propertyPackages': [
-        'overrideidpackage',
-        'namepackage',
-        'documentationpackage',
-        'asynchronousdefinitionpackage',
-        'exclusivedefinitionpackage',
-        'datapropertiespackage',
-        'executionlistenerspackage',
-        'multiinstance_typepackage',
-        'multiinstance_cardinalitypackage',
-        'multiinstance_collectionpackage',
-        'multiinstance_variablepackage',
-        'multiinstance_conditionpackage',
-        'istransactionpackage'
-      ],
-      'hiddenPropertyPackages': [],
-      'roles': [
-        'Activity',
-        'sequence_start',
-        'sequence_end',
-        'all'
-      ]
-    },
-    {
-      'type': 'node',
       'id': 'CollapsedSubProcess',
       'title': 'Collapsed Sub process',
       'description': 'A sub process scope',
@@ -669,12 +632,7 @@ export const AA = {
         '水平泳道'
       ],
       'propertyPackages': [
-        'overrideidpackage',
-        'namepackage',
-        'documentationpackage',
-        'departmentpackage',
-        'activerolepackage',
-        'activesystempackage'
+        'roleIdpackage'
       ],
       'hiddenPropertyPackages': [],
       'roles': [
@@ -937,12 +895,6 @@ export const AA = {
             ]
           },
           {
-            'from': 'BoundaryCompensationEvent',
-            'to': [
-              'sequence_end'
-            ]
-          },
-          {
             'from': 'TextAnnotation',
             'to': [
               'sequence_start'
@@ -951,9 +903,27 @@ export const AA = {
           {
             'from': 'BoundaryCompensationEvent',
             'to': [
+              'sequence_end'
+            ]
+          },
+          {
+            'from': 'BoundaryCompensationEvent',
+            'to': [
               'sequence_start'
             ]
-          }
+          },
+          {
+            'from': 'sequence_start',
+            'to': [
+              'FlowBox'
+            ]
+          },
+          {
+            'from': 'sequence_end',
+            'to': [
+              'FlowBox'
+            ]
+          },
         ]
       },
       {

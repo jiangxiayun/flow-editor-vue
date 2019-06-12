@@ -227,7 +227,7 @@ export default class Canvas extends AbstractShape {
 
         // add uiObject to the Canvas
         // add uiObject to this Shape
-        if (index != undefined) {
+        if (index !== undefined) {
           this.children.splice(index, 0, uiObject)
         } else {
           this.children.push(uiObject)
@@ -352,7 +352,7 @@ export default class Canvas extends AbstractShape {
       // Create a new Stencil
       let stencil = StencilSet.stencil(this.getStencil().namespace() + shape.stencil.id)
       // Create a new Shape
-      let ShapeClass = (stencil.type() == 'node') ? Node : Edge
+      let ShapeClass = (stencil.type() === 'node') ? Node : Edge
       let newShape = new ShapeClass(
         { 'eventHandlerCallback': eventHandler },
         stencil, this.facade)
@@ -380,11 +380,11 @@ export default class Canvas extends AbstractShape {
      */
     const addChildShapesRecursively = function (shape) {
       let addedShapes = []
-      if (shape.childShapes && shape.childShapes.constructor == String) {
+      if (shape.childShapes && shape.childShapes.constructor === String) {
         shape.childShapes = JSON.parse(shape.childShapes)
       }
 
-      shape.childShapes.each(function (childShape) {
+      shape.childShapes.each((childShape) => {
         addedShapes.push(addShape(childShape, shape))
         addedShapes = addedShapes.concat(addChildShapesRecursively(childShape))
       })

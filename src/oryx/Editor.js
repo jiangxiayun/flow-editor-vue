@@ -745,7 +745,6 @@ export default class Editor {
    */
   loadSerialized (model, requestMeta) {
     let canvas = this.getCanvas()
-    // Bugfix (cf. http://code.google.com/p/oryx-editor/issues/detail?id=240)
     // Deserialize the canvas' stencil set extensions properties first!
     this.loadSSExtensions(model.ssextensions)
 
@@ -757,8 +756,9 @@ export default class Editor {
         this.loadSSExtension(metaDataExtension)
       }
     }
-    let shapes = this.getCanvas().addShapeObjects(model.childShapes, this.handleEvents.bind(this))
 
+    let shapes = this.getCanvas().addShapeObjects(model.childShapes, this.handleEvents.bind(this))
+    console.log(11, shapes)
     if (model.properties) {
       for (let key in model.properties) {
         let value = model.properties[key]

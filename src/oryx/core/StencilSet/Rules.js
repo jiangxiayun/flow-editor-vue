@@ -3,8 +3,6 @@ import ORYX_Shape from '../Shape'
 
 export default class Rules {
   constructor () {
-    // arguments.callee.$.construct.apply(this, arguments)
-
     this._stencilSets = []
     this._stencils = []
     this._containerStencils = []
@@ -32,7 +30,7 @@ export default class Rules {
    */
   initializeRules (stencilSet) {
     const existingSS = this._stencilSets.find(function (ss) {
-      return (ss.namespace() == stencilSet.namespace())
+      return (ss.namespace() === stencilSet.namespace())
     })
     if (existingSS) {
       // reinitialize all rules
@@ -277,7 +275,7 @@ export default class Rules {
 
   _getStencilById (id) {
     return this._stencils.find(function (stencil) {
-      return stencil.id() == id
+      return stencil.id() === id
     })
   }
 

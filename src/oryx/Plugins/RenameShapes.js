@@ -1,7 +1,7 @@
 import ORYX_Config from '../CONFIG'
 import ORYX_Command from '../core/Command'
 import ORYX_Shape from '../core/Shape'
-import autogrow from 'src/libs/jquery.autogrow-textarea'
+import autogrow from '../../libs/jquery.autogrow-textarea'
 
 // 双击修改名称
 export default class RenameShapes {
@@ -17,7 +17,6 @@ export default class RenameShapes {
       functionality: this.renamePerF2.bind(this)
     })
     this.hideFun = this.hide.bind(this)
-    console.log(123)
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.hideFun, true)
   }
   /**
@@ -44,8 +43,9 @@ export default class RenameShapes {
     // from these, get all properties where write access are and the type is String or Expression
     props = props.findAll(function (item) {
       return !item.readonly() &&
-        (item.type() == ORYX_Config.TYPE_STRING ||
-          item.type() == ORYX_Config.TYPE_EXPRESSION || item.type() == ORYX_Config.TYPE_DATASOURCE)
+        (item.type() === ORYX_Config.TYPE_STRING
+          || item.type() === ORYX_Config.TYPE_EXPRESSION
+          || item.type() === ORYX_Config.TYPE_DATASOURCE)
     })
 
     // Get all ref ids
@@ -64,7 +64,6 @@ export default class RenameShapes {
       return
     }
 
-    console.log(22, labels)
     // Define the nearest label
     let nearestLabel = labels.length === 1 ? labels[0] : null
     // if (!nearestLabel) {
@@ -79,7 +78,7 @@ export default class RenameShapes {
       })
       if (!nearestLabel) {
         let evtCoord = this.facade.eventCoordinates(evt)
-        console.log('evtCoord', evtCoord)
+        // console.log('evtCoord', evtCoord)
 
         let additionalIEZoom = 1
         if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {

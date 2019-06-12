@@ -814,12 +814,9 @@ export default class Shape extends AbstractShape {
   }
 
   deserialize (serialize, json) {
-    // arguments.callee.$.deserialize.apply(this, arguments);
     super.deserialize(serialize, json)
     // Set the Bounds
-    let bounds = serialize.find(function (ser) {
-      return 'oryx-bounds' === (ser.prefix + '-' + ser.name)
-    })
+    let bounds = serialize.find((ser) => 'oryx-bounds' === (ser.prefix + '-' + ser.name))
     if (bounds) {
       let b = bounds.value.replace(/,/g, ' ').split(' ').without('')
       let type = this.getInstanceofType()

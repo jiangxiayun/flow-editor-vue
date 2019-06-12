@@ -349,8 +349,7 @@ export default class AbstractShape extends UIObject {
       // Complex properties can be real json objects, encode them to a string
       if (Object.prototype.toString.call(value) === 'Object') value = JSON.stringify(value)
 
-      // switch (prefix + '-' + name) {
-      switch (name) {
+      switch (prefix + '-' + name) {
         case 'raziel-parent':
           // Set parent
           if (!this.parent) {
