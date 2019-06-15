@@ -8,6 +8,8 @@
                 :interceptors-draw="handlePasteBtn"
                 :contextmenuList="contextmenuList"
                 @oncontextmenu="handleContextmenu"
+                @doubleClick="doubleClick"
+                @doubleClickToChangeVal="doubleClickToChangeVal"
                 @clickContextmenuCommand="handleContextmenuCommand"
                 @selection-changed="selectionChanged">
       <template slot="paletteWrapper" slot-scope="scope">
@@ -541,6 +543,12 @@
             this.writeDialog.visible = false
             break
         }
+      },
+      doubleClick (shape) {
+        console.log(333, shape)
+      },
+      doubleClickToChangeVal (params) {
+        console.log(44, params)
       }
     }
   }

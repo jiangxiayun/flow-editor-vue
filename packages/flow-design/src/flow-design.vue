@@ -60,6 +60,8 @@
       })
       FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, this.initCompleted)
       FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, this.selectChangeFun)
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_DOUBLE_CLICK, this.doubleClick)
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_PROPERTY_CHANGED_BYOUTSIDE, this.doubleClickToChangeVal)
       // 将用户在深层子组件里的自定义事件抛出
       this.$on('Propagation', this.handlePopEvent)
     },
@@ -75,11 +77,20 @@
       },
       showContextmenu () {
         this.$refs.canvasWrapper.showContextmenu()
+      },
+      doubleClick (evt, shape) {
+        this.handlePopEvent('doubleClick', shape)
+      },
+      doubleClickToChangeVal (params) {
+        this.handlePopEvent('doubleClickToChangeVal', params)
+
       }
     },
     beforeDestroy () {
       FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, this.initCompleted)
       FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, this.selectChangeFun)
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_DOUBLE_CLICK, this.doubleClick)
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_PROPERTY_CHANGED_BYOUTSIDE, this.doubleClickToChangeVal)
       this.editorManager.clearAllEvents()
     }
   }

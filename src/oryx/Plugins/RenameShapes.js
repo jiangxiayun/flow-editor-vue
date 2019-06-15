@@ -1,6 +1,6 @@
 import ORYX_Config from '../CONFIG'
-import ORYX_Command from '../core/Command'
 import ORYX_Shape from '../core/Shape'
+import SetPropertyCommand from '../../flowable/Command/setProperty'
 import autogrow from '../../libs/jquery.autogrow-textarea'
 
 // 双击修改名称
@@ -9,13 +9,13 @@ export default class RenameShapes {
     this.facade = facade
     this.facade.registerOnEvent(ORYX_Config.EVENT_CANVAS_SCROLL, this.hideField.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_DBLCLICK, this.actOnDBLClick.bind(this))
-    this.facade.offer({
-      keyCodes: [{
-        keyCode: 113, // F2-Key
-        keyAction: ORYX_Config.KEY_ACTION_DOWN
-      }],
-      functionality: this.renamePerF2.bind(this)
-    })
+    // this.facade.offer({
+    //   keyCodes: [{
+    //     keyCode: 113, // F2-Key
+    //     keyAction: ORYX_Config.KEY_ACTION_DOWN
+    //   }],
+    //   functionality: this.renamePerF2.bind(this)
+    // })
     this.hideFun = this.hide.bind(this)
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.hideFun, true)
   }
@@ -143,46 +143,8 @@ export default class RenameShapes {
     this.oldValueText = shape.properties.get(propId)
     document.getElementById('canvasSection').appendChild(textInput)
     this.shownTextField = textInput
-
-
-    // Value change listener needs to be defined now since we reference it in the text field
-    this.updateValueFunction = function (newValue, oldValue) {
-      let currentEl = shape
-      let facade = this.facade
-
-      if (oldValue != newValue) {
-        // Implement the specific command for property change
-        class commandClass extends ORYX_Command{
-          constructor () {
-            super()
-            this.el = currentEl
-            this.propId = propId
-            this.oldValue = oldValue
-            this.newValue = newValue
-            this.facade = facade
-          }
-          execute () {
-            this.el.setProperty(this.propId, this.newValue)
-            // this.el.update();
-            this.facade.setSelection([this.el])
-            this.facade.getCanvas().update()
-            this.facade.updateSelection()
-          }
-          rollback () {
-            this.el.setProperty(this.propId, this.oldValue)
-            //this.el.update();
-            this.facade.setSelection([this.el])
-            this.facade.getCanvas().update()
-            this.facade.updateSelection()
-          }
-        }
-        // Instantiated the class
-        const command = new commandClass()
-
-        // Execute the command
-        this.facade.executeCommands([command])
-      }
-    }.bind(this)
+    this.currentShape = shape
+    this.propId = propId
 
     jQuery('#shapeTextInput').focus()
     jQuery('#shapeTextInput').autogrow()
@@ -190,6 +152,24 @@ export default class RenameShapes {
     // Disable the keydown in the editor (that when hitting the delete button, the shapes not get deleted)
     this.facade.disableEvent(ORYX_Config.EVENT_KEYDOWN)
   }
+
+  // Value change listener needs to be defined now since we reference it in the text field
+  updateValueFunction (newValue, oldValue) {
+    if (oldValue != newValue) {
+      // Instantiated the class
+      const command = new SetPropertyCommand(this.propId, oldValue, newValue, this.currentShape, this.facade)
+      // Execute the command
+      this.facade.executeCommands([command])
+      this.facade.raiseEvent({
+        type: ORYX_Config.EVENT_PROPERTY_CHANGED_BYOUTSIDE,
+        newValue: newValue,
+        oldValue: oldValue,
+        shape: this.currentShape,
+        key: this.propId
+      })
+    }
+  }
+
   getCenterPositionself (svgNode, shape) {
     if (!svgNode) {
       return { x: 0, y: 0 }

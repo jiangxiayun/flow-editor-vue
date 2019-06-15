@@ -170,6 +170,7 @@ const ORYX_CONFIG = {
   EVENT_SHAPEADDED: 'shapeadded',
   EVENT_SHAPEREMOVED: 'shaperemoved',
   EVENT_PROPERTY_CHANGED: 'propertyChanged',
+  EVENT_PROPERTY_CHANGED_BYOUTSIDE: 'EVENT_PROPERTY_CHANGED_BYOUTSIDE', // 在双击输入框中修改了属性
   EVENT_DRAGDROP_START: 'dragdrop.start',
   EVENT_SHAPE_MENU_CLOSE: 'shape.menu.close',
   EVENT_DRAGDROP_END: 'dragdrop.end',
@@ -220,6 +221,7 @@ const ORYX_CONFIG = {
   EVENT_TYPE_ITEM_DROPPED: 'event-type-item-dropped',
   /** Event fired when a property value is changed. */
   EVENT_TYPE_PROPERTY_VALUE_CHANGED: 'event-type-property-value-changed',
+  EVENT_TYPE_PROPERTY_CHANGED_BYOUTSIDE: 'event-type-property-value-changed-outside',
   EVENT_TYPE_SELECTION_CHANGED: 'event-type-selection-changed',
   /** Event fired on double click in canvas. */
   EVENT_TYPE_DOUBLE_CLICK: 'event-type-double-click',

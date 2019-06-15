@@ -384,6 +384,10 @@ export default class EditorManager {
       {
         oryxType: ORYX.CONFIG.EVENT_PROPERTY_CHANGED,
         flowableType: ORYX.CONFIG.EVENT_TYPE_PROPERTY_VALUE_CHANGED
+      },
+      {
+        oryxType: ORYX.CONFIG.EVENT_PROPERTY_CHANGED_BYOUTSIDE,
+        flowableType: ORYX.CONFIG.EVENT_TYPE_PROPERTY_CHANGED_BYOUTSIDE
       }
     ]
 
@@ -689,11 +693,11 @@ export default class EditorManager {
       // 控制 toolbar buttons 是否可用
       this.updateToolbarButtonStatus(shapes)
 
-      let documentEvent = event.documentEvent
-      if (documentEvent && ORYX.CONFIG.CustomConfigs.UI_CONFIG.CUSTOM_CONTEXTMENU) {
-        // console.log(99, documentEvent.button)
-        // if (documentEvent.button === 2) return
-      }
+      // let documentEvent = event.documentEvent
+      // if (documentEvent && ORYX.CONFIG.CustomConfigs.UI_CONFIG.CUSTOM_CONTEXTMENU) {
+      //   console.log(99, documentEvent.button)
+      //   if (documentEvent.button === 2) return
+      // }
 
       // Listen to selection change events: show properties
       this.showShapeProperties(shapes)

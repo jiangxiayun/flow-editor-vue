@@ -1,6 +1,6 @@
-import ORYX from 'src/oryx'
+import ORYX_Command from 'src/oryx/core/Command'
 
-export default class SetProperty extends ORYX.Core.Command {
+export default class SetProperty extends ORYX_Command {
   constructor (key, oldValue, newValue, shape, facade) {
     super()
     this.key = key

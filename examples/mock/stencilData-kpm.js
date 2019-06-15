@@ -4,6 +4,20 @@ export const AA = {
   'description': 'BPMN process editor',
   'propertyPackages': [
     {
+      'name': 'rolemappackage',
+      'properties': [
+        {
+          'id': 'roleMap',
+          'type': 'Object',
+          'title': '业务角色',
+          'value': '',
+          'description': '业务角色',
+          'popular': true,
+          'directlyEditable': false
+        }
+      ]
+    },
+    {
       'name': 'refTaskpackage',
       'properties': [{
         'id': 'refId',
@@ -632,7 +646,7 @@ export const AA = {
         '水平泳道'
       ],
       'propertyPackages': [
-        'roleIdpackage'
+        'rolemappackage'
       ],
       'hiddenPropertyPackages': [],
       'roles': [

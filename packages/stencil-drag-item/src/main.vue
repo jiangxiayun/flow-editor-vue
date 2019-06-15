@@ -182,7 +182,7 @@
               return false
             }
 
-            console.log(887,item,  '!!!!', parentCandidate)
+            // console.log(887,item,  '!!!!', parentCandidate)
             if (item.type === 'node') {
               // check if the draggable is a boundary event and the parent an Activity
               let _canContain = false
