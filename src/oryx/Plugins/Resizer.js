@@ -316,23 +316,22 @@ export default class Resizer {
       case 'north':
         // upL.x = 0
         upL.y -= 5
-        this.node.style.width = this.bounds.width() + 'px'
+        this.node.style.width = (a.a * this.bounds.width()) + 'px'
         break
       case 'south':
         // upL.x = 0
         upL.y += (a.d * this.bounds.height()) - 5
-        this.node.style.width = this.bounds.width() + 'px'
+        this.node.style.width = (a.a * this.bounds.width()) + 'px'
         break
       case 'west':
         upL.x -= 5
         // upL.y = 0
-        this.node.style.height = this.bounds.height() + 'px'
+        this.node.style.height = (a.d * this.bounds.height()) + 'px'
         break
       case 'east':
         upL.x += (a.a * this.bounds.width()) - 5
         // upL.y = 0
-        this.node.style.height = this.bounds.height() + 'px'
-
+        this.node.style.height = (a.d * this.bounds.height()) + 'px'
         break
     }
 
