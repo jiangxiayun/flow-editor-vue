@@ -83,8 +83,7 @@ const FLOWABLE = {
       },
       {
         type: 'separator',
-        title: 'TOOLBAR.ACTION.SAVE',
-        cssClass: 'toolbar-separator'
+        cssClass: 'toolbar-separator',
       },
       {
         type: 'button',
@@ -138,6 +137,7 @@ const FLOWABLE = {
         type: 'button',
         title: 'TOOLBAR.ACTION.ZOOMACTUAL',
         cssClass: 'editor-icon editor-icon-zoom-actual',
+        actionType: 'internal',
         action: 'FLOWABLE.TOOLBAR.ACTIONS.zoomActual'
       },
       {

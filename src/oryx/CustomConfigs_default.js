@@ -174,12 +174,14 @@ const DEFAULT_CONFIG = {
         'type': 'button',
         'title': 'TOOLBAR.ACTION.ZOOMACTUAL',
         'cssClass': 'editor-icon editor-icon-zoom-actual',
+        'actionType': 'internal',
         'action': 'FLOWABLE.TOOLBAR.ACTIONS.zoomActual'
       },
       {
         'type': 'button',
         'title': 'TOOLBAR.ACTION.ZOOMFIT',
         'cssClass': 'editor-icon editor-icon-zoom-fit',
+        'actionType': 'internal',
         'action': 'FLOWABLE.TOOLBAR.ACTIONS.zoomFit'
       },
       {

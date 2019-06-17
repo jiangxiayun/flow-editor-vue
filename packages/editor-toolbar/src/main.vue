@@ -85,6 +85,8 @@
       },
       toolbarButtonClicked (buttonIndex) {
         let buttonClicked = this.items[buttonIndex]
+        console.log(22, buttonClicked)
+
         if (buttonClicked.actionType === 'custom-defined') {
           // 用户自定义按钮事件，以$emit抛出 buttonClicked.action 事件
           this.dispatch('flowEditor', buttonClicked.action, this.editorManager, true)
@@ -106,7 +108,6 @@
           '$rootScope': this.$parent,
           'editorManager': this.editorManager
         }
-
         this.executeFunctionByName(this.buttonClicked.action, services)
       },
       doBtnActionAndBubble () {

@@ -224,8 +224,10 @@ const ACTIONS = {
   _getOryxViewPlugin: function (services) {
     const $scope = services.$scope
     const editorManager = services.editorManager
+    console.log($scope.oryxViewPlugin)
     if ($scope.oryxViewPlugin === undefined || $scope.oryxViewPlugin === null) {
       $scope.oryxViewPlugin = new ORYX.Plugins.View(editorManager.getEditor())
+      console.log(888888)
     }
     return $scope.oryxViewPlugin
   },
