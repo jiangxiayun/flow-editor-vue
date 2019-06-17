@@ -83,7 +83,6 @@
       },
       doubleClickToChangeVal (params) {
         this.handlePopEvent('doubleClickToChangeVal', params)
-
       }
     },
     beforeDestroy () {

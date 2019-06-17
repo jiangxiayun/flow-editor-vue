@@ -701,7 +701,9 @@ export default class EditorManager {
 
       // Listen to selection change events: show properties
       this.showShapeProperties(shapes)
-      this.updateOryxButtonPosition(shapes)
+      if (ORYX.CONFIG.CustomConfigs.UI_CONFIG.Oryx_button_left_bottom) {
+        this.updateOryxButtonPosition(shapes)
+      }
     })
   }
   showShapeProperties (shapes) {
