@@ -10,7 +10,9 @@ export default class Save {
       }
     }, false)
 
-    window.onbeforeunload = this.onUnLoad.bind(this)
+    this.onUnLoadFun = this.onUnLoad.bind(this)
+
+    window.onbeforeunload = this.onUnLoadFun
 
     this.changeDifference = 0
 
@@ -37,7 +39,7 @@ export default class Save {
     }.bind(this))
 
     //TODO very critical for load time performance!!!
-    //this.serializedDOM = DataManager.__persistDOM(this.facade);
+    // this.serializedDOM = DataManager.__persistDOM(this.facade);
 
     this.hasChanges = this._hasChanges.bind(this)
   }
@@ -53,14 +55,22 @@ export default class Save {
   }
 
   _hasChanges () {
-    return this.changeDifference !== 0 ||
-      (this.facade.getModelMetaData()['new'] && this.facade.getCanvas().getChildShapes().size() > 0)
+    if (this.changeDifference !== 0) {
+      return true
+    } else {
+      let modelMetaData = this.facade.getModelMetaData()
+      if (modelMetaData && modelMetaData['new'] &&
+        this.facade.getCanvas().getChildShapes().size() > 0) {
+        return true
+      }
+    }
+    return false
   }
 
   onUnLoad () {
     if (this._hasChanges()) {
       // return ORYX.I18N.Save.unsavedData
-      return 'There are unsaved data, please save before you leave, otherwise your changes get lost!'
+      return '666There are unsaved data, please save before you leave, otherwise your changes get lost!'
     }
   }
 }

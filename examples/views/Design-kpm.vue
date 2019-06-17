@@ -250,6 +250,9 @@
 
         let json = this.editorManager.getModel()
         console.log(json)
+        this.editorManager.handleEvents({
+          type: 'editorSaved'
+        })
 
         // let params = {
         //   modeltype: this.mockData.model.modelType,
@@ -550,6 +553,26 @@
       doubleClickToChangeVal (params) {
         console.log(44, params)
       }
+    },
+    beforeRouteLeave (to, from , next) {
+      const loadedPlugins = this.editorManager.editor.loadedPlugins
+      let SavePlugins = null
+      for(let i in loadedPlugins) {
+        console.log(loadedPlugins[i].type)
+        if (loadedPlugins[i].type === 'Plugins.Save') {
+          SavePlugins = loadedPlugins[i]
+          break
+        }
+      }
+      console.log(22, SavePlugins._hasChanges())
+
+
+      // const answer = window.confirm('确认离开吗？系统可能不会保存您所做的更改。')
+      // if (answer) {
+      //   next()
+      // } else {
+      //   next(false)
+      // }
     }
   }
 </script>
