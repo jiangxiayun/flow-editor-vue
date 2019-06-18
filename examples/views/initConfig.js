@@ -187,7 +187,7 @@ const FLOWABLE = {
   },
   UI_CONFIG: {
     CUSTOM_CONTEXTMENU: true,
-    Oryx_button_right_top: false,
+    Oryx_button_right_top: true,
     CUSTOM_CONTEXTMENU_NODES: ['UserTask', 'UserTask2', 'FlowBox'],
     /* UI */
     CANVAS_WIDTH: 1200,
