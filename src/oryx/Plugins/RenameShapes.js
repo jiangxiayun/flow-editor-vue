@@ -1,4 +1,5 @@
 import ORYX_Config from '../CONFIG'
+import ORYX_Utils from '../Utils'
 import ORYX_Shape from '../core/Shape'
 import SetPropertyCommand from '../../flowable/Command/setProperty'
 import autogrow from '../../libs/jquery.autogrow-textarea'
@@ -19,6 +20,7 @@ export default class RenameShapes {
     this.hideFun = this.hide.bind(this)
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEDOWN, this.hideFun, true)
   }
+
   /**
    * This method handles the "F2" key down event. The selected shape are looked
    * up and the editing of title/name of it gets started.
@@ -78,33 +80,18 @@ export default class RenameShapes {
       })
       if (!nearestLabel) {
         let evtCoord = this.facade.eventCoordinates(evt)
+        // evtCoord = ORYX_Utils.pointHandleBelow10ToSvg(evtCoord)
+        // evtCoord.y += $('editor-header').clientHeight - $('canvasSection').scrollTop - 5
+        // evtCoord.x -= $('canvasSection').scrollLeft
+        //
+        // let trans = this.facade.getCanvas().rootNode.lastChild.getScreenCTM()
+        // evtCoord.x *= trans.a
+        // evtCoord.y *= trans.d
+
         // console.log('evtCoord', evtCoord)
-
-        let additionalIEZoom = 1
-        if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-          let ua = navigator.userAgent
-          if (ua.indexOf('MSIE') >= 0) {
-            // IE 10 and below
-            let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-            if (zoom !== 100) {
-              additionalIEZoom = zoom / 100
-            }
-          }
-        }
-
-        if (additionalIEZoom !== 1) {
-          evtCoord.x = evtCoord.x / additionalIEZoom
-          evtCoord.y = evtCoord.y / additionalIEZoom
-        }
-
-        evtCoord.y += $('editor-header').clientHeight - $('canvasSection').scrollTop - 5
-        evtCoord.x -= $('canvasSection').scrollLeft
-
-        let trans = this.facade.getCanvas().rootNode.lastChild.getScreenCTM()
-        evtCoord.x *= trans.a
-        evtCoord.y *= trans.d
-
+        // console.log('shape', shape.absoluteBounds())
         let diff = labels.map((label) => {
+          // let center = this.getCenterPosition(label.node, shape)
           let center = this.getCenterPositionself(label.node, shape)
           let len = Math.sqrt(Math.pow(center.x - evtCoord.x, 2) + Math.pow(center.y - evtCoord.y, 2))
           return { diff: len, label: label }
@@ -113,7 +100,7 @@ export default class RenameShapes {
         diff.sort(function (a, b) {
           return a.diff - b.diff
         })
-
+        // console.log('diff', diff)
         nearestLabel = diff[0].label
       }
     }
@@ -128,7 +115,7 @@ export default class RenameShapes {
     // Get the center position from the nearest label
     let width = Math.min(Math.max(100, shape.bounds.width()), 200)
     let center = this.getCenterPosition(nearestLabel.node, shape)
-    console.log('center', center)
+    // console.log('center', center)
     center.x -= (width / 2)
     // let propId = prop.prefix() + '-' + prop.id()
     let propId = prop.id()
@@ -181,21 +168,24 @@ export default class RenameShapes {
     let bbox = svgNode.getBBox()
     let center = {}
     if (bbox.x || bbox.width) {
+      console.log(34, bbox, scale)
       center = {
-        x: absoluteXY.x + bbox.x + bbox.width / 2 +  + scale.e,
-        y: absoluteXY.y + bbox.y + bbox.height / 2 + scale.f
+        x: absoluteXY.x + bbox.x + bbox.width / 2,
+        y: absoluteXY.y + bbox.y + bbox.height / 2
       }
 
       center.x *= scale.a
       center.y *= scale.d
     } else {
-      let x =  svgNode.getAttributeNS(null, 'x')
-      let y =  svgNode.getAttributeNS(null, 'y')
+      let x = svgNode.getAttributeNS(null, 'x')
+      let y = svgNode.getAttributeNS(null, 'y')
+      // console.log(35, x, y)
       center = {
         x: absoluteXY.x + Number(x),
         y: absoluteXY.y + Number(y)
       }
     }
+    // console.log(77, center)
     return center
   }
 
@@ -220,6 +210,7 @@ export default class RenameShapes {
             x: ClientRect.x + ClientRect.width / 2,
             y: ClientRect.y + ClientRect.height / 2
           }
+          // console.log(66, center)
           fittoelemSign = true
           // return center
         }
@@ -277,6 +268,7 @@ export default class RenameShapes {
       center.x = center.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft)
     }
 
+    console.log(svgNode, center)
     return center
   }
 

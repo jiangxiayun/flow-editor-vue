@@ -378,20 +378,18 @@ const Utils = {
     return z
   },
   pointHandleBelow10: function (point) {
-    let additionalIEZoom = 1
-    if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-      let ua = navigator.userAgent
-      if (ua.indexOf('MSIE') >= 0) {
-        // IE 10 and below
-        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-        if (zoom !== 100) {
-          additionalIEZoom = zoom / 100
-        }
-      }
-    }
+    let additionalIEZoom = this.IEZoomBelow10(1)
     if (additionalIEZoom !== 1) {
       point.x = point.x * additionalIEZoom
       point.y = point.y * additionalIEZoom
+    }
+    return point
+  },
+  pointHandleBelow10ToSvg: function (point) {
+    let additionalIEZoom = this.IEZoomBelow10(1)
+    if (additionalIEZoom !== 1) {
+      point.x = point.x / additionalIEZoom
+      point.y = point.y / additionalIEZoom
     }
     return point
   },

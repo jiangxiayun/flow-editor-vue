@@ -154,6 +154,7 @@
     },
     methods: {
       oryxBtnStatus (btns) {
+        // console.log('oryxBtnStatus', btns)
         btns.map(btn => {
           this.btn_visibile[btn.type] = btn.status
         })
@@ -216,7 +217,9 @@
       },
       fnHandleScrollDebounce: _debounce(function (_type, index, item) {
         this.editorManager.handleEvents({ type: 'canvas.scrollEnd' })
-        this.editorManager.updateOryxButtonPosition(this.selectedElements)
+        if (ORYX_CONFIG.CustomConfigs.UI_CONFIG.Oryx_button_right_top) {
+          this.editorManager.updateOryxButtonPosition(this.selectedElements)
+        }
         this.selectedElements = undefined
         this.subSelectionElements = undefined
       }, 200),
