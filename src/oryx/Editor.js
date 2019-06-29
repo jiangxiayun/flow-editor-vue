@@ -29,7 +29,7 @@ export default class Editor {
   /** @lends ORYX.Editor.prototype */
   constructor (config) {
     // Defines the global dom event listener
-    this.DOMEventListeners = new Hash()
+    this.DOMEventListeners = new Map()
     // Defines the selection
     this.selection = []
     // Defines the current zoom level
@@ -39,27 +39,27 @@ export default class Editor {
     this.loadedPlugins = []
     this.pluginsData = []
 
-    // meta data about the model for the signavio warehouse
-    // directory, new, name, description, revision, model (the model data)
+    // let model = config
+    // this.id = model.modelId
+    // if(config.model) {
+    //   model = config.model;
+    // }
+    // if(!this.id) {
+    //   this.id = model.id;
+    //   if(!this.id) {
+    //     this.id = ORYX.Editor.provideId();
+    //   }
+    // }
 
-    let model = config
-    this.id = model.modelId
-
-    if (config.model) {
-      model = config.model
-    }
-
+    let model = config.model ? config.model : config
+    this.id = config.modelId || model.id
     if (!this.id) {
-      this.id = model.id
-      if (!this.id) {
-        this.id = ORYX_Utils.provideId()
-      }
+      this.id = ORYX_Utils.provideId()
     }
 
     // Defines if the editor should be fullscreen or not
     this.fullscreen = config.fullscreen !== false
-
-    // Initialize the eventlistener
+    // 初始化事件监听器
     this._initEventListener()
     // CREATES the canvas
     this._createCanvas(model.stencil ? model.stencil.id : null, model.properties)
@@ -69,12 +69,10 @@ export default class Editor {
     // Initializing of a callback to check loading ends
     let loadPluginFinished = false
     let loadContentFinished = false
-    let initFinished = function () {
-      if (!loadPluginFinished || !loadContentFinished) {
-        return
-      }
+    const initFinished = () => {
+      if (!loadPluginFinished || !loadContentFinished) return
       this._finishedLoading()
-    }.bind(this)
+    }
 
     // LOAD the plugins
     this.loadPlugins()
@@ -82,57 +80,16 @@ export default class Editor {
     initFinished()
 
     // LOAD the content of the current editor instance
-    window.setTimeout(function () {
+    window.setTimeout(() => {
       this.loadSerialized(model, true) // Request the meta data as well
       this.getCanvas().update()
       loadContentFinished = true
       initFinished()
       this.handleEvents({ type: ORYX_Config.EVENT_EDITOR_INIT_COMPLETED })
-    }.bind(this), 200)
-
-    this.Cookie = {
-      callbacks: [],
-      onChange: function (callback, interval) {
-        this.callbacks.push(callback)
-        this.start(interval)
-      },
-      start: function (interval) {
-        if (this.pe) {
-          return
-        }
-        let currentString = document.cookie
-        this.pe = new PeriodicalExecuter(function () {
-          if (currentString != document.cookie) {
-            currentString = document.cookie
-            this.callbacks.each(function (callback) {
-              callback(this.getParams())
-            }.bind(this))
-          }
-
-        }.bind(this), (interval || 10000) / 1000)
-      },
-      stop: function () {
-        if (this.pe) {
-          this.pe.stop()
-          this.pe = null
-        }
-      },
-      getParams: function () {
-        let res = {}
-        let p = document.cookie
-        p.split('; ').each(function (param) {
-          res[param.split('=')[0]] = param.split('=')[1]
-        })
-        return res
-      },
-      toString: function () {
-        return document.cookie
-      }
-    }
+    }, 200)
   }
 
   _finishedLoading () {
-    // Raise Loaded Event
     this.handleEvents({ type: ORYX_Config.EVENT_LOADED })
   }
 
@@ -151,27 +108,6 @@ export default class Editor {
     this.DOMEventListeners.set(ORYX_Config.EVENT_MOUSEOUT, [])
     this.DOMEventListeners.set(ORYX_Config.EVENT_SELECTION_CHANGED, [])
     this.DOMEventListeners.set(ORYX_Config.EVENT_MOUSEMOVE, [])
-  }
-
-  /**
-   * Generate the whole viewport of the
-   * Editor and initialized the Ext-Framework
-   */
-  _generateGUI () {
-    // Defines the layout height if it's NOT fullscreen
-    let layoutHeight = ORYX_Config.WINDOW_HEIGHT
-    let canvasParent = this.getCanvas().rootNode.parentNode
-
-    jQuery('#canvasSection').append(canvasParent)
-    if (canvasParent.parentNode) {
-      // Set the editor to the center, and refresh the size
-      canvasParent.parentNode.setAttributeNS(null, 'align', 'center')
-      canvasParent.setAttributeNS(null, 'align', 'left')
-      this.getCanvas().setSize({
-        width: ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_WIDTH,
-        height: ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_HEIGHT
-      })
-    }
   }
 
   getAvailablePlugins () {
@@ -381,6 +317,28 @@ export default class Editor {
       }
     })
   }
+
+  /**
+   * Generate the whole viewport of the
+   * Editor and initialized the Ext-Framework
+   */
+  _generateGUI () {
+    // Defines the layout height if it's NOT fullscreen
+    let layoutHeight = ORYX_Config.WINDOW_HEIGHT
+    let canvasParent = this.getCanvas().rootNode.parentNode
+
+    document.getElementById('canvasSection').appendChild(canvasParent)
+    if (canvasParent.parentNode) {
+      // Set the editor to the center, and refresh the size
+      canvasParent.parentNode.setAttributeNS(null, 'align', 'center')
+      canvasParent.setAttributeNS(null, 'align', 'left')
+      this.getCanvas().setSize({
+        width: ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_WIDTH,
+        height: ORYX_Config.CustomConfigs.UI_CONFIG.CANVAS_HEIGHT
+      })
+    }
+  }
+
   /**
    * Creates the Canvas
    * @param {String} [stencilType] The stencil type used for creating the canvas.
@@ -389,12 +347,14 @@ export default class Editor {
    * @param {Object} [canvasConfig] Any canvas properties (like language).
    */
   _createCanvas (stencilType, canvasConfig) {
+    console.log(stencilType, canvasConfig)
     if (stencilType) {
       // Add namespace to stencilType
       if (stencilType.search(/^http/) === -1) {
         stencilType = this.getStencilSets().values()[0].namespace() + stencilType
       }
     } else {
+      console.log(111, this.getStencilSets(), this.id)
       // Get any root stencil type
       stencilType = this.getStencilSets().values()[0].findRootStencilName()
     }
@@ -405,10 +365,7 @@ export default class Editor {
       ORYX_Log.fatal('初始化失败, 因为类型为 %0 的模具不是加载的模具集的一部分。', stencilType)
     }
 
-    // create all dom
-    // TODO fix border, so the visible canvas has a double border and some spacing to the scrollbars
     let div = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', null, ['div'])
-    // set class for custom styling
     div.addClassName('ORYX_Editor')
 
     // create the canvas
@@ -422,7 +379,7 @@ export default class Editor {
 
     if (canvasConfig) {
       // Migrate canvasConfig to an RDF-like structure
-      //FIXME this isn't nice at all because we don't want rdf any longer
+      // FIXME this isn't nice at all because we don't want rdf any longer
       let properties = []
       for (let field in canvasConfig) {
         properties.push({
@@ -758,7 +715,7 @@ export default class Editor {
     }
 
     let shapes = this.getCanvas().addShapeObjects(model.childShapes, this.handleEvents.bind(this))
-    console.log(11, shapes)
+    // console.log(11, shapes)
     if (model.properties) {
       for (let key in model.properties) {
         let value = model.properties[key]
@@ -853,23 +810,25 @@ export default class Editor {
     if (eventType === ORYX_Config.EVENT_KEYUP) {
       this._keyupEnabled = false
     }
-    if (this.DOMEventListeners.keys().member(eventType)) {
-      let value = this.DOMEventListeners.unset(eventType)
+    if (this.DOMEventListeners.has(eventType)) {
+      let value = this.DOMEventListeners.get(eventType)
+      this.DOMEventListeners.delete(eventType)
       this.DOMEventListeners.set('disable_' + eventType, value)
     }
   }
 
   enableEvent (eventType) {
-    if (eventType == ORYX_Config.EVENT_KEYDOWN) {
+    if (eventType === ORYX_Config.EVENT_KEYDOWN) {
       this._keydownEnabled = true
     }
 
-    if (eventType == ORYX_Config.EVENT_KEYUP) {
+    if (eventType === ORYX_Config.EVENT_KEYUP) {
       this._keyupEnabled = true
     }
 
-    if (this.DOMEventListeners.keys().member('disable_' + eventType)) {
-      let value = this.DOMEventListeners.unset('disable_' + eventType)
+    if (this.DOMEventListeners.has('disable_' + eventType)) {
+      let value = this.DOMEventListeners.get('disable_' + eventType)
+      this.DOMEventListeners.delete('disable_' + eventType)
       this.DOMEventListeners.set(eventType, value)
     }
   }
@@ -878,14 +837,14 @@ export default class Editor {
    *  Methods for the PluginFacade
    */
   registerOnEvent (eventType, callback) {
-    if (!(this.DOMEventListeners.keys().member(eventType))) {
+    if (!(this.DOMEventListeners.has(eventType))) {
       this.DOMEventListeners.set(eventType, [])
     }
     this.DOMEventListeners.get(eventType).push(callback)
   }
 
   unregisterOnEvent (eventType, callback) {
-    if (this.DOMEventListeners.keys().member(eventType)) {
+    if (this.DOMEventListeners.has(eventType)) {
       this.DOMEventListeners.set(eventType, this.DOMEventListeners.get(eventType).without(callback))
     } else {
       // Event is not supported
@@ -1008,7 +967,7 @@ export default class Editor {
     let shapetype = option.type
     // Get the stencil set
     let sset = ORYX_StencilSet.stencilSet(option.namespace)
-    if (sset.stencil(shapetype).type() == 'node') {
+    if (sset.stencil(shapetype).type() === 'node') {
       newShapeObject = new ORYX_Node(
         { 'eventHandlerCallback': this.handleEvents.bind(this) },
         sset.stencil(shapetype),
@@ -1152,6 +1111,7 @@ export default class Editor {
   }
 
   deleteShape (shape) {
+    console.log('deleteShape', shape)
     if (!shape || !shape.parent) {
       return
     }
@@ -1201,7 +1161,7 @@ export default class Editor {
    * scheduled in the _eventsQueue. Needed to handle Layout-Callbacks.
    */
   _executeEventImmediately (eventObj) {
-    if (this.DOMEventListeners.keys().member(eventObj.event.type)) {
+    if (this.DOMEventListeners.has(eventObj.event.type)) {
       // console.log(1, eventObj.event.type, this.DOMEventListeners.get(eventObj.event.type))
       this.DOMEventListeners.get(eventObj.event.type).each((function (value) {
         value(eventObj.event, eventObj.arg)
@@ -1549,7 +1509,7 @@ export default class Editor {
     })
     Plugins._clearPlugins()
 
-    this.DOMEventListeners = new Hash()
+    this.DOMEventListeners = new Map()
     this._eventsQueue = []
   }
 }

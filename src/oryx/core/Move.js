@@ -146,6 +146,7 @@ export default class Move extends  Command {
       let docker = this.dockedNodes[i].docker
 
       docker.setDockedShape(shouldDocked ? this.dockedNodes[i].dockedShape : undefined)
+      console.log('setDockedShape')
       if (docker.getDockedShape()) {
         docker.setReferencePoint(this.dockedNodes[i].refPoint)
         //docker.update();

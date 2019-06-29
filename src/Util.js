@@ -143,3 +143,27 @@ export function _throttle (fn, interval = 200) {
 //   }
 //   return FirstOBJ;
 // }
+
+// 返回数组中每个对象的某个属性集合（数组）
+export function pluck (arry, property) {
+  let results = []
+  arry.each(function (value) {
+    results.push(value[property])
+  })
+  return results
+}
+// function pluck(property) {
+//   var results = [];
+//   this.each(function(value) {
+//     results.push(value[property]);
+//   });
+//   return results;
+// }
+
+// this.dockers.invoke('update')
+// function invoke(method) {
+//   var args = $A(arguments).slice(1);
+//   return this.map(function(value) {
+//     return value[method].apply(value, args);
+//   });
+// }

@@ -7,6 +7,7 @@
                 @btn-paste-click="handlePasteBtn"
                 :interceptors-draw="handlePasteBtn"
                 :contextmenuList="contextmenuList"
+                @editorInitCompleted="editorInitCompleted"
                 @oncontextmenu="handleContextmenu"
                 @doubleClick="doubleClick"
                 @doubleClickToChangeVal="doubleClickToChangeVal"
@@ -92,7 +93,7 @@
         :close-on-click-modal="false"
         width="90%"
         :before-close="handlepropertyWriteClose">
-      {{selectedItem}}
+      <!--{{selectedItem}}-->
       <component v-bind:is="writeDialog.componentTemplate"
                  :key="writeDialog.properties"
                  :property="selectedItem.properties"
@@ -185,7 +186,7 @@
               { name: 'Plugins.NodesResize' },
               { name: 'Plugins.PoolResize' },
               { name: 'Plugins.HighlightingSelectedShapes' },
-              { name: 'Plugins.DragDocker' },
+              // { name: 'Plugins.DragDocker' },
               { name: 'Plugins.AddDocker' },
               { name: 'Plugins.SelectionFrame' },
               { name: 'Plugins.ShapeHighlighting' },
@@ -225,13 +226,15 @@
       }
     },
     components: { propertySection, refActivity, activityTabsEdit },
-    created () {},
     computed: {
       modelData () {
         return this.editorManager ? this.editorManager.getModel() : { properties: {} }
       }
     },
     methods: {
+      editorInitCompleted () {
+        console.log(66778)
+      },
       selectionChanged (event) {
         if (this.currentShapeMode !== 'write') {
           this.selectedItem = event.selectedItem
@@ -370,6 +373,7 @@
         }
       },
       stateEditorManager (editor) {
+        console.log(456)
         this.editorManager = editor
       },
       handleContextmenu ({ selectedElements }) {

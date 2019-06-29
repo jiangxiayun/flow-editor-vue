@@ -84,6 +84,7 @@ class DeleteCommand extends Command {
     //reconnect shapes
     this.dockers.each(function (d) {
       d.object.setDockedShape(d.dockedShape)
+      console.log('setDockedShape')
       d.object.setReferencePoint(d.referencePoint)
     }.bind(this))
 

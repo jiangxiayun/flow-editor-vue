@@ -121,11 +121,17 @@
       },
       toolbarSecondaryButtonClicked (buttonIndex) {
         let buttonClicked = this.secondaryItems[buttonIndex]
-        let services = {
-          'this': this,
-          'editorManager': this.editorManager
+
+        if (buttonClicked.actionType === 'custom-defined') {
+          // 用户自定义按钮事件，以$emit抛出 buttonClicked.action 事件
+          this.dispatch('flowEditor', buttonClicked.action, this.editorManager, true)
+        } else if (buttonClicked.actionType === 'internal') {
+          let services = {
+            'this': this,
+            'editorManager': this.editorManager
+          }
+          this.executeFunctionByName(buttonClicked.action, services)
         }
-        this.executeFunctionByName(buttonClicked.action, services)
       },
       MousetrapBind () {
         /* Key bindings */

@@ -1,3 +1,4 @@
+import { pluck } from '../../Util'
 import AbstractShape from './AbstractShape'
 import UIObject from './UIObject'
 import ORYX_Log from '../Log'
@@ -321,7 +322,7 @@ export default class Canvas extends AbstractShape {
   /**
    * Creates shapes out of the given collection of shape objects and adds them to the canvas.
    * @example
-   * canvas.addShapeObjects({
+   * canvas.addShapeObjects([{
          bounds:{ lowerRight:{ y:510, x:633 }, upperLeft:{ y:146, x:210 } },
          resourceId:"oryx_F0715955-50F2-403D-9851-C08CFE70F8BD",
          childShapes:[],
@@ -331,7 +332,7 @@ export default class Canvas extends AbstractShape {
          },
          outgoing:[{resourceId: 'aShape'}],
          target: {resourceId: 'aShape'}
-       });
+       }]);
    * @param {Object} shapeObjects
    * @param {Function} [eventHandler] An event handler passed to each newly created shape (as eventHandlerCallback)
    * @return {Array} A collection of ORYX.Core.Shape
@@ -339,7 +340,6 @@ export default class Canvas extends AbstractShape {
    */
   addShapeObjects (shapeObjects, eventHandler) {
     if (!shapeObjects) return
-
     this.initializingShapes = true
 
     /* FIXME This implementation is very evil! At first, all shapes are created on
@@ -348,14 +348,12 @@ export default class Canvas extends AbstractShape {
      and the creation phase (where the outgoings are evaluated). This must be reflected
      in code to provide a nicer API/ implementation!!! */
 
-    const addShape = function (shape, parent) {
+    const addShape = (shape, parent) => {
       // Create a new Stencil
       let stencil = StencilSet.stencil(this.getStencil().namespace() + shape.stencil.id)
       // Create a new Shape
       let ShapeClass = (stencil.type() === 'node') ? Node : Edge
-      let newShape = new ShapeClass(
-        { 'eventHandlerCallback': eventHandler },
-        stencil, this.facade)
+      let newShape = new ShapeClass({ 'eventHandlerCallback': eventHandler }, stencil, this.facade)
 
       // Set the resource id
       newShape.resourceId = shape.resourceId
@@ -368,36 +366,34 @@ export default class Canvas extends AbstractShape {
 
       // Add the shape to the canvas
       this.add(newShape)
-
       return {
         json: shape,
         object: newShape
       }
-    }.bind(this)
+    }
 
     /** Builds up recursively a flatted array of shapes, including a javascript object and json representation
      * @param {Object} shape Any object that has Object#childShapes
      */
-    const addChildShapesRecursively = function (shape) {
+    const addChildShapesRecursively = (shape) => {
       let addedShapes = []
       if (shape.childShapes && shape.childShapes.constructor === String) {
         shape.childShapes = JSON.parse(shape.childShapes)
       }
-
-      shape.childShapes.each((childShape) => {
+      shape.childShapes.forEach((childShape) => {
         addedShapes.push(addShape(childShape, shape))
         addedShapes = addedShapes.concat(addChildShapesRecursively(childShape))
       })
 
       return addedShapes
-    }.bind(this)
+    }
 
     let shapes = addChildShapesRecursively({
       childShapes: shapeObjects,
       resourceId: this.resourceId
     })
     // prepare deserialisation parameter
-    shapes.each(function (shape) {
+    shapes.forEach((shape) => {
         let properties = []
         for (let field in shape.json.properties) {
           properties.push({
@@ -408,7 +404,7 @@ export default class Canvas extends AbstractShape {
         }
 
         // Outgoings
-        shape.json.outgoing.each(function (out) {
+        shape.json.outgoing.forEach((out) => {
           properties.push({
             prefix: 'raziel',
             name: 'outgoing',
@@ -417,8 +413,7 @@ export default class Canvas extends AbstractShape {
         })
 
         // Target
-        // (because of a bug, the first outgoing is taken when there is no target,
-        // can be removed after some time)
+        // (because of a bug, the first outgoing is taken when there is no target,can be removed after some time)
         if (shape.object instanceof Edge) {
           let target = shape.json.target || shape.json.outgoing[0]
           if (target) {
@@ -441,12 +436,18 @@ export default class Canvas extends AbstractShape {
 
         // Dockers [{x:40, y:50}, {x:30, y:60}] => "40 50 30 60  #"
         if (shape.json.dockers) {
+          let str = ''
+          shape.json.dockers.map(docker => {
+            str += docker.x + ' ' + docker.y + ' '
+          })
+          str += ' #'
           properties.push({
             prefix: 'oryx',
             name: 'dockers',
-            value: shape.json.dockers.inject('', function (dockersStr, docker) {
-              return dockersStr + docker.x + ' ' + docker.y + ' '
-            }) + ' #'
+            value: str
+            // value: shape.json.dockers.inject('', function (dockersStr, docker) {
+            //   return dockersStr + docker.x + ' ' + docker.y + ' '
+            // }) + ' #'
           })
         }
 
@@ -458,30 +459,34 @@ export default class Canvas extends AbstractShape {
         })
 
         shape.__properties = properties
-      }.bind(this)
-    )
+      })
 
     // Deserialize the properties from the shapes
     // This can't be done earlier because Shape#deserialize expects that all referenced nodes are already there
 
     // first, deserialize all nodes
-    shapes.each(function (shape) {
+    shapes.each((shape) => {
       if (shape.object instanceof Node) {
         shape.object.deserialize(shape.__properties, shape.json)
-      }
-    })
-
-    // second, deserialize all edges
-    shapes.each(function (shape) {
-      if (shape.object instanceof Edge) {
+      } else if (shape.object instanceof Edge) {
         shape.object.deserialize(shape.__properties, shape.json)
         shape.object._oldBounds = shape.object.bounds.clone()
         shape.object._update()
       }
     })
 
+    // second, deserialize all edges
+    // shapes.each((shape) => {
+    //   if (shape.object instanceof Edge) {
+    //     shape.object.deserialize(shape.__properties, shape.json)
+    //     shape.object._oldBounds = shape.object.bounds.clone()
+    //     shape.object._update()
+    //   }
+    // })
+
     delete this.initializingShapes
-    return shapes.pluck('object')
+    // return shapes.pluck('object')
+    return  pluck(shapes, 'object')
   }
 
   /**

@@ -27,19 +27,20 @@ export default class Edge extends Shape {
    */
   constructor (options, stencil, facade) {
     super(...arguments)
+    this.facade = facade
     this.isMovable = true
     this.isSelectable = true
     this._dockerUpdated = false
-    this._markers = new Hash() //a hash map of SVGMarker objects where keys are the marker ids
+    this._markers = new Map() // a hash map of SVGMarker objects where keys are the marker ids
     this._paths = []
     this._interactionPaths = []
-    this._dockersByPath = new Hash()
-    this._markersByPath = new Hash()
+    this._dockersByPath = new Map()
+    this._markersByPath = new Map()
 
     /* Data structures to store positioning information of attached child nodes */
-    this.attachedNodePositionData = new Hash()
+    this.attachedNodePositionData = new Map()
 
-    //TODO was muss hier initial erzeugt werden?
+    // TODO was muss hier initial erzeugt werden?
     let stencilNode = this.node.childNodes[0].childNodes[0]
     stencilNode = ORYX_Utils.graft('http://www.w3.org/2000/svg', stencilNode, ['g', {
       'pointer-events': 'painted'
@@ -49,7 +50,6 @@ export default class Edge extends Shape {
     this.addEventHandlers(stencilNode.parentNode)
 
     this._oldBounds = this.bounds.clone()
-
     // load stencil
     this._init(this._stencil.view())
 
@@ -58,9 +58,207 @@ export default class Edge extends Shape {
     }
   }
 
+  /**
+   * Initializes the Edge after loading the SVG representation of the edge.
+   * @param {SVGDocument} svgDocument
+   */
+  _init (svgDocument) {
+    super._init(svgDocument)
+
+    let minPointX, minPointY, maxPointX, maxPointY
+    // init markers
+    let defs = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'defs')
+    if (defs.length > 0) {
+      defs = defs[0]
+      let markerElements = Array.from(defs.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'marker'))
+      let marker
+      const me = this
+      markerElements.each(function (markerElement) {
+        try {
+          marker = new ORYX_SVG.SVGMarker(markerElement.cloneNode(true))
+          me._markers.set(marker.id, marker)
+          let textElements =  Array.from(marker.element.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text'))
+          textElements.each(function (textElement) {
+            let label = new ORYX_SVG.Label({
+              textElement: textElement,
+              shapeId: this.id
+            })
+            me._labels.set(label.id, label)
+          })
+        } catch (e) {}
+      })
+    }
+
+    let gs = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'g')
+    if (gs.length <= 0) {
+      throw 'Edge: No g element found.'
+    }
+
+    let g = gs[0]
+    g.setAttributeNS(null, 'id', null)
+    let isFirst = true
+
+    Array.from(g.childNodes).each((path, index) => {
+      if (ORYX_Utils.checkClassType(path, SVGPathElement)) {
+        // 当元素为 path 时
+        path = path.cloneNode(false)
+
+        let pathId = this.id + '_' + index
+        path.setAttributeNS(null, 'id', pathId)
+        this._paths.push(path)
+
+        // check, if markers are set and update the id
+        let markersByThisPath = []
+        let markerUrl = path.getAttributeNS(null, 'marker-start')
+        if (markerUrl && markerUrl !== '') {
+          markerUrl = markerUrl.strip()
+          markerUrl = markerUrl.replace(/^url\(#/, '')
+
+          let markerStartId = this.getValidMarkerId(markerUrl)
+          path.setAttributeNS(null, 'marker-start', 'url(#' + markerStartId + ')')
+
+          markersByThisPath.push(this._markers.get(markerStartId))
+        }
+
+        markerUrl = path.getAttributeNS(null, 'marker-mid')
+        if (markerUrl && markerUrl !== '') {
+          markerUrl = markerUrl.strip()
+          markerUrl = markerUrl.replace(/^url\(#/, '')
+          let markerMidId = this.getValidMarkerId(markerUrl)
+          path.setAttributeNS(null, 'marker-mid', 'url(#' + markerMidId + ')')
+
+          markersByThisPath.push(this._markers.get(markerMidId))
+        }
+
+        markerUrl = path.getAttributeNS(null, 'marker-end')
+        if (markerUrl && markerUrl !== '') {
+          markerUrl = markerUrl.strip()
+
+          let markerEndId = this.getValidMarkerId(markerUrl)
+          path.setAttributeNS(null, 'marker-end', 'url(#' + markerEndId + ')')
+
+          markersByThisPath.push(this._markers.get(markerEndId))
+        }
+
+        this._markersByPath.set(pathId, markersByThisPath)
+
+        // init dockers
+        let parser = new PathParser()
+        let handler = new ORYX_SVG.PointsPathHandler()
+        parser.setHandler(handler)
+        parser.parsePath(path)
+
+        if (handler.points.length < 4) {
+          throw 'Edge: Path has to have two or more points specified.'
+        }
+
+        this._dockersByPath.set(pathId, [])
+
+        for (let i = 0; i < handler.points.length; i += 2) {
+          // handler.points.each((function(point, pIndex){
+          let x = handler.points[i]
+          let y = handler.points[i + 1]
+          if (isFirst || i > 0) {
+            let docker = new ORYX_Controls.Docker({
+              eventHandlerCallback: this.eventHandlerCallback
+            })
+
+            docker.bounds.centerMoveTo(x, y)
+            docker.bounds.registerCallback(this._dockerChangedCallback)
+            this.add(docker)
+
+            // this._dockersByPath[pathId].push(docker);
+
+            // calculate minPoint and maxPoint
+            if (minPointX) {
+              minPointX = Math.min(x, minPointX)
+              minPointY = Math.min(y, minPointY)
+            } else {
+              minPointX = x
+              minPointY = y
+            }
+
+            if (maxPointX) {
+              maxPointX = Math.max(x, maxPointX)
+              maxPointY = Math.max(y, maxPointY)
+            } else {
+              maxPointX = x
+              maxPointY = y
+            }
+          }
+          //}).bind(this));
+        }
+        isFirst = false
+      }
+    })
+
+    this.bounds.set(minPointX, minPointY, maxPointX, maxPointY)
+
+    // if (false && (this.bounds.width() === 0 || this.bounds.height() === 0)) {
+    //   let width = this.bounds.width()
+    //   let height = this.bounds.height()
+    //
+    //   this.bounds.extend({
+    //     x: width === 0 ? 2 : 0,
+    //     y: height === 0 ? 2 : 0
+    //   })
+    //
+    //   this.bounds.moveBy({
+    //     x: width === 0 ? -1 : 0,
+    //     y: height === 0 ? -1 : 0
+    //   })
+    // }
+
+    this._oldBounds = this.bounds.clone()
+
+    // add paths to this.node
+    this._paths.reverse()
+    let paths = []
+    this._paths.each((path) => {
+      paths.push(this.node.childNodes[0].childNodes[0].childNodes[0].appendChild(path))
+    })
+    this._paths = paths
+
+    // init interaction path
+    this._paths.each((path) => {
+      let iPath = path.cloneNode(false)
+      iPath.setAttributeNS(null, 'id', undefined)
+      iPath.setAttributeNS(null, 'stroke-width', 10)
+      iPath.setAttributeNS(null, 'visibility', 'hidden')
+      iPath.setAttributeNS(null, 'stroke-dasharray', null)
+      iPath.setAttributeNS(null, 'stroke', 'black')
+      iPath.setAttributeNS(null, 'fill', 'none')
+      iPath.setAttributeNS(null, 'title', this.getStencil().title())
+      this._interactionPaths.push(this.node.childNodes[0].childNodes[0].childNodes[0].appendChild(iPath))
+    })
+
+    this._paths.reverse()
+    this._interactionPaths.reverse()
+
+    /**initialize labels*/
+    let textElems = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text')
+    Array.from(textElems).each((textElem) => {
+      let label = new ORYX_SVG.Label({
+        textElement: textElem,
+        shapeId: this.id
+      })
+      this.node.childNodes[0].childNodes[0].appendChild(label.node)
+      this._labels.set(label.id, label)
+
+      label.registerOnChange(this.layout.bind(this))
+    })
+
+    this.propertiesChanged.each(function (pair) {
+      pair.value = true
+    })
+    //this._update(true);
+  }
+
   _update (force) {
     if (this._dockerUpdated || this.isChanged || force) {
-      this.dockers.invoke('update')
+      // 更新 dockers 的 bounds
+      // this.dockers.invoke('update')
+      this.dockers.map(docker => docker.update())
 
       // if (false && (this.bounds.width() === 0 || this.bounds.height() === 0)) {
       //   let width = this.bounds.width()
@@ -85,7 +283,7 @@ export default class Edge extends Shape {
       let diffWidth = (this.bounds.width() / oldWidth) || 1
       let diffHeight = (this.bounds.height() / oldHeight) || 1
 
-      this.dockers.each((function (docker) {
+      this.dockers.each((docker) => {
         // Unregister on BoundsChangedCallback
         docker.bounds.unregisterCallback(this._dockerChangedCallback)
 
@@ -103,8 +301,7 @@ export default class Edge extends Shape {
         // Do Docker update and register on DockersBoundChange
         docker.update()
         docker.bounds.registerCallback(this._dockerChangedCallback)
-
-      }).bind(this))
+      })
 
       if (this._dockerUpdated) {
         let a = this.dockers.first().bounds.center()
@@ -397,6 +594,172 @@ export default class Edge extends Shape {
     }
   }
 
+  refresh () {
+    super.refresh()
+    //TODO consider points for marker mids
+    let lastPoint
+    this._paths.each((path, index) => {
+      let dockers = this._dockersByPath.get(path.id)
+      let c = undefined
+      let d = undefined
+      if (lastPoint) {
+        d = 'M' + lastPoint.x + ' ' + lastPoint.y
+      } else {
+        c = dockers[0].bounds.center()
+        lastPoint = c
+        d = 'M' + c.x + ' ' + c.y
+      }
+
+      for (let i = 1; i < dockers.length; i++) {
+        // for each docker, draw a line to the center
+        c = dockers[i].bounds.center()
+        d = d + 'L' + c.x + ' ' + c.y + ' '
+        lastPoint = c
+      }
+
+      path.setAttributeNS(null, 'd', d)
+      this._interactionPaths[index].setAttributeNS(null, 'd', d)
+    })
+
+    /* move child shapes of an edge */
+    if (this.getChildNodes().length > 0) {
+      let x = this.bounds.upperLeft().x
+      let y = this.bounds.upperLeft().y
+      this.node.firstChild.childNodes[1].setAttributeNS(null, 'transform', 'translate(' + x + ', ' + y + ')')
+    }
+  }
+
+  add (shape) {
+    super.add(shape)
+    // If the new shape is a Docker which is not contained
+    if (shape instanceof ORYX_Controls.Docker && this.dockers.include(shape)) {
+      // Add it to the dockers list ordered by paths
+      let pathArray = [...this._dockersByPath.values()][0]
+      if (pathArray) {
+        pathArray.splice(this.dockers.indexOf(shape), 0, shape)
+      }
+
+      /* Perform nessary adjustments on the edge's child shapes */
+      this.handleChildShapesAfterAddDocker(shape)
+    }
+  }
+
+  /**
+   * Removes an edge's child shape
+   */
+  remove (shape) {
+    super.remove(shape)
+
+    if (this.attachedNodePositionData.get(shape.getId())) {
+      this.attachedNodePositionData.delete[shape.getId()]
+    }
+
+    /* Adjust child shapes if neccessary */
+    if (shape instanceof ORYX_Controls.Docker) {
+      this.handleChildShapesAfterRemoveDocker(shape)
+    }
+  }
+
+  /**
+   *@deprecated Use the .createDocker() Method and set the point via the bounds
+   */
+  addDocker (position, exDocker) {
+    let lastDocker
+    let result
+    let _dockersByPath = [...this._dockersByPath.entries()]
+    _dockersByPath.some((pair) => {
+      return pair[1].some((docker, index) => {
+        if (!lastDocker) {
+          lastDocker = docker
+          return false
+        } else {
+          let point1 = lastDocker.bounds.center()
+          let point2 = docker.bounds.center()
+
+          position = ORYX_Utils.pointHandleBelow10ToSvg(position)
+          if (ORYX_Math.isPointInLine(position.x, position.y, point1.x, point1.y, point2.x, point2.y, 10)) {
+            let path = this._paths.find(function (path) {
+              return path.id === pair[0]
+            })
+            if (path) {
+              let allowAttr = path.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'allowDockers')
+              if (allowAttr && allowAttr.toLowerCase() === 'no') {
+                return true
+              }
+            }
+
+            let newDocker = (exDocker)
+              ? exDocker :
+              this.createDocker(this.dockers.indexOf(lastDocker) + 1, position)
+
+            newDocker.bounds.centerMoveTo(position)
+            if (exDocker) {
+              this.add(newDocker, this.dockers.indexOf(lastDocker) + 1)
+            }
+            result = newDocker
+            return true
+          } else {
+            lastDocker = docker
+            return false
+          }
+        }
+      })
+    })
+    return result
+  }
+
+  removeDocker (docker) {
+    if (this.dockers.length > 2 && !(this.dockers.first() === docker)) {
+      let _dockersByPath = [...this._dockersByPath.entries()]
+      _dockersByPath.some((pair) => {
+        if (pair[1].includes(docker)) {
+          if (docker === pair[1].last()) {
+            return true
+          } else {
+            this.remove(docker)
+            this._dockersByPath.set(pair[0], pair[1].without(docker))
+            this.isChanged = true
+            this._dockerChanged()
+            return true
+          }
+        }
+        return false
+      })
+    }
+  }
+
+  /**
+   * Adds all necessary markers of this Edge to the SVG document.
+   * Has to be called, while this.node is part of DOM.
+   */
+  addMarkers (defs) {
+    this._markers.forEach(function (marker) {
+      if (!defs.ownerDocument.getElementById(marker.id)) {
+        marker.element = defs.appendChild(marker.element)
+      }
+    })
+  }
+
+  /**
+   * Removes all necessary markers of this Edge from the SVG document.
+   * Has to be called, while this.node is part of DOM.
+   */
+  removeMarkers () {
+    let svgElement = this.node.ownerSVGElement
+    if (svgElement) {
+      let defs = svgElement.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'defs')
+      if (defs.length > 0) {
+        defs = defs[0]
+        this._markers.forEach(function (marker) {
+          let foundMarker = defs.ownerDocument.getElementById(marker.id)
+          if (foundMarker) {
+            marker.element = defs.removeChild(marker.element)
+          }
+        })
+      }
+    }
+  }
+
   /**
    *  Moves a point to the upperLeft of a node's bounds.
    *
@@ -414,7 +777,7 @@ export default class Edge extends Shape {
    * Refreshes the visual representation of edge's attached nodes.
    */
   refreshAttachedNodes () {
-    this.attachedNodePositionData.values().each((nodeData) => {
+    [...this.attachedNodePositionData.values()].forEach((nodeData) => {
       let startPoint = nodeData.segment.docker1.bounds.center()
       let endPoint = nodeData.segment.docker2.bounds.center()
       this.relativizePoint(startPoint)
@@ -614,7 +977,9 @@ export default class Edge extends Shape {
    */
   optimizedUpdate () {
     let updateDocker = function (docker) {
-      if (!docker._dockedShape || !docker._dockedShapeBounds) { return }
+      if (!docker._dockedShape || !docker._dockedShapeBounds) {
+        return
+      }
       let off = {
         x: docker._dockedShape.bounds.a.x - docker._dockedShapeBounds.a.x,
         y: docker._dockedShape.bounds.a.y - docker._dockedShapeBounds.a.y
@@ -627,48 +992,6 @@ export default class Edge extends Shape {
     updateDocker(this.dockers.last())
 
     this.refresh()
-  }
-
-  refresh () {
-    // call base class refresh method
-    // arguments.callee.$.refresh.apply(this, arguments)
-
-    super.refresh()
-    //TODO consider points for marker mids
-    let lastPoint
-    this._paths.each((function (path, index) {
-      let dockers = this._dockersByPath.get(path.id)
-      let c = undefined
-      let d = undefined
-      if (lastPoint) {
-        d = 'M' + lastPoint.x + ' ' + lastPoint.y
-      } else {
-        c = dockers[0].bounds.center()
-        lastPoint = c
-
-        d = 'M' + c.x + ' ' + c.y
-      }
-
-      for (let i = 1; i < dockers.length; i++) {
-        // for each docker, draw a line to the center
-        c = dockers[i].bounds.center()
-        d = d + 'L' + c.x + ' ' + c.y + ' '
-        lastPoint = c
-      }
-
-      path.setAttributeNS(null, 'd', d)
-      this._interactionPaths[index].setAttributeNS(null, 'd', d)
-
-    }).bind(this))
-
-
-    /* move child shapes of an edge */
-    if (this.getChildNodes().length > 0) {
-      let x = this.bounds.upperLeft().x
-      let y = this.bounds.upperLeft().y
-      this.node.firstChild.childNodes[1].setAttributeNS(null, 'transform', 'translate(' + x + ', ' + y + ')')
-    }
-
   }
 
   /**
@@ -754,8 +1077,8 @@ export default class Edge extends Shape {
    * (0 - 359.99999999)
    */
   _getAngle (docker1, docker2) {
-    let p1 = docker1 instanceof ORYX_Controls.Docker ? docker1.absoluteCenterXY() : docker1;
-    let p2 = docker2 instanceof ORYX_Controls.Docker ? docker2.absoluteCenterXY() : docker2;
+    let p1 = docker1 instanceof ORYX_Controls.Docker ? docker1.absoluteCenterXY() : docker1
+    let p2 = docker2 instanceof ORYX_Controls.Docker ? docker2.absoluteCenterXY() : docker2
 
     return ORYX_Math.getAngle(p1, p2)
   }
@@ -779,22 +1102,6 @@ export default class Edge extends Shape {
     }).bind(this))
 
     this._dockerChanged()
-  }
-
-  add (shape) {
-    super.add(shape)
-
-    // If the new shape is a Docker which is not contained
-    if (shape instanceof ORYX_Controls.Docker && this.dockers.include(shape)) {
-      // Add it to the dockers list ordered by paths
-      let pathArray = this._dockersByPath.values()[0]
-      if (pathArray) {
-        pathArray.splice(this.dockers.indexOf(shape), 0, shape)
-      }
-
-      /* Perform nessary adjustments on the edge's child shapes */
-      this.handleChildShapesAfterAddDocker(shape)
-    }
   }
 
   /**
@@ -835,24 +1142,19 @@ export default class Edge extends Shape {
 
     let relativDockerPosition = lengthSegmentPart1 / (lengthSegmentPart1 + lengthSegmentPart2)
 
-    segmentElements.each(function (nodePositionData) {
+    segmentElements.forEach(function (nodePositionData, key) {
       /* Assign child node to the new segment */
-      if (nodePositionData.value.relativDistanceFromDocker1 < relativDockerPosition) {
+      if (nodePositionData.relativDistanceFromDocker1 < relativDockerPosition) {
         /* Case: before added Docker */
-        nodePositionData.value.segment.docker2 = docker
-        nodePositionData.value.relativDistanceFromDocker1 =
-          nodePositionData.value.relativDistanceFromDocker1 / relativDockerPosition
+        nodePositionData.segment.docker2 = docker
+        nodePositionData.relativDistanceFromDocker1 = nodePositionData.relativDistanceFromDocker1 / relativDockerPosition
       } else {
         /* Case: after added Docker */
-        nodePositionData.value.segment.docker1 = docker
+        nodePositionData.segment.docker1 = docker
         let newFullDistance = 1 - relativDockerPosition
-        let relativPartOfSegment =
-          nodePositionData.value.relativDistanceFromDocker1
-          - relativDockerPosition
+        let relativPartOfSegment = nodePositionData.relativDistanceFromDocker1 - relativDockerPosition
 
-        nodePositionData.value.relativDistanceFromDocker1 =
-          relativPartOfSegment / newFullDistance
-
+        nodePositionData.relativDistanceFromDocker1 = relativPartOfSegment / newFullDistance
       }
     })
 
@@ -914,11 +1216,12 @@ export default class Edge extends Shape {
     }
 
     /* Get elements of the segment */
-    let elementsOfSegment =
-      this.attachedNodePositionData.findAll(function (nodePositionData) {
-        return nodePositionData.value.segment.docker1 === startDocker &&
-          nodePositionData.value.segment.docker2 === endDocker
+    let elementsOfSegment = new Map(
+      [...this.attachedNodePositionData].filter(function (key, nodePositionData) {
+        return nodePositionData.segment.docker1 === startDocker &&
+          nodePositionData.segment.docker2 === endDocker
       })
+    )
 
     /* Return a Hash in each case */
     if (!elementsOfSegment) {
@@ -926,22 +1229,6 @@ export default class Edge extends Shape {
     }
 
     return elementsOfSegment
-  }
-
-  /**
-   * Removes an edge's child shape
-   */
-  remove (shape) {
-    super.remove(shape)
-
-    if (this.attachedNodePositionData.get(shape.getId())) {
-      this.attachedNodePositionData.unset[shape.getId()]
-    }
-
-    /* Adjust child shapes if neccessary */
-    if (shape instanceof ORYX_Controls.Docker) {
-      this.handleChildShapesAfterRemoveDocker(shape)
-    }
   }
 
   updateReferencePointOfLabel (label, intersection, from, to, dirty) {
@@ -1036,18 +1323,18 @@ export default class Edge extends Shape {
       return
     }
 
-    this.attachedNodePositionData.each(function (nodePositionData) {
-      if (nodePositionData.value.segment.docker1 === docker) {
+    this.attachedNodePositionData.forEach(function (nodePositionData, key) {
+      if (nodePositionData.segment.docker1 === docker) {
         /* The new start of the segment is the predecessor of docker2. */
-        let index = this.dockers.indexOf(nodePositionData.value.segment.docker2)
-        if (index == -1) {
+        let index = this.dockers.indexOf(nodePositionData.segment.docker2)
+        if (index === -1) {
           return
         }
-        nodePositionData.value.segment.docker1 = this.dockers[index - 1]
-      } else if (nodePositionData.value.segment.docker2 === docker) {
+        nodePositionData.segment.docker1 = this.dockers[index - 1]
+      } else if (nodePositionData.segment.docker2 === docker) {
         /* The new end of the segment is the successor of docker1. */
-        let index = this.dockers.indexOf(nodePositionData.value.segment.docker1)
-        if (index == -1) {
+        let index = this.dockers.indexOf(nodePositionData.segment.docker1)
+        if (index === -1) {
           return
         }
         nodePositionData.value.segment.docker2 = this.dockers[index + 1]
@@ -1085,84 +1372,6 @@ export default class Edge extends Shape {
     this.refreshAttachedNodes()
   }
 
-  /**
-   *@deprecated Use the .createDocker() Method and set the point via the bounds
-   */
-  addDocker (position, exDocker) {
-    let lastDocker
-    let result
-    this._dockersByPath.any((function (pair) {
-      return pair.value.any((function (docker, index) {
-        if (!lastDocker) {
-          lastDocker = docker
-          return false
-        } else {
-          let point1 = lastDocker.bounds.center()
-          let point2 = docker.bounds.center()
-
-          let additionalIEZoom = 1
-          if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-            let ua = navigator.userAgent
-            if (ua.indexOf('MSIE') >= 0) {
-              //IE 10 and below
-              let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-              if (zoom !== 100) {
-                additionalIEZoom = zoom / 100
-              }
-            }
-          }
-
-          if (additionalIEZoom !== 1) {
-            position.x = position.x / additionalIEZoom
-            position.y = position.y / additionalIEZoom
-          }
-
-          if (ORYX_Math.isPointInLine(position.x, position.y, point1.x, point1.y, point2.x, point2.y, 10)) {
-            let path = this._paths.find(function (path) {
-              return path.id === pair.key
-            })
-            if (path) {
-              let allowAttr = path.getAttributeNS(ORYX_Config.NAMESPACE_ORYX, 'allowDockers')
-              if (allowAttr && allowAttr.toLowerCase() === 'no') {
-                return true
-              }
-            }
-
-            let newDocker = (exDocker) ? exDocker : this.createDocker(this.dockers.indexOf(lastDocker) + 1, position)
-            newDocker.bounds.centerMoveTo(position)
-            if (exDocker) {
-              this.add(newDocker, this.dockers.indexOf(lastDocker) + 1)
-            }
-            result = newDocker
-            return true
-          } else {
-            lastDocker = docker
-            return false
-          }
-        }
-      }).bind(this))
-    }).bind(this))
-    return result
-  }
-
-  removeDocker (docker) {
-    if (this.dockers.length > 2 && !(this.dockers.first() === docker)) {
-      this._dockersByPath.any((function (pair) {
-        if (pair.value.member(docker)) {
-          if (docker === pair.value.last()) {
-            return true
-          } else {
-            this.remove(docker)
-            this._dockersByPath.set(pair.key, pair.value.without(docker))
-            this.isChanged = true
-            this._dockerChanged()
-            return true
-          }
-        }
-        return false
-      }).bind(this))
-    }
-  }
 
   /**
    * Removes all dockers from the edge which are on
@@ -1205,216 +1414,6 @@ export default class Edge extends Shape {
     return marked
   }
 
-  /**
-   * Initializes the Edge after loading the SVG representation of the edge.
-   * @param {SVGDocument} svgDocument
-   */
-  _init (svgDocument) {
-    super._init(svgDocument)
-
-    let minPointX, minPointY, maxPointX, maxPointY
-    // init markers
-    let defs = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'defs')
-    if (defs.length > 0) {
-      defs = defs[0]
-      let markerElements = $A(defs.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'marker'))
-      let marker
-      const me = this
-      markerElements.each(function (markerElement) {
-        try {
-          marker = new ORYX_SVG.SVGMarker(markerElement.cloneNode(true))
-          me._markers.set(marker.id, marker)
-          let textElements = $A(marker.element.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text'))
-          let label
-          textElements.each(function (textElement) {
-            label = new ORYX_SVG.Label({
-              textElement: textElement,
-              shapeId: this.id
-            })
-
-            me._labels.set(label.id, label)
-          })
-        }
-        catch (e) {}
-      })
-    }
-
-    let gs = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'g')
-    if (gs.length <= 0) {
-      throw 'Edge: No g element found.'
-    }
-
-    let g = gs[0]
-    g.setAttributeNS(null, 'id', null)
-    let isFirst = true
-
-    $A(g.childNodes).each((function (path, index) {
-      if (ORYX_Utils.checkClassType(path, SVGPathElement)) {
-        path = path.cloneNode(false)
-
-        let pathId = this.id + '_' + index
-        path.setAttributeNS(null, 'id', pathId)
-        this._paths.push(path)
-
-        // check, if markers are set and update the id
-        let markersByThisPath = []
-        let markerUrl = path.getAttributeNS(null, 'marker-start')
-
-        if (markerUrl && markerUrl !== '') {
-          markerUrl = markerUrl.strip()
-          markerUrl = markerUrl.replace(/^url\(#/, '')
-
-          let markerStartId = this.getValidMarkerId(markerUrl)
-          path.setAttributeNS(null, 'marker-start', 'url(#' + markerStartId + ')')
-
-          markersByThisPath.push(this._markers.get(markerStartId))
-        }
-
-        markerUrl = path.getAttributeNS(null, 'marker-mid')
-
-        if (markerUrl && markerUrl !== '') {
-          markerUrl = markerUrl.strip()
-          markerUrl = markerUrl.replace(/^url\(#/, '')
-          let markerMidId = this.getValidMarkerId(markerUrl)
-          path.setAttributeNS(null, 'marker-mid', 'url(#' + markerMidId + ')')
-
-          markersByThisPath.push(this._markers.get(markerMidId))
-        }
-
-        markerUrl = path.getAttributeNS(null, 'marker-end')
-
-        if (markerUrl && markerUrl !== '') {
-          markerUrl = markerUrl.strip()
-
-          let markerEndId = this.getValidMarkerId(markerUrl)
-          path.setAttributeNS(null, 'marker-end', 'url(#' + markerEndId + ')')
-
-          markersByThisPath.push(this._markers.get(markerEndId))
-        }
-
-        this._markersByPath[pathId] = markersByThisPath
-
-        // init dockers
-        let parser = new PathParser()
-        let handler = new ORYX_SVG.PointsPathHandler()
-        parser.setHandler(handler)
-        parser.parsePath(path)
-
-        if (handler.points.length < 4) {
-          throw 'Edge: Path has to have two or more points specified.'
-        }
-
-        this._dockersByPath.set(pathId, [])
-
-        for (let i = 0; i < handler.points.length; i += 2) {
-          // handler.points.each((function(point, pIndex){
-          let x = handler.points[i]
-          let y = handler.points[i + 1]
-          if (isFirst || i > 0) {
-            let docker = new ORYX_Controls.Docker({
-              eventHandlerCallback: this.eventHandlerCallback
-            })
-
-            docker.bounds.centerMoveTo(x, y)
-            docker.bounds.registerCallback(this._dockerChangedCallback)
-            this.add(docker, this.dockers.length)
-
-            // this._dockersByPath[pathId].push(docker);
-
-            // calculate minPoint and maxPoint
-            if (minPointX) {
-              minPointX = Math.min(x, minPointX)
-              minPointY = Math.min(y, minPointY)
-            } else {
-              minPointX = x
-              minPointY = y
-            }
-
-            if (maxPointX) {
-              maxPointX = Math.max(x, maxPointX)
-              maxPointY = Math.max(y, maxPointY)
-            } else {
-              maxPointX = x
-              maxPointY = y
-            }
-          }
-          //}).bind(this));
-        }
-        isFirst = false
-      }
-    }).bind(this))
-
-    this.bounds.set(minPointX, minPointY, maxPointX, maxPointY)
-
-    if (false && (this.bounds.width() === 0 || this.bounds.height() === 0)) {
-      let width = this.bounds.width()
-      let height = this.bounds.height()
-
-      this.bounds.extend({
-        x: width === 0 ? 2 : 0,
-        y: height === 0 ? 2 : 0
-      })
-
-      this.bounds.moveBy({
-        x: width === 0 ? -1 : 0,
-        y: height === 0 ? -1 : 0
-      })
-
-    }
-
-    this._oldBounds = this.bounds.clone()
-
-    // add paths to this.node
-    this._paths.reverse()
-    let paths = []
-    this._paths.each((function (path) {
-      paths.push(this.node.childNodes[0].childNodes[0].childNodes[0].appendChild(path))
-    }).bind(this))
-
-    this._paths = paths
-
-    // init interaction path
-    this._paths.each((function (path) {
-      let iPath = path.cloneNode(false)
-      iPath.setAttributeNS(null, 'id', undefined)
-      iPath.setAttributeNS(null, 'stroke-width', 10)
-      iPath.setAttributeNS(null, 'visibility', 'hidden')
-      iPath.setAttributeNS(null, 'stroke-dasharray', null)
-      iPath.setAttributeNS(null, 'stroke', 'black')
-      iPath.setAttributeNS(null, 'fill', 'none')
-      iPath.setAttributeNS(null, 'title', this.getStencil().title())
-      this._interactionPaths.push(this.node.childNodes[0].childNodes[0].childNodes[0].appendChild(iPath))
-    }).bind(this))
-
-    this._paths.reverse()
-    this._interactionPaths.reverse()
-
-    /**initialize labels*/
-    let textElems = svgDocument.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text')
-
-    $A(textElems).each((function (textElem) {
-      let label = new ORYX_SVG.Label({
-        textElement: textElem,
-        shapeId: this.id
-      })
-      this.node.childNodes[0].childNodes[0].appendChild(label.node)
-      this._labels.set(label.id, label)
-
-      label.registerOnChange(this.layout.bind(this))
-    }).bind(this))
-
-    this.propertiesChanged.each(function (pair) {
-      pair.value = true
-    })
-
-    //if(this.dockers.length == 2) {
-
-
-    //  }
-
-    //this._update(true);
-  }
-
   getValidMarkerId (markerUrl) {
     if (markerUrl.indexOf('url("#') >= 0) {
       // Fix for IE9, additional quotes are added to the <id
@@ -1423,38 +1422,6 @@ export default class Edge extends Shape {
     } else {
       markerUrl = markerUrl.replace(/^url\(#/, '')
       return this.id.concat(markerUrl.replace(/\)$/, ''))
-    }
-  }
-
-  /**
-   * Adds all necessary markers of this Edge to the SVG document.
-   * Has to be called, while this.node is part of DOM.
-   */
-  addMarkers (defs) {
-    this._markers.each(function (marker) {
-      if (!defs.ownerDocument.getElementById(marker.value.id)) {
-        marker.value.element = defs.appendChild(marker.value.element)
-      }
-    })
-  }
-
-  /**
-   * Removes all necessary markers of this Edge from the SVG document.
-   * Has to be called, while this.node is part of DOM.
-   */
-  removeMarkers () {
-    let svgElement = this.node.ownerSVGElement
-    if (svgElement) {
-      let defs = svgElement.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'defs')
-      if (defs.length > 0) {
-        defs = defs[0]
-        this._markers.each(function (marker) {
-          let foundMarker = defs.ownerDocument.getElementById(marker.value.id)
-          if (foundMarker) {
-            marker.value.element = defs.removeChild(marker.value.element)
-          }
-        })
-      }
     }
   }
 
@@ -1470,16 +1437,18 @@ export default class Edge extends Shape {
     let result = super.serialize()
     // var result = arguments.callee.$.serialize.apply(this)
 
-    //add dockers triple
+    // add dockers triple
     let value = ''
-    this._dockersByPath.each((function (pair) {
-      pair.value.each(function (docker) {
-        let position = docker.getDockedShape() && docker.referencePoint ? docker.referencePoint : docker.bounds.center()
+    this._dockersByPath.forEach( pair => {
+      pair.forEach(function (docker) {
+        let position = docker.getDockedShape() && docker.referencePoint
+          ? docker.referencePoint
+          : docker.bounds.center()
         value = value.concat(position.x + ' ' + position.y + ' ')
       })
 
       value += ' # '
-    }).bind(this))
+    })
     result.push({
       name: 'dockers',
       prefix: 'oryx',
@@ -1487,8 +1456,8 @@ export default class Edge extends Shape {
       type: 'literal'
     })
 
-    //add parent triple dependant on the dockedShapes
-    //TODO change this when canvas becomes a resource
+    // add parent triple dependant on the dockedShapes
+    // TODO change this when canvas becomes a resource
     /*        var source = this.dockers.first().getDockedShape();
      var target = this.dockers.last().getDockedShape();
      var sharedParent;
@@ -1538,7 +1507,7 @@ export default class Edge extends Shape {
      });*/
     //}
 
-    //serialize target and source
+    // serialize target and source
     let lastDocker = this.dockers.last()
     let target = lastDocker.getDockedShape()
 
@@ -1571,8 +1540,7 @@ export default class Edge extends Shape {
           result = serializeEvent.result
         }
       }
-    }
-    catch (e) {}
+    } catch (e) {}
     return result
   }
 
@@ -1597,7 +1565,8 @@ export default class Edge extends Shape {
         }
       }
     }
-    catch (e) {}
+    catch (e) {
+    }
 
     // Set the outgoing shapes
     let target = data.find(function (ser) {
@@ -1621,6 +1590,7 @@ export default class Edge extends Shape {
       let next = this.getCanvas().getChildShapeByResourceId(obj.value)
 
       if (next) {
+        console.log(33333333)
         if (next == targetShape) {
           // If this is an edge, set the last docker to the next shape
           this.dockers.last().setDockedShape(next)

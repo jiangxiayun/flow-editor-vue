@@ -31,7 +31,7 @@
     name: 'flowEditor',
     data () {
       return {
-        wrapperHeight: '700px',
+        wrapperHeight: '900px',
         editorManager: null,
         editor: null,
         editorHistory: [],
@@ -58,7 +58,7 @@
         ...this.config,
         elementsWithoutRenameAction: ['Lane', 'V-Lane']
       })
-      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, this.initCompleted)
+      FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_EDITOR_READY, this.initCompleted)
       FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, this.selectChangeFun)
       FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_DOUBLE_CLICK, this.doubleClick)
       FLOW_eventBus.addListener(ORYX_CONFIG.EVENT_TYPE_PROPERTY_CHANGED_BYOUTSIDE, this.doubleClickToChangeVal)
@@ -86,7 +86,7 @@
       }
     },
     beforeDestroy () {
-      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_EDITOR_INIT_COMPLETED, this.initCompleted)
+      FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_EDITOR_READY, this.initCompleted)
       FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_SELECTION_CHANGED, this.selectChangeFun)
       FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_DOUBLE_CLICK, this.doubleClick)
       FLOW_eventBus.removeListener(ORYX_CONFIG.EVENT_TYPE_PROPERTY_CHANGED_BYOUTSIDE, this.doubleClickToChangeVal)

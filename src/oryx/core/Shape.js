@@ -47,6 +47,49 @@ export default class Shape extends AbstractShape {
   }
 
   /**
+   * Child classes have to overwrite this method for initializing a loaded
+   * SVG representation.
+   * @param {SVGDocument} svgDocument
+   */
+  _init (svgDocument) {
+    // adjust ids
+    this._adjustIds(svgDocument, 0)
+  }
+
+  _adjustIds(element, idIndex) {
+    if (element instanceof Element) {
+      let eid = element.getAttributeNS(null, 'id')
+      if (eid && eid !== '') {
+        element.setAttributeNS(null, 'id', this.id + eid)
+      } else {
+        element.setAttributeNS(null, 'id', this.id + '_' + this.id + '_' + idIndex)
+        idIndex++
+      }
+
+      // Replace URL in fill attribute
+      let fill = element.getAttributeNS(null, 'fill')
+      if (fill && fill.include('url(#')) {
+        fill = fill.replace(/url\(#/g, 'url(#' + this.id)
+        element.setAttributeNS(null, 'fill', fill)
+      }
+
+      // 替换 filter 的id
+      let filter = element.getAttributeNS(null, 'filter')
+      if (filter && filter.include('url(#')) {
+        filter = filter.replace(/url\(#/g, 'url(#' + this.id)
+        element.setAttributeNS(null, 'filter', filter)
+      }
+
+      if (element.hasChildNodes()) {
+        for (let i = 0; i < element.childNodes.length; i++) {
+          idIndex = this._adjustIds(element.childNodes[i], idIndex)
+        }
+      }
+    }
+    return idIndex
+  }
+
+  /**
    * If changed flag is set, refresh method is called.
    */
   update () {
@@ -365,6 +408,123 @@ export default class Shape extends AbstractShape {
   }
 
   /**
+   * Overrides the UIObject.add method. Adds uiObject to the correct sub node.
+   * @param {UIObject} uiObject
+   * @param {Number} index
+   */
+  add (uiObject, index, silent) {
+    // parameter has to be an UIObject, but
+    // must not be an Edge.
+    if (uiObject instanceof UIObject && !(uiObject.getInstanceofType().includes('Edge'))) {
+      if (!(this.children.member(uiObject))) {
+        // if uiObject is child of another parent, remove it from that parent.
+        if (uiObject.parent) {
+          uiObject.parent.remove(uiObject, true)
+        }
+
+        // add uiObject to this Shape
+        if (index !== undefined) {
+          this.children.splice(index, 0, uiObject)
+        } else {
+          this.children.push(uiObject)
+        }
+
+        // set parent reference
+        uiObject.parent = this
+
+        // add uiObject.node to this.node depending on the type of uiObject
+        let parent
+        let type = uiObject.getInstanceofType()
+        if (type.includes('Node')) {
+          parent = this.node.childNodes[0].childNodes[1]
+          this.nodes.push(uiObject)
+        } else if (uiObject instanceof ORYX_Controls.Control) {
+          let ctrls = this.node.childNodes[1]
+          if (uiObject instanceof ORYX_Controls.Docker) {
+            parent = ctrls.childNodes[0]
+            if (this.dockers.length >= 2) {
+              this.dockers.splice(
+                index !== undefined ? Math.min(index, this.dockers.length - 1) : this.dockers.length - 1,
+                0, uiObject)
+            } else {
+              this.dockers.push(uiObject)
+            }
+          } else if (uiObject instanceof ORYX_Controls.Magnet) {
+            parent = ctrls.childNodes[1]
+            this.magnets.push(uiObject)
+          } else {
+            parent = ctrls
+          }
+        } else {	// UIObject
+          parent = this.node
+        }
+
+        if (index != undefined && index < parent.childNodes.length)
+          uiObject.node = parent.insertBefore(uiObject.node, parent.childNodes[index])
+        else
+          uiObject.node = parent.appendChild(uiObject.node)
+
+        this._changed()
+        // uiObject.bounds.registerCallback(this._changedCallback);
+
+        if (this.eventHandlerCallback && silent !== true)
+          this.eventHandlerCallback({ type: ORYX_Config.EVENT_SHAPEADDED, shape: uiObject })
+
+      } else {
+        ORYX_Log.warn('add: ORYX.Core.UIObject is already a child of this object.')
+      }
+    } else {
+      ORYX_Log.warn('add: Parameter is not of type ORYX.Core.UIObject.')
+    }
+  }
+
+  /**
+   * Overrides the UIObject.remove method. Removes uiObject.
+   * @param {UIObject} uiObject
+   */
+  remove (uiObject, silent) {
+    // if uiObject is a child of this object, remove it.
+    if (this.children.member(uiObject)) {
+      // remove uiObject from children
+      let parent = uiObject.parent
+      this.children = this.children.without(uiObject)
+
+      // delete parent reference of uiObject
+      uiObject.parent = undefined
+
+      // delete uiObject.node from this.node
+      if (uiObject instanceof Shape) {
+        let type = uiObject.getInstanceofType()
+        if (type.includes('Edge')) {
+          uiObject.removeMarkers()
+          uiObject.node = this.node.childNodes[0].childNodes[2].removeChild(uiObject.node)
+        } else {
+          uiObject.node = this.node.childNodes[0].childNodes[1].removeChild(uiObject.node)
+          this.nodes = this.nodes.without(uiObject)
+        }
+      } else if (uiObject instanceof ORYX_Controls.Control) {
+        if (uiObject instanceof ORYX_Controls.Docker) {
+          uiObject.node = this.node.childNodes[1].childNodes[0].removeChild(uiObject.node)
+          this.dockers = this.dockers.without(uiObject)
+        } else if (uiObject instanceof ORYX_Controls.Magnet) {
+          uiObject.node = this.node.childNodes[1].childNodes[1].removeChild(uiObject.node)
+          this.magnets = this.magnets.without(uiObject)
+        } else {
+          uiObject.node = this.node.childNodes[1].removeChild(uiObject.node)
+        }
+      }
+
+      if (this.eventHandlerCallback && silent !== true)
+        this.eventHandlerCallback({ type: ORYX_Config.EVENT_SHAPEREMOVED, shape: uiObject, parent: parent })
+
+      this._changed()
+      // uiObject.bounds.unregisterCallback(this._changedCallback);
+    } else {
+      ORYX_Log.warn('remove: ORYX.Core.UIObject is not a child of this object.')
+    }
+  }
+
+  /**
    * Returns an array of Label objects.
    */
   getLabels () {
@@ -512,124 +672,6 @@ export default class Shape extends AbstractShape {
       })
 
       return result
-    }
-  }
-
-  /**
-   * Overrides the UIObject.add method. Adds uiObject to the correct sub node.
-   * @param {UIObject} uiObject
-   * @param {Number} index
-   */
-  add (uiObject, index, silent) {
-    // parameter has to be an UIObject, but
-    // must not be an Edge.
-    if (uiObject instanceof UIObject && !(uiObject.getInstanceofType().includes('Edge'))) {
-      if (!(this.children.member(uiObject))) {
-        //if uiObject is child of another parent, remove it from that parent.
-        if (uiObject.parent) {
-          uiObject.parent.remove(uiObject, true)
-        }
-
-        // add uiObject to this Shape
-        if (index != undefined) {
-          this.children.splice(index, 0, uiObject)
-        } else {
-          this.children.push(uiObject)
-        }
-
-        // set parent reference
-        uiObject.parent = this
-
-        // add uiObject.node to this.node depending on the type of uiObject
-        let parent
-        let type = uiObject.getInstanceofType()
-        if (type.includes('Node')) {
-          parent = this.node.childNodes[0].childNodes[1]
-          this.nodes.push(uiObject)
-        } else if (uiObject instanceof ORYX_Controls.Control) {
-          let ctrls = this.node.childNodes[1]
-          if (uiObject instanceof ORYX_Controls.Docker) {
-            parent = ctrls.childNodes[0]
-            if (this.dockers.length >= 2) {
-              this.dockers.splice(index !== undefined ? Math.min(index, this.dockers.length - 1) :
-                this.dockers.length - 1, 0, uiObject)
-            } else {
-              this.dockers.push(uiObject)
-            }
-          } else if (uiObject instanceof ORYX_Controls.Magnet) {
-            parent = ctrls.childNodes[1]
-            this.magnets.push(uiObject)
-          } else {
-            parent = ctrls
-          }
-        } else {	// UIObject
-          parent = this.node
-        }
-
-        if (index != undefined && index < parent.childNodes.length)
-          uiObject.node = parent.insertBefore(uiObject.node, parent.childNodes[index])
-        else
-          uiObject.node = parent.appendChild(uiObject.node)
-
-        this._changed()
-        // uiObject.bounds.registerCallback(this._changedCallback);
-
-
-        if (this.eventHandlerCallback && silent !== true)
-          this.eventHandlerCallback({ type: ORYX_Config.EVENT_SHAPEADDED, shape: uiObject })
-
-      } else {
-        ORYX_Log.warn('add: ORYX.Core.UIObject is already a child of this object.')
-      }
-    } else {
-      ORYX_Log.warn('add: Parameter is not of type ORYX.Core.UIObject.')
-    }
-  }
-
-  /**
-   * Overrides the UIObject.remove method. Removes uiObject.
-   * @param {UIObject} uiObject
-   */
-  remove (uiObject, silent) {
-    // if uiObject is a child of this object, remove it.
-    if (this.children.member(uiObject)) {
-      // remove uiObject from children
-      let parent = uiObject.parent
-
-      this.children = this.children.without(uiObject)
-
-      // delete parent reference of uiObject
-      uiObject.parent = undefined
-
-      // delete uiObject.node from this.node
-      if (uiObject instanceof Shape) {
-        let type = uiObject.getInstanceofType()
-        if (type.includes('Edge')) {
-          uiObject.removeMarkers()
-          uiObject.node = this.node.childNodes[0].childNodes[2].removeChild(uiObject.node)
-        } else {
-          uiObject.node = this.node.childNodes[0].childNodes[1].removeChild(uiObject.node)
-          this.nodes = this.nodes.without(uiObject)
-        }
-      } else if (uiObject instanceof ORYX_Controls.Control) {
-        if (uiObject instanceof ORYX_Controls.Docker) {
-          uiObject.node = this.node.childNodes[1].childNodes[0].removeChild(uiObject.node)
-          this.dockers = this.dockers.without(uiObject)
-        } else if (uiObject instanceof ORYX_Controls.Magnet) {
-          uiObject.node = this.node.childNodes[1].childNodes[1].removeChild(uiObject.node)
-          this.magnets = this.magnets.without(uiObject)
-        } else {
-          uiObject.node = this.node.childNodes[1].removeChild(uiObject.node)
-        }
-      }
-
-      if (this.eventHandlerCallback && silent !== true)
-        this.eventHandlerCallback({ type: ORYX_Config.EVENT_SHAPEREMOVED, shape: uiObject, parent: parent })
-
-      this._changed()
-      // uiObject.bounds.unregisterCallback(this._changedCallback);
-    } else {
-      ORYX_Log.warn('remove: ORYX.Core.UIObject is not a child of this object.')
     }
   }
 
@@ -857,53 +899,6 @@ export default class Shape extends AbstractShape {
       json.labels = labels
     }
     return json
-  }
-
-  /**
-   * Private methods.
-   */
-
-  /**
-   * Child classes have to overwrite this method for initializing a loaded
-   * SVG representation.
-   * @param {SVGDocument} svgDocument
-   */
-  _init (svgDocument) {
-    // adjust ids
-    this._adjustIds(svgDocument, 0)
-  }
-
-  _adjustIds(element, idIndex) {
-    if (element instanceof Element) {
-      let eid = element.getAttributeNS(null, 'id')
-      if (eid && eid !== '') {
-        element.setAttributeNS(null, 'id', this.id + eid)
-      } else {
-        element.setAttributeNS(null, 'id', this.id + '_' + this.id + '_' + idIndex)
-        idIndex++
-      }
-
-      // Replace URL in fill attribute
-      let fill = element.getAttributeNS(null, 'fill')
-      if (fill && fill.include('url(#')) {
-        fill = fill.replace(/url\(#/g, 'url(#' + this.id)
-        element.setAttributeNS(null, 'fill', fill)
-      }
-
-      // 替换 filter 的id
-      let filter = element.getAttributeNS(null, 'filter')
-      if (filter && filter.include('url(#')) {
-        filter = filter.replace(/url\(#/g, 'url(#' + this.id)
-        element.setAttributeNS(null, 'filter', filter)
-      }
-
-      if (element.hasChildNodes()) {
-        for (let i = 0; i < element.childNodes.length; i++) {
-          idIndex = this._adjustIds(element.childNodes[i], idIndex)
-        }
-      }
-    }
-    return idIndex
   }
 
   toString() {

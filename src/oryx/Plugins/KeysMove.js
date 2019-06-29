@@ -252,11 +252,13 @@ export default class KeysMove extends AbstractPlugin {
       execute () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(undefined)
+          console.log('setDockedShape')
         })
       }
       rollback () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(el.dockedShape)
+          console.log('setDockedShape')
           el.docker.setReferencePoint(el.refPoint)
           //el.docker.update();
         })

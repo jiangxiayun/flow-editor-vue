@@ -534,8 +534,10 @@ export default class DragDropResize extends AbstractPlugin {
               parent.add(this.docker.parent)
               // Set the Docker to the new Shape
               this.docker.setDockedShape(undefined)
+              console.log('setDockedShape')
               this.docker.bounds.centerMoveTo(pos)
               this.docker.setDockedShape(toDockShape)
+              console.log('setDockedShape')
               // this.docker.update();
 
               this.facade.setSelection([this.docker.parent])
@@ -826,12 +828,14 @@ export default class DragDropResize extends AbstractPlugin {
       execute () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(undefined)
+          console.log('setDockedShape')
         })
       }
 
       rollback () {
         this.dockers.each(function (el) {
           el.docker.setDockedShape(el.dockedShape)
+          console.log('setDockedShape')
           el.docker.setReferencePoint(el.refPoint)
           //el.docker.update();
         })

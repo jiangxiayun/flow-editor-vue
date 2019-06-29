@@ -8,7 +8,6 @@
     <el-tabs type="border-card">
       <el-tab-pane label="版本信息">版本信息</el-tab-pane>
       <el-tab-pane label="流程活动基本信息">
-        {{form}}
         <el-form ref="form" :model="form" label-width="80px">
           <el-form-item label="活动名称">
             <el-input v-model="form['oryx-name']"></el-input>

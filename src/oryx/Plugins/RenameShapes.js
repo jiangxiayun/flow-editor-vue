@@ -68,28 +68,13 @@ export default class RenameShapes {
 
     // Define the nearest label
     let nearestLabel = labels.length === 1 ? labels[0] : null
-    // if (!nearestLabel) {
-    //   nearestLabel = labels.find(function (label) {
-    //     let el = label.id.split('_')
-    //     return el[el.length - 1] === 'name'
-    //   })
-    // }
+
     if (!nearestLabel) {
       nearestLabel = labels.find(function (label) {
         return label.node == evt.target || label.node == evt.target.parentNode
       })
       if (!nearestLabel) {
         let evtCoord = this.facade.eventCoordinates(evt)
-        // evtCoord = ORYX_Utils.pointHandleBelow10ToSvg(evtCoord)
-        // evtCoord.y += $('editor-header').clientHeight - $('canvasSection').scrollTop - 5
-        // evtCoord.x -= $('canvasSection').scrollLeft
-        //
-        // let trans = this.facade.getCanvas().rootNode.lastChild.getScreenCTM()
-        // evtCoord.x *= trans.a
-        // evtCoord.y *= trans.d
-
-        // console.log('evtCoord', evtCoord)
-        // console.log('shape', shape.absoluteBounds())
         let diff = labels.map((label) => {
           // let center = this.getCenterPosition(label.node, shape)
           let center = this.getCenterPositionself(label.node, shape)

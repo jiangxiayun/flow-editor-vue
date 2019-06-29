@@ -61,8 +61,7 @@ export default class DragDropResize extends AbstractPlugin {
     let type = shape.getStencil().idWithoutNs()
 
     if (type === 'Pool' || type === 'Lane' || type === 'V-Lane') {
-      let newBounds = shape.absoluteBounds()
-      this.dragBounds = newBounds
+      this.dragBounds = shape.absoluteBounds()
       let aspectRatio = shape.getStencil().fixedAspectRatio() ?
         shape.bounds.width() / shape.bounds.height() : undefined
       switch (type) {
@@ -92,7 +91,9 @@ export default class DragDropResize extends AbstractPlugin {
   onSelectionChanged (event) {
     this.hideResizers()
     let elements = event.elements
-    if (elements.length === 1 && elements[0].isResizable) {
+    if (elements.length === 0) {
+      this.currentShape = null
+    } else if (elements.length === 1 && elements[0].isResizable) {
       let shape = elements[0]
       this.currentShape = shape
       this.setResizes()

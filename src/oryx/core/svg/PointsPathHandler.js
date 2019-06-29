@@ -10,9 +10,7 @@
 export default class PointsPathHandler {
   constructor () {
     // arguments.callee.$.construct.apply(this, arguments)
-
     this.points = []
-
     this._lastAbsX = undefined
     this._lastAbsY = undefined
   }

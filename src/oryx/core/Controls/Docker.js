@@ -11,7 +11,6 @@ import ORYX_Utils from '../../Utils'
  */
 export default class Docker extends Control {
   constructor () {
-    // arguments.callee.$.construct.apply(this, arguments);
     super(...arguments)
     this.isMovable = true				// Enables movability
     this.bounds.set(0, 0, 16, 16)		// Set the bounds
@@ -21,7 +20,7 @@ export default class Docker extends Control {
     this._oldRefPoint1 = undefined
     this._oldRefPoint2 = undefined
 
-    // this.anchors = [];
+    // this.anchors = []
     this.anchorLeft = null
     this.anchorRight = null
     this.anchorTop = null
@@ -64,15 +63,8 @@ export default class Docker extends Control {
       let type = this._dockedShape.getInstanceofType()
       if (this._dockedShapeBounds && type.includes('Node')) {
         // Calc the delta of width and height of the lastBounds and the current Bounds
-        let dswidth = this._dockedShapeBounds.width()
-        let dsheight = this._dockedShapeBounds.height()
-        if (!dswidth) {
-          dswidth = 1
-        }
-        if (!dsheight) {
-          dsheight = 1
-        }
-
+        let dswidth = this._dockedShapeBounds.width() || 1
+        let dsheight = this._dockedShapeBounds.height() || 1
         let widthDelta = this._dockedShape.bounds.width() / dswidth
         let heightDelta = this._dockedShape.bounds.height() / dsheight
 
@@ -149,18 +141,14 @@ export default class Docker extends Control {
      newPoint = this.bounds.center();
      }*/
 
-
     //	}
 
-    // Call the super class
     super.update()
-    // arguments.callee.$.update.apply(this, arguments)
   }
   /**
    * Calls the super class refresh method and updates the view of the docker.
    */
   refresh () {
-    // arguments.callee.$.refresh.apply(this, arguments)
     super.refresh()
     // Refresh the dockers node
     let p = this.bounds.upperLeft()
@@ -192,8 +180,7 @@ export default class Docker extends Control {
   setReferencePoint(point) {
     // Set the referencepoint
     if (this.referencePoint !== point &&
-      (!this.referencePoint ||
-        !point ||
+      (!this.referencePoint || !point ||
         this.referencePoint.x !== point.x ||
         this.referencePoint.y !== point.y)) {
 
@@ -201,8 +188,9 @@ export default class Docker extends Control {
       this._changed()
     }
     // Update directly, because the referencepoint has no influence of the bounds
-    //this.refresh();
+    // this.refresh()
   }
+
   /**
    * Get the absolute referencepoint
    */
@@ -259,20 +247,12 @@ export default class Docker extends Control {
       // Get the bounds and set the new referencepoint
       let bounds = this.bounds
       let absUL = shape.absoluteXY()
-
-      /*if(shape.parent){
-       var b = shape.parent.bounds.upperLeft();
-       absUL.x -= b.x;
-       absUL.y -= b.y;
-       }*/
-
       referencePoint = {
         x: bounds.center().x - absUL.x,
         y: bounds.center().y - absUL.y
       }
 
       this._dockedShapeBounds = this._dockedShape.bounds.clone()
-
       this._dockedShape.bounds.registerCallback(this._updateCallback)
 
       // Set the color of the docker as docked
@@ -284,8 +264,8 @@ export default class Docker extends Control {
 
     // Set the referencepoint
     this.setReferencePoint(referencePoint)
-    this._changed()
-    //this.update();
+    // this._changed()
+    // this.update()
   }
   /**
    * Get the docked Shape

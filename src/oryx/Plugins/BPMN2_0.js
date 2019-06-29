@@ -188,11 +188,10 @@ class ResizeLanesCommand extends Command {
   }
 
   update () {
-
     // Hack to prevent the updating of the dockers
     this.plugin.hashedBounds[this.pool.id]['REMOVED'] = true
     // Update
-    //this.facade.getCanvas().update();
+    // this.facade.getCanvas().update();
   }
 
   rollback () {
@@ -306,7 +305,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     this.facade.registerOnEvent(ORYX_Config.EVENT_DRAGDOCKER_DOCKED, this.handleDockerDocked.bind(this))
     this.facade.registerOnEvent('layout.bpmn2_0.pool', this.handleLayoutPool.bind(this))
     this.facade.registerOnEvent('layout.bpmn2_0.subprocess', this.handleSubProcess.bind(this))
-    this.facade.registerOnEvent(ORYX_Config.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this))
+    // this.facade.registerOnEvent(ORYX_Config.EVENT_SHAPEREMOVED, this.handleShapeRemove.bind(this))
     this.facade.registerOnEvent(ORYX_Config.EVENT_LOADED, this.afterLoad.bind(this))
   }
 
@@ -642,7 +641,9 @@ export default class BPMN2_0 extends AbstractPlugin {
     }
 
     // Get all deleted lanes
-    let resourceIds = $H(this.hashedBounds[pool.id]).keys()
+
+    let resourceIds = Object.keys(this.hashedBounds[pool.id])
+    // let resourceIds = $H(this.hashedBounds[pool.id]).keys()
     i = -1
     while (++i < resourceIds.length) {
       if (!allLanesArry.any((lane) => lane.id === resourceIds[i])) {
@@ -657,7 +658,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     let poolTypeId = pool.getStencil().idWithoutNs()
     // 有新增或者删除 lane
     if (deletedLanes.length > 0 || addedLanes.length > 0) {
-      height = this.updateHeight(pool)
+      height = this.updateHeight(lanes, pool)
       width = this.adjustWidth(lanes, pool)
       // pool.update()
     } else if (pool == currentShape) {
@@ -774,7 +775,7 @@ export default class BPMN2_0 extends AbstractPlugin {
         }
       })
       // Get height and adjust child heights
-      height = this.updateHeight(pool)
+      height = this.updateHeight(lanes, pool)
       // height = this.adjustHeight(horLanes, currentShape)
       // Check if something has changed and maybe create a command
       this.checkForChanges(allHorLanes, changes)
@@ -1109,7 +1110,6 @@ export default class BPMN2_0 extends AbstractPlugin {
 
   // 设置外形尺寸
   setDimensions (shape, width, height, x, y) {
-    // let isLane = shape.getStencil().id().endsWith('Lane')
     let laneType = shape.getStencil().idWithoutNs()
     // Set the bounds
     if (laneType === 'Lane') {
@@ -1272,8 +1272,10 @@ export default class BPMN2_0 extends AbstractPlugin {
   }
 
   // 所有横泳道更新bounds 并更新泳池的bounds，返回泳池的总高度
-  updateHeight (root) {
-    let lanes = this.getLanes(root)
+  updateHeight (lanes, root) {
+    if (!lanes && root) {
+      lanes = this.getLanes(root)
+    }
     let { horLanes, verLanes } = lanes
     if (horLanes.length === 0) {
       return root.bounds.height()
@@ -1282,7 +1284,7 @@ export default class BPMN2_0 extends AbstractPlugin {
     let i = -1
     while (++i < horLanes.length) {
       this.setLanePosition(horLanes[i], null, height)
-      height += this.updateHeight(horLanes[i])
+      height += this.updateHeight(null, horLanes[i])
     }
 
     this.setDimensions(root, null, height)

@@ -236,7 +236,10 @@ export default class Resizer {
     this.bounds = bounds
 
     if (!min) {
-      min = { width: ORYX_Config.CustomConfigs.UI_CONFIG.MINIMUM_SIZE, height: ORYX_Config.CustomConfigs.UI_CONFIG.MINIMUM_SIZE }
+      min = {
+        width: ORYX_Config.CustomConfigs.UI_CONFIG.MINIMUM_SIZE,
+        height: ORYX_Config.CustomConfigs.UI_CONFIG.MINIMUM_SIZE
+      }
     }
 
     if (!max) {
@@ -275,23 +278,13 @@ export default class Resizer {
     upL.x *= a.a
     upL.y *= a.d
 
-    let additionalIEZoom = 1
-    if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-      let ua = navigator.userAgent
-      if (ua.indexOf('MSIE') >= 0) {
-        // IE 10 and below
-        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-        if (zoom !== 100) {
-          additionalIEZoom = zoom / 100
-        }
-      }
-    }
-
+    let additionalIEZoom = ORYX_Utils.IEZoomBelow10(1)
+    let canvasSectionOffset = jQuery('#canvasSection').offset()
     if (additionalIEZoom === 1) {
-      upL.y = upL.y - jQuery('#canvasSection').offset().top + a.f
-      upL.x = upL.x - jQuery('#canvasSection').offset().left + a.e
+      upL.y = upL.y - canvasSectionOffset.top + a.f
+      upL.x = upL.x - canvasSectionOffset.left + a.e
     } else {
-      let canvasOffsetLeft = jQuery('#canvasSection').offset().left
+      let canvasOffsetLeft = canvasSectionOffset.left
       let canvasScrollLeft = jQuery('#canvasSection').scrollLeft()
       let canvasScrollTop = jQuery('#canvasSection').scrollTop()
 
@@ -300,9 +293,14 @@ export default class Resizer {
       if (offset > 10) {
         additionaloffset = (offset / additionalIEZoom) - offset
       }
-      upL.y = upL.y - (jQuery('#canvasSection').offset().top * additionalIEZoom) + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop) + a.f
+      upL.y = upL.y - (canvasSectionOffset.top * additionalIEZoom) + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop) + a.f
       upL.x = upL.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft) + a.e
     }
+    // console.log('orientation', this.orientation)
+    // console.log('additionalIEZoom', additionalIEZoom)
+    // console.log('canvasSectionOffset', canvasSectionOffset)
+    // console.log('upL', upL)
+    // console.log('==============')
 
     switch (this.orientation) {
       case 'northwest':

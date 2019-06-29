@@ -322,7 +322,6 @@ const ORYX_CONFIG = {
       }
     }
     this.CustomConfigs = DEFAULT_CONFIG
-    console.log(111, DEFAULT_CONFIG)
   }
 }
 
