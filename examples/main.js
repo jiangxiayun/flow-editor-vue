@@ -34,7 +34,6 @@ Vue.filter('dateformat', function (date, format) {
   return ''
 })
 
-
 new Vue({
   router,
   render: h => h(App)

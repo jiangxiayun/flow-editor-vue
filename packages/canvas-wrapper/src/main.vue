@@ -490,7 +490,11 @@
 
             let parentCandidate = aShapes.reverse().find((candidate) => {
               return (this.editorManager.instanceofCanvas(candidate)
-                || this.editorManager.instanceofNode(candidate)
+                || (stencil.id().endsWith('Lane')
+                  ? this.editorManager.instanceofNode(candidate)
+                  : (this.editorManager.instanceofNode(candidate)
+                    && !(candidate.getStencil().id().endsWith('Lane') || candidate.getStencil().id().endsWith('Pool'))
+                ))
                 || this.editorManager.instanceofEdge(candidate))
             })
 
