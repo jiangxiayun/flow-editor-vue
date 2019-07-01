@@ -345,7 +345,7 @@
           if (this.quickMenu) {
             // 当拖拽的是快捷元素
             let shapes = this.editorManager.getSelection()
-            if (shapes && shapes.length == 1) {
+            if (shapes && shapes.length === 1) {
               let currentSelectedShape = shapes.first()
               let option = {}
               option.type = currentSelectedShape.getStencil().namespace() + ui.draggable[0].id
@@ -372,8 +372,10 @@
 
               option.position = pos
 
-              if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' &&
-                containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation') {
+              if (containedStencil.idWithoutNs() !== 'SequenceFlow'
+                && containedStencil.idWithoutNs() !== 'Association'
+                && containedStencil.idWithoutNs() !== 'MessageFlow'
+                && containedStencil.idWithoutNs() !== 'DataAssociation') {
 
                 let args = { sourceShape: currentSelectedShape, targetStencil: containedStencil }
                 let targetStencil = this.editorManager.getRules().connectMorph(args)
@@ -385,7 +387,13 @@
 
               // let command = new FLOWABLE_OPTIONS.CreateCommand(option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
               // this.editorManager.executeCommands([command])
-              this.editorManager.assignCommand('CreateCommand', option, this.editorManager.dropTargetElement, pos, this.editorManager.getEditor())
+              this.editorManager.assignCommand(
+                'CreateCommand',
+                option,
+                this.editorManager.dropTargetElement,
+                pos,
+                this.editorManager.getEditor()
+              )
             }
 
           } else {

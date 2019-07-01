@@ -111,16 +111,18 @@ export default class Editor {
   }
 
   getAvailablePlugins () {
-    let curAvailablePlugins = ORYX_Utils.availablePlugins.clone()
-    curAvailablePlugins.each(function (plugin) {
-      if (this.loadedPlugins.find(function (loadedPlugin) {
-        return loadedPlugin.type == this.name
-      }.bind(plugin))) {
-        plugin.engaged = true
-      } else {
-        plugin.engaged = false
-      }
-    }.bind(this))
+    // let curAvailablePlugins = Plugins.availablePlugins.clone()
+    // curAvailablePlugins.each(function (plugin) {
+    //   if (this.loadedPlugins.find(function (loadedPlugin) {
+    //     return loadedPlugin.type == this.name
+    //   }.bind(plugin))) {
+    //     plugin.engaged = true
+    //   } else {
+    //     plugin.engaged = false
+    //   }
+    // }.bind(this))
+
+    let curAvailablePlugins = this.loadedPlugins.clone()
     return curAvailablePlugins
   }
 

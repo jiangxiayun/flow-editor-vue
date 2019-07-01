@@ -458,6 +458,7 @@ export default class Arrangement extends AbstractPlugin {
             }
             // Set the new position
             shape.bounds.moveTo(newCoordinates)
+            console.log(22)
             this.plugin.layoutEdges(shape, shape.getAllDockedShapes(), offset)
             //shape.update()
           }

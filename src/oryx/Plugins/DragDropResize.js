@@ -193,7 +193,8 @@ export default class DragDropResize extends AbstractPlugin {
       this.selectedRect.show()
 
       // Show the resize button, if there is only one element and this is resizeable
-      if (elements.length === 1 && elements[0].isResizable && this.UI_CONFIG.canNodesResize) {
+      if (elements.length === 1 && elements[0].isResizable && this.UI_CONFIG.canNodesResize
+      && !['Lane', 'V-Lane', 'Pool'].includes(elements[0].getStencil().idWithoutNs())) {
         let aspectRatio = elements[0].getStencil().fixedAspectRatio() ?
           elements[0].bounds.width() / elements[0].bounds.height() : undefined
         this.resizerSE.setBounds(this.dragBounds, elements[0].minimumSize, elements[0].maximumSize, aspectRatio)
@@ -687,6 +688,7 @@ export default class DragDropResize extends AbstractPlugin {
    * Redraw the selected Shapes.
    */
   refreshSelectedShapes () {
+    console.log(888889)
     // If the selection bounds not initialized, return
     if (!this.dragBounds) {
       return
@@ -785,7 +787,7 @@ export default class DragDropResize extends AbstractPlugin {
             .findAll(function (r) {
               return r instanceof ORYX_Edge
             }.bind(this))
-
+          console.log(22)
           this.plugin.layoutEdges(this.shape, allEdges, offset)
           this.plugin.facade.setSelection([this.shape])
           this.plugin.facade.getCanvas().update()

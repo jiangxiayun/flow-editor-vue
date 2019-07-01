@@ -349,6 +349,7 @@ text * {
   overflow: auto;
   background-color: #F8F8F8;
   max-height: 100%;
+  position: relative;
 }
 
 .ORYX_Editor {
@@ -385,6 +386,7 @@ text * {
   display: block;
   margin: auto;
   opacity: 0.6;
+  z-index: 90;
 
   &:hover {
     opacity: 1.0;
@@ -392,8 +394,9 @@ text * {
   &.N, &.S, &.E, &.W {
     margin: 0;
     background: #5fbcd3;
-    height: 17px;
-    width: 17px;
+    height: 20px;
+    width: 20px;
+    line-height: 20px;
     text-align: center;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
@@ -402,11 +405,11 @@ text * {
   &.N, &.S {
     &.canvas_resize_indicator_shrink {
       left: 50%;
-      transform: translateX(-9px);
+      transform: translateX(-12px);
     }
     &.canvas_resize_indicator_grow {
       left: 50%;
-      transform: translateX(9px);
+      transform: translateX(12px);
     }
   }
   &.N {
@@ -418,11 +421,11 @@ text * {
   &.W, &.E {
     &.canvas_resize_indicator_shrink {
       top: 50%;
-      transform: translateY(-9px);
+      transform: translateY(-12px);
     }
     &.canvas_resize_indicator_grow {
       top: 50%;
-      transform: translateY(9px);
+      transform: translateY(12px);
     }
   }
   &.W {
@@ -499,6 +502,7 @@ text * {
   position: relative;
   background-color: transparent;
   background-repeat: no-repeat;
+  z-index: 80;
 }
 
 .resizer_southeast {

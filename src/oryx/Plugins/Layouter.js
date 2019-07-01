@@ -37,9 +37,9 @@ class EdgeLayouter extends AbstractLayouter {
    * @param {Object} edges
    */
   layout (edges) {
-    edges.each(function (edge) {
+    edges.each((edge) => {
       this.doLayout(edge)
-    }.bind(this))
+    })
   }
 
   /**

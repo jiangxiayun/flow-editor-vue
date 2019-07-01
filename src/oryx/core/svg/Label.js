@@ -508,15 +508,17 @@ export default class Label {
         }
 
         let textLines = this._text.split('\n')
+
         while (textLines.last() === '') {
           textLines.pop()
         }
-
+        console.log(1, textLines)
         if (this.node.ownerDocument) {
           // Only reset the tspans if the text has changed or has to be wrapped
           if (this.fitToElemId || this._textHasChanged) {
             this.node.textContent = '' // Remove content
             textLines.each((function (textLine, index) {
+              console.log(2, textLine)
               let tspan = this.node.ownerDocument.createElementNS(ORYX_CONFIG.NAMESPACE_SVG, 'tspan')
               tspan.textContent = textLine.trim()
               if (this.fitToElemId) {
@@ -530,7 +532,9 @@ export default class Label {
               if (tspan.textContent === '') {
                 tspan.textContent = ' '
               }
-              //append tspan to text node
+              // append tspan to text node
+              console.log(5, tspan)
+
               this.node.appendChild(tspan)
             }).bind(this))
             delete this._textHasChanged
@@ -557,12 +561,13 @@ export default class Label {
     }
   }
 
+  // label 分割换行
   _checkFittingToReferencedElem () {
     try {
       let tspans = $A(this.node.getElementsByTagNameNS(ORYX_CONFIG.NAMESPACE_SVG, 'tspan'))
 
-      //only do this in firefox 3. all other browsers do not support word wrapping!!!!!
-      //if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && new Number(RegExp.$1)>=3) {
+      // only do this in firefox 3. all other browsers do not support word wrapping!!!!!
+      // if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && new Number(RegExp.$1)>=3) {
       let newtspans = []
 
       let refNode = this.node.ownerDocument.getElementById(this.fitToElemId)
@@ -737,7 +742,7 @@ export default class Label {
    * @param {int} endIndex Optional, for sub strings
    */
   _getRenderedTextLength (tspan, startIndex, endIndex, fontSize) {
-    //if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && new Number(RegExp.$1) >= 3) {
+    // if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && new Number(RegExp.$1) >= 3) {
     if (startIndex === undefined) {
       //test string: abcdefghijklmnopqrstuvwxyz√∂√§√º,.-#+
       // 1234567890√üABCDEFGHIJKLMNOPQRSTUVWXYZ;:_'*√ú√Ñ√ñ!"¬ß$%&/()=?[]{}|<>'~¬¥`\^¬∞¬µ@‚Ç¨¬≤¬≥ for(var i = 0; i <

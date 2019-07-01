@@ -24,7 +24,7 @@ export default class Move extends  Command {
       return shape.parent
     })
     this.dockedNodes = moveShapes.findAll(function (shape) {
-      return shape instanceof ORYX_Node && shape.dockers.length == 1
+      return shape instanceof ORYX_Node && shape.dockers.length === 1
     }).collect(function (shape) {
       return {
         docker: shape.dockers[0],

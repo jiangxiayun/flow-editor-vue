@@ -186,7 +186,7 @@
               { name: 'Plugins.NodesResize' },
               { name: 'Plugins.PoolResize' },
               { name: 'Plugins.HighlightingSelectedShapes' },
-              // { name: 'Plugins.DragDocker' },
+              { name: 'Plugins.DragDocker' },
               { name: 'Plugins.AddDocker' },
               { name: 'Plugins.SelectionFrame' },
               { name: 'Plugins.ShapeHighlighting' },

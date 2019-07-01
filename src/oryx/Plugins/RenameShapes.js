@@ -1,6 +1,7 @@
 import ORYX_Config from '../CONFIG'
 import ORYX_Utils from '../Utils'
 import ORYX_Shape from '../core/Shape'
+import Plugin_Edit from './Edit'
 import SetPropertyCommand from '../../flowable/Command/setProperty'
 import autogrow from '../../libs/jquery.autogrow-textarea'
 
@@ -98,9 +99,10 @@ export default class RenameShapes {
     })
 
     // Get the center position from the nearest label
+    // let width = Math.min(Math.max(100, shape.bounds.width()), 200)
     let width = Math.min(Math.max(100, shape.bounds.width()), 200)
     let center = this.getCenterPosition(nearestLabel.node, shape)
-    // console.log('center', center)
+    console.log('center', center)
     center.x -= (width / 2)
     // let propId = prop.prefix() + '-' + prop.id()
     let propId = prop.id()
@@ -110,6 +112,7 @@ export default class RenameShapes {
     textInput.style.width = width + 'px'
     textInput.style.left = (center.x < 10) ? 10 : center.x + 'px'
     textInput.style.top = (center.y - 15) + 'px'
+    textInput.style.fontSize = '12px'
     textInput.className = 'x-form-textarea x-form-field x_form_text_set_absolute'
     textInput.value = shape.properties.get(propId)
     this.oldValueText = shape.properties.get(propId)
@@ -125,11 +128,27 @@ export default class RenameShapes {
     this.facade.disableEvent(ORYX_Config.EVENT_KEYDOWN)
   }
 
+  getEditPlugin (facade) {
+    if (!this.EditPlugin) {
+      this.EditPlugin = new Plugin_Edit(facade)
+    }
+    return this.EditPlugin
+  }
   // Value change listener needs to be defined now since we reference it in the text field
   updateValueFunction (newValue, oldValue) {
+    let type = this.currentShape.getStencil().idWithoutNs()
+    if (type === 'TextArea' && !newValue) {
+      this.getEditPlugin(this.facade).editDelete()
+      return
+    }
+
     if (oldValue != newValue) {
       // Instantiated the class
       const command = new SetPropertyCommand(this.propId, oldValue, newValue, this.currentShape, this.facade)
+      if (type === 'TextArea') {
+        // 自动更新文本框的高度
+        console.log(33, newValue, this.shownTextField.style.height, this.currentShape.bounds.height())
+      }
       // Execute the command
       this.facade.executeCommands([command])
       this.facade.raiseEvent({

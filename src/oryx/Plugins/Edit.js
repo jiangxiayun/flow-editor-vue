@@ -70,8 +70,7 @@ class DeleteCommand extends Command {
     this.facade.setSelection([])
     this.facade.getCanvas().update()
     this.facade.updateSelection()
-    this.facade.handleEvents({ type: ORYX_Config.ACTION_DELETE_COMPLETED })
-
+    this.facade.raiseEvent({ type: ORYX_Config.ACTION_DELETE_COMPLETED })
   }
 
   rollback () {
@@ -500,7 +499,7 @@ export default class Edit {
    * Performs the delete operation. No more asking.
    */
   editDelete () {
-    var selection = this.facade.getSelection()
+    const selection = this.facade.getSelection()
 
     if (selection.length > 0) {
       // only update the command stack if something was performed...
@@ -508,7 +507,6 @@ export default class Edit {
       clipboard.refresh(selection, this.getAllShapesToConsider(selection))
 
       const command = new this.DeleteCommand(clipboard, this.facade)
-
       this.facade.executeCommands([command])
     }
   }

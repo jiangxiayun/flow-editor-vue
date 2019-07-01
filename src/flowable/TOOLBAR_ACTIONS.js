@@ -189,7 +189,7 @@ const ACTIONS = {
     const $scope = services.$scope
     const editorManager = services.editorManager
     if ($scope.oryxEditPlugin === undefined || $scope.oryxEditPlugin === null) {
-      $scope.oryxEditPlugin = new ORYX.Plugins.Edit(editorManager.getEditor())
+      $scope.oryxEditPlugin = new ORYX.Plugins.Edit(editorManager.getEditor()._getPluginFacade())
     }
     return $scope.oryxEditPlugin
   },

@@ -334,7 +334,35 @@ export const AA = {
           "refToView": "default"
         }
       ]
-    }
+    },
+    {
+      'name': 'textareapackage',
+      'properties': [
+        {
+          'id': 'text',
+          'type': 'String',
+          'title': '文本',
+          'value': '文本',
+          'description': '文本框',
+          'popular': true,
+          'refToView': 'text'
+        }
+      ]
+    },
+    {
+      'name': 'textpackage',
+      'properties': [
+        {
+          'id': 'text',
+          'type': 'String',
+          'title': 'Text',
+          'value': '',
+          'description': 'The text of the text annotation.',
+          'popular': true,
+          'refToView': 'text'
+        }
+      ]
+    },
   ],
   'stencils': [
     {
@@ -783,6 +811,24 @@ export const AA = {
       'hiddenPropertyPackages': [],
       'roles': [
         'ConnectingObjectsMorph',
+        'all'
+      ]
+    },
+    {
+      'type': 'node',
+      'id': 'TextArea',
+      'title': '文本',
+      'description': 'Annotates elements with description text.',
+      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" xmlns:oryx="http://www.b3mn.org/oryx" xmlns:xlink="http://www.w3.org/1999/xlink" width="102" height="51" version="1.0"><defs></defs><oryx:magnets><oryx:magnet oryx:cx="2" oryx:cy="25" oryx:anchors="left" oryx:default="yes"/></oryx:magnets><g pointer-events="all" oryx:minimumSize="10 20" oryx:maximumSize="" ><rect id="textarearect" oryx:resize="vertical horizontal" x="1" y="1" width="100" height="50" stroke="none" fill="none" /><text font-size="12" id="text" x="5" y="2" oryx:align="top left" oryx:fittoelem="textarearect" oryx:anchors="left" stroke="#373e48"></text></g></svg>\n',
+      'icon': 'artifact/text.annotation.png',
+      'groups': [
+        '其他'
+      ],
+      'propertyPackages': [
+        'textareapackage',
+      ],
+      'hiddenPropertyPackages': [],
+      'roles': [
         'all'
       ]
     },

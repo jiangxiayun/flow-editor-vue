@@ -147,7 +147,9 @@ export default class KeysMove extends AbstractPlugin {
     // move each shape in the selection by the point calculated and update it.
     selection = selection.findAll(function (shape) {
       // Check if this shape is docked to an shape in the selection
-      if (shape instanceof ORYX_Node && shape.dockers.length == 1 && selection.include(shape.dockers.first().getDockedShape())) {
+      if (shape instanceof ORYX_Node
+        && shape.dockers.length === 1
+        && selection.include(shape.dockers.first().getDockedShape())) {
         return false
       }
 
@@ -157,7 +159,7 @@ export default class KeysMove extends AbstractPlugin {
         if (selection.include(s)) {
           return false
         }
-      } while (s = s.parent)
+      } while (s == s.parent)
 
       // Otherwise, return true
       return true
@@ -207,7 +209,7 @@ export default class KeysMove extends AbstractPlugin {
     }).flatten().compact()
 
     if (selection.size() > 0) {
-      //Stop moving at canvas borders
+      // Stop moving at canvas borders
       let selectionBounds = [this.facade.getCanvas().bounds.lowerRight().x,
         this.facade.getCanvas().bounds.lowerRight().y,
         0,
