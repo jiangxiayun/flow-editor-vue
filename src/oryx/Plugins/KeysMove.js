@@ -229,7 +229,7 @@ export default class KeysMove extends AbstractPlugin {
       if (selectionBounds[3] + p.y > this.facade.getCanvas().bounds.lowerRight().y)
         p.y = this.facade.getCanvas().bounds.lowerRight().y - selectionBounds[3]
 
-      if (p.x != 0 || p.y != 0) {
+      if (p.x !== 0 || p.y !== 0) {
         // Instantiate the moveCommand
         const commands = [new ORYX_Move(selection, p, null, currentSelection, this)]
         // Execute the commands

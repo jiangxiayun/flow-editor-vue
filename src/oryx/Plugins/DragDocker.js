@@ -1,13 +1,15 @@
 import ORYX_Config from '../CONFIG'
+import ORYX_Utils from '../Utils'
 import ORYX_Controls from '../core/Controls/index'
 import ORYX_Edge from '../core/Edge'
 import ORYX_Node from '../core/Node'
 import ORYX_Shape from '../core/Shape'
 import ORYX_Canvas from '../core/Canvas'
-import ORYX_Command from '../core/Command'
 import ORYX_Math from '../core/Math'
 
 import UIDragFunction from '../core/UIEnableDrag'
+import DragDockerCommand from '../../flowable/Command/DragDockerCommand'
+import layoutEdgesCommand from '../../flowable/Command/layoutEdgesCommand'
 
 export default class DragDocker {
   /**
@@ -187,22 +189,7 @@ export default class DragDocker {
       if (this.isStartDocker || this.isEndDocker) {
         // Get the EventPosition and all Shapes on these point
         let evPos = this.facade.eventCoordinates(event)
-        let additionalIEZoom = 1
-        if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-          let ua = navigator.userAgent
-          if (ua.indexOf('MSIE') >= 0) {
-            //IE 10 and below
-            let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-            if (zoom !== 100) {
-              additionalIEZoom = zoom / 100
-            }
-          }
-        }
-
-        if (additionalIEZoom !== 1) {
-          evPos.x = evPos.x / additionalIEZoom
-          evPos.y = evPos.y / additionalIEZoom
-        }
+        evPos = ORYX_Utils.pointHandleBelow10ToSvg(evPos)
 
         if (this.docker.isDocked()) {
           /* Only consider start/end dockers if they are moved over a treshold */
@@ -216,7 +203,7 @@ export default class DragDocker {
           /* Undock the docker */
           this.docker.setDockedShape(undefined)
           // Set the Docker to the center of the mouse pointer
-          //this.docker.bounds.centerMoveTo(evPos);
+          // this.docker.bounds.centerMoveTo(evPos);
           this.dockerParent._update()
         }
 
@@ -311,7 +298,7 @@ export default class DragDocker {
 
           if (snapToMagnet) {
             this.docker.bounds.centerMoveTo(snapToMagnet.absoluteCenterXY())
-            //this.docker.update()
+            // this.docker.update()
           }
         }
       }
@@ -341,7 +328,7 @@ export default class DragDocker {
           nearestY = Math.abs(nearestY) < minOffset ? nearestY : 0
 
           this.docker.bounds.centerMoveTo(dockerCenter.x + nearestX, dockerCenter.y + nearestY)
-          //this.docker.update()
+          // this.docker.update()
         } else {
           let previous = this.docker.parent.dockers[Math.max(this.docker.parent.dockers.indexOf(this.docker) - 1, 0)]
           let next = this.docker.parent.dockers[Math.min(this.docker.parent.dockers.indexOf(this.docker) + 1, this.docker.parent.dockers.length - 1)]
@@ -370,7 +357,7 @@ export default class DragDocker {
         }
       }
     }
-    //this.facade.getCanvas().update();
+    // this.facade.getCanvas().update();
     this.dockerParent._update()
   }
 
@@ -388,7 +375,7 @@ export default class DragDocker {
     // Show all Labels from Docker
     this.dockerParent.getLabels().each(function (label) {
       label.show()
-      //label.update();
+      // label.update();
     })
 
     // If there is a last top level Shape
@@ -423,60 +410,39 @@ export default class DragDocker {
       shapes = shapeWithoutEdges.length ? shapeWithoutEdges : shapes
       this.facade.setSelection(shapes)
     } else {
-      // Command-Pattern for dragging one docker
-      class dragDockerCommand extends ORYX_Command{
-        constructor (docker, newPos, oldPos, newDockedShape, oldDockedShape, facade) {
-          super()
-          this.docker = docker
-          this.index = docker.parent.dockers.indexOf(docker)
-          this.newPosition = newPos
-          this.newDockedShape = newDockedShape
-          this.oldPosition = oldPos
-          this.oldDockedShape = oldDockedShape
-          this.facade = facade
-          this.index = docker.parent.dockers.indexOf(docker)
-          this.shape = docker.parent
-        }
-        execute () {
-          if (!this.docker.parent) {
-            this.docker = this.shape.dockers[this.index]
-          }
-          this.dock(this.newDockedShape, this.newPosition)
-          this.removedDockers = this.shape.removeUnusedDockers()
-          this.facade.updateSelection()
-        }
-        rollback () {
-          this.dock(this.oldDockedShape, this.oldPosition);
-          (this.removedDockers || $H({})).each(function (d) {
-            this.shape.add(d.value, Number(d.key))
-            this.shape._update(true)
-          }.bind(this))
-          this.facade.updateSelection()
-        }
-        dock (toDockShape, pos) {
-          // Set the Docker to the new Shape
-          this.docker.setDockedShape(undefined)
-          if (toDockShape) {
-            this.docker.setDockedShape(toDockShape)
-            this.docker.setReferencePoint(pos)
-            //this.docker.update();
-            //this.docker.parent._update();
-          } else {
-            this.docker.bounds.centerMoveTo(pos)
-          }
-          this.facade.getCanvas().update()
-        }
-      }
-
-      if (this.docker.parent) {
+      let edge = this.docker.parent
+      if (edge) {
         // Instanziate the dockCommand
-        const command = new dragDockerCommand(this.docker, this.docker.getDockedShape() ? this.docker.referencePoint : this.docker.bounds.center(), this._commandArg.refPoint, this.docker.getDockedShape(), this._commandArg.dockedShape, this.facade)
-        this.facade.executeCommands([command])
+        console.log(88888)
+        let dockedShape = this.docker.getDockedShape()
+        let newRefPoint = dockedShape ? this.docker.referencePoint : this.docker.bounds.center()
+        let oldRefPoint = this._commandArg.refPoint
+        const command = new DragDockerCommand(
+          this.docker,
+          newRefPoint,
+          oldRefPoint,
+          dockedShape,
+          this._commandArg.dockedShape, this.facade)
+
+        let doCommands = [command]
+        // 如果端点有连接元素，则更新连接线，保证折线直角
+        if (dockedShape) {
+          let offset = {
+            x: newRefPoint.x - oldRefPoint.x,
+            y: newRefPoint.y - oldRefPoint.y
+          }
+          console.log(3333, edge, dockedShape, offset)
+          this.edgeLayoutByDragDocker = true // 标记行为，若移动dockers,重新计算连线
+          const edgeLayout = new layoutEdgesCommand([edge], dockedShape, offset, this)
+          doCommands.push(edgeLayout)
+        }
+
+        this.facade.executeCommands(doCommands)
       }
     }
 
     // Update all Shapes
-    //this.facade.updateSelection();
+    // this.facade.updateSelection();
 
     // Undefined all variables
     this.docker = undefined
@@ -484,6 +450,21 @@ export default class DragDocker {
     this.dockerSource = undefined
     this.dockerTarget = undefined
     this.lastUIObj = undefined
+  }
+
+  doLayout (shapes) {
+    // Raises a do layout event
+    if (this.facade.raiseEvent) {
+      this.facade.raiseEvent({
+        type: ORYX_Config.EVENT_LAYOUT,
+        shapes: shapes
+      })
+    } else {
+      this.facade.handleEvents({
+        type: ORYX_Config.EVENT_LAYOUT,
+        shapes: shapes
+      })
+    }
   }
 
   /**

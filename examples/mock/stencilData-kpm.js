@@ -199,50 +199,50 @@ export const AA = {
       }]
     },
     {
-    'name': 'outputpackage',
-    'properties': [{
-      'id': 'output',
-      'type': 'Text',
-      'title': '输出',
-      'value': '',
-      'description': '活动输出内容',
-      'popular': true
-    }]
-  },
+      'name': 'outputpackage',
+      'properties': [{
+        'id': 'output',
+        'type': 'Text',
+        'title': '输出',
+        'value': '',
+        'description': '活动输出内容',
+        'popular': true
+      }]
+    },
     {
-    'name': 'standardpackage',
-    'properties': [{
-      'id': 'standard',
-      'type': 'List',
-      'title': '制度规范',
-      'value': '',
-      'description': '制度规范',
-      'popular': true
-    }]
-  },
+      'name': 'standardpackage',
+      'properties': [{
+        'id': 'standard',
+        'type': 'List',
+        'title': '制度规范',
+        'value': '',
+        'description': '制度规范',
+        'popular': true
+      }]
+    },
     {
-    'name': 'attachmentpackage',
-    'properties': [{
-      'id': 'attachment',
-      'type': 'List',
-      'title': '附件',
-      'value': '',
-      'description': '附件',
-      'popular': true
-    }]
-  },
+      'name': 'attachmentpackage',
+      'properties': [{
+        'id': 'attachment',
+        'type': 'List',
+        'title': '附件',
+        'value': '',
+        'description': '附件',
+        'popular': true
+      }]
+    },
     {
-    'name': 'kpipackage',
-    'properties': [{
-      'id': 'kpi',
-      'type': 'List',
-      'title': '流程指标',
-      'value': '',
-      'description': '流程指标',
-      'popular': true
-    }
-    ]
-  },
+      'name': 'kpipackage',
+      'properties': [{
+        'id': 'kpi',
+        'type': 'List',
+        'title': '流程指标',
+        'value': '',
+        'description': '流程指标',
+        'popular': true
+      }
+      ]
+    },
     {
       'name': 'kcppackage',
       'properties': [
@@ -322,16 +322,16 @@ export const AA = {
       ]
     },
     {
-      "name": "defaultflowpackage",
-      "properties": [
+      'name': 'defaultflowpackage',
+      'properties': [
         {
-          "id": "defaultflow",
-          "type": "Boolean",
-          "title": "Default flow",
-          "value": "false",
-          "description": "Define the sequence flow as default",
-          "popular": true,
-          "refToView": "default"
+          'id': 'defaultflow',
+          'type': 'Boolean',
+          'title': 'Default flow',
+          'value': 'false',
+          'description': 'Define the sequence flow as default',
+          'popular': true,
+          'refToView': 'default'
         }
       ]
     },
@@ -362,7 +362,7 @@ export const AA = {
           'refToView': 'text'
         }
       ]
-    },
+    }
   ],
   'stencils': [
     {
@@ -450,11 +450,9 @@ export const AA = {
       'propertyPackages': [
         'numberepackage',
         'namepackage',
-        'refTaskpackage',
+        'refTaskpackage'
       ],
-      'hiddenPropertyPackages': [
-
-      ],
+      'hiddenPropertyPackages': [],
       'roles': [
         'Activity',
         'sequence_start',
@@ -825,7 +823,7 @@ export const AA = {
         '其他'
       ],
       'propertyPackages': [
-        'textareapackage',
+        'textareapackage'
       ],
       'hiddenPropertyPackages': [],
       'roles': [
@@ -957,7 +955,7 @@ export const AA = {
             'to': [
               'FlowBox'
             ]
-          },
+          }
         ]
       },
       {
@@ -1137,6 +1135,24 @@ export const AA = {
         'baseMorphs': [
           'DataStore'
         ]
+      }
+    ],
+    'layoutRules': [
+      {
+        'role': 'all',
+        // 'role': 'Activity',
+        'in': {
+          't': 3,
+          'r': 1,
+          'b': 1,
+          'l': 4
+        },
+        'out': {
+          't': 1,
+          'r': 4,
+          'b': 3,
+          'l': 1
+        }
       }
     ]
   }

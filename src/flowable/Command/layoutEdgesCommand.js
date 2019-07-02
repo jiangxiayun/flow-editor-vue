@@ -2,6 +2,7 @@ import ORYX_Command from 'src/oryx/core/Command'
 
 export default class layoutEdgesCommand extends ORYX_Command {
   constructor (edges, node, offset, plugin) {
+    console.log(233, node)
     super()
     this.edges = edges
     this.node = node
@@ -49,6 +50,11 @@ export default class layoutEdgesCommand extends ORYX_Command {
         }
         edge._update(true)
         edge.removeUnusedDockers()
+        console.log('edgeLayoutByDragDocker')
+        if (this.plugin.edgeLayoutByDragDocker) {
+          this.plugin.doLayout(edge)
+          return
+        }
         if (this.isBendPointIncluded(edge)) {
           console.log(77)
           this.plugin.doLayout(edge)
@@ -131,11 +137,10 @@ export default class layoutEdgesCommand extends ORYX_Command {
       bb.widen(20) // Wide with 20 because of the arrow from the edge
     }
 
-    return edge.dockers
-      .any(function (docker, i) {
+    return edge.dockers.any(function (docker, i) {
         let c = docker.bounds.center()
         // Dont count first and last
-        return i != 0 && i != edge.dockers.length - 1 &&
+        return i !== 0 && i !== edge.dockers.length - 1 &&
           // Check if the point is included to the absolute bounds
           ((ab && ab.isIncluded(c)) || (bb && bb.isIncluded(c)))
       })

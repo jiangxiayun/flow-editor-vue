@@ -512,7 +512,6 @@ export default class Label {
         while (textLines.last() === '') {
           textLines.pop()
         }
-        console.log(1, textLines)
         if (this.node.ownerDocument) {
           // Only reset the tspans if the text has changed or has to be wrapped
           if (this.fitToElemId || this._textHasChanged) {

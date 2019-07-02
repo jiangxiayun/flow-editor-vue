@@ -97,18 +97,27 @@ class EdgeLayouter extends AbstractLayouter {
     // Calc center position, between a and b
     // depending on there weight
     let m = {}
-    m.x = a.x < b.x ?
-      (((b.x - bb.width() / 2) - (a.x + ab.width() / 2)) / 2) + (a.x + ab.width() / 2) :
-      (((a.x - ab.width() / 2) - (b.x + bb.width() / 2)) / 2) + (b.x + bb.width() / 2)
+    let abWidth = ab.width()
+    let abHeight = ab.height()
+    let abUpLX = ab.a.x
+    let abUpLY = ab.a.y
+    let abDownRX = ab.b.x
+    let abDownRY = ab.b.y
 
-    m.y = a.y < b.y ?
-      (((b.y - bb.height() / 2) - (a.y + ab.height() / 2)) / 2) + (a.y + ab.height() / 2) :
-      (((a.y - ab.height() / 2) - (b.y + bb.height() / 2)) / 2) + (b.y + bb.height() / 2)
+    let bbWidth =  bb.width()
+    let bbHeight =  bb.height()
+    let bbUpLX = bb.a.x
+    let bbUpLY = bb.a.y
+    let bbDownRX = bb.b.x
+    let bbDownRY = bb.b.y
 
+    // m 的坐标为2个节点距离的中间点
+    m.x = a.x < b.x ? ((abDownRX + bbUpLX) / 2) : ((bbDownRX + abUpLX) / 2)
+    m.y = a.y < b.y ? ((abDownRY + bbUpLY) / 2) : ((bbDownRY + abUpLY) / 2)
 
     // Enlarge both bounds with 10
-    ab.widen(5) // Wide the from less than
-    bb.widen(20) // the to because of the arrow from the edge
+    // ab.widen(5) // Wide the from less than
+    // bb.widen(20) // the to because of the arrow from the edge
 
     let positions = []
     let off = this.getOffset.bind(this)
@@ -157,7 +166,7 @@ class EdgeLayouter extends AbstractLayouter {
 
     // Sort DESC of weights
     return positions.sort(function (a, b) {
-      return a.z < b.z ? 1 : (a.z == b.z ? -1 : -1)
+      return a.z < b.z ? 1 : (a.z === b.z ? -1 : -1)
     })
   }
 
@@ -196,8 +205,8 @@ class EdgeLayouter extends AbstractLayouter {
     // If reverse is set
     if (reverse) {
       // Reverse d1 and d2
-      d1 = d1 == 't' ? 'b' : (d1 == 'r' ? 'l' : (d1 == 'b' ? 't' : (d1 == 'l' ? 'r' : 'r')))
-      d2 = d2 == 't' ? 'b' : (d2 == 'r' ? 'l' : (d2 == 'b' ? 't' : (d2 == 'l' ? 'r' : 'r')))
+      d1 = d1 === 't' ? 'b' : (d1 === 'r' ? 'l' : (d1 === 'b' ? 't' : (d1 === 'l' ? 'r' : 'r')))
+      d2 = d2 === 't' ? 'b' : (d2 === 'r' ? 'l' : (d2 === 'b' ? 't' : (d2 === 'l' ? 'r' : 'r')))
     }
 
     // Get rules for from "out" and to "in"
@@ -267,8 +276,7 @@ class EdgeLayouter extends AbstractLayouter {
   setDockers (edge, a, b) {
     if (!edge) return
 
-    // Remove all dockers (implicit,
-    // start and end dockers will not removed)
+    // Remove all dockers (implicit,start and end dockers will not removed)
     edge.dockers.each(function (r) {
       edge.removeDocker(r)
     });

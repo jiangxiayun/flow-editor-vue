@@ -1053,10 +1053,10 @@ export default class Rules {
     // For each role
     shape.getStencil().roles().each(function (role) {
       // check if there are layout information
-      if (this._layoutRules[role]) {
+      if (this._layoutRules.get(role)) {
         // if so, parse those information to the 'layout' variable
-        parseValues(this._layoutRules[role], 'in')
-        parseValues(this._layoutRules[role], 'out')
+        parseValues(this._layoutRules.get(role), 'in')
+        parseValues(this._layoutRules.get(role), 'out')
       }
     }.bind(this));
 

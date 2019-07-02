@@ -36,7 +36,7 @@ const UIDragFunction = {
   },
 
   UIEnableDrag: function (event, uiObj, option) {
-    console.log(uiObj, this)
+    console.log(uiObj, option)
     this.uiObj = uiObj
     let upL = uiObj.bounds.upperLeft()
 
@@ -59,7 +59,6 @@ const UIDragFunction = {
 
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.disableCallback, true)
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.dragCallback, false)
-
   }
 }
 
