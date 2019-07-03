@@ -125,7 +125,9 @@ class EdgeLayouter extends AbstractLayouter {
     // Checks ----+
     //            |
     //            V
-    if (!ab.isIncluded(b.x, a.y) && !bb.isIncluded(b.x, a.y)) {
+    if (!ab.isIncluded(b.x, a.y) && !bb.isIncluded(b.x, a.y)
+      && !this.isTopOrBottomDocker(aFirst, abUpLY, abDownRY)
+      && !this.isTopOrBottomDocker(aLast, bbUpLY, bbDownRY)) {
       positions.push({
         a: { x: b.x + off(last, bm, 'x'), y: a.y + off(first, am, 'y') },
         z: this.getWeight(from, a.x < b.x ? 'r' : 'l', to, a.y < b.y ? 't' : 'b', edge)
@@ -134,7 +136,9 @@ class EdgeLayouter extends AbstractLayouter {
 
     // Checks |
     //        +--->
-    if (!ab.isIncluded(a.x, b.y) && !bb.isIncluded(a.x, b.y)) {
+    if (!ab.isIncluded(a.x, b.y) && !bb.isIncluded(a.x, b.y)
+      && !this.isLeftOrRightDocker(aFirst, abUpLX, abDownRX)
+      && !this.isLeftOrRightDocker(aLast, bbUpLX, bbDownRX)) {
       positions.push({
         a: { x: a.x + off(first, am, 'x'), y: b.y + off(last, bm, 'y') },
         z: this.getWeight(from, a.y < b.y ? 'b' : 't', to, a.x < b.x ? 'l' : 'r', edge)
@@ -144,7 +148,9 @@ class EdgeLayouter extends AbstractLayouter {
     // Checks  --+
     //           |
     //           +--->
-    if (!ab.isIncluded(m.x, a.y) && !bb.isIncluded(m.x, b.y)) {
+    if (!ab.isIncluded(m.x, a.y) && !bb.isIncluded(m.x, b.y)
+      && !this.isTopOrBottomDocker(aFirst, abUpLY, abDownRY)
+      && !this.isTopOrBottomDocker(aLast, bbUpLY, bbDownRY)) {
       positions.push({
         a: { x: m.x, y: a.y + off(first, am, 'y') },
         b: { x: m.x, y: b.y + off(last, bm, 'y') },
@@ -156,7 +162,9 @@ class EdgeLayouter extends AbstractLayouter {
     //        +---+
     //            |
     //            V
-    if (!ab.isIncluded(a.x, m.y) && !bb.isIncluded(b.x, m.y)) {
+    if (!ab.isIncluded(a.x, m.y) && !bb.isIncluded(b.x, m.y)
+      && !this.isLeftOrRightDocker(aFirst, abUpLX, abDownRX)
+      && !this.isLeftOrRightDocker(aLast, bbUpLX, bbDownRX)) {
       positions.push({
         a: { x: a.x + off(first, am, 'x'), y: m.y },
         b: { x: b.x + off(last, bm, 'x'), y: m.y },
@@ -168,6 +176,13 @@ class EdgeLayouter extends AbstractLayouter {
     return positions.sort(function (a, b) {
       return a.z < b.z ? 1 : (a.z === b.z ? -1 : -1)
     })
+  }
+
+  isTopOrBottomDocker (point, ty, by) {
+    return Math.abs(point.y - ty) < 5 || Math.abs(point.y - by) < 5
+  }
+  isLeftOrRightDocker (point, lx, rx) {
+    return Math.abs(point.x - lx) < 5 || Math.abs(point.x - rx) < 5
   }
 
   /**
@@ -183,6 +198,7 @@ class EdgeLayouter extends AbstractLayouter {
 
   /**
    * Returns a value which shows the weight for this configuration
+   * 返回一个值，该值显示此配置的权重
    *
    * @param {Object} from Shape which is coming from
    * @param {String} d1 Direction where is goes

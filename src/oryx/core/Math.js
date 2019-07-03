@@ -1,4 +1,4 @@
-var RIGHT = 2, TOP = 8, BOTTOM = 4, LEFT = 1
+const RIGHT = 2, TOP = 8, BOTTOM = 4, LEFT = 1
 
 function computeOutCode (x, y, xmin, ymin, xmax, ymax) {
   var code = 0
@@ -42,16 +42,21 @@ const ORYX_Math = {
    * @class ORYX.Core.Math.prototype
    */
   isPointInLine: function (pointX, pointY, lPoint1X, lPoint1Y, lPoint2X, lPoint2Y, offset) {
-
     offset = offset ? Math.abs(offset) : 1
 
     // Check if the edge is vertical
-    if (Math.abs(lPoint1X - lPoint2X) <= offset && Math.abs(pointX - lPoint1X) <= offset && pointY - Math.max(lPoint1Y, lPoint2Y) <= offset && Math.min(lPoint1Y, lPoint2Y) - pointY <= offset) {
+    if (Math.abs(lPoint1X - lPoint2X) <= offset
+      && Math.abs(pointX - lPoint1X) <= offset
+      && pointY - Math.max(lPoint1Y, lPoint2Y) <= offset
+      && Math.min(lPoint1Y, lPoint2Y) - pointY <= offset) {
       return true
     }
 
     // Check if the edge is horizontal
-    if (Math.abs(lPoint1Y - lPoint2Y) <= offset && Math.abs(pointY - lPoint1Y) <= offset && pointX - Math.max(lPoint1X, lPoint2X) <= offset && Math.min(lPoint1X, lPoint2X) - pointX <= offset) {
+    if (Math.abs(lPoint1Y - lPoint2Y) <= offset
+      && Math.abs(pointY - lPoint1Y) <= offset
+      && pointX - Math.max(lPoint1X, lPoint2X) <= offset
+      && Math.min(lPoint1X, lPoint2X) - pointX <= offset) {
       return true
     }
 
@@ -82,7 +87,6 @@ const ORYX_Math = {
 
     return tx * tx + ty * ty < 1.0
   },
-
 
   /**
    * Get a boolean if the point is in the polygone
@@ -125,6 +129,7 @@ const ORYX_Math = {
   },
 
   /**
+   * 计算点与线之间的距离
    *  Calculates the distance between a point and a line. It is also testable, if
    *  the distance orthogonal to the line, matches the segment of the line.
    *
@@ -149,6 +154,7 @@ const ORYX_Math = {
 
   /**
    * Calculates the distance between two points.
+   * 计算点与点之间的距离
    *
    * @param {point} point1
    * @param {point} point2
@@ -168,7 +174,6 @@ const ORYX_Math = {
     return ORYX_Math.getDistancePointToPoint(point, between1) /
       ORYX_Math.getDistancePointToPoint(between1, between2)
   },
-
 
   /**
    * Returns true, if the point is of the left hand
@@ -209,6 +214,7 @@ const ORYX_Math = {
 
   /**
    * Returns the vector of the both points
+   * 返回两个点的矢量
    *
    * @param {point} point1
    * @param {point} point2
@@ -223,6 +229,7 @@ const ORYX_Math = {
   /**
    * Returns the an identity vector of the given vector,
    * which has the length ot one.
+   * 返回给定向量的一个标识向量，其长度为1。
    *
    * @param {point} vector
    * or
@@ -252,6 +259,7 @@ const ORYX_Math = {
   /**
    * Returns the intersection point of a line and a point that defines a line
    * orthogonal to the given line.
+   * 返回直线与某点到直线垂线段的交点坐标
    *
    *  @param {float} lineP1
    *    The starting point of the line segment
@@ -283,7 +291,7 @@ const ORYX_Math = {
       }
     }
 
-    let pointOfIntersection = new Object()
+    let pointOfIntersection = {}
     pointOfIntersection.x = lineP1.x + u * (lineP2.x - lineP1.x)
     pointOfIntersection.y = lineP1.y + u * (lineP2.y - lineP1.y)
 
@@ -292,6 +300,7 @@ const ORYX_Math = {
 
   /**
    * Translated the point with the given matrix.
+   * 用给定的矩阵转换点。
    * @param {Point} point
    * @param {Matrix} matrix
    * @return {Object} Includes x, y
@@ -326,9 +335,9 @@ const ORYX_Math = {
 
   /**
    * Returns the determinant of the svg transformation matrix
+   * 返回SVG变换矩阵的行列式
    * @param {SVGTranformationMatrix} matrix
    * @return {Number}
-   *
    */
   getDeterminant: function (m) {
     // a11a22a33+a12a23a31+a13a21a32-a13a22a31-a12a21a33-a11a23a32
@@ -390,6 +399,8 @@ const ORYX_Math = {
   },
   /**
    * Returns TRUE if the rectangle is over the edge and has intersection points or includes it
+   * 如果矩形位于edge上方且有交点或包含交点，则返回true
+   *
    * @param {Object} x1 Point A of the line
    * @param {Object} y1
    * @param {Object} x2 Point B of the line
@@ -406,6 +417,7 @@ const ORYX_Math = {
   /**
    * Returns the clipped line on the given rectangle. If there is
    * no intersection, it will return NULL.
+   * 返回给定矩形上的剪切线。如果没有交集，它将返回空值。
    *
    * @param {Object} x1 Point A of the line
    * @param {Object} y1
@@ -417,28 +429,28 @@ const ORYX_Math = {
    * @param {Object} ymax
    */
   clipLineOnRect: function (x1, y1, x2, y2, xmin, ymin, xmax, ymax) {
-    //Outcodes for P0, P1, and whatever point lies outside the clip rectangle
+    // Outcodes for P0, P1, and whatever point lies outside the clip rectangle
     let outcode0, outcode1, outcodeOut, hhh = 0
     let accept = false, done = false
 
-    //compute outcodes
+    // compute outcodes
     outcode0 = computeOutCode(x1, y1, xmin, ymin, xmax, ymax)
     outcode1 = computeOutCode(x2, y2, xmin, ymin, xmax, ymax)
 
     do {
-      if ((outcode0 | outcode1) == 0) {
+      if ((outcode0 || outcode1) === 0) {
         accept = true
         done = true
       } else if ((outcode0 & outcode1) > 0) {
         done = true
       } else {
-        //failed both tests, so calculate the line segment to clip
-        //from an outside point to an intersection with clip edge
+        // failed both tests, so calculate the line segment to clip
+        // from an outside point to an intersection with clip edge
         let x = 0, y = 0
-        //At least one endpoint is outside the clip rectangle; pick it.
-        outcodeOut = outcode0 != 0 ? outcode0 : outcode1
-        //Now find the intersection point;
-        //use formulas y = y0 + slope * (x - x0), x = x0 + (1/slope)* (y - y0)
+        // At least one endpoint is outside the clip rectangle; pick it.
+        outcodeOut = outcode0 !== 0 ? outcode0 : outcode1
+        // Now find the intersection point;
+        // use formulas y = y0 + slope * (x - x0), x = x0 + (1/slope)* (y - y0)
         if ((outcodeOut & TOP) > 0) {
           x = x1 + (x2 - x1) * (ymax - y1) / (y2 - y1)
           y = ymax
@@ -453,9 +465,9 @@ const ORYX_Math = {
           x = xmin
         }
 
-        //Now we move outside point to intersection point to clip
-        //and get ready for next pass.
-        if (outcodeOut == outcode0) {
+        // Now we move outside point to intersection point to clip
+        // and get ready for next pass.
+        if (outcodeOut === outcode0) {
           x1 = x
           y1 = y
           outcode0 = computeOutCode(x1, y1, xmin, ymin, xmax, ymax)
@@ -466,7 +478,7 @@ const ORYX_Math = {
         }
       }
       hhh++
-    } while (done != true && hhh < 5000)
+    } while (done !== true && hhh < 5000)
 
     if (accept) {
       return { a: { x: x1, y: y1 }, b: { x: x2, y: y2 } }

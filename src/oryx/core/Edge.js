@@ -729,6 +729,68 @@ export default class Edge extends Shape {
   }
 
   /**
+   * Removes all dockers from the edge which are on
+   * the line between two dockers
+   * @return {Object} Removed dockers in an indicied array
+   * (key is the removed position of the docker, value is docker themselve)
+   */
+  removeUnusedDockers () {
+    let marked = new Hash()
+
+    this.dockers.each(function (docker, i) {
+      if (i == 0 || i == this.dockers.length - 1) {
+        return
+      }
+      let previous = this.dockers[i - 1]
+
+      /* Do not consider already removed dockers */
+      if (marked.values().indexOf(previous) != -1 && this.dockers[i - 2]) {
+        previous = this.dockers[i - 2]
+      }
+      let next = this.dockers[i + 1]
+
+      let cp = previous.getDockedShape() && previous.referencePoint ? previous.getAbsoluteReferencePoint() : previous.bounds.center()
+      let cn = next.getDockedShape() && next.referencePoint ? next.getAbsoluteReferencePoint() : next.bounds.center()
+      let cd = docker.bounds.center()
+
+      if (ORYX_Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)) {
+        marked.set(i, docker)
+      }
+    }.bind(this))
+
+    marked.each(function (docker) {
+      this.removeDocker(docker.value)
+    }.bind(this))
+
+    if (marked.values().length > 0) {
+      this._update(true)
+    }
+
+    return marked
+  }
+
+  alignDockers () {
+    this._update(true)
+
+    let firstPoint = this.dockers.first().bounds.center()
+    let lastPoint = this.dockers.last().bounds.center()
+
+    let deltaX = lastPoint.x - firstPoint.x
+    let deltaY = lastPoint.y - firstPoint.y
+
+    let numOfDockers = this.dockers.length - 1
+
+    this.dockers.each((function (docker, index) {
+      let part = index / numOfDockers
+      docker.bounds.unregisterCallback(this._dockerChangedCallback)
+      docker.bounds.moveTo(firstPoint.x + part * deltaX, firstPoint.y + part * deltaY)
+      docker.bounds.registerCallback(this._dockerChangedCallback)
+    }).bind(this))
+
+    this._dockerChanged()
+  }
+
+  /**
    * Adds all necessary markers of this Edge to the SVG document.
    * Has to be called, while this.node is part of DOM.
    */
@@ -758,6 +820,286 @@ export default class Edge extends Shape {
         })
       }
     }
+  }
+
+  getValidMarkerId (markerUrl) {
+    if (markerUrl.indexOf('url("#') >= 0) {
+      // Fix for IE9, additional quotes are added to the <id
+      let rawId = markerUrl.replace(/^url\(\"#/, '').replace(/\"\)$/, '')
+      return this.id + rawId
+    } else {
+      markerUrl = markerUrl.replace(/^url\(#/, '')
+      return this.id.concat(markerUrl.replace(/\)$/, ''))
+    }
+  }
+
+  /**
+   * Performs nessary adjustments on the edge's child shapes.
+   * 对edge的子元素执行必要的调整。
+   *
+   * @param {ORYX.Core.Controls.Docker} docker
+   *    The added docker
+   */
+  handleChildShapesAfterAddDocker (docker) {
+    /* Ensure type of Docker */
+    if (!(docker instanceof ORYX_Controls.Docker)) {
+      return undefined
+    }
+
+    let index = this.dockers.indexOf(docker)
+    if (!(0 < index && index < this.dockers.length - 1)) {
+      /* Exception: Expect added docker between first and last node of the edge */
+      return undefined
+    }
+
+    /* Get child nodes concerning the segment of the new docker */
+    let startDocker = this.dockers[index - 1]
+    let endDocker = this.dockers[index + 1]
+
+    /* Adjust the position of edge's child nodes */
+    let segmentElements = this.getAttachedNodePositionDataForSegment(startDocker, endDocker)
+
+    let lengthSegmentPart1 = ORYX_Math.getDistancePointToPoint(
+      startDocker.bounds.center(),
+      docker.bounds.center())
+    let lengthSegmentPart2 = ORYX_Math.getDistancePointToPoint(
+      endDocker.bounds.center(),
+      docker.bounds.center())
+
+    if (!(lengthSegmentPart1 + lengthSegmentPart2)) {
+      return
+    }
+
+    let relativDockerPosition = lengthSegmentPart1 / (lengthSegmentPart1 + lengthSegmentPart2)
+
+    segmentElements.forEach(function (nodePositionData, key) {
+      /* Assign child node to the new segment */
+      if (nodePositionData.relativDistanceFromDocker1 < relativDockerPosition) {
+        /* Case: before added Docker */
+        nodePositionData.segment.docker2 = docker
+        nodePositionData.relativDistanceFromDocker1 = nodePositionData.relativDistanceFromDocker1 / relativDockerPosition
+      } else {
+        /* Case: after added Docker */
+        nodePositionData.segment.docker1 = docker
+        let newFullDistance = 1 - relativDockerPosition
+        let relativPartOfSegment = nodePositionData.relativDistanceFromDocker1 - relativDockerPosition
+
+        nodePositionData.relativDistanceFromDocker1 = relativPartOfSegment / newFullDistance
+      }
+    })
+
+
+    // Update all labels reference points
+    this.getLabels().each(function (label) {
+      let ref = label.getReferencePoint()
+      if (!ref) {
+        return
+      }
+      let index = this.dockers.indexOf(docker)
+      if (index >= ref.segment.fromIndex && index <= ref.segment.toIndex) {
+
+        let segment = this.findSegment(ref.intersection)
+        if (!segment) {
+          // Choose whether the first of the last segment
+          segment.fromDocker = ref.segment.fromIndex >= (this.dockers.length / 2) ? this.dockers[0] : this.dockers[this.dockers.length - 2]
+          segment.toDocker = this.dockers[this.dockers.indexOf(from) + 1] // The next one if the to docker
+        }
+
+        let fromPosition = segment.fromDocker.bounds.center(), toPosition = segment.toDocker.bounds.center()
+
+        let intersection = ORYX_Math.getPointOfIntersectionPointLine(
+          fromPosition, 		// P1 - Center of the first docker
+          toPosition, 		// P2 - Center of the second docker
+          ref.intersection, 	// P3 - Center of the label
+          true)
+        //var oldDistance = ORYX.Core.Math.getDistanceBetweenTwoPoints(ref.segment.fromPosition,
+        // ref.segment.toPosition, ref.intersection); intersection =
+        // ORYX.Core.Math.getPointBetweenTwoPoints(fromPosition, toPosition, isNaN(oldDistance) ? 0.5 :
+        // (lengthOld*oldDistance)/lengthNew);
+
+        // Update the reference point
+        this.updateReferencePointOfLabel(label, intersection, segment.fromDocker, segment.toDocker, true)
+      }
+    }.bind(this))
+
+    /* Update attached nodes visual representation */
+    this.refreshAttachedNodes()
+  }
+
+  /**
+   *  Returns elements from {@link attachedNodePositiondata} that match the
+   *  segement defined by startDocker and endDocker.
+   *
+   *  @param {ORYX.Core.Controls.Docker} startDocker
+   *    The docker defining the begin of the segment.
+   *  @param {ORYX.Core.Controls.Docker} endDocker
+   *    The docker defining the begin of the segment.
+   *
+   *  @return {Hash} attachedNodePositionData
+   *    Child elements matching the segment
+   */
+  getAttachedNodePositionDataForSegment (startDocker, endDocker) {
+    /* Ensure that the segment is defined correctly */
+    if (!((startDocker instanceof ORYX_Controls.Docker)
+      && (endDocker instanceof ORYX_Controls.Docker))) {
+      return []
+    }
+
+    /* Get elements of the segment */
+    let elementsOfSegment = new Map(
+      [...this.attachedNodePositionData].filter(function (key, nodePositionData) {
+        return nodePositionData.segment.docker1 === startDocker &&
+          nodePositionData.segment.docker2 === endDocker
+      })
+    )
+
+    /* Return a Hash in each case */
+    if (!elementsOfSegment) {
+      return []
+    }
+
+    return elementsOfSegment
+  }
+
+  updateReferencePointOfLabel (label, intersection, from, to, dirty) {
+    if (!label.getReferencePoint() || !label.isVisible) {
+      return
+    }
+
+    let ref = label.getReferencePoint()
+
+    if (ref.orientation && ref.orientation !== 'ce') {
+      let angle = this._getAngle(from, to)
+      if (ref.distance >= 0) {
+        if (angle == 0) {
+          label.horizontalAlign('left')//ref.orientation == "lr" ? "right" : "left");
+          label.verticalAlign('bottom')
+        } else if (angle > 0 && angle < 90) {
+          label.horizontalAlign('right')
+          label.verticalAlign('bottom')
+        } else if (angle == 90) {
+          label.horizontalAlign('right')
+          label.verticalAlign('top')//ref.orientation == "lr" ? "bottom" : "top");
+        } else if (angle > 90 && angle < 180) {
+          label.horizontalAlign('right')
+          label.verticalAlign('top')
+        } else if (angle == 180) {
+          label.horizontalAlign('left')//ref.orientation == "ur" ? "right" : "left");
+          label.verticalAlign('top')
+        } else if (angle > 180 && angle < 270) {
+          label.horizontalAlign('left')
+          label.verticalAlign('top')
+        } else if (angle == 270) {
+          label.horizontalAlign('left')
+          label.verticalAlign('top')//ref.orientation == "ll" ? "bottom" : "top");
+        } else if (angle > 270 && angle <= 360) {
+          label.horizontalAlign('left')
+          label.verticalAlign('bottom')
+        }
+      } else {
+        if (angle == 0) {
+          label.horizontalAlign('left')//ref.orientation == "ur" ? "right" : "left");
+          label.verticalAlign('top')
+        } else if (angle > 0 && angle < 90) {
+          label.horizontalAlign('left')
+          label.verticalAlign('top')
+        } else if (angle == 90) {
+          label.horizontalAlign('left')
+          label.verticalAlign('top')//ref.orientation == "ll" ? "bottom" : "top");
+        } else if (angle > 90 && angle < 180) {
+          label.horizontalAlign('left')
+          label.verticalAlign('bottom')
+        } else if (angle == 180) {
+          label.horizontalAlign('left')//ref.orientation == "lr" ? "right" : "left");
+          label.verticalAlign('bottom')
+        } else if (angle > 180 && angle < 270) {
+          label.horizontalAlign('right')
+          label.verticalAlign('bottom')
+        } else if (angle == 270) {
+          label.horizontalAlign('right')
+          label.verticalAlign('top')//ref.orientation == "lr" ? "bottom" : "top");
+        } else if (angle > 270 && angle <= 360) {
+          label.horizontalAlign('right')
+          label.verticalAlign('top')
+        }
+      }
+      ref.iorientation = ref.iorientation || ref.orientation
+      ref.orientation = (label.verticalAlign() == 'top' ? 'u' : 'l') + (label.horizontalAlign() == 'left' ? 'l' : 'r')
+    }
+
+    label.setReferencePoint(jQuery.extend({}, {
+      intersection: intersection,
+      segment: {
+        from: from,
+        fromIndex: this.dockers.indexOf(from),
+        fromPosition: from.bounds.center(),
+        to: to,
+        toIndex: this.dockers.indexOf(to),
+        toPosition: to.bounds.center()
+      },
+      dirty: dirty || false
+    }, ref))
+  }
+
+  /**
+   *  Adjusts the child shapes of an edges after a docker was removed.
+   *  docker 移除后，调整edge的子元素
+   *  @param{ORYX.Core.Controls.Docker} docker
+   *    The removed docker.
+   */
+  handleChildShapesAfterRemoveDocker (docker) {
+    /* Ensure docker type */
+    if (!(docker instanceof ORYX_Controls.Docker)) {
+      return
+    }
+
+    this.attachedNodePositionData.forEach(function (nodePositionData, key) {
+      if (nodePositionData.segment.docker1 === docker) {
+        /* The new start of the segment is the predecessor of docker2. */
+        let index = this.dockers.indexOf(nodePositionData.segment.docker2)
+        if (index === -1) {
+          return
+        }
+        nodePositionData.segment.docker1 = this.dockers[index - 1]
+      } else if (nodePositionData.segment.docker2 === docker) {
+        /* The new end of the segment is the successor of docker1. */
+        let index = this.dockers.indexOf(nodePositionData.segment.docker1)
+        if (index === -1) {
+          return
+        }
+        nodePositionData.value.segment.docker2 = this.dockers[index + 1]
+      }
+    }.bind(this))
+
+    // Update all labels reference points
+    this.getLabels().each(function (label) {
+      let ref = label.getReferencePoint()
+      if (!ref) {
+        return
+      }
+      let from = ref.segment.from
+      let to = ref.segment.to
+
+      if (from !== docker && to !== docker) {
+        return
+      }
+
+      let segment = this.findSegment(ref.intersection)
+      if (!segment) {
+        from = segment.fromDocker
+        to = segment.toDocker
+      } else {
+        from = from === docker ? this.dockers[this.dockers.indexOf(to) - 1] : from
+        to = this.dockers[this.dockers.indexOf(from) + 1]
+      }
+
+      let intersection = ORYX_Math.getPointOfIntersectionPointLine(from.bounds.center(), to.bounds.center(), ref.intersection, true)
+      // Update the reference point
+      this.updateReferencePointOfLabel(label, intersection, from, to, true)
+    }.bind(this))
+
+    /* Update attached nodes visual representation */
+    this.refreshAttachedNodes()
   }
 
   /**
@@ -1006,13 +1348,14 @@ export default class Edge extends Shape {
 
   /**
    * Returns TRUE if the bounds is over the edge
+   * 如果edge在指定bounds上，返回true
    * @param {Bounds}
    *
    */
   isBoundsIncluded (bounds) {
     let dockers = this.dockers, size = dockers.length
     return dockers.any(function (docker, i) {
-      if (i == size - 1) {
+      if (i === size - 1) {
         return false
       }
       let a = docker.bounds.center()
@@ -1024,6 +1367,7 @@ export default class Edge extends Shape {
 
   /**
    * Calculate if the point is inside the Shape
+   * 计算点是否在形状内
    * @param {PointX}
    * @param {PointY}
    */
@@ -1081,348 +1425,6 @@ export default class Edge extends Shape {
     let p2 = docker2 instanceof ORYX_Controls.Docker ? docker2.absoluteCenterXY() : docker2
 
     return ORYX_Math.getAngle(p1, p2)
-  }
-
-  alignDockers () {
-    this._update(true)
-
-    let firstPoint = this.dockers.first().bounds.center()
-    let lastPoint = this.dockers.last().bounds.center()
-
-    let deltaX = lastPoint.x - firstPoint.x
-    let deltaY = lastPoint.y - firstPoint.y
-
-    let numOfDockers = this.dockers.length - 1
-
-    this.dockers.each((function (docker, index) {
-      let part = index / numOfDockers
-      docker.bounds.unregisterCallback(this._dockerChangedCallback)
-      docker.bounds.moveTo(firstPoint.x + part * deltaX, firstPoint.y + part * deltaY)
-      docker.bounds.registerCallback(this._dockerChangedCallback)
-    }).bind(this))
-
-    this._dockerChanged()
-  }
-
-  /**
-   * Performs nessary adjustments on the edge's child shapes.
-   *
-   * @param {ORYX.Core.Controls.Docker} docker
-   *    The added docker
-   */
-  handleChildShapesAfterAddDocker (docker) {
-    /* Ensure type of Docker */
-    if (!(docker instanceof ORYX_Controls.Docker)) {
-      return undefined
-    }
-
-    let index = this.dockers.indexOf(docker)
-    if (!(0 < index && index < this.dockers.length - 1)) {
-      /* Exception: Expect added docker between first and last node of the edge */
-      return undefined
-    }
-
-    /* Get child nodes concerning the segment of the new docker */
-    let startDocker = this.dockers[index - 1]
-    let endDocker = this.dockers[index + 1]
-
-    /* Adjust the position of edge's child nodes */
-    let segmentElements = this.getAttachedNodePositionDataForSegment(startDocker, endDocker)
-
-    let lengthSegmentPart1 = ORYX_Math.getDistancePointToPoint(
-      startDocker.bounds.center(),
-      docker.bounds.center())
-    let lengthSegmentPart2 = ORYX_Math.getDistancePointToPoint(
-      endDocker.bounds.center(),
-      docker.bounds.center())
-
-    if (!(lengthSegmentPart1 + lengthSegmentPart2)) {
-      return
-    }
-
-    let relativDockerPosition = lengthSegmentPart1 / (lengthSegmentPart1 + lengthSegmentPart2)
-
-    segmentElements.forEach(function (nodePositionData, key) {
-      /* Assign child node to the new segment */
-      if (nodePositionData.relativDistanceFromDocker1 < relativDockerPosition) {
-        /* Case: before added Docker */
-        nodePositionData.segment.docker2 = docker
-        nodePositionData.relativDistanceFromDocker1 = nodePositionData.relativDistanceFromDocker1 / relativDockerPosition
-      } else {
-        /* Case: after added Docker */
-        nodePositionData.segment.docker1 = docker
-        let newFullDistance = 1 - relativDockerPosition
-        let relativPartOfSegment = nodePositionData.relativDistanceFromDocker1 - relativDockerPosition
-
-        nodePositionData.relativDistanceFromDocker1 = relativPartOfSegment / newFullDistance
-      }
-    })
-
-
-    // Update all labels reference points
-    this.getLabels().each(function (label) {
-      let ref = label.getReferencePoint()
-      if (!ref) {
-        return
-      }
-      let index = this.dockers.indexOf(docker)
-      if (index >= ref.segment.fromIndex && index <= ref.segment.toIndex) {
-
-        let segment = this.findSegment(ref.intersection)
-        if (!segment) {
-          // Choose whether the first of the last segment
-          segment.fromDocker = ref.segment.fromIndex >= (this.dockers.length / 2) ? this.dockers[0] : this.dockers[this.dockers.length - 2]
-          segment.toDocker = this.dockers[this.dockers.indexOf(from) + 1] // The next one if the to docker
-        }
-
-        let fromPosition = segment.fromDocker.bounds.center(), toPosition = segment.toDocker.bounds.center()
-
-        let intersection = ORYX_Math.getPointOfIntersectionPointLine(
-          fromPosition, 		// P1 - Center of the first docker
-          toPosition, 		// P2 - Center of the second docker
-          ref.intersection, 	// P3 - Center of the label
-          true)
-        //var oldDistance = ORYX.Core.Math.getDistanceBetweenTwoPoints(ref.segment.fromPosition,
-        // ref.segment.toPosition, ref.intersection); intersection =
-        // ORYX.Core.Math.getPointBetweenTwoPoints(fromPosition, toPosition, isNaN(oldDistance) ? 0.5 :
-        // (lengthOld*oldDistance)/lengthNew);
-
-        // Update the reference point
-        this.updateReferencePointOfLabel(label, intersection, segment.fromDocker, segment.toDocker, true)
-      }
-    }.bind(this))
-
-    /* Update attached nodes visual representation */
-    this.refreshAttachedNodes()
-  }
-
-  /**
-   *  Returns elements from {@link attachedNodePositiondata} that match the
-   *  segement defined by startDocker and endDocker.
-   *
-   *  @param {ORYX.Core.Controls.Docker} startDocker
-   *    The docker defining the begin of the segment.
-   *  @param {ORYX.Core.Controls.Docker} endDocker
-   *    The docker defining the begin of the segment.
-   *
-   *  @return {Hash} attachedNodePositionData
-   *    Child elements matching the segment
-   */
-  getAttachedNodePositionDataForSegment (startDocker, endDocker) {
-    /* Ensure that the segment is defined correctly */
-    if (!((startDocker instanceof ORYX_Controls.Docker)
-      && (endDocker instanceof ORYX_Controls.Docker))) {
-      return []
-    }
-
-    /* Get elements of the segment */
-    let elementsOfSegment = new Map(
-      [...this.attachedNodePositionData].filter(function (key, nodePositionData) {
-        return nodePositionData.segment.docker1 === startDocker &&
-          nodePositionData.segment.docker2 === endDocker
-      })
-    )
-
-    /* Return a Hash in each case */
-    if (!elementsOfSegment) {
-      return []
-    }
-
-    return elementsOfSegment
-  }
-
-  updateReferencePointOfLabel (label, intersection, from, to, dirty) {
-    if (!label.getReferencePoint() || !label.isVisible) {
-      return
-    }
-
-    let ref = label.getReferencePoint()
-
-    if (ref.orientation && ref.orientation !== 'ce') {
-      let angle = this._getAngle(from, to)
-      if (ref.distance >= 0) {
-        if (angle == 0) {
-          label.horizontalAlign('left')//ref.orientation == "lr" ? "right" : "left");
-          label.verticalAlign('bottom')
-        } else if (angle > 0 && angle < 90) {
-          label.horizontalAlign('right')
-          label.verticalAlign('bottom')
-        } else if (angle == 90) {
-          label.horizontalAlign('right')
-          label.verticalAlign('top')//ref.orientation == "lr" ? "bottom" : "top");
-        } else if (angle > 90 && angle < 180) {
-          label.horizontalAlign('right')
-          label.verticalAlign('top')
-        } else if (angle == 180) {
-          label.horizontalAlign('left')//ref.orientation == "ur" ? "right" : "left");
-          label.verticalAlign('top')
-        } else if (angle > 180 && angle < 270) {
-          label.horizontalAlign('left')
-          label.verticalAlign('top')
-        } else if (angle == 270) {
-          label.horizontalAlign('left')
-          label.verticalAlign('top')//ref.orientation == "ll" ? "bottom" : "top");
-        } else if (angle > 270 && angle <= 360) {
-          label.horizontalAlign('left')
-          label.verticalAlign('bottom')
-        }
-      } else {
-        if (angle == 0) {
-          label.horizontalAlign('left')//ref.orientation == "ur" ? "right" : "left");
-          label.verticalAlign('top')
-        } else if (angle > 0 && angle < 90) {
-          label.horizontalAlign('left')
-          label.verticalAlign('top')
-        } else if (angle == 90) {
-          label.horizontalAlign('left')
-          label.verticalAlign('top')//ref.orientation == "ll" ? "bottom" : "top");
-        } else if (angle > 90 && angle < 180) {
-          label.horizontalAlign('left')
-          label.verticalAlign('bottom')
-        } else if (angle == 180) {
-          label.horizontalAlign('left')//ref.orientation == "lr" ? "right" : "left");
-          label.verticalAlign('bottom')
-        } else if (angle > 180 && angle < 270) {
-          label.horizontalAlign('right')
-          label.verticalAlign('bottom')
-        } else if (angle == 270) {
-          label.horizontalAlign('right')
-          label.verticalAlign('top')//ref.orientation == "lr" ? "bottom" : "top");
-        } else if (angle > 270 && angle <= 360) {
-          label.horizontalAlign('right')
-          label.verticalAlign('top')
-        }
-      }
-      ref.iorientation = ref.iorientation || ref.orientation
-      ref.orientation = (label.verticalAlign() == 'top' ? 'u' : 'l') + (label.horizontalAlign() == 'left' ? 'l' : 'r')
-    }
-
-    label.setReferencePoint(jQuery.extend({}, {
-      intersection: intersection,
-      segment: {
-        from: from,
-        fromIndex: this.dockers.indexOf(from),
-        fromPosition: from.bounds.center(),
-        to: to,
-        toIndex: this.dockers.indexOf(to),
-        toPosition: to.bounds.center()
-      },
-      dirty: dirty || false
-    }, ref))
-  }
-
-  /**
-   *  Adjusts the child shapes of an edges after a docker was removed.
-   *
-   *  @param{ORYX.Core.Controls.Docker} docker
-   *    The removed docker.
-   */
-  handleChildShapesAfterRemoveDocker (docker) {
-    /* Ensure docker type */
-    if (!(docker instanceof ORYX_Controls.Docker)) {
-      return
-    }
-
-    this.attachedNodePositionData.forEach(function (nodePositionData, key) {
-      if (nodePositionData.segment.docker1 === docker) {
-        /* The new start of the segment is the predecessor of docker2. */
-        let index = this.dockers.indexOf(nodePositionData.segment.docker2)
-        if (index === -1) {
-          return
-        }
-        nodePositionData.segment.docker1 = this.dockers[index - 1]
-      } else if (nodePositionData.segment.docker2 === docker) {
-        /* The new end of the segment is the successor of docker1. */
-        let index = this.dockers.indexOf(nodePositionData.segment.docker1)
-        if (index === -1) {
-          return
-        }
-        nodePositionData.value.segment.docker2 = this.dockers[index + 1]
-      }
-    }.bind(this))
-
-    // Update all labels reference points
-    this.getLabels().each(function (label) {
-      let ref = label.getReferencePoint()
-      if (!ref) {
-        return
-      }
-      let from = ref.segment.from
-      let to = ref.segment.to
-
-      if (from !== docker && to !== docker) {
-        return
-      }
-
-      let segment = this.findSegment(ref.intersection)
-      if (!segment) {
-        from = segment.fromDocker
-        to = segment.toDocker
-      } else {
-        from = from === docker ? this.dockers[this.dockers.indexOf(to) - 1] : from
-        to = this.dockers[this.dockers.indexOf(from) + 1]
-      }
-
-      let intersection = ORYX_Math.getPointOfIntersectionPointLine(from.bounds.center(), to.bounds.center(), ref.intersection, true)
-      // Update the reference point
-      this.updateReferencePointOfLabel(label, intersection, from, to, true)
-    }.bind(this))
-
-    /* Update attached nodes visual representation */
-    this.refreshAttachedNodes()
-  }
-
-
-  /**
-   * Removes all dockers from the edge which are on
-   * the line between two dockers
-   * @return {Object} Removed dockers in an indicied array
-   * (key is the removed position of the docker, value is docker themselve)
-   */
-  removeUnusedDockers () {
-    let marked = new Hash()
-
-    this.dockers.each(function (docker, i) {
-      if (i == 0 || i == this.dockers.length - 1) {
-        return
-      }
-      let previous = this.dockers[i - 1]
-
-      /* Do not consider already removed dockers */
-      if (marked.values().indexOf(previous) != -1 && this.dockers[i - 2]) {
-        previous = this.dockers[i - 2]
-      }
-      let next = this.dockers[i + 1]
-
-      let cp = previous.getDockedShape() && previous.referencePoint ? previous.getAbsoluteReferencePoint() : previous.bounds.center()
-      let cn = next.getDockedShape() && next.referencePoint ? next.getAbsoluteReferencePoint() : next.bounds.center()
-      let cd = docker.bounds.center()
-
-      if (ORYX_Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)) {
-        marked.set(i, docker)
-      }
-    }.bind(this))
-
-    marked.each(function (docker) {
-      this.removeDocker(docker.value)
-    }.bind(this))
-
-    if (marked.values().length > 0) {
-      this._update(true)
-    }
-
-    return marked
-  }
-
-  getValidMarkerId (markerUrl) {
-    if (markerUrl.indexOf('url("#') >= 0) {
-      // Fix for IE9, additional quotes are added to the <id
-      let rawId = markerUrl.replace(/^url\(\"#/, '').replace(/\"\)$/, '')
-      return this.id + rawId
-    } else {
-      markerUrl = markerUrl.replace(/^url\(#/, '')
-      return this.id.concat(markerUrl.replace(/\)$/, ''))
-    }
   }
 
   /**
@@ -1521,7 +1523,7 @@ export default class Edge extends Shape {
     }
 
     try {
-      //result = this.getStencil().serialize(this, result);
+      // result = this.getStencil().serialize(this, result);
       let serializeEvent = this.getStencil().serialize()
 
       /*
@@ -1564,9 +1566,7 @@ export default class Edge extends Shape {
           data = deserializeEvent.result
         }
       }
-    }
-    catch (e) {
-    }
+    } catch (e) {}
 
     // Set the outgoing shapes
     let target = data.find(function (ser) {
@@ -1590,7 +1590,6 @@ export default class Edge extends Shape {
       let next = this.getCanvas().getChildShapeByResourceId(obj.value)
 
       if (next) {
-        console.log(33333333)
         if (next == targetShape) {
           // If this is an edge, set the last docker to the next shape
           this.dockers.last().setDockedShape(next)
@@ -1598,7 +1597,7 @@ export default class Edge extends Shape {
         } else if (next instanceof Edge) {
           // Set the first docker of the next shape
           next.dockers.first().setDockedShape(this)
-          //next.dockers.first().setReferencePoint({x: this.bounds.width() / 2.0, y: this.bounds.height() / 2.0});
+          // next.dockers.first().setReferencePoint({x: this.bounds.width() / 2.0, y: this.bounds.height() / 2.0});
         }
         /*else if(next.dockers.length > 0) { //next is a node and next has a docker
          next.dockers.first().setDockedShape(this);
@@ -1609,8 +1608,7 @@ export default class Edge extends Shape {
     }).bind(this))
 
     let oryxDockers = data.find(function (obj) {
-      return (obj.prefix === 'oryx' &&
-        obj.name === 'dockers')
+      return (obj.prefix === 'oryx' && obj.name === 'dockers')
     })
 
     if (oryxDockers) {
@@ -1672,9 +1670,9 @@ export default class Edge extends Shape {
               let newDocker = this.createDocker()
               newDocker.bounds.centerMoveTo(x, y)
 
-              //this.dockers = this.dockers.without(newDocker);
-              //this.dockers.splice(this.dockers.indexOf(dockersByPath.last()), 0, newDocker);
-              //dockersByPath.splice(this.dockers.indexOf(dockersByPath.last()), 0, newDocker);
+              // this.dockers = this.dockers.without(newDocker);
+              // this.dockers.splice(this.dockers.indexOf(dockersByPath.last()), 0, newDocker);
+              // dockersByPath.splice(this.dockers.indexOf(dockersByPath.last()), 0, newDocker);
             }
           }
         }
@@ -1686,10 +1684,6 @@ export default class Edge extends Shape {
     // arguments.callee.$.deserialize.apply(this, arguments)
     super.deserialize(...arguments)
     this._changed()
-  }
-
-  toString () {
-    return this.getStencil().title() + ' ' + this.id
   }
 
   /**
@@ -1736,6 +1730,10 @@ export default class Edge extends Shape {
     }
 
     return json
+  }
+
+  toString () {
+    return this.getStencil().title() + ' ' + this.id
   }
 
   getInstanceofType () {

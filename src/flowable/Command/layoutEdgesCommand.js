@@ -13,6 +13,7 @@ export default class layoutEdgesCommand extends ORYX_Command {
     let center = node.absoluteXY()
     this.ulo = { x: center.x - offset.x, y: center.y - offset.y }
   }
+
   execute () {
     if (this.changes) {
       this.executeAgain()
@@ -37,12 +38,14 @@ export default class layoutEdgesCommand extends ORYX_Command {
       }.bind(this))
       //  对每条边检测其第二个和倒数第二个 docker，如果在同一水平/垂直线上，则对齐 bounds
       .each((edge) => {
-        if (edge.dockers.first().getDockedShape() === this.node) {
+        let firstDockedShape = edge.dockers.first().getDockedShape()
+        let lastDockedShape = edge.dockers.last().getDockedShape()
+        if (firstDockedShape === this.node) {
           const second = edge.dockers[1]
           if (this.align(second.bounds, edge.dockers.first())) {
             second.update()
           }
-        } else if (edge.dockers.last().getDockedShape() === this.node) {
+        } else if (lastDockedShape === this.node) {
           const beforeLast = edge.dockers[edge.dockers.length - 2]
           if (this.align(beforeLast.bounds, edge.dockers.last())) {
             beforeLast.update()
@@ -50,13 +53,19 @@ export default class layoutEdgesCommand extends ORYX_Command {
         }
         edge._update(true)
         edge.removeUnusedDockers()
-        console.log('edgeLayoutByDragDocker')
         if (this.plugin.edgeLayoutByDragDocker) {
+          console.log('edgeLayoutByDragDocker')
+          this.plugin.doLayout(edge)
+          return
+        }
+        if (edge.isBoundsIncluded(firstDockedShape.bounds)
+          || edge.isBoundsIncluded(lastDockedShape.bounds)) {
+          console.log('BoundsIncluded')
           this.plugin.doLayout(edge)
           return
         }
         if (this.isBendPointIncluded(edge)) {
-          console.log(77)
+          console.log('BendPointIncluded')
           this.plugin.doLayout(edge)
           return
         }
@@ -75,7 +84,7 @@ export default class layoutEdgesCommand extends ORYX_Command {
           // Find all horizontal/vertical edges
           if (Math.abs(-Math.abs(p1.x - p2.x) + Math.abs(this.offset.x)) < 2
             || Math.abs(-Math.abs(p1.y - p2.y) + Math.abs(this.offset.y)) < 2) {
-           console.log(888)
+            console.log(888)
             this.plugin.doLayout(edge)
           }
         }
@@ -88,6 +97,7 @@ export default class layoutEdgesCommand extends ORYX_Command {
     }.bind(this))
 
   }
+
   /**
    * Align the bounds if the center is
    * the same than the old center
@@ -119,8 +129,10 @@ export default class layoutEdgesCommand extends ORYX_Command {
       }
     }
   }
+
   /**
    * Returns a TRUE if there are bend point which overlay the shape
+   * 如果存在覆盖形状的折弯点，则返回true。
    */
   isBendPointIncluded (edge) {
     // Get absolute bounds
@@ -138,25 +150,32 @@ export default class layoutEdgesCommand extends ORYX_Command {
     }
 
     return edge.dockers.any(function (docker, i) {
-        let c = docker.bounds.center()
-        // Dont count first and last
-        return i !== 0 && i !== edge.dockers.length - 1 &&
-          // Check if the point is included to the absolute bounds
-          ((ab && ab.isIncluded(c)) || (bb && bb.isIncluded(c)))
-      })
+      let c = docker.bounds.center()
+      // Dont count first and last
+      if (i !== 0 && i !== edge.dockers.length - 1) {
+        // Check if the point is included to the absolute bounds
+        return ((ab && ab.isIncluded(c)) || (bb && bb.isIncluded(c)))
+      }
+      return false
+
+      // return i !== 0 && i !== edge.dockers.length - 1 &&
+      //   // Check if the point is included to the absolute bounds
+      //   ((ab && ab.isIncluded(c)) || (bb && bb.isIncluded(c)))
+    })
   }
 
-  removeAllDocker(edge) {
+  removeAllDocker (edge) {
     edge.dockers.slice(1, edge.dockers.length - 1).each(function (docker) {
       edge.removeDocker(docker)
     })
   }
+
   executeAgain () {
     this.changes.each(function (change) {
       // Reset the dockers
       this.removeAllDocker(change.edge)
       change.dockerPositions.each(function (pos, i) {
-        if (i == 0 || i == change.dockerPositions.length - 1) {
+        if (i === 0 || i === change.dockerPositions.length - 1) {
           return
         }
         let docker = change.edge.createDocker(undefined, pos)
@@ -166,12 +185,13 @@ export default class layoutEdgesCommand extends ORYX_Command {
       change.edge._update(true)
     }.bind(this))
   }
+
   rollback () {
     this.changes.each(function (change) {
       // Reset the dockers
       this.removeAllDocker(change.edge)
       change.oldDockerPositions.each(function (pos, i) {
-        if (i == 0 || i == change.oldDockerPositions.length - 1) {
+        if (i === 0 || i === change.oldDockerPositions.length - 1) {
           return
         }
         let docker = change.edge.createDocker(undefined, pos)

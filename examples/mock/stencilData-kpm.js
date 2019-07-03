@@ -464,6 +464,88 @@ export const AA = {
 
     {
       'type': 'node',
+      'id': 'ExclusiveGateway',
+      'title': '排他网关',
+      'description': 'A choice gateway',
+      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns:oryx="http://www.b3mn.org/oryx" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.0" width="40" height="40"><defs id="defs4"/><oryx:magnets><oryx:magnet oryx:cx="20" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="39" oryx:cy="20" oryx:anchors="right"/><oryx:magnet oryx:cx="20" oryx:cy="39" oryx:anchors="bottom"/><oryx:magnet oryx:cx="1" oryx:cy="20" oryx:anchors="left"/><oryx:magnet oryx:default="yes" oryx:cy="20" oryx:cx="20"/></oryx:magnets><g><path d="M 0,20 L 20,0 L 40,20 L 20,40z" id="bg_frame" fill="#ffffff" stroke="#585858" style="stroke-width:1"/><g id="cross"><path id="crosspath" stroke="#585858" fill="#585858" d="M 14,14 L 16,14 L 26,26 L 24,26 z" style="stroke-width:1"/><path id="crosspath2" stroke="#585858" fill="#585858" d="M 14,26 L 16,26 L 26,14 L 24,14 z" style="stroke-width:1"/></g><text id="text_name" x="36" y="36" oryx:align="left top"/></g></svg>\n',
+      'icon': 'gateway/exclusive.databased.png',
+      'groups': [
+        'Gateways'
+      ],
+      'propertyPackages': [
+        'overrideidpackage',
+        'namepackage',
+        'documentationpackage',
+        'asynchronousdefinitionpackage',
+        'exclusivedefinitionpackage',
+        'sequencefloworderpackage'
+      ],
+      'hiddenPropertyPackages': [],
+      'roles': [
+        'sequence_start',
+        'GatewaysMorph',
+        'sequence_end',
+        'all'
+      ]
+    },
+    {
+      "type": "node",
+      "id": "ParallelGateway",
+      "title": "Parallel gateway",
+      "description": "A parallel gateway",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.0\" width=\"40\" height=\"40\"><oryx:magnets><oryx:magnet oryx:cx=\"20\" oryx:cy=\"1\" oryx:anchors=\"top\"/><oryx:magnet oryx:cx=\"39\" oryx:cy=\"20\" oryx:anchors=\"right\"/><oryx:magnet oryx:cx=\"20\" oryx:cy=\"39\" oryx:anchors=\"bottom\"/><oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\"/><oryx:magnet oryx:default=\"yes\" oryx:cy=\"20\" oryx:cx=\"20\"/></oryx:magnets><g><path d=\"M 0,20 L 20,0 L 40,20 L 20,40z\" id=\"bg_frame\" fill=\"#ffffff\" stroke=\"#585858\" style=\"stroke-width:1\"/><path d=\"M 10,20 L 30,20 M 20,10 L 20,30\" id=\"path9\" stroke=\"#585858\" style=\"fill:none;stroke-width:3\"/><text id=\"text_name\" x=\"36\" y=\"36\" oryx:align=\"left top\"/></g></svg>\n",
+      "icon": "gateway/parallel.png",
+      "groups": [
+        "Gateways"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "asynchronousdefinitionpackage",
+        "exclusivedefinitionpackage",
+        "sequencefloworderpackage"
+      ],
+      "hiddenPropertyPackages": [
+
+      ],
+      "roles": [
+        "sequence_start",
+        "GatewaysMorph",
+        "sequence_end",
+        "all"
+      ]
+    },
+    {
+      "type": "node",
+      "id": "IntermediateSignalEvent",
+      "title": "连接点",
+      "description": "网关驳回连接点",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" width=\"40\" height=\"40\" version=\"1.0\"><defs></defs><oryx:magnets><oryx:magnet oryx:cx=\"20\" oryx:cy=\"20\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"20\" oryx:cy=\"20\" /><g pointer-events=\"fill\"><circle id=\"bg_frame\" cx=\"20\" cy=\"20\" r=\"20\" stroke=\"#585858\" fill=\"#ffffff\" stroke-width=\"1\"/><circle id=\"frame\" cx=\"20\" cy=\"20\" r=\"17\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/><path id=\"signalThrowing\" d=\"M 12,16 L 22,16 L 22,10 L 32,20 L 22,30 L 22,24 L 12,24 z\" fill=\"none\" stroke=\"#585858\" stroke-width=\"1\" /><text font-size=\"11\" id=\"text_name\" x=\"20\" y=\"43\" oryx:align=\"top center\" stroke=\"#373e48\"></text></g></svg>\n",
+      "icon": "catching/signal.png",
+      "groups": [
+        "Gateways"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "executionlistenerspackage",
+        "signalrefpackage"
+      ],
+      "hiddenPropertyPackages": [
+
+      ],
+      "roles": [
+        "sequence_start",
+        "sequence_end",
+        "CatchEventsMorph",
+        "all"
+      ]
+    },
+
+    {
+      'type': 'node',
       'id': 'FlowBox',
       'title': '盒子',
       'description': '流程盒子',
@@ -491,32 +573,7 @@ export const AA = {
         'all'
       ]
     },
-    {
-      'type': 'node',
-      'id': 'ExclusiveGateway',
-      'title': '排他网关',
-      'description': 'A choice gateway',
-      'view': '<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns:oryx="http://www.b3mn.org/oryx" xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" version="1.0" width="80" height="80"><defs id="defs4"/><oryx:magnets><oryx:magnet oryx:cx="40" oryx:cy="1" oryx:anchors="top"/><oryx:magnet oryx:cx="79" oryx:cy="40" oryx:anchors="right"/><oryx:magnet oryx:cx="40" oryx:cy="79" oryx:anchors="bottom"/><oryx:magnet oryx:cx="1" oryx:cy="40" oryx:anchors="left"/><oryx:magnet oryx:default="yes" oryx:cy="40" oryx:cx="40" /></oryx:magnets><g><path d="M 0,40 L 40,0 L 80,40 L 40,80z" id="bg_frame" fill="#ffffff" stroke="#585858" style="stroke-width:1"/><g id="cross"><path id="crosspath" stroke="#585858" fill="#585858" d="M 30,30 L 34,30 L 50,50 L 46,50 z" style="stroke-width:1"/><path id="crosspath2" stroke="#585858" fill="#585858" d="M 30,50 L 34,50 L 50,30 L 46,30 z" style="stroke-width:1"/></g><text id="text_name" x="66" y="66" oryx:align="left top"/></g></svg>\n',
-      'icon': 'gateway/exclusive.databased.png',
-      'groups': [
-        '基础元素'
-      ],
-      'propertyPackages': [
-        'overrideidpackage',
-        'namepackage',
-        'documentationpackage',
-        'asynchronousdefinitionpackage',
-        'exclusivedefinitionpackage',
-        'sequencefloworderpackage'
-      ],
-      'hiddenPropertyPackages': [],
-      'roles': [
-        'sequence_start',
-        'GatewaysMorph',
-        'sequence_end',
-        'all'
-      ]
-    },
+
     {
       'type': 'node',
       'id': 'EndNoneEvent',
