@@ -36,7 +36,6 @@ const UIDragFunction = {
   },
 
   UIEnableDrag: function (event, uiObj, option) {
-    console.log(uiObj, option)
     this.uiObj = uiObj
     let upL = uiObj.bounds.upperLeft()
 

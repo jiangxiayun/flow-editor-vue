@@ -251,7 +251,7 @@ export default class Edge extends Shape {
     this.propertiesChanged.each(function (pair) {
       pair.value = true
     })
-    //this._update(true);
+    // this._update(true);
   }
 
   _update (force) {
@@ -629,8 +629,8 @@ export default class Edge extends Shape {
     }
   }
 
-  add (shape) {
-    super.add(shape)
+  add (shape, index) {
+    super.add(shape, index)
     // If the new shape is a Docker which is not contained
     if (shape instanceof ORYX_Controls.Docker && this.dockers.include(shape)) {
       // Add it to the dockers list ordered by paths
@@ -688,7 +688,7 @@ export default class Edge extends Shape {
               }
             }
 
-            let newDocker = (exDocker)
+            let newDocker = exDocker
               ? exDocker :
               this.createDocker(this.dockers.indexOf(lastDocker) + 1, position)
 
@@ -1431,7 +1431,7 @@ export default class Edge extends Shape {
    * Calls when a docker has changed
    */
   _dockerChanged () {
-    //this._update(true);
+    // this._update(true);
     this._dockerUpdated = true
   }
 

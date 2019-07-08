@@ -1,8 +1,7 @@
 import ORYX_Config from '../CONFIG'
-
-import ORYX_Command from '../core/Command'
 import ORYX_Controls from '../core/Controls/index'
 import ORYX_Edge from '../core/Edge'
+import AddAndRemoveDockerCommand from '../../flowable/Command/AddAndRemoveDockerCommand'
 
 export default class AddDocker {
 
@@ -59,7 +58,6 @@ export default class AddDocker {
         position: this.facade.eventCoordinates(event)
       })
       this.setEnableAdd(false)
-
     } else if (this.enabledRemove() &&
       uiObj instanceof ORYX_Controls.Docker &&
       uiObj.parent instanceof ORYX_Edge) {
@@ -74,52 +72,17 @@ export default class AddDocker {
 
   // Options: edge (required), position (required if add), docker (required if delete)
   newDockerCommand (options) {
-    if (!options.edge)
+    if (!options.edge) {
       return
-
-    class commandClass extends ORYX_Command{
-      constructor(addEnabled, deleteEnabled, edge, docker, pos, facade) {
-        super()
-        this.addEnabled = addEnabled
-        this.deleteEnabled = deleteEnabled
-        this.edge = edge
-        this.docker = docker
-        this.pos = pos
-        this.facade = facade
-      }
-      execute() {
-        if (this.addEnabled) {
-          if (!this.docker) {
-            this.docker = this.edge.addDocker(this.pos)
-            this.index = this.edge.dockers.indexOf(this.docker)
-          } else {
-            this.edge.add(this.docker, this.index)
-          }
-        }
-        else if (this.deleteEnabled) {
-          this.index = this.edge.dockers.indexOf(this.docker)
-          this.pos = this.docker.bounds.center()
-          this.edge.removeDocker(this.docker)
-        }
-        this.edge.getLabels().invoke('show')
-        this.facade.getCanvas().update()
-        this.facade.updateSelection()
-      }
-      rollback () {
-        if (this.addEnabled) {
-          if (this.docker instanceof ORYX_Controls.Docker) {
-            this.edge.removeDocker(this.docker)
-          }
-        } else if (this.deleteEnabled) {
-          this.edge.add(this.docker, this.index)
-        }
-        this.edge.getLabels().invoke('show')
-        this.facade.getCanvas().update()
-        this.facade.updateSelection()
-      }
     }
 
-    let command = new commandClass(this.enabledAdd(), this.enabledRemove(), options.edge, options.docker, options.position, this.facade)
+    let command = new AddAndRemoveDockerCommand(
+      this.enabledAdd(),
+      this.enabledRemove(),
+      options.edge,
+      options.docker,
+      options.position,
+      this.facade)
 
     this.facade.executeCommands([command])
   }

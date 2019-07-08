@@ -688,7 +688,6 @@ export default class DragDropResize extends AbstractPlugin {
    * Redraw the selected Shapes.
    */
   refreshSelectedShapes () {
-    console.log(888889)
     // If the selection bounds not initialized, return
     if (!this.dragBounds) {
       return

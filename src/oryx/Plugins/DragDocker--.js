@@ -174,9 +174,6 @@ export default class DragDocker {
   dockerMoved (event) {
     this.outerDockerNotMoved = false
     let snapToMagnet = undefined
-    let middleMagnet = undefined
-    this.snapToMagnet = null
-    this.middleMagnet = null
 
     if (this.docker.parent) {
       if (this.isStartDocker || this.isEndDocker) {
@@ -283,13 +280,11 @@ export default class DragDocker {
           this.isValid = false
         }
 
+        this.nearestMagnet = null
         // Snap to the nearest Magnet
         if (this.lastUIObj && this.isValid && !(event.shiftKey || event.ctrlKey)) {
-          snapToMagnet = this.lastUIObj.magnets.find((magnet) => {
-            if (!magnet.anchorBottom && !magnet.anchorLeft &&
-              !magnet.anchorRight && !magnet.anchorTop) {
-              this.middleMagnet = magnet
-            }
+          console.log(233, this.lastUIObj.magnets)
+          snapToMagnet = this.lastUIObj.magnets.find(function (magnet) {
             return magnet.absoluteBounds().isIncluded(evPos)
           })
 
@@ -357,7 +352,7 @@ export default class DragDocker {
         }
       }
     }
-    this.snapToMagnet = this.middleMagnet || snapToMagnet
+    // this.facade.getCanvas().update();
     this.dockerParent._update()
   }
 
@@ -378,15 +373,12 @@ export default class DragDocker {
       // label.update();
     })
 
-    if (this.snapToMagnet) {
-      this.docker.bounds.centerMoveTo(this.snapToMagnet.absoluteCenterXY())
-    }
-
     // If there is a last top level Shape
     if (this.lastUIObj && (this.isStartDocker || this.isEndDocker)) {
       // If there is a valid connection, the set as a docked Shape to them
       if (this.isValid) {
         this.docker.setDockedShape(this.lastUIObj)
+
         this.facade.raiseEvent({
           type: ORYX_Config.EVENT_DRAGDOCKER_DOCKED,
           docker: this.docker,

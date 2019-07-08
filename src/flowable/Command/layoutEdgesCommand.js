@@ -79,14 +79,16 @@ export default class layoutEdgesCommand extends ORYX_Command {
     // Find all edges with exactly two dockers
       .each(function (edge) {
         if (edge.dockers.length === 2) {
-          const p1 = edge.dockers.first().getAbsoluteReferencePoint() || edge.dockers.first().bounds.center()
-          const p2 = edge.dockers.last().getAbsoluteReferencePoint() || edge.dockers.first().bounds.center()
-          // Find all horizontal/vertical edges
-          if (Math.abs(-Math.abs(p1.x - p2.x) + Math.abs(this.offset.x)) < 2
-            || Math.abs(-Math.abs(p1.y - p2.y) + Math.abs(this.offset.y)) < 2) {
-            console.log(888)
-            this.plugin.doLayout(edge)
-          }
+          this.plugin.doLayout(edge)
+
+          // const p1 = edge.dockers.first().getAbsoluteReferencePoint() || edge.dockers.first().bounds.center()
+          // const p2 = edge.dockers.last().getAbsoluteReferencePoint() || edge.dockers.first().bounds.center()
+          // // Find all horizontal/vertical edges
+          // if (Math.abs(-Math.abs(p1.x - p2.x) + Math.abs(this.offset.x)) < 2
+          //   || Math.abs(-Math.abs(p1.y - p2.y) + Math.abs(this.offset.y)) < 2) {
+          //   console.log(888)
+          //   this.plugin.doLayout(edge)
+          // }
         }
       }.bind(this))
 

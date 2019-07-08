@@ -461,7 +461,6 @@ export default class Node extends Shape {
       let next = this.getCanvas().getChildShapeByResourceId(obj.value)
 
       if (next) {
-        console.log(66666666)
         if (next instanceof ORYX_Edge) {
           // Set the first docker of the next shape
           next.dockers.first().setDockedShape(this)

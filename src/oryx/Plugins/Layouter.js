@@ -130,7 +130,8 @@ class EdgeLayouter extends AbstractLayouter {
       && !this.isTopOrBottomDocker(aLast, bbUpLY, bbDownRY)) {
       positions.push({
         a: { x: b.x + off(last, bm, 'x'), y: a.y + off(first, am, 'y') },
-        z: this.getWeight(from, a.x < b.x ? 'r' : 'l', to, a.y < b.y ? 't' : 'b', edge)
+        z: this.getWeight(from, a.x < b.x ? 'r' : 'l', to, a.y < b.y ? 't' : 'b', edge),
+        order: 1
       })
     }
 
@@ -141,7 +142,8 @@ class EdgeLayouter extends AbstractLayouter {
       && !this.isLeftOrRightDocker(aLast, bbUpLX, bbDownRX)) {
       positions.push({
         a: { x: a.x + off(first, am, 'x'), y: b.y + off(last, bm, 'y') },
-        z: this.getWeight(from, a.y < b.y ? 'b' : 't', to, a.x < b.x ? 'l' : 'r', edge)
+        z: this.getWeight(from, a.y < b.y ? 'b' : 't', to, a.x < b.x ? 'l' : 'r', edge),
+        order: 2
       })
     }
 
@@ -154,7 +156,8 @@ class EdgeLayouter extends AbstractLayouter {
       positions.push({
         a: { x: m.x, y: a.y + off(first, am, 'y') },
         b: { x: m.x, y: b.y + off(last, bm, 'y') },
-        z: this.getWeight(from, 'r', to, 'l', edge, a.x > b.x)
+        z: this.getWeight(from, 'r', to, 'l', edge, a.x > b.x),
+        order: 3
       })
     }
 
@@ -168,7 +171,8 @@ class EdgeLayouter extends AbstractLayouter {
       positions.push({
         a: { x: a.x + off(first, am, 'x'), y: m.y },
         b: { x: b.x + off(last, bm, 'x'), y: m.y },
-        z: this.getWeight(from, 'b', to, 't', edge, a.y > b.y)
+        z: this.getWeight(from, 'b', to, 't', edge, a.y > b.y),
+        order: 4
       })
     }
 
