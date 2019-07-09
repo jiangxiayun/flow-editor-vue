@@ -31,7 +31,7 @@
     name: 'flowEditor',
     data () {
       return {
-        wrapperHeight: '900px',
+        wrapperHeight: '500px',
         editorManager: null,
         editor: null,
         editorHistory: [],

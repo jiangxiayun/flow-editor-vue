@@ -55,8 +55,19 @@ class EdgeLayouter extends AbstractLayouter {
     if (!from || !to) return
 
     let positions = this.getPositions(from, to, edge)
+    if ( positions === 'straightLine') {
+      this.setDockers(edge, [])
+      return
+    }
     if (positions.length > 0) {
-      this.setDockers(edge, positions[0].a, positions[0].b)
+      let points = []
+      for (let item in positions[0]) {
+        if (item !== 'z' && item !== 'order') {
+          points.push(positions[0][item])
+        }
+      }
+      this.setDockers(edge, points)
+      // this.setDockers(edge, positions[0].a, positions[0].b)
     }
   }
 
@@ -86,17 +97,6 @@ class EdgeLayouter extends AbstractLayouter {
     let aFirst = edge.dockers.first().getAbsoluteReferencePoint()
     let aLast = edge.dockers.last().getAbsoluteReferencePoint()
 
-    // IF ------>
-    // or  |
-    //     V
-    // Do nothing
-    if (Math.abs(aFirst.x - aLast.x) < 1 || Math.abs(aFirst.y - aLast.y) < 1) {
-      return []
-    }
-
-    // Calc center position, between a and b
-    // depending on there weight
-    let m = {}
     let abWidth = ab.width()
     let abHeight = ab.height()
     let abUpLX = ab.a.x
@@ -111,6 +111,24 @@ class EdgeLayouter extends AbstractLayouter {
     let bbDownRX = bb.b.x
     let bbDownRY = bb.b.y
 
+    let av = this.isTopOrBottomDocker(aFirst, abUpLY, abDownRY)
+    let ah = this.isLeftOrRightDocker(aFirst, abUpLX, abDownRX)
+    let bv = this.isTopOrBottomDocker(aLast, bbUpLY, bbDownRY)
+    let bh = this.isLeftOrRightDocker(aLast, bbUpLX, bbDownRX)
+
+    // IF ------>
+    // or  |
+    //     V
+    // Do nothing
+    if ((!ah && !bh && Math.abs(aFirst.x - aLast.x) < 1) ||
+      (!av && !bv && Math.abs(aFirst.y - aLast.y) < 1)) {
+      // return []
+      return 'straightLine'
+    }
+
+    // Calc center position, between a and b
+    // depending on there weight
+    let m = {}
     // m 的坐标为2个节点距离的中间点
     m.x = a.x < b.x ? ((abDownRX + bbUpLX) / 2) : ((bbDownRX + abUpLX) / 2)
     m.y = a.y < b.y ? ((abDownRY + bbUpLY) / 2) : ((bbDownRY + abUpLY) / 2)
@@ -125,9 +143,8 @@ class EdgeLayouter extends AbstractLayouter {
     // Checks ----+
     //            |
     //            V
-    if (!ab.isIncluded(b.x, a.y) && !bb.isIncluded(b.x, a.y)
-      && !this.isTopOrBottomDocker(aFirst, abUpLY, abDownRY)
-      && !this.isTopOrBottomDocker(aLast, bbUpLY, bbDownRY)) {
+    // 当a不是上下点，b不是左右点
+    if (!ab.isIncluded(b.x, a.y) && !bb.isIncluded(b.x, a.y) && !av && !bh) {
       positions.push({
         a: { x: b.x + off(last, bm, 'x'), y: a.y + off(first, am, 'y') },
         z: this.getWeight(from, a.x < b.x ? 'r' : 'l', to, a.y < b.y ? 't' : 'b', edge),
@@ -137,9 +154,8 @@ class EdgeLayouter extends AbstractLayouter {
 
     // Checks |
     //        +--->
-    if (!ab.isIncluded(a.x, b.y) && !bb.isIncluded(a.x, b.y)
-      && !this.isLeftOrRightDocker(aFirst, abUpLX, abDownRX)
-      && !this.isLeftOrRightDocker(aLast, bbUpLX, bbDownRX)) {
+    // 要求a不是左右点，b不是上下点
+    if (!ab.isIncluded(a.x, b.y) && !bb.isIncluded(a.x, b.y) && !ah && !bv) {
       positions.push({
         a: { x: a.x + off(first, am, 'x'), y: b.y + off(last, bm, 'y') },
         z: this.getWeight(from, a.y < b.y ? 'b' : 't', to, a.x < b.x ? 'l' : 'r', edge),
@@ -150,9 +166,8 @@ class EdgeLayouter extends AbstractLayouter {
     // Checks  --+
     //           |
     //           +--->
-    if (!ab.isIncluded(m.x, a.y) && !bb.isIncluded(m.x, b.y)
-      && !this.isTopOrBottomDocker(aFirst, abUpLY, abDownRY)
-      && !this.isTopOrBottomDocker(aLast, bbUpLY, bbDownRY)) {
+    // 要求ab均不是上下点
+    if (!ab.isIncluded(m.x, a.y) && !bb.isIncluded(m.x, b.y) && !av && !bv) {
       positions.push({
         a: { x: m.x, y: a.y + off(first, am, 'y') },
         b: { x: m.x, y: b.y + off(last, bm, 'y') },
@@ -165,15 +180,61 @@ class EdgeLayouter extends AbstractLayouter {
     //        +---+
     //            |
     //            V
-    if (!ab.isIncluded(a.x, m.y) && !bb.isIncluded(b.x, m.y)
-      && !this.isLeftOrRightDocker(aFirst, abUpLX, abDownRX)
-      && !this.isLeftOrRightDocker(aLast, bbUpLX, bbDownRX)) {
+    // 要求ab均不是左右点
+    if (!ab.isIncluded(a.x, m.y) && !bb.isIncluded(b.x, m.y) && !ah && !bh) {
       positions.push({
         a: { x: a.x + off(first, am, 'x'), y: m.y },
         b: { x: b.x + off(last, bm, 'x'), y: m.y },
         z: this.getWeight(from, 'b', to, 't', edge, a.y > b.y),
         order: 4
       })
+    }
+
+    let outOffset = 20
+
+    if (ab.isIncluded(a.x, m.y) && bb.isIncluded(b.x, m.y)) {
+      // Checks
+      //        +---+
+      //        |   |
+      //        V   V
+      // 要求ab均不是左右点
+      if (!ah && !bh) {
+        let topd = a.y < b.y ? abUpLY : bbUpLY
+        positions.push({
+          a: { x: a.x, y: topd  - outOffset },
+          b: { x: b.x, y: topd - outOffset },
+          z: this.getWeight(from, 't', to, 't', edge),
+          order: 5
+        })
+      }
+      // Checks
+      //        +---+
+      //        |   |
+      //        |   +---
+      //        V
+      if (!ah && bh) {
+        positions.push({
+          a: { x: a.x, y: a.y < b.y ? abUpLY - outOffset : abDownRY + outOffset },
+          b: { x: m.x, y: a.y < b.y ? abUpLY - outOffset : abDownRY + outOffset },
+          c: { x: m.x, y: b.y + off(last, bm, 'y') },
+          z: this.getWeight(from, a.y < b.y ? 't' : 'b', to,  a.x < b.x ? 'l' : 'r', edge),
+          order: 6
+        })
+      }
+      if (ah && bv) {
+        // Checks  ----+
+        //         |   |
+        //       --+   |
+        //             V
+        positions.push({
+          a: { x: m.x, y: a.y },
+          b: { x: m.x, y: a.y < b.y ? bbUpLY - outOffset : bbDownRY + outOffset },
+          c: { x: b.x, y: a.y < b.y ? bbUpLY - outOffset : bbDownRY + outOffset },
+          z: this.getWeight(from, a.x < b.x ? 'r' : 'l', to, a.y < b.y ? 't' : 'b', edge),
+          order: 7
+        })
+      }
+
     }
 
     // Sort DESC of weights
@@ -183,10 +244,22 @@ class EdgeLayouter extends AbstractLayouter {
   }
 
   isTopOrBottomDocker (point, ty, by) {
-    return Math.abs(point.y - ty) < 5 || Math.abs(point.y - by) < 5
+    if (Math.abs(point.y - ty) < 5) {
+      return 't'
+    }
+    if (Math.abs(point.y - by) < 5) {
+      return 'b'
+    }
+    return false
   }
   isLeftOrRightDocker (point, lx, rx) {
-    return Math.abs(point.x - lx) < 5 || Math.abs(point.x - rx) < 5
+    if (Math.abs(point.x - lx) < 5) {
+      return 'l'
+    }
+    if (Math.abs(point.x - rx) < 5) {
+      return 'r'
+    }
+    return false
   }
 
   /**
@@ -290,20 +363,19 @@ class EdgeLayouter extends AbstractLayouter {
    * (except the start and end) and adds two new
    * dockers, on the position a and b.
    * @param {Object} edge
-   * @param {Object} a
-   * @param {Object} b
+   * @param {Array} points
    */
-  setDockers (edge, a, b) {
+  setDockers (edge, points) {
     if (!edge) return
 
     // Remove all dockers (implicit,start and end dockers will not removed)
     edge.dockers.each(function (r) {
       edge.removeDocker(r)
-    });
+    })
 
     // For a and b (if exists), create
     // a new docker and set position
-    [a, b].compact().each(function (pos) {
+    points.compact().each(function (pos) {
       let docker = edge.createDocker(undefined, pos)
       docker.bounds.centerMoveTo(pos)
     })
