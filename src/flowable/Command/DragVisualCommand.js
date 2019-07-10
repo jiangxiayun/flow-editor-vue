@@ -7,28 +7,32 @@ export default class DragVisualCommand extends ORYX_Command {
     this.newPosition = newPos
     this.oldPosition = oldPos
     this.facade = facade
-    this.shape = visual.parent
+    this.startDock = visual.segmentStartDocker
+    this.endDock = visual.segmentEndDocker
+    this.shape = this.startDock.parent
   }
   execute () {
-    this.dock(this.newDockedShape, this.newPosition)
+    this.dock(this.newPosition, this.visual.isStraightLine)
     this.removedDockers = this.shape.removeUnusedDockers()
     this.facade.updateSelection()
   }
   rollback () {
-    this.dock(this.oldDockedShape, this.oldPosition);
+    this.dock(this.oldPosition, this.visual.isStraightLine);
     (this.removedDockers || []).each(function (d) {
       this.shape.add(d.value, Number(d.key))
       this.shape._update(true)
     }.bind(this))
     this.facade.updateSelection()
   }
-  dock (startDock, endDock, pos, dir) {
+  dock (pos, dir) {
+    let a1 = this.startDock.bounds.center()
+    let a2 = this.endDock.bounds.center()
     if (dir === 'ver') {
-      this.startDock.bounds.moveBy(pos, 0)
-      this.endDock.bounds.moveBy(pos, 0)
+      this.startDock.bounds.centerMoveTo(pos, a1.y)
+      this.endDock.bounds.centerMoveTo(pos, a2.y)
     } else {
-      this.startDock.bounds.moveBy(0, pos)
-      this.endDock.bounds.moveBy(0, pos)
+      this.startDock.bounds.centerMoveTo(a1.x, pos)
+      this.endDock.bounds.centerMoveTo(a2.x, pos)
     }
     this.facade.getCanvas().update()
   }

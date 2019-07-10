@@ -879,8 +879,6 @@ export default class Edge extends Shape {
    *    The added docker
    */
   handleChildShapesAfterAddDocker (docker) {
-    console.log(778899)
-
     /* Ensure type of Docker */
     if (!(docker instanceof ORYX_Controls.Docker)) {
       return undefined

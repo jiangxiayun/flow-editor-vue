@@ -25,19 +25,9 @@ export default class DragVisual {
     // Define Variables
     this.shapeSelection = undefined
     this.visual = undefined
-    this.docker = undefined
-    this.dockerParent = undefined
-    this.dockerSource = undefined
-    this.dockerTarget = undefined
-    this.lastUIObj = undefined
     this.isStartDocker = undefined
     this.isEndDocker = undefined
     this.undockTreshold = 10
-    this.initialVisualosition = undefined
-    this.initialDockerPosition = undefined
-    this.visualMoveOffset = 0
-    this.outerDockerNotMoved = undefined
-    this.isValid = false
 
     // For the Drag and Drop
     this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this))
@@ -89,18 +79,20 @@ export default class DragVisual {
       this.facade.setSelection()
 
       this.visual = uiObj
-      this.isStraightLine = this.visual.isStraightLine
-      this.initialVisualPosition = this.isStraightLine === 'ver'?
-        this.visual.segmentStartDocker.x : this.visual.segmentStartDocker.y
       this.visualParent = uiObj.parent
       this.isStartDocker = this.visual.segmentStartDocker
       this.isEndDocker = this.visual.segmentEndDocker
+
+      this.isStraightLine = this.visual.isStraightLine
+      this.initialVisualPosition = this.isStraightLine === 'ver'?
+        this.isStartDocker.bounds.center().x : this.isStartDocker.bounds.center().y
 
       // Define command arguments
       this._commandArg = {
         visual: uiObj,
         isStraightLine: this.isStraightLine,
-        refPoint: this.initialVisualPosition
+        refStartPoint: this.isStartDocker.bounds.center(),
+        refEndPoint: this.isEndDocker.bounds.center()
       }
 
       // Show the Docker
@@ -177,19 +169,18 @@ export default class DragVisual {
     this.facade.setSelection(this.shapeSelection)
     // Hide the visual
     this.visual.hide()
-    let edge = this.visual.parent
-    if (edge) {
+
+    if (this.visualParent) {
       // Instanziate the dockCommand
       this.newRefPoint = this.isStraightLine === 'ver'?
-        this.visual.segmentStartDocker.x : this.visual.segmentStartDocker.y
+        this.isStartDocker.bounds.center().x : this.isStartDocker.bounds.center().y
       const command = new DragVisualCommand(
         this.visual,
         this.newRefPoint,
         this.initialVisualPosition,
         this.facade)
 
-      let doCommands = [command]
-      this.facade.executeCommands(doCommands)
+      this.facade.executeCommands([command])
     }
     this.visual = undefined
     this.visualParent = undefined
