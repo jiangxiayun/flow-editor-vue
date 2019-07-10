@@ -188,6 +188,7 @@
               { name: 'Plugins.HighlightingSelectedShapes' },
               { name: 'Plugins.DragDocker' },
               { name: 'Plugins.AddDocker' },
+              { name: 'Plugins.DragVisual' },
               { name: 'Plugins.SelectionFrame' },
               { name: 'Plugins.ShapeHighlighting' },
               { name: 'Plugins.Overlay' },

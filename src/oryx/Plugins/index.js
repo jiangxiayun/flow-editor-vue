@@ -15,6 +15,7 @@ import GridLine from './GridLine'
 import ShapeHighlighting from './ShapeHighlighting'
 import HighlightingSelectedShapes from './HighlightingSelectedShapes'
 import Resizer from './Resizer'
+import DragVisual from './DragVisual'
 import DragDocker from './DragDocker'
 import AddDocker from './AddDocker'
 import SelectionFrame from './SelectionFrame'
@@ -45,6 +46,7 @@ const Plugins = {
   ShapeHighlighting: ShapeHighlighting,
   HighlightingSelectedShapes: HighlightingSelectedShapes,
   Resizer: Resizer,
+  DragVisual: DragVisual,
   DragDocker: DragDocker,
   AddDocker: AddDocker,
   SelectionFrame: SelectionFrame,

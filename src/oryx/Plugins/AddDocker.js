@@ -58,6 +58,12 @@ export default class AddDocker {
         position: this.facade.eventCoordinates(event)
       })
       this.setEnableAdd(false)
+    } else if (this.enabledAdd() && uiObj instanceof ORYX_Controls.Segment) {
+      this.newDockerCommand({
+        edge: uiObj.parent,
+        position: this.facade.eventCoordinates(event)
+      })
+      this.setEnableAdd(false)
     } else if (this.enabledRemove() &&
       uiObj instanceof ORYX_Controls.Docker &&
       uiObj.parent instanceof ORYX_Edge) {

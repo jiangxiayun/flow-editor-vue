@@ -16,7 +16,7 @@ const UIDragFunction = {
     // this.uiObj.update();
 
     if (this.movedCallback) {
-      this.movedCallback(event)
+      this.movedCallback(event, position)
     }
 
     // Event.stop(event);

@@ -18,6 +18,7 @@ export default class Shape extends AbstractShape {
     this.facade = facade
     this.dockers = []
     this.magnets = []
+    this.visual = []
 
     this._defaultMagnet
 
@@ -40,7 +41,8 @@ export default class Shape extends AbstractShape {
         ],
         ['g', { 'class': 'controls' },
           ['g', { 'class': 'dockers' }],
-          ['g', { 'class': 'magnets' }]
+          ['g', { 'class': 'magnets' }],
+          ['g', { 'class': 'visual' }]
         ],
         ['g', { 'class': 'helper' }]
       ])
@@ -452,6 +454,9 @@ export default class Shape extends AbstractShape {
           } else if (uiObject instanceof ORYX_Controls.Magnet) {
             parent = ctrls.childNodes[1]
             this.magnets.push(uiObject)
+          } else if (uiObject instanceof ORYX_Controls.Segment) {
+            parent = ctrls.childNodes[2]
+            this.visual.push(uiObject)
           } else {
             parent = ctrls
           }
@@ -509,6 +514,9 @@ export default class Shape extends AbstractShape {
         } else if (uiObject instanceof ORYX_Controls.Magnet) {
           uiObject.node = this.node.childNodes[1].childNodes[1].removeChild(uiObject.node)
           this.magnets = this.magnets.without(uiObject)
+        } else if (uiObject instanceof ORYX_Controls.Segment) {
+          uiObject.node = this.node.childNodes[1].childNodes[2].removeChild(uiObject.node)
+          this.visual = this.visual.without(uiObject)
         } else {
           uiObject.node = this.node.childNodes[1].removeChild(uiObject.node)
         }

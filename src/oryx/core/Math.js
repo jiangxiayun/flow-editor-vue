@@ -27,6 +27,18 @@ const ORYX_Math = {
       y: (point1.y + point2.y) / 2.0
     }
   },
+
+  // 判断是否是水平或垂直的线条
+  isStraightLine: function (point1, point2) {
+    if (Math.abs(point1.x - point2.x) < 2) {
+      return 'ver'
+    }
+    if (Math.abs(point1.y - point2.y) < 2) {
+      return 'hor'
+    }
+    return false
+  },
+
   /**
    * Returns a TRUE if the point is over a line (defined by
    * point1 and point 2). In Addition a threshold can be set,

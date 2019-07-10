@@ -33,6 +33,7 @@ export default class Edge extends Shape {
     this._dockerUpdated = false
     this._markers = new Map() // a hash map of SVGMarker objects where keys are the marker ids
     this._paths = []
+    this.visuals = []
     this._interactionPaths = []
     this._dockersByPath = new Map()
     this._markersByPath = new Map()
@@ -596,7 +597,7 @@ export default class Edge extends Shape {
 
   refresh () {
     super.refresh()
-    //TODO consider points for marker mids
+    // TODO consider points for marker mids
     let lastPoint
     this._paths.each((path, index) => {
       let dockers = this._dockersByPath.get(path.id)
@@ -616,6 +617,9 @@ export default class Edge extends Shape {
         d = d + 'L' + c.x + ' ' + c.y + ' '
         lastPoint = c
       }
+
+      // 添加连线平移辅助
+      this.addSegmentVisual(dockers)
 
       path.setAttributeNS(null, 'd', d)
       this._interactionPaths[index].setAttributeNS(null, 'd', d)
@@ -833,6 +837,40 @@ export default class Edge extends Shape {
     }
   }
 
+
+  addSegmentVisual (dockers) {
+    this.removeSegmentVisual()
+    for (let i = 1; i < dockers.length - 2; i++) {
+      let docker1 = dockers[i]
+      let docker2 = dockers[i + 1]
+      let point1 = docker1.bounds.center()
+      let point2 = docker2.bounds.center()
+
+      let isStraightLine = ORYX_Math.isStraightLine(point1, point2)
+      if (!isStraightLine) {
+        continue
+      }
+      if ((isStraightLine === 'ver' && Math.abs(point1.y - point2.y) > 4) ||
+        (isStraightLine === 'hor' && Math.abs(point1.x - point2.x) > 4)) {
+        let visual = new ORYX_Controls.Segment({
+          point1,
+          point2,
+          docker1,
+          docker2,
+          eventHandlerCallback: this.eventHandlerCallback
+        })
+        // visual.bounds.centerMoveTo(x, y)
+        // visual.bounds.registerCallback(this._dockerChangedCallback)
+        this.visuals.push(visual)
+        this.add(visual)
+      }
+    }
+  }
+
+  removeSegmentVisual  (visual) {
+    this.visuals.map(visual => this.remove(visual))
+    this.visuals = []
+  }
   /**
    * Performs nessary adjustments on the edge's child shapes.
    * 对edge的子元素执行必要的调整。
@@ -841,6 +879,8 @@ export default class Edge extends Shape {
    *    The added docker
    */
   handleChildShapesAfterAddDocker (docker) {
+    console.log(778899)
+
     /* Ensure type of Docker */
     if (!(docker instanceof ORYX_Controls.Docker)) {
       return undefined

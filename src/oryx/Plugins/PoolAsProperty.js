@@ -71,7 +71,6 @@ export default class PoolAsProperty extends AbstractPlugin {
   }
 
   handleShapeRemove (option) {
-    console.log('handleShapeRemove', option)
     let sh = option.shape
     if (sh instanceof ORYX_Node) {
       let type = sh.getStencil().idWithoutNs()
