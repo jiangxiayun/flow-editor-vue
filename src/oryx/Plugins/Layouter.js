@@ -17,6 +17,7 @@ class EdgeLayouter extends AbstractLayouter {
     'http://b3mn.org/stencilset/jbpm4#SequenceFlow',
     'http://b3mn.org/stencilset/bpmn2.0#MessageFlow',
     'http://b3mn.org/stencilset/bpmn2.0#SequenceFlow',
+    'http://b3mn.org/stencilset/bpmn2.0#Association',
     'http://b3mn.org/stencilset/bpmn2.0choreography#MessageFlow',
     'http://b3mn.org/stencilset/bpmn2.0choreography#SequenceFlow',
     'http://b3mn.org/stencilset/bpmn2.0conversation#ConversationLink',
@@ -386,7 +387,6 @@ class EdgeLayouter extends AbstractLayouter {
     })
 
     // Update edge
-    // edge.refresh();
     edge._update(true)
   }
 }

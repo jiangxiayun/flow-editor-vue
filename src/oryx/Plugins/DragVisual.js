@@ -137,7 +137,6 @@ export default class DragVisual {
           center.y - dockerCenter.y : nearestY
 
       }).bind(this))
-
       if (Math.abs(nearestX) < minOffset || Math.abs(nearestY) < minOffset) {
         nearestX = Math.abs(nearestX) < minOffset ? nearestX : 0
         nearestY = Math.abs(nearestY) < minOffset ? nearestY : 0

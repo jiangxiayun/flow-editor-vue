@@ -33,7 +33,7 @@ export default class Edge extends Shape {
     this._dockerUpdated = false
     this._markers = new Map() // a hash map of SVGMarker objects where keys are the marker ids
     this._paths = []
-    this.visuals = []
+    this.visualDockerMap = {}
     this._interactionPaths = []
     this._dockersByPath = new Map()
     this._markersByPath = new Map()
@@ -260,6 +260,7 @@ export default class Edge extends Shape {
       // 更新 dockers 的 bounds
       // this.dockers.invoke('update')
       this.dockers.map(docker => docker.update())
+      this.visuals.map(visual => visual.refresh())
 
       // if (false && (this.bounds.width() === 0 || this.bounds.height() === 0)) {
       //   let width = this.bounds.width()
@@ -618,9 +619,6 @@ export default class Edge extends Shape {
         lastPoint = c
       }
 
-      // 添加连线平移辅助
-      this.addSegmentVisual(dockers)
-
       path.setAttributeNS(null, 'd', d)
       this._interactionPaths[index].setAttributeNS(null, 'd', d)
     })
@@ -631,6 +629,8 @@ export default class Edge extends Shape {
       let y = this.bounds.upperLeft().y
       this.node.firstChild.childNodes[1].setAttributeNS(null, 'transform', 'translate(' + x + ', ' + y + ')')
     }
+
+    this.refreshSegmentVisual()
   }
 
   add (shape, index) {
@@ -645,6 +645,7 @@ export default class Edge extends Shape {
 
       /* Perform nessary adjustments on the edge's child shapes */
       this.handleChildShapesAfterAddDocker(shape)
+      this.addSegmentVisual()
     }
   }
 
@@ -661,6 +662,21 @@ export default class Edge extends Shape {
     /* Adjust child shapes if neccessary */
     if (shape instanceof ORYX_Controls.Docker) {
       this.handleChildShapesAfterRemoveDocker(shape)
+
+      // 更新 Visual  refreshSegmentVisual
+      let index = this.dockers.indexOf(shape)
+      let visual = this.visualDockerMap[shape.id]
+      if (visual) {
+        this.removeOneSegmentVisual(visual.visual)
+      }
+      if (index > 1) {
+        let preDocker = this.dockers[index -1]
+        visual = this.visualDockerMap[preDocker.id]
+        if (visual) {
+          this.removeOneSegmentVisual(visual.visual)
+        }
+      }
+      this.refreshSegmentVisual()
     }
   }
 
@@ -837,39 +853,58 @@ export default class Edge extends Shape {
     }
   }
 
-
-  addSegmentVisual (dockers) {
+  refreshSegmentVisual () {
+    for (let i = 1; i < this.dockers.length - 2; i++) {
+      let docker1 = this.dockers[i]
+      let docker2 = this.dockers[i + 1]
+      let old = this.visualDockerMap[docker1.id]
+      if (!old || (old && old.end !== docker2.id)) {
+        this.createSegmentVisual(docker1, docker2)
+      }
+    }
+  }
+  addSegmentVisual () {
+    const dockers = this.dockers
     this.removeSegmentVisual()
     for (let i = 1; i < dockers.length - 2; i++) {
       let docker1 = dockers[i]
       let docker2 = dockers[i + 1]
-      let point1 = docker1.bounds.center()
-      let point2 = docker2.bounds.center()
+      this.createSegmentVisual(docker1, docker2)
+    }
+  }
+  createSegmentVisual (docker1, docker2) {
+    let point1 = docker1.bounds.center()
+    let point2 = docker2.bounds.center()
 
-      let isStraightLine = ORYX_Math.isStraightLine(point1, point2)
-      if (!isStraightLine) {
-        continue
-      }
-      if ((isStraightLine === 'ver' && Math.abs(point1.y - point2.y) > 4) ||
-        (isStraightLine === 'hor' && Math.abs(point1.x - point2.x) > 4)) {
-        let visual = new ORYX_Controls.Segment({
-          point1,
-          point2,
-          docker1,
-          docker2,
-          eventHandlerCallback: this.eventHandlerCallback
-        })
-        // visual.bounds.centerMoveTo(x, y)
-        // visual.bounds.registerCallback(this._dockerChangedCallback)
-        this.visuals.push(visual)
-        this.add(visual)
+    let isStraightLine = ORYX_Math.isStraightLine(point1, point2)
+    if (!isStraightLine) {
+      return
+    }
+    if ((isStraightLine === 'ver' && Math.abs(point1.y - point2.y) > 4) ||
+      (isStraightLine === 'hor' && Math.abs(point1.x - point2.x) > 4)) {
+      let visual = new ORYX_Controls.Segment({
+        point1,
+        point2,
+        docker1,
+        docker2,
+        eventHandlerCallback: this.eventHandlerCallback
+      })
+      // visual.bounds.centerMoveTo(x, y)
+      // visual.bounds.registerCallback(this._dockerChangedCallback)
+      this.add(visual)
+      this.visualDockerMap[docker1.id] = {
+        start: docker1.id,
+        end: docker2.id,
+        visual: visual
       }
     }
   }
-
-  removeSegmentVisual  (visual) {
+  removeOneSegmentVisual (visual) {
+    this.remove(visual)
+    delete this.visualDockerMap[visual.id]
+  }
+  removeSegmentVisual  () {
     this.visuals.map(visual => this.remove(visual))
-    this.visuals = []
   }
   /**
    * Performs nessary adjustments on the edge's child shapes.

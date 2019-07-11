@@ -26,32 +26,39 @@ export default class Segment extends Control {
     let bound = {}
     if (this.isStraightLine === 'ver') {
       bound = {
-        a: point1.x -2,
-        b: point1.y < point2.y ?  point1.y + 4 : point2.y + 4,
-        width: 4,
-        height: Math.abs(point1.y - point2.y) - 8,
+        // a: point1.x -2,
+        // b: point1.y < point2.y ?  point1.y + 4 : point2.y + 4,
+        // width: 4,
+        // height: Math.abs(point1.y - point2.y) - 8,
         cursor: 'ew-resize'
       }
     } else if (this.isStraightLine === 'hor') {
       bound = {
-        a: point1.x < point2.x ?  point1.x + 4 : point2.x + 4,
-        b: point1.y - 2,
-        width: Math.abs(point1.x - point2.x) - 8,
-        height: 4,
+        // a: point1.x < point2.x ?  point1.x + 4 : point2.x + 4,
+        // b: point1.y - 2,
+        // width: Math.abs(point1.x - point2.x) - 8,
+        // height: 4,
         cursor: 'ns-resize'
       }
     }
 
     // Set the bounds
-    this.bounds.set(bound.a, bound.b, bound.a + bound.width, bound.b + bound.height)
+    this.bounds.set(0, 0, 10, 10)
 
     // The DockerNode reprasentation
+    // this._dockerNode = ORYX_Utils.graft('http://www.w3.org/2000/svg',
+    //   this.node,
+    //   ['g', { 'pointer-events': 'visible' },
+    //     ['rect', { x: bound.a, y: bound.b - 3, width: bound.width, height: bound.height + 6,
+    //       stroke: 'none', fill: 'none' }],
+    //     ['rect', { x: bound.a, y: bound.b, width: bound.width, height: bound.height,
+    //       stroke: 'black', fill: '#ffff79', 'stroke-width': '1', style: `cursor:${bound.cursor}` }]
+    //   ])
+
     this._dockerNode = ORYX_Utils.graft('http://www.w3.org/2000/svg',
       this.node,
       ['g', { 'pointer-events': 'visible' },
-        ['rect', { x: bound.a, y: bound.b - 3, width: bound.width, height: bound.height + 6,
-          stroke: 'none', fill: 'none' }],
-        ['rect', { x: bound.a, y: bound.b, width: bound.width, height: bound.height,
+        ['rect', { x: 0, y: 0, width: 10, height: 10,
           stroke: 'black', fill: '#ffff79', 'stroke-width': '1', style: `cursor:${bound.cursor}` }]
       ])
     this.hide()
@@ -68,9 +75,44 @@ export default class Segment extends Control {
    */
   refresh () {
     super.refresh()
-    // Refresh the dockers node
-    let p = this.bounds.upperLeft()
-    this._dockerNode.setAttributeNS(null, 'transform', 'translate(' + p.x + ', ' + p.y + ')')
+    let bound = {}
+    let point1 = this.segmentStartDocker.bounds.center()
+    let point2 = this.segmentEndDocker.bounds.center()
+    let smallThenminSize = true
+    if (this.isStraightLine === 'ver') {
+      bound = {
+        a: point1.x -2,
+        b: point1.y < point2.y ?  point1.y + 4 : point2.y + 4,
+        width: 4,
+        height: Math.abs(point1.y - point2.y) - 8,
+        mid: {x: point1.x, y: bound.b + bound.height / 2}
+      }
+      if (bound.height > 4) smallThenminSize = false
+    } else if (this.isStraightLine === 'hor') {
+      bound = {
+        a: point1.x < point2.x ?  point1.x + 4 : point2.x + 4,
+        b: point1.y - 2,
+        width: Math.abs(point1.x - point2.x) - 8,
+        height: 4,
+        mid: {x: bound.a + bound.width / 2, y: point1.y}
+      }
+      if (bound.width > 4) smallThenminSize = false
+    }
+    // let p = this.bounds.upperLeft()
+    // this._dockerNode.setAttributeNS(null, 'transform', 'translate(' + p.x + ', ' + p.y + ')')
+
+    if (!smallThenminSize) {
+      this._dockerNode.setAttributeNS(null, 'display', 'unset')
+      let rect = this._dockerNode.getElementsByTagName('rect')
+      this._dockerNode.setAttributeNS(null, 'transform', 'translate(' + bound.a + ', ' + bound.b + ')')
+      rect[0].setAttributeNS(null, 'width', bound.width)
+      rect[0].setAttributeNS(null, 'height', bound.height)
+      // Set the bounds to the new point
+      this.bounds.centerMoveTo(bound.mid.x, bound.mid.y)
+    } else {
+      this._dockerNode.setAttributeNS(null, 'display', 'none')
+    }
+    // console.log(1, this.isStraightLine, this.segmentStartDocker, this.segmentEndDocker,  bound.height)
   }
 
   /**

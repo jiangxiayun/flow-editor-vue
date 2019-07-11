@@ -701,6 +701,9 @@ export default class Editor {
    * @param {String} model.resourceId
    * @return {ORYX.Core.Shape[]} List of created shapes
    * @methodOf ORYX.Editor.prototype
+   *
+   *
+   * 渲染画布已有元素
    */
   loadSerialized (model, requestMeta) {
     let canvas = this.getCanvas()

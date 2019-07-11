@@ -26,9 +26,9 @@ const UIDragFunction = {
     document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.dragCallback, false)
     document.documentElement.removeEventListener(ORYX_Config.EVENT_MOUSEUP, this.disableCallback, true)
 
-    if (this.upCallback)
+    if (this.upCallback) {
       this.upCallback(event)
-
+    }
     this.upCallback = undefined
     this.movedCallback = undefined
 

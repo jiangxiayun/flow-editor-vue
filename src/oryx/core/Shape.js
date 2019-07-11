@@ -18,7 +18,7 @@ export default class Shape extends AbstractShape {
     this.facade = facade
     this.dockers = []
     this.magnets = []
-    this.visual = []
+    this.visuals = []
 
     this._defaultMagnet
 
@@ -456,7 +456,7 @@ export default class Shape extends AbstractShape {
             this.magnets.push(uiObject)
           } else if (uiObject instanceof ORYX_Controls.Segment) {
             parent = ctrls.childNodes[2]
-            this.visual.push(uiObject)
+            this.visuals.push(uiObject)
           } else {
             parent = ctrls
           }
@@ -516,7 +516,7 @@ export default class Shape extends AbstractShape {
           this.magnets = this.magnets.without(uiObject)
         } else if (uiObject instanceof ORYX_Controls.Segment) {
           uiObject.node = this.node.childNodes[1].childNodes[2].removeChild(uiObject.node)
-          this.visual = this.visual.without(uiObject)
+          this.visuals = this.visuals.without(uiObject)
         } else {
           uiObject.node = this.node.childNodes[1].removeChild(uiObject.node)
         }

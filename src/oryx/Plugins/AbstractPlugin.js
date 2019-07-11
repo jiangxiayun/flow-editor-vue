@@ -349,7 +349,6 @@ export default class AbstractPlugin {
    * @param {Array} edges
    */
   layoutEdges (node, allEdges, offset) {
-    console.log(233, node, allEdges, offset)
     if (!this.facade.isExecutingCommands()) {
       return
     }
