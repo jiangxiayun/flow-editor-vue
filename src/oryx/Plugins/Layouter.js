@@ -48,6 +48,7 @@ class EdgeLayouter extends AbstractLayouter {
    * @param {Object} edge
    */
   doLayout (edge) {
+    console.log(789)
     // Get from and to node
     let from = edge.getIncomingNodes()[0]
     let to = edge.getOutgoingNodes()[0]
@@ -367,6 +368,7 @@ class EdgeLayouter extends AbstractLayouter {
    * @param {Array} points
    */
   setDockers (edge, points) {
+    console.log(8888890)
     if (!edge) return
 
     // Remove all dockers (implicit,start and end dockers will not removed)

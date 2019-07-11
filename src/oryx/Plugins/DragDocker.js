@@ -300,7 +300,6 @@ export default class DragDocker {
         }
       }
     }
-    let parentDockers = this.docker.parent.dockers
     // Snap to on the nearest Docker of the same parent
     if (!(event.shiftKey || event.ctrlKey) && !snapToMagnet) {
       let minOffset = ORYX_Config.DOCKER_SNAP_OFFSET
@@ -309,6 +308,7 @@ export default class DragDocker {
       let dockerCenter = this.docker.bounds.center()
 
       if (this.docker.parent) {
+        let parentDockers = this.docker.parent.dockers
         parentDockers.each((function (docker) {
           if (this.docker == docker) {
             return
@@ -416,7 +416,6 @@ export default class DragDocker {
       let edge = this.docker.parent
       if (edge) {
         // Instanziate the dockCommand
-        console.log(88888)
         let dockedShape = this.docker.getDockedShape()
         let newRefPoint = dockedShape ? this.docker.referencePoint : this.docker.bounds.center()
         let oldRefPoint = this._commandArg.refPoint
@@ -434,7 +433,7 @@ export default class DragDocker {
             x: newRefPoint.x - oldRefPoint.x,
             y: newRefPoint.y - oldRefPoint.y
           }
-          console.log(3333, edge, dockedShape, offset)
+          // console.log(3333, edge, dockedShape, offset)
           this.edgeLayoutByDragDocker = true // 标记行为，若移动dockers,重新计算连线
           const edgeLayout = new layoutEdgesCommand([edge], dockedShape, offset, this)
           doCommands.push(edgeLayout)

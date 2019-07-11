@@ -664,18 +664,13 @@ export default class Edge extends Shape {
       this.handleChildShapesAfterRemoveDocker(shape)
 
       // 更新 Visual  refreshSegmentVisual
-      let index = this.dockers.indexOf(shape)
-      let visual = this.visualDockerMap[shape.id]
-      if (visual) {
-        this.removeOneSegmentVisual(visual.visual)
-      }
-      if (index > 1) {
-        let preDocker = this.dockers[index -1]
-        visual = this.visualDockerMap[preDocker.id]
-        if (visual) {
-          this.removeOneSegmentVisual(visual.visual)
+      let visualAry = []
+      for (let key in this.visualDockerMap) {
+        if (key === shape.id || this.visualDockerMap[key].end === shape.id) {
+          visualAry.push(this.visualDockerMap[key])
         }
       }
+      visualAry.map(item => this.removeOneSegmentVisual(item.visual, item.start))
       this.refreshSegmentVisual()
     }
   }
@@ -858,7 +853,11 @@ export default class Edge extends Shape {
       let docker1 = this.dockers[i]
       let docker2 = this.dockers[i + 1]
       let old = this.visualDockerMap[docker1.id]
-      if (!old || (old && old.end !== docker2.id)) {
+      if (!old) {
+        this.createSegmentVisual(docker1, docker2)
+      } else if (old.end !== docker2.id ||
+        !ORYX_Math.isStraightLine(docker1.bounds.center(), docker2.bounds.center())) {
+        this.removeOneSegmentVisual(old.visual, docker1.id)
         this.createSegmentVisual(docker1, docker2)
       }
     }
@@ -899,12 +898,13 @@ export default class Edge extends Shape {
       }
     }
   }
-  removeOneSegmentVisual (visual) {
+  removeOneSegmentVisual (visual, id) {
     this.remove(visual)
-    delete this.visualDockerMap[visual.id]
+    delete this.visualDockerMap[id]
   }
   removeSegmentVisual  () {
     this.visuals.map(visual => this.remove(visual))
+    this.visualDockerMap = {}
   }
   /**
    * Performs nessary adjustments on the edge's child shapes.
