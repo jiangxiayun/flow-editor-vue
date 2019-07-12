@@ -101,6 +101,7 @@ export default class RenameShapes {
     // Get the center position from the nearest label
     // let width = Math.min(Math.max(100, shape.bounds.width()), 200)
     let width = Math.min(Math.max(100, shape.bounds.width()), 200)
+    console.log('223', nearestLabel.node, shape)
     let center = this.getCenterPosition(nearestLabel.node, shape)
     console.log('center', center)
     center.x -= (width / 2)
@@ -113,7 +114,6 @@ export default class RenameShapes {
     textInput.style.left = (center.x < 10) ? 10 : center.x + 'px'
     textInput.style.top = (center.y - 15) + 'px'
     textInput.style.fontSize = '12px'
-    textInput.className = 'x-form-textarea x-form-field x_form_text_set_absolute'
     textInput.value = shape.properties.get(propId)
     this.oldValueText = shape.properties.get(propId)
     document.getElementById('canvasSection').appendChild(textInput)
@@ -211,8 +211,8 @@ export default class RenameShapes {
         if (rects[i].getAttributeNS(null, 'id') === shape.id + fittoelem) {
           ClientRect = rects[i].getBoundingClientRect()
           center = {
-            x: ClientRect.x + ClientRect.width / 2,
-            y: ClientRect.y + ClientRect.height / 2
+            x: ClientRect.left + ClientRect.width / 2,
+            y: ClientRect.top + ClientRect.height / 2
           }
           // console.log(66, center)
           fittoelemSign = true
@@ -242,37 +242,26 @@ export default class RenameShapes {
       center.x *= scale.a
       center.y *= scale.d
     }
-
-    let additionalIEZoom = 1
-    if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
-      let ua = navigator.userAgent
-      if (ua.indexOf('MSIE') >= 0) {
-        // IE 10 and below
-        let zoom = Math.round((screen.deviceXDPI / screen.logicalXDPI) * 100)
-        if (zoom !== 100) {
-          additionalIEZoom = zoom / 100
-        }
-      }
-    }
+    let additionalIEZoom = ORYX_Utils.IEZoomBelow10(1)
+    const canvasSection = jQuery('#canvasSection')
+    const canvasSectionOffset = canvasSection.offset()
 
     if (additionalIEZoom === 1) {
-      center.y = center.y - jQuery('#canvasSection').offset().top + 5
-      center.x -= jQuery('#canvasSection').offset().left
+      center.y = center.y - canvasSectionOffset.top + 5
+      center.x -= canvasSectionOffset.left
     } else {
-      let canvasOffsetLeft = jQuery('#canvasSection').offset().left
-      let canvasScrollLeft = jQuery('#canvasSection').scrollLeft()
-      let canvasScrollTop = jQuery('#canvasSection').scrollTop()
+      let canvasOffsetLeft = canvasSectionOffset.left
+      let canvasScrollLeft = canvasSection.scrollLeft()
+      let canvasScrollTop = canvasSection.scrollTop()
 
       let offset = scale.e - (canvasOffsetLeft * additionalIEZoom)
       let additionaloffset = 0
       if (offset > 10) {
         additionaloffset = (offset / additionalIEZoom) - offset
       }
-      center.y = center.y - (jQuery('#canvasSection').offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop)
+      center.y = center.y - (canvasSectionOffset.top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop)
       center.x = center.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft)
     }
-
-    console.log(svgNode, center)
     return center
   }
 
