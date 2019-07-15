@@ -64,7 +64,7 @@ export default class Segment extends Control {
           stroke: '#fff', fill: '#49924e', 'stroke-width': '3', style: `cursor:${bound.cursor}` }]
       ])
 
-    // this.hide()
+    this.hide()
     this.addEventHandlers(this._dockerNode)
 
     // Buffer the Update Callback for un-/register on Event-Handler
