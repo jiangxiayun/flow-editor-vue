@@ -291,7 +291,7 @@ export default class Label {
     try {
       try {
         let width, cn = this.node.childNodes
-        if (cn.length == 0) {
+        if (cn.length === 0) {
           width = this.node.getBBox().width
         } else {
           for (let i = 0, size = cn.length; i < size; ++i) {
@@ -591,7 +591,7 @@ export default class Label {
               if (sslength > refBoxLength - 2) {
                 let newtspan = this.node.ownerDocument.createElementNS(ORYX_CONFIG.NAMESPACE_SVG, 'tspan')
                 if (lastSeperatorIndex <= startIndex) {
-                  lastSeperatorIndex = (i == 0) ? i : i - 1
+                  lastSeperatorIndex = (i === 0) ? i : i - 1
                   newtspan.textContent = tspan.textContent.slice(startIndex, lastSeperatorIndex).trim()
                   // lastSeperatorIndex = i;
                 } else {

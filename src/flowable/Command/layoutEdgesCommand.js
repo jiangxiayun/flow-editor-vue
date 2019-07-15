@@ -58,8 +58,10 @@ export default class layoutEdgesCommand extends ORYX_Command {
           this.plugin.doLayout(edge)
           return
         }
-        if (edge.isBoundsIncluded(firstDockedShape.bounds)
-          || edge.isBoundsIncluded(lastDockedShape.bounds)) {
+        // console.log(1, firstDockedShape)
+        // console.log(2, lastDockedShape)
+        if ((firstDockedShape && edge.isBoundsIncluded(firstDockedShape.bounds))
+          || (lastDockedShape && edge.isBoundsIncluded(lastDockedShape.bounds))) {
           console.log('BoundsIncluded')
           this.plugin.doLayout(edge)
           return

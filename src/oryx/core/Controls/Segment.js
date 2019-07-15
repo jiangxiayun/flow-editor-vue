@@ -58,10 +58,13 @@ export default class Segment extends Control {
     this._dockerNode = ORYX_Utils.graft('http://www.w3.org/2000/svg',
       this.node,
       ['g', { 'pointer-events': 'visible' },
-        ['rect', { x: 0, y: 0, width: 10, height: 10,
-          stroke: 'black', fill: '#ffff79', 'stroke-width': '1', style: `cursor:${bound.cursor}` }]
+        // ['rect', { x: 0, y: 0, width: 10, height: 10,
+        //   stroke: 'black', fill: 'red', 'stroke-width': '1', style: `cursor:${bound.cursor}` }],
+        ['rect', { x: 0, y: 0, width: 1, height: 1,
+          stroke: '#fff', fill: '#49924e', 'stroke-width': '3', style: `cursor:${bound.cursor}` }]
       ])
-    this.hide()
+
+    // this.hide()
     this.addEventHandlers(this._dockerNode)
 
     // Buffer the Update Callback for un-/register on Event-Handler
@@ -81,9 +84,9 @@ export default class Segment extends Control {
     let smallThenminSize = true
     if (this.isStraightLine === 'ver') {
       bound = {
-        a: point1.x -2,
+        a: point1.x - 3,
         b: point1.y < point2.y ?  point1.y + 4 : point2.y + 4,
-        width: 4,
+        width: 6,
         height: Math.abs(point1.y - point2.y) - 8,
         mid: {x: point1.x, y: bound.b + bound.height / 2}
       }
@@ -91,9 +94,9 @@ export default class Segment extends Control {
     } else if (this.isStraightLine === 'hor') {
       bound = {
         a: point1.x < point2.x ?  point1.x + 4 : point2.x + 4,
-        b: point1.y - 2,
+        b: point1.y - 3,
         width: Math.abs(point1.x - point2.x) - 8,
-        height: 4,
+        height: 6,
         mid: {x: bound.a + bound.width / 2, y: point1.y}
       }
       if (bound.width > 4) smallThenminSize = false
@@ -107,6 +110,8 @@ export default class Segment extends Control {
       this._dockerNode.setAttributeNS(null, 'transform', 'translate(' + bound.a + ', ' + bound.b + ')')
       rect[0].setAttributeNS(null, 'width', bound.width)
       rect[0].setAttributeNS(null, 'height', bound.height)
+      // rect[1].setAttributeNS(null, 'width', bound.width)
+      // rect[1].setAttributeNS(null, 'height', bound.height)
       // Set the bounds to the new point
       this.bounds.centerMoveTo(bound.mid.x, bound.mid.y)
     } else {

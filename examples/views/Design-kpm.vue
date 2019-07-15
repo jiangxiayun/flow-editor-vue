@@ -111,6 +111,7 @@
   import FLOW_eventBus from 'src/flowable/FLOW_eventBus'
   import configure from './initConfig'
   import EndFlowPlugin from './customPlugin'
+  // import HoverPlugin from './hoverDialog'
   import refActivity from '@/components/flow/ref_task'
   import activityTabsEdit from '@/components/flow/edit_task'
   const flowSaveData = localStorage.getItem('flowSaveData')
@@ -197,7 +198,8 @@
               { name: 'Plugins.BPMN2_0' },
               { name: 'Plugins.RenameShapes' },
               { name: 'Plugins.PoolAsProperty' },
-              { name: 'EndFlowPlugin', plugin: EndFlowPlugin, type: 'custom' }
+              { name: 'EndFlowPlugin', plugin: EndFlowPlugin, type: 'custom' },
+              // { name: 'HoverPlugin', plugin: HoverPlugin, type: 'custom' }
             ]
           },
           editorConfigs: configure
