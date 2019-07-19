@@ -4,6 +4,19 @@ export const AA = {
   'description': 'BPMN process editor',
   'propertyPackages': [
     {
+      'name': 'canDblClickEditpackage',
+      'properties': [
+        {
+          'id': 'canDblClickEdit',
+          'type': 'Boolean',
+          'title': '是否可双击编辑',
+          'value': 'false',
+          'description': '用于某些特殊条件下置为不可双击编辑状态',
+          'popular': true
+        }
+      ]
+    },
+    {
       'name': 'rolemappackage',
       'properties': [
         {

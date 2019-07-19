@@ -517,7 +517,7 @@ export default class Label {
           if (this.fitToElemId || this._textHasChanged) {
             this.node.textContent = '' // Remove content
             textLines.each((function (textLine, index) {
-              console.log(2, textLine)
+              // console.log(2, textLine)
               let tspan = this.node.ownerDocument.createElementNS(ORYX_CONFIG.NAMESPACE_SVG, 'tspan')
               tspan.textContent = textLine.trim()
               if (this.fitToElemId) {
@@ -532,7 +532,6 @@ export default class Label {
                 tspan.textContent = ' '
               }
               // append tspan to text node
-              console.log(5, tspan)
 
               this.node.appendChild(tspan)
             }).bind(this))

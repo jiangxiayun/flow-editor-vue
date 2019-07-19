@@ -35,6 +35,10 @@ export default class RenameShapes {
     if (!(shape instanceof ORYX_Shape)) {
       return
     }
+    if (shape.properties.get('canDblClickEdit') === false ||
+      shape.properties.get('canDblClickEdit') === 'false') {
+      return
+    }
 
     // Destroys the old input, if there is one
     this.destroy()
@@ -101,9 +105,9 @@ export default class RenameShapes {
     // Get the center position from the nearest label
     // let width = Math.min(Math.max(100, shape.bounds.width()), 200)
     let width = Math.min(Math.max(100, shape.bounds.width()), 200)
-    console.log('223', nearestLabel.node, shape)
+    // console.log('223', nearestLabel.node, shape)
     let center = this.getCenterPosition(nearestLabel.node, shape)
-    console.log('center', center)
+    // console.log('center', center)
     center.x -= (width / 2)
     // let propId = prop.prefix() + '-' + prop.id()
     let propId = prop.id()
@@ -145,10 +149,6 @@ export default class RenameShapes {
     if (oldValue != newValue) {
       // Instantiated the class
       const command = new SetPropertyCommand(this.propId, oldValue, newValue, this.currentShape, this.facade)
-      if (type === 'TextArea') {
-        // 自动更新文本框的高度
-        console.log(33, newValue, this.shownTextField.style.height, this.currentShape.bounds.height())
-      }
       // Execute the command
       this.facade.executeCommands([command])
       this.facade.raiseEvent({
@@ -172,7 +172,6 @@ export default class RenameShapes {
     let bbox = svgNode.getBBox()
     let center = {}
     if (bbox.x || bbox.width) {
-      console.log(34, bbox, scale)
       center = {
         x: absoluteXY.x + bbox.x + bbox.width / 2,
         y: absoluteXY.y + bbox.y + bbox.height / 2
