@@ -78,7 +78,7 @@ export default class Edge extends Shape {
         try {
           marker = new ORYX_SVG.SVGMarker(markerElement.cloneNode(true))
           me._markers.set(marker.id, marker)
-          let textElements =  Array.from(marker.element.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text'))
+          let textElements = Array.from(marker.element.getElementsByTagNameNS(ORYX_Config.NAMESPACE_SVG, 'text'))
           textElements.each(function (textElement) {
             let label = new ORYX_SVG.Label({
               textElement: textElement,
@@ -86,7 +86,8 @@ export default class Edge extends Shape {
             })
             me._labels.set(label.id, label)
           })
-        } catch (e) {}
+        } catch (e) {
+        }
       })
     }
 
@@ -293,7 +294,6 @@ export default class Edge extends Shape {
         // set the new bounds to the docker
         if (!this._dockerUpdated) {
           docker.bounds.moveBy(diffX, diffY)
-
           if (diffWidth !== 1 || diffHeight !== 1) {
             let relX = docker.bounds.upperLeft().x - upL.x
             let relY = docker.bounds.upperLeft().y - upL.y
@@ -462,34 +462,44 @@ export default class Edge extends Shape {
               let pos2 = this.dockers[numOfDockers / 2].bounds.center()
               let pos = { x: (pos1.x + pos2.x) / 2.0, y: (pos1.y + pos2.y) / 2.0 }
 
-              label.horizontalAlign('center')
-              label.verticalAlign('bottom')
-              label.x = pos.x
+              // label.horizontalAlign('center')
+              label.horizontalAlign('left')
+              label.verticalAlign('middle')
+              label.x = pos.x + 5
               label.y = pos.y - label.getOffsetTop()
-
-              if (angle <= 90 || angle > 270) {
-                label.rotate(360 - angle, pos)
-              } else {
-                label.rotate(180 - angle, pos)
-              }
+              // if (angle <= 90 || angle > 270) {
+              //   label.rotate(360 - angle, pos)
+              // } else {
+              //   label.rotate(180 - angle, pos)
+              // }
             } else {
               index = parseInt(numOfDockers / 2)
               angle = this._getAngle(this.dockers[index], this.dockers[index + 1])
               pos = this.dockers[index].bounds.center()
 
-              if (angle <= 90 || angle > 270) {
-                label.horizontalAlign('left')
-                label.verticalAlign('bottom')
-                label.x = pos.x + label.getOffsetTop()
-                label.y = pos.y - label.getOffsetTop()
-                label.rotate(360 - angle, pos)
-              } else {
-                label.horizontalAlign('right')
-                label.verticalAlign('bottom')
-                label.x = pos.x - label.getOffsetTop()
-                label.y = pos.y - label.getOffsetTop()
-                label.rotate(180 - angle, pos)
-              }
+              let pos2 = this.dockers[index + 1].bounds.center()
+              label.horizontalAlign('left')
+              label.verticalAlign('bottom')
+              label.x = pos.x + label.getOffsetTop()
+              label.y = (pos.y + pos2.y) / 2 - label.getOffsetTop()
+
+              // console.log(567, label, angle)
+              // label.rotate(180 - angle, pos)
+              // if (angle <= 90 || angle > 270) {
+              //   label.horizontalAlign('left')
+              //   label.verticalAlign('bottom')
+              //   label.x = pos.x + label.getOffsetTop()
+              //   label.y = pos.y - label.getOffsetTop()
+              //   label.rotate(360 - angle, pos)
+              // } else {
+              //   label.horizontalAlign('right')
+              //   label.verticalAlign('bottom')
+              //   label.x = pos.x - label.getOffsetTop()
+              //   let pos2 = this.dockers[index + 1].bounds.center()
+              //   console.log(567, pos, pos2)
+              //   label.y = pos.y - label.getOffsetTop()
+              //   label.rotate(180 - angle, pos)
+              // }
             }
 
             break
@@ -753,7 +763,7 @@ export default class Edge extends Shape {
     let marked = new Hash()
 
     this.dockers.each(function (docker, i) {
-      if (i == 0 || i == this.dockers.length - 1) {
+      if (i === 0 || i === this.dockers.length - 1) {
         return
       }
       let previous = this.dockers[i - 1]
@@ -768,7 +778,7 @@ export default class Edge extends Shape {
       let cn = next.getDockedShape() && next.referencePoint ? next.getAbsoluteReferencePoint() : next.bounds.center()
       let cd = docker.bounds.center()
 
-      if (ORYX_Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)) {
+      if (ORYX_Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, ORYX_Config.CustomConfigs.UI_CONFIG.PX_OFFSET)) {
         marked.set(i, docker)
       }
     }.bind(this))
@@ -862,6 +872,7 @@ export default class Edge extends Shape {
       }
     }
   }
+
   addSegmentVisual () {
     const dockers = this.dockers
     this.removeSegmentVisual()
@@ -871,6 +882,7 @@ export default class Edge extends Shape {
       this.createSegmentVisual(docker1, docker2)
     }
   }
+
   createSegmentVisual (docker1, docker2) {
     let point1 = docker1.bounds.center()
     let point2 = docker2.bounds.center()
@@ -898,14 +910,17 @@ export default class Edge extends Shape {
       }
     }
   }
+
   removeOneSegmentVisual (visual, id) {
     this.remove(visual)
     delete this.visualDockerMap[id]
   }
-  removeSegmentVisual  () {
+
+  removeSegmentVisual () {
     this.visuals.map(visual => this.remove(visual))
     this.visualDockerMap = {}
   }
+
   /**
    * Performs nessary adjustments on the edge's child shapes.
    * 对edge的子元素执行必要的调整。
@@ -1496,7 +1511,6 @@ export default class Edge extends Shape {
   _getAngle (docker1, docker2) {
     let p1 = docker1 instanceof ORYX_Controls.Docker ? docker1.absoluteCenterXY() : docker1
     let p2 = docker2 instanceof ORYX_Controls.Docker ? docker2.absoluteCenterXY() : docker2
-
     return ORYX_Math.getAngle(p1, p2)
   }
 
@@ -1514,7 +1528,7 @@ export default class Edge extends Shape {
 
     // add dockers triple
     let value = ''
-    this._dockersByPath.forEach( pair => {
+    this._dockersByPath.forEach(pair => {
       pair.forEach(function (docker) {
         let position = docker.getDockedShape() && docker.referencePoint
           ? docker.referencePoint
@@ -1615,7 +1629,8 @@ export default class Edge extends Shape {
           result = serializeEvent.result
         }
       }
-    } catch (e) {}
+    } catch (e) {
+    }
     return result
   }
 
@@ -1639,7 +1654,8 @@ export default class Edge extends Shape {
           data = deserializeEvent.result
         }
       }
-    } catch (e) {}
+    } catch (e) {
+    }
 
     // Set the outgoing shapes
     let target = data.find(function (ser) {

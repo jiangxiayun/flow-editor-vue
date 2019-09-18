@@ -95,7 +95,7 @@ const Utils = {
           this.graft(namespace, e, t[i].toString(), doc)
         } else if (t[i].constructor == Object) {
           // hash's properties => element's attributes
-          for (var k in t[i]) {
+          for (let k in t[i]) {
             e.setAttributeNS(null, k, t[i][k])
           }
         }

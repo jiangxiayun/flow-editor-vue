@@ -215,7 +215,7 @@ export default class DragDropResize extends AbstractPlugin {
           window.clearTimeout(this.distPointTimeout)
         }
 
-        this.distPointTimeout = window.setTimeout(function () {
+        this.distPointTimeout = window.setTimeout(() => {
           // Get all the shapes, there will consider at snapping
           // Consider only those elements who shares the same parent element
           let distShapes = this.facade.getCanvas().getChildShapes(true).findAll(function (value) {
@@ -257,7 +257,7 @@ export default class DragDropResize extends AbstractPlugin {
             }
           }).bind(this))
 
-        }.bind(this), 10)
+        }, 10)
       }
     }
   }
@@ -349,7 +349,6 @@ export default class DragDropResize extends AbstractPlugin {
 
     position.x -= this.offsetScroll.x - this.scrollNode.scrollLeft
     position.y -= this.offsetScroll.y - this.scrollNode.scrollTop
-
     // If not the Control-Key are pressed
     let modifierKeyPressed = event.shiftKey || event.ctrlKey
     if (this.UI_CONFIG.GRID_ENABLED && !modifierKeyPressed) {
@@ -363,7 +362,6 @@ export default class DragDropResize extends AbstractPlugin {
     // Adjust the point by the zoom faktor
     position.x /= this.faktorXY.x
     position.y /= this.faktorXY.y
-
     // Set that the position is not lower than zero
     position.x = Math.max(0, position.x)
     position.y = Math.max(0, position.y)
@@ -701,7 +699,6 @@ export default class DragDropResize extends AbstractPlugin {
       y: upL.y - oldUpL.y
     }
 
-    console.log('toMoveShapes', this.toMoveShapes, offset, this.containmentParentNode, this.currentShapes)
     // Instanciate the dragCommand
     const commands = [new ORYX_Command_Move(
       this.toMoveShapes, offset, this.containmentParentNode, this.currentShapes, this
@@ -786,7 +783,6 @@ export default class DragDropResize extends AbstractPlugin {
             .findAll(function (r) {
               return r instanceof ORYX_Edge
             }.bind(this))
-          console.log(22)
           this.plugin.layoutEdges(this.shape, allEdges, offset)
           this.plugin.facade.setSelection([this.shape])
           this.plugin.facade.getCanvas().update()
@@ -926,6 +922,7 @@ export default class DragDropResize extends AbstractPlugin {
   snapToGrid (position) {
     // Get the current Bounds
     let bounds = this.dragBounds
+    let boundsUl = this.dragBounds.upperLeft()
 
     let point = {}
     let ulThres = 6
@@ -987,7 +984,11 @@ export default class DragDropResize extends AbstractPlugin {
       if (this.vLine && gridX)
         this.vLine.update(gridX)
     } else {
-      ul.x = (position.x - (position.x % (this.UI_CONFIG.GRID_DISTANCE / 2)))
+      if (Math.abs(position.x - boundsUl.x) > 4 * this.UI_CONFIG.PX_OFFSET) {
+        ul.x = (position.x - (position.x % (this.UI_CONFIG.GRID_DISTANCE / 2)))
+      } else {
+        ul.x = boundsUl.x
+      }
       if (this.vLine)
         this.vLine.hide()
     }
@@ -998,11 +999,14 @@ export default class DragDropResize extends AbstractPlugin {
       if (this.hLine && gridY)
         this.hLine.update(gridY)
     } else {
-      ul.y = (position.y - (position.y % (this.UI_CONFIG.GRID_DISTANCE / 2)))
+      if (Math.abs(position.y - boundsUl.y) > 4 * this.UI_CONFIG.PX_OFFSET) {
+        ul.y = (position.y - (position.y % (this.UI_CONFIG.GRID_DISTANCE / 2)))
+      } else {
+        ul.y = boundsUl.y
+      }
       if (this.hLine)
         this.hLine.hide()
     }
-
     return ul
   }
 

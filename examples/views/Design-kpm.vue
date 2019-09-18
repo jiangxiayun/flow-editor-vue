@@ -138,6 +138,7 @@
     }
   }
 
+  // const flowSaveDataFinally = mockData
   const TaskNoneQuote = [
     {
       name: '新建活动',
@@ -555,10 +556,10 @@
         }
       },
       doubleClick (shape) {
-        console.log(333, shape)
+        // console.log(333, shape)
       },
       doubleClickToChangeVal (params) {
-        console.log(44, params)
+        // console.log(44, params)
       }
     },
     beforeRouteLeave (to, from , next) {

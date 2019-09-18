@@ -33,8 +33,16 @@ export default class RenameShapes {
 
   actOnDBLClick (evt, shape) {
     if (!(shape instanceof ORYX_Shape)) {
-      return
+      // 处理在平移visual上双击的情况
+      if (shape.getInstanceofType().indexOf('SegmentVisual') < -1){
+        return
+      }
+      shape = shape.parent // 取平移 visual的父元素 Edge
+      if (!(shape instanceof ORYX_Shape)) {
+        return
+      }
     }
+
     if (shape.properties.get('canDblClickEdit') === false ||
       shape.properties.get('canDblClickEdit') === 'false') {
       return

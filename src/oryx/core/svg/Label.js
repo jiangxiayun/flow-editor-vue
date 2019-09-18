@@ -548,7 +548,8 @@ export default class Label {
             window.setTimeout(this._checkFittingToReferencedElem.bind(this), 0)
             // this._checkFittingToReferencedElem();
           } else {
-            window.setTimeout(this._positionText.bind(this), 0)
+            window.setTimeout(this._checkFittingToDefaultWidth.bind(this), 0)
+            // window.setTimeout(this._positionText.bind(this), 0)
             // this._positionText();
           }
         }
@@ -557,6 +558,75 @@ export default class Label {
         // this.node.setAttributeNS(null, "fill-opacity", "0.2");
       }
     }
+  }
+
+  // label 分割换行 ,文本默认宽度取 LABEL_DEFAULT_LINE_WIDTH 常量
+  _checkFittingToDefaultWidth () {
+    try {
+      let tspans = $A(this.node.getElementsByTagNameNS(ORYX_CONFIG.NAMESPACE_SVG, 'tspan'))
+      // only do this in firefox 3. all other browsers do not support word wrapping!!!!!
+      // if (/Firefox[\/\s](\d+\.\d+)/.test(navigator.userAgent) && new Number(RegExp.$1)>=3) {
+      let newtspans = []
+      let labelWidth = ORYX_CONFIG.CustomConfigs.UI_CONFIG.LABEL_DEFAULT_LINE_WIDTH
+      let fontSize = this.getFontSize()
+
+      for (let j = 0; j < tspans.length; j++) {
+        let tspan = tspans[j]
+        let textLength = this._getRenderedTextLength(tspan, undefined, undefined, fontSize)
+        if (textLength > labelWidth) {
+          let startIndex = 0
+          let lastSeperatorIndex = 0
+          let numOfChars = this.getTrimmedTextLength(tspan.textContent)
+          for (let i = 0; i < numOfChars; i++) {
+            let sslength = this._getRenderedTextLength(tspan, startIndex, i - startIndex, fontSize)
+            if (sslength > labelWidth - 2) {
+              let newtspan = this.node.ownerDocument.createElementNS(ORYX_CONFIG.NAMESPACE_SVG, 'tspan')
+              if (lastSeperatorIndex <= startIndex) {
+                lastSeperatorIndex = (i === 0) ? i : i - 1
+                newtspan.textContent = tspan.textContent.slice(startIndex, lastSeperatorIndex).trim()
+                // lastSeperatorIndex = i;
+              } else {
+                newtspan.textContent = tspan.textContent.slice(startIndex, ++lastSeperatorIndex).trim()
+              }
+
+              newtspan.setAttributeNS(null, 'x', this.invisibleRenderPoint)
+              newtspan.setAttributeNS(null, 'y', this.invisibleRenderPoint)
+
+              // insert tspan to text node
+              // this.node.insertBefore(newtspan, tspan);
+              newtspans.push(newtspan)
+              startIndex = lastSeperatorIndex
+            } else {
+              let curChar = tspan.textContent.charAt(i)
+              if (curChar === ' ' ||
+                curChar === '-' ||
+                curChar === '.' ||
+                curChar === ',' ||
+                curChar === ';' ||
+                curChar === ':') {
+                lastSeperatorIndex = i
+              }
+            }
+          }
+
+          tspan.textContent = tspan.textContent.slice(startIndex).trim()
+        }
+
+        newtspans.push(tspan)
+      }
+
+      while (this.node.hasChildNodes()) {
+        this.node.removeChild(this.node.childNodes[0])
+      }
+
+      while (newtspans.length > 0) {
+        this.node.appendChild(newtspans.shift())
+      }
+
+    } catch (e) {
+      ORYX_Log.fatal('Error ' + e)
+    }
+    window.setTimeout(this._positionText.bind(this), 0)
   }
 
   // label 分割换行
@@ -1009,7 +1079,6 @@ export default class Label {
   deserialize (obj, shape) {
     if (obj && 'undefined' != typeof obj.x && 'undefined' != typeof obj.y) {
       this.setPosition({ x: obj.x, y: obj.y })
-
       if ('undefined' != typeof obj.distance) {
         let from = shape.dockers[obj.from]
         let to = shape.dockers[obj.to]

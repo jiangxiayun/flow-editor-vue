@@ -123,7 +123,7 @@ export default class KeysMove extends AbstractPlugin {
   move (key, far, e) {
     Event.stop(e.event)
     // calculate the distance to move the objects and get the selection.
-    let distance = far ? 20 : 5
+    let distance = far ? 4 * ORYX_Config.CustomConfigs.UI_CONFIG.PX_OFFSET : 1
     let selection = this.facade.getSelection()
     let currentSelection = this.facade.getSelection()
     let p = { x: 0, y: 0 }

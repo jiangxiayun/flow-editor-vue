@@ -8,6 +8,7 @@ import ORYX_Edge from '../core/Edge'
 import ORYX_Config from '../CONFIG'
 
 class EdgeLayouter extends AbstractLayouter {
+  PX_OFFSET = ORYX_Config.CustomConfigs.UI_CONFIG.PX_OFFSET
   /**
    * Layout only Edges
    */
@@ -48,7 +49,6 @@ class EdgeLayouter extends AbstractLayouter {
    * @param {Object} edge
    */
   doLayout (edge) {
-    console.log(789)
     // Get from and to node
     let from = edge.getIncomingNodes()[0]
     let to = edge.getOutgoingNodes()[0]
@@ -122,8 +122,8 @@ class EdgeLayouter extends AbstractLayouter {
     // or  |
     //     V
     // Do nothing
-    if ((!ah && !bh && Math.abs(aFirst.x - aLast.x) < 1) ||
-      (!av && !bv && Math.abs(aFirst.y - aLast.y) < 1)) {
+    if ((!ah && !bh && Math.abs(aFirst.x - aLast.x) < this.PX_OFFSET) ||
+      (!av && !bv && Math.abs(aFirst.y - aLast.y) < this.PX_OFFSET)) {
       // return []
       return 'straightLine'
     }
@@ -246,19 +246,19 @@ class EdgeLayouter extends AbstractLayouter {
   }
 
   isTopOrBottomDocker (point, ty, by) {
-    if (Math.abs(point.y - ty) < 5) {
+    if (Math.abs(point.y - ty) < this.PX_OFFSET) {
       return 't'
     }
-    if (Math.abs(point.y - by) < 5) {
+    if (Math.abs(point.y - by) < this.PX_OFFSET) {
       return 'b'
     }
     return false
   }
   isLeftOrRightDocker (point, lx, rx) {
-    if (Math.abs(point.x - lx) < 5) {
+    if (Math.abs(point.x - lx) < this.PX_OFFSET) {
       return 'l'
     }
-    if (Math.abs(point.x - rx) < 5) {
+    if (Math.abs(point.x - rx) < this.PX_OFFSET) {
       return 'r'
     }
     return false

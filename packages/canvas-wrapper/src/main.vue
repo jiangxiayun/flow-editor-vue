@@ -190,7 +190,7 @@
       editShape () {
         this.editorManager.edit(this.selectedShape.resourceId)
       },
-      fnScroll () {
+      fnScroll (event) {
         // Hides the resizer and quick menu items during scrolling
         const selectedElements = this.editorManager.getSelection()
         const subSelectionElements = this.editorManager.getSubSelection()
@@ -212,7 +212,7 @@
         jQuery('.resizer_northwest').each(function (i, obj) {
           obj.style.display = 'none'
         })
-        this.editorManager.handleEvents({ type: ORYX_CONFIG.EVENT_CANVAS_SCROLL })
+        this.editorManager.handleEvents({ type: ORYX_CONFIG.EVENT_CANVAS_SCROLL, event })
         this.fnHandleScrollDebounce()
       },
       fnHandleScrollDebounce: _debounce(function (_type, index, item) {

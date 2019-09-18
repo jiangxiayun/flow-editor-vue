@@ -582,7 +582,7 @@ export default class Editor {
             })
           }
 
-          //this.parents.values().uniq().invoke("update");
+          // this.parents.values().uniq().invoke("update");
           this.facade.getCanvas().update()
 
           if (!this.noSelection)

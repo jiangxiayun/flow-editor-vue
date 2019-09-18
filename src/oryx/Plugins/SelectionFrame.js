@@ -8,13 +8,14 @@ export default class SelectionFrame {
     // Register on MouseEvents
     this.handleMouseUpFun = this.handleMouseUp.bind(this)
     this.facade.registerOnEvent(ORYX_Config.EVENT_MOUSEDOWN, this.handleMouseDown.bind(this))
-
+    this.facade.registerOnEvent(ORYX_Config.EVENT_CANVAS_SCROLL, this.canvasScroll.bind(this))
     document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEUP, this.handleMouseUpFun, true)
 
     // Some initiale variables
     this.position = { x: 0, y: 0 }
     this.size = { width: 0, height: 0 }
     this.offsetPosition = { x: 0, y: 0 }
+    this.selectMoving = false
 
     // (Un)Register Mouse-Move Event
     this.moveCallback = undefined
@@ -23,14 +24,17 @@ export default class SelectionFrame {
     this.node = ORYX_Utils.graft('http://www.w3.org/1999/xhtml', $('canvasSection'),
       ['div', { 'class': 'Oryx_SelectionFrame' }])
 
+    this.CanvasSection = jQuery('#canvasSection')
     this.hide()
   }
 
   handleMouseDown (event, uiObj) {
     // If there is the Canvas
     if (uiObj instanceof ORYX_Canvas) {
+      this.selectMoving = true
       // Calculate the Offset
       let scrollNode = uiObj.rootNode.parentNode.parentNode
+      this.offsetScroll = { x: scrollNode.scrollLeft, y: scrollNode.scrollTop }
       let a = this.facade.getCanvas().node.getScreenCTM()
       this.offsetPosition = {
         x: a.e,
@@ -39,8 +43,8 @@ export default class SelectionFrame {
 
       // Set the new Position
       this.setPos({
-        x: Event.pointerX(event) - jQuery('#canvasSection').offset().left,
-        y: Event.pointerY(event) - jQuery('#canvasSection').offset().top + 5
+        x: Event.pointerX(event) - this.CanvasSection.offset().left,
+        y: Event.pointerY(event) - this.CanvasSection.offset().top + 5
       })
 
       // Reset the size
@@ -49,9 +53,6 @@ export default class SelectionFrame {
 
       // Register Mouse-Move Event
       document.documentElement.addEventListener(ORYX_Config.EVENT_MOUSEMOVE, this.moveCallback, false)
-
-      this.offsetScroll = { x: scrollNode.scrollLeft, y: scrollNode.scrollTop }
-
       // Show the Frame
       this.show()
     }
@@ -61,7 +62,66 @@ export default class SelectionFrame {
     // Event.stop(event)
   }
 
+  handleMouseMove (event) {
+    if (!this.selectMoving) {
+      return
+    }
+    // Calculate the size
+    const CanvasSection_offset = this.CanvasSection.offset()
+    let size = {
+      width: Event.pointerX(event) - this.position.x - CanvasSection_offset.left,
+      height: Event.pointerY(event) - this.position.y - CanvasSection_offset.top + 5
+    }
+
+    // const scrollNode = this.facade.getCanvas().rootNode.parentNode.parentNode
+    const scrollNode = document.getElementById('canvasSection')
+    size.width -= this.offsetScroll.x - scrollNode.scrollLeft
+    size.height -= this.offsetScroll.y - scrollNode.scrollTop
+
+    this.moveimgSize = size
+    // Set the size
+    this.resize(size)
+    Event.stop(event)
+  }
+
+  canvasScroll (event) {
+    if (!this.selectMoving) {
+      return
+    }
+    const scrollNode = document.getElementById('canvasSection')
+    let { x, y } = this.offsetScroll
+    // 与鼠标down 时的偏移差
+    let offset = {
+      x: scrollNode.scrollLeft - x,
+      y: scrollNode.scrollTop - y
+    }
+
+    // 顶点坐标变化，拓展 scroll 偏移距离
+    this.setPos({
+      x: this.position.x - offset.x,
+      y: this.position.y - offset.y
+    })
+    // let size = {
+    //   width: this.moveimgSize.width + offset.x,
+    //   height: this.moveimgSize.height + offset.y
+    // }
+    this.moveimgSize.width += offset.x
+    this.moveimgSize.height += offset.y
+    this.resize(this.moveimgSize)
+
+    // this.offsetScroll = {
+    //   x: this.offsetScroll.x + offset.x,
+    //   y: this.offsetScroll.y + offset.y
+    // }
+
+    this.offsetScroll = {
+      x: scrollNode.scrollLeft,
+      y: scrollNode.scrollTop
+    }
+  }
+
   handleMouseUp (event) {
+    this.selectMoving = false
     // If there was an MouseMoving
     if (this.moveCallback) {
       // Hide the Frame
@@ -128,22 +188,6 @@ export default class SelectionFrame {
     }
   }
 
-  handleMouseMove (event) {
-    // Calculate the size
-    let size = {
-      width: Event.pointerX(event) - this.position.x - jQuery('#canvasSection').offset().left,
-      height: Event.pointerY(event) - this.position.y - jQuery('#canvasSection').offset().top + 5
-    }
-
-    let scrollNode = this.facade.getCanvas().rootNode.parentNode.parentNode
-    size.width -= this.offsetScroll.x - scrollNode.scrollLeft
-    size.height -= this.offsetScroll.y - scrollNode.scrollTop
-
-    // Set the size
-    this.resize(size)
-    Event.stop(event)
-  }
-
   hide () {
     this.node.style.display = 'none'
   }
@@ -161,7 +205,7 @@ export default class SelectionFrame {
 
   resize (size) {
     // Calculate the negative offset
-    this.setPos(this.position)
+    // this.setPos(this.position)
     this.size = Object.clone(size)
 
     if (size.width < 0) {

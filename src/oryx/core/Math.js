@@ -393,11 +393,14 @@ const ORYX_Math = {
    * @return {Number} 0 <= x <= 359.99999
    */
   getAngle: function (p1, p2) {
-    if (p1.x == p2.x && p1.y == p2.y)
+    if ((p1.x == p2.x && p1.y == p2.y) ||
+      (Math.abs(p1.x - p2.x) < 2 && Math.abs(p1.y - p2.y) < 2))
       return 0
 
-    let angle = Math.asin(Math.sqrt(Math.pow(p1.y - p2.y, 2))
-      / (Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p1.y - p2.y, 2))))
+    let py1_2 = Math.abs(p1.y - p2.y) < 2 ? 0 : p1.y - p2.y
+    let px2_1 = Math.abs(p2.x - p1.x) < 2 ? 0 : p2.x - p1.x
+    let angle = Math.asin(Math.sqrt(Math.pow(py1_2, 2))
+      / (Math.sqrt(Math.pow(px2_1, 2) + Math.pow(py1_2, 2))))
       * 180 / Math.PI
 
     if (p2.x >= p1.x && p2.y <= p1.y)

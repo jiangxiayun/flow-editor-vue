@@ -658,7 +658,159 @@ export const mockData = {
         'target': {
           'resourceId': 'sid-4F6722CA-9043-4310-8BDD-2B3B97392E34'
         }
-      }
+      },
+
+      {
+        "outgoing": [
+          {
+            "resourceId": "sid-95F9ED47-6C8D-4273-BD39-E70557D7634D"
+          }
+        ],
+        "resourceId": "sid-3FD63486-3A95-447A-AB17-887861BBFCDF",
+        "bounds": {
+          "upperLeft": {
+            "x": 1037,
+            "y": 509
+          },
+          "lowerRight": {
+            "x": 1077,
+            "y": 549
+          }
+        },
+        "stencil": {
+          "id": "ExclusiveGateway"
+        },
+        "dockers": [
+
+        ],
+        "properties": {
+          "name": ""
+        },
+        "childShapes": [
+
+        ]
+      },
+      {
+        "outgoing": [
+          {
+            "resourceId": "sid-D463BFD1-268B-448E-818B-AB37034AA3D0"
+          }
+        ],
+        "resourceId": "sid-95F9ED47-6C8D-4273-BD39-E70557D7634D",
+        "bounds": {
+          "upperLeft": {
+            "x": 1077.390625,
+            "y": 529
+          },
+          "lowerRight": {
+            "x": 1114.4629580690025,
+            "y": 665.7788641550494
+          }
+        },
+        "stencil": {
+          "id": "SequenceFlow"
+        },
+        "dockers": [
+          {
+            "x": 20,
+            "y": 20
+          },
+          {
+            "x": 1093.5,
+            "y": 529
+          },
+          {
+            "x": 1094.5596923828125,
+            "y": 664.6448974609375
+          },
+          {
+            "x": 56,
+            "y": 36
+          }
+        ],
+        "properties": {
+          "defaultflow": "false",
+          "name": "Y"
+        },
+        "childShapes": [
+
+        ],
+        "target": {
+          "resourceId": "sid-D463BFD1-268B-448E-818B-AB37034AA3D0"
+        }
+      },
+      {
+        "outgoing": [
+        ],
+        "resourceId": "sid-D463BFD1-268B-448E-818B-AB37034AA3D0",
+        "bounds": {
+          "upperLeft": {
+            "x": 1115,
+            "y": 633
+          },
+          "lowerRight": {
+            "x": 1227,
+            "y": 705
+          }
+        },
+        "stencil": {
+          "id": "UserTask"
+        },
+        "dockers": [
+
+        ],
+        "properties": {
+          "activityAttributeVo": {
+            "createdByLable": "索晓菲",
+            "creationDate": 1568168636000,
+            "frameId": "07267bd2ac584dba8243644ec2af1d66",
+            "frameL0Id": "07267bd2ac584dba8243644ec2af1d66",
+            "frameL0Lable": "集团总部",
+            "frameLable": "集团总部",
+            "id": "e3725a0b41d04de38be23a44fb42b4ca",
+            "jsonDesc": {
+              "kpiLable": [
+
+              ],
+              "organizationLable": "集团总部",
+              "roleLable": "董事长"
+            },
+            "lastUpdateDate": 1568170044000,
+            "lastUpdatedByLable": "索晓菲",
+            "type": "approval"
+          },
+          "activityEnvAttribute": {
+            "attachment": [
+
+            ],
+            "clause": [
+
+            ],
+            "dates": "1",
+            "description": "审核公司预算并报董事会审批",
+            "form": [
+
+            ],
+            "kpi": [
+
+            ],
+            "name": "审核",
+            "organization": "5369343dc7b84a05a74921f002c1f067",
+            "roleId": "0909ac69cb1a4978b679039fbc13eb1e",
+            "standard": [
+
+            ]
+          },
+          "name": "审核",
+          "nmb": "05-05",
+          "refId": "e3725a0b41d04de38be23a44fb42b4ca",
+          "type": "approval"
+        },
+        "childShapes": [
+
+        ]
+      },
+
     ],
     'stencil': {
       'id': 'BPMNDiagram'

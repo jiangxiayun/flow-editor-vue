@@ -2,7 +2,7 @@ import ORYX_Command from 'src/oryx/core/Command'
 
 export default class layoutEdgesCommand extends ORYX_Command {
   constructor (edges, node, offset, plugin) {
-    console.log(233, node)
+    console.log('layoutEdgesCommand', node)
     super()
     this.edges = edges
     this.node = node
@@ -53,6 +53,7 @@ export default class layoutEdgesCommand extends ORYX_Command {
         }
         edge._update(true)
         edge.removeUnusedDockers()
+
         if (this.plugin.edgeLayoutByDragDocker) {
           console.log('edgeLayoutByDragDocker')
           this.plugin.doLayout(edge)
@@ -66,6 +67,7 @@ export default class layoutEdgesCommand extends ORYX_Command {
           this.plugin.doLayout(edge)
           return
         }
+
         if (this.isBendPointIncluded(edge)) {
           console.log('BendPointIncluded')
           this.plugin.doLayout(edge)

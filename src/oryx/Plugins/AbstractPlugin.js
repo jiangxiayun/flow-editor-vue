@@ -352,6 +352,7 @@ export default class AbstractPlugin {
     if (!this.facade.isExecutingCommands()) {
       return
     }
+    console.log(890)
     this.facade.executeCommands([new layoutEdgesCommand(allEdges, node, offset, this)])
   }
 }
