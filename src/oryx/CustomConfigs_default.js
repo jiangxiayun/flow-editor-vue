@@ -12,7 +12,7 @@ const DEFAULT_CONFIG = {
     CANVAS_BACKGROUND_COLOR: 'none',
     SelectedRect_Border_color: '#E70012', // 选中标记虚线框的border颜色
     SELECTED_AREA_PADDING: 5,  // 选中标记虚线框的 padding 像素
-    LABEL_DEFAULT_LINE_WIDTH: 100, // 默认label 文本宽度
+    LABEL_DEFAULT_LINE_WIDTH: 70, // 默认label 文本宽度
     GRID_DISTANCE: 30,
     GRID_ENABLED: true,
     ZOOM_OFFSET: 0.1,
