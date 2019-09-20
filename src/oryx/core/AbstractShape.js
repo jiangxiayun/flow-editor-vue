@@ -401,7 +401,7 @@ export default class AbstractShape extends UIObject {
       let key = pair.key
       let value = pair.value
 
-      //If complex property, value should be a json object
+      // If complex property, value should be a json object
       if (this.getStencil().property(key)
         && this.getStencil().property(key).type() === ORYX_Config.TYPE_COMPLEX
         && Object.prototype.toString.call(value) === 'String') {

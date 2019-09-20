@@ -488,7 +488,7 @@ export default class Edge extends Shape {
               // label.x = pos.x + label.getOffsetTop()
               // label.y = (pos.y + pos2.y) / 2 - label.getOffsetTop()
 
-              console.log(index, this.dockers[index])
+              // console.log(index, this.dockers[index])
               if (angle === 0 || angle === 360) {
                 label.horizontalAlign('center')  // X水平，文字居中，底端对齐
                 label.verticalAlign('bottom')
@@ -1648,8 +1648,7 @@ export default class Edge extends Shape {
           result = serializeEvent.result
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
     return result
   }
 
@@ -1673,8 +1672,7 @@ export default class Edge extends Shape {
           data = deserializeEvent.result
         }
       }
-    } catch (e) {
-    }
+    } catch (e) {}
 
     // Set the outgoing shapes
     let target = data.find(function (ser) {

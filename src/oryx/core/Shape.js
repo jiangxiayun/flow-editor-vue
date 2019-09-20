@@ -743,10 +743,13 @@ export default class Shape extends AbstractShape {
 
     while (true) {
       // Calculate the midpoint of the current to points
-      let midPointX = Math.min(includePointX, excludePointX) +
-        ((Math.max(includePointX, excludePointX) - Math.min(includePointX, excludePointX)) / 2.0)
-      let midPointY = Math.min(includePointY, excludePointY) +
-        ((Math.max(includePointY, excludePointY) - Math.min(includePointY, excludePointY)) / 2.0)
+      // let midPointX = Math.min(includePointX, excludePointX) +
+      //   ((Math.max(includePointX, excludePointX) - Math.min(includePointX, excludePointX)) / 2.0)
+      // let midPointY = Math.min(includePointY, excludePointY) +
+      //   ((Math.max(includePointY, excludePointY) - Math.min(includePointY, excludePointY)) / 2.0)
+
+      let midPointX = Math.min(includePointX, excludePointX) + (Math.abs(includePointX - excludePointX) / 2.0)
+      let midPointY = Math.min(includePointY, excludePointY) + ( Math.abs(includePointY - excludePointY) / 2.0)
 
       // Set the new midpoint by the means of the include of the bounds
       if (this.isPointIncluded(midPointX, midPointY, bounds)) {

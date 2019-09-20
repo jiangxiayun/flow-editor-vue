@@ -71,6 +71,7 @@ export default class Docker extends Control {
         // If there is an different
         if (widthDelta !== 1.0 || heightDelta !== 1.0) {
           // Set the delta
+          console.log(444444444, widthDelta, heightDelta)
           this.referencePoint.x *= widthDelta
           this.referencePoint.y *= heightDelta
         }
@@ -132,6 +133,25 @@ export default class Docker extends Control {
       }
 
       // Set the bounds to the new point
+      // if (this._dockedShape) {
+      //   let dockedShapeAbsoluteB = this._dockedShape.absoluteBounds()
+      //   if (newPoint.x < dockedShapeAbsoluteB.a.x || newPoint.x > dockedShapeAbsoluteB.b.x ||
+      //     newPoint.y < dockedShapeAbsoluteB.a.y || newPoint.y > dockedShapeAbsoluteB.b.y){
+      //     // docked 溢出
+      //     this.setReferencePoint({
+      //       x: (dockedShapeAbsoluteB.b.x - dockedShapeAbsoluteB.a.x) / 2,
+      //       y: (dockedShapeAbsoluteB.b.y - dockedShapeAbsoluteB.a.y) / 2
+      //     })
+      //     // this.bounds.centerMoveTo({
+      //     //   x: (dockedShapeAbsoluteB.a.x + dockedShapeAbsoluteB.b.x) / 2,
+      //     //   y: (dockedShapeAbsoluteB.a.y + dockedShapeAbsoluteB.b.y) / 2
+      //     // })
+      //
+      //     this._oldRefPoint1 = absoluteReferenzPoint1
+      //     this._oldRefPoint2 = absoluteReferenzPoint2
+      //     return
+      //   }
+      // }
       this.bounds.centerMoveTo(newPoint)
 
       this._oldRefPoint1 = absoluteReferenzPoint1
@@ -184,6 +204,7 @@ export default class Docker extends Control {
         this.referencePoint.x !== point.x ||
         this.referencePoint.y !== point.y)) {
 
+      console.log(1111, point)
       this.referencePoint = point
       this._changed()
     }
@@ -263,6 +284,7 @@ export default class Docker extends Control {
     }
 
     // Set the referencepoint
+    console.log('setReferencePoint', referencePoint)
     this.setReferencePoint(referencePoint)
     // this._changed()
     // this.update()

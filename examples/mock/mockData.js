@@ -35,782 +35,343 @@ export const mockData = {
       'process_potentialstartergroup': '',
       'iseagerexecutionfetch': true
     },
-    'childShapes': [
+    "childShapes": [
       {
-        'resourceId': 'startEvent1',
-        'properties': {
-          'overrideid': '',
-          'name': '开始',
-          'documentation': '',
-          'executionlisteners': '',
-          'initiator': '',
-          'formkeydefinition': '',
-          'formreference': '',
-          'formproperties': ''
-        },
-        'stencil': {
-          'id': 'StartNoneEvent'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-2DA089CE-2D36-4C1F-9889-0DBA4A1D4C34'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 130,
-            'y': 193
-          },
-          'upperLeft': {
-            'x': 100,
-            'y': 163
-          }
-        },
-        'dockers': [
-
-        ]
-      },
-      {
-        'resourceId': 'sid-F2289A33-D579-452D-86F8-AE5F37D39C5C',
-        'properties': {
-          'overrideid': '',
-          'name': '用户填写请假单9988',
-          'documentation': '',
-          'asynchronousdefinition': 'false',
-          'exclusivedefinition': 'false',
-          'executionlisteners': '',
-          'multiinstance_type': 'Parallel',
-          'multiinstance_cardinality': '',
-          'multiinstance_collection': '',
-          'multiinstance_variable': '',
-          'multiinstance_condition': '',
-          'isforcompensation': 'false',
-          'usertaskassignment': {
-            'assignment': {
-              'type': 'idm',
-              'idm': {
-                'type': 'user',
-                'assignee': {
-                  'id': 'manager',
-                  'firstName': 'manager',
-                  'lastName': 'manager',
-                  'email': 'manager@163.com',
-                  'fullName': 'manager manager',
-                  'groups': [
-
-                  ],
-                  'privileges': [
-
-                  ],
-                  '$$hashKey': 'object:558'
-                }
-              }
-            }
-          },
-          'formkeydefinition': '',
-          'formreference': {
-            'id': '638e122b-3be7-11e9-afe0-82ad27eff10d',
-            'name': '填写请假单',
-            'key': 'leave-input-from'
-          },
-          'duedatedefinition': '',
-          'prioritydefinition': '',
-          'formproperties': '',
-          'tasklisteners': '',
-          'skipexpression': '',
-          'categorydefinition': ''
-        },
-        'stencil': {
-          'id': 'UserTask'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-E35C6DE9-D5A4-43F3-B928-CD486296E07D'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 265,
-            'y': 215
-          },
-          'upperLeft': {
-            'x': 165,
-            'y': 135
-          }
-        },
-        'dockers': [
-
-        ]
-      },
-      {
-        'resourceId': 'sid-2DA089CE-2D36-4C1F-9889-0DBA4A1D4C34',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'conditionsequenceflow': '',
-          'executionlisteners': '',
-          'defaultflow': 'false',
-          'skipexpression': ''
-        },
-        'stencil': {
-          'id': 'SequenceFlow'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-F2289A33-D579-452D-86F8-AE5F37D39C5C'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 164.78169969647763,
-            'y': 177.54813849089433
-          },
-          'upperLeft': {
-            'x': 130.06205030352237,
-            'y': 176.50654900910567
-          }
-        },
-        'dockers': [
-          {
-            'x': 15,
-            'y': 15
-          },
-          {
-            'x': 50,
-            'y': 40
-          }
-        ],
-        'target': {
-          'resourceId': 'sid-F2289A33-D579-452D-86F8-AE5F37D39C5C'
-        }
-      },
-      {
-        'resourceId': 'sid-3B2BA28A-F373-4DAD-B916-FBD2C1ED714E',
-        'properties': {
-          'overrideid': '',
-          'name': '部门领导审批',
-          'documentation': '',
-          'asynchronousdefinition': 'false',
-          'exclusivedefinition': 'false',
-          'executionlisteners': '',
-          'multiinstance_type': 'None',
-          'multiinstance_cardinality': '',
-          'multiinstance_collection': '',
-          'multiinstance_variable': '',
-          'multiinstance_condition': '',
-          'isforcompensation': 'false',
-          'usertaskassignment': {
-            'assignment': {
-              'type': 'idm',
-              'idm': {
-                'type': 'user',
-                'assignee': {
-                  'id': 'manager',
-                  'firstName': 'manager',
-                  'lastName': 'manager',
-                  'email': 'manager@163.com',
-                  'fullName': 'manager manager',
-                  'groups': [
-
-                  ],
-                  'privileges': [
-
-                  ],
-                  '$$hashKey': 'object:2869'
-                }
-              }
-            }
-          },
-          'formkeydefinition': '',
-          'formreference': '',
-          'duedatedefinition': '',
-          'prioritydefinition': '',
-          'formproperties': '',
-          'tasklisteners': '',
-          'skipexpression': '',
-          'categorydefinition': ''
-        },
-        'stencil': {
-          'id': 'UserTask'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-0D4A7B4D-3C1D-4D1A-B7FC-A42B84C60CBE'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 535,
-            'y': 335
-          },
-          'upperLeft': {
-            'x': 435,
-            'y': 255
-          }
-        },
-        'dockers': [
-
-        ]
-      },
-      {
-        'resourceId': 'sid-4D07711C-5A69-4825-8FA1-B0866540D733',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'executionlisteners': ''
-        },
-        'stencil': {
-          'id': 'EndNoneEvent'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 718,
-            'y': 192
-          },
-          'upperLeft': {
-            'x': 690,
-            'y': 164
-          }
-        },
-        'dockers': [
-
-        ]
-      },
-      {
-        'resourceId': 'sid-CD1B2BB6-E102-46F1-AFCF-61D7C71419C7',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'asynchronousdefinition': 'false',
-          'exclusivedefinition': 'false',
-          'dataproperties': '',
-          'executionlisteners': '',
-          'multiinstance_type': 'None',
-          'multiinstance_cardinality': '',
-          'multiinstance_collection': '',
-          'multiinstance_variable': '',
-          'multiinstance_condition': '',
-          'istransaction': 'false'
-        },
-        'stencil': {
-          'id': 'CollapsedSubProcess'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 295,
-            'y': 365
-          },
-          'upperLeft': {
-            'x': 195,
-            'y': 285
-          }
-        },
-        'dockers': [
-
-        ]
-      },
-      {
-        'resourceId': 'sid-0D4A7B4D-3C1D-4D1A-B7FC-A42B84C60CBE',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'conditionsequenceflow': '',
-          'executionlisteners': '',
-          'defaultflow': 'false',
-          'skipexpression': '',
-          'showdiamondmarker': false
-        },
-        'stencil': {
-          'id': 'SequenceFlow'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-4D07711C-5A69-4825-8FA1-B0866540D733'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 691.1414192437379,
-            'y': 268.02097226720247
-          },
-          'upperLeft': {
-            'x': 535.4992057562621,
-            'y': 184.86965273279753
-          }
-        },
-        'dockers': [
-          {
-            'x': 50,
-            'y': 40
-          },
-          {
-            'x': 14,
-            'y': 14
-          }
-        ],
-        'target': {
-          'resourceId': 'sid-4D07711C-5A69-4825-8FA1-B0866540D733'
-        }
-      },
-      {
-        'resourceId': 'sid-9012C71B-5A95-4979-8605-2E67F8ED0712',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'asynchronousdefinition': 'false',
-          'exclusivedefinition': 'false',
-          'sequencefloworder': ''
-        },
-        'stencil': {
-          'id': 'ExclusiveGateway'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-B15F4736-8C5A-42FE-9E80-7AA659C64042'
-          },
-          {
-            'resourceId': 'sid-FC4FB9E4-4E20-4B93-9C95-EF2DE78CDA97'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 355,
-            'y': 198
-          },
-          'upperLeft': {
-            'x': 315,
-            'y': 158
-          }
-        },
-        'dockers': [
-
-        ]
-      },
-      {
-        'resourceId': 'sid-E35C6DE9-D5A4-43F3-B928-CD486296E07D',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'conditionsequenceflow': '',
-          'executionlisteners': '',
-          'defaultflow': 'false',
-          'skipexpression': ''
-        },
-        'stencil': {
-          'id': 'SequenceFlow'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-9012C71B-5A95-4979-8605-2E67F8ED0712'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 315.2503123535919,
-            'y': 177.5062578088398
-          },
-          'upperLeft': {
-            'x': 265.6871876464081,
-            'y': 176.2671796911602
-          }
-        },
-        'dockers': [
-          {
-            'x': 50,
-            'y': 40
-          },
-          {
-            'x': 20,
-            'y': 20
-          }
-        ],
-        'target': {
-          'resourceId': 'sid-9012C71B-5A95-4979-8605-2E67F8ED0712'
-        }
-      },
-      {
-        'resourceId': 'sid-4F6722CA-9043-4310-8BDD-2B3B97392E34',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'asynchronousdefinition': 'false',
-          'exclusivedefinition': 'false',
-          'executionlisteners': '',
-          'multiinstance_type': 'None',
-          'multiinstance_cardinality': '',
-          'multiinstance_collection': '',
-          'multiinstance_variable': '',
-          'multiinstance_condition': '',
-          'isforcompensation': true,
-          'usertaskassignment': '',
-          'formkeydefinition': '',
-          'formreference': '',
-          'duedatedefinition': '',
-          'prioritydefinition': '',
-          'formproperties': '',
-          'tasklisteners': '',
-          'skipexpression': '',
-          'categorydefinition': ''
-        },
-        'stencil': {
-          'id': 'UserTask'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-2B855895-02F2-4FC0-94BE-3634AA7FEFAD'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 600,
-            'y': 172
-          },
-          'upperLeft': {
-            'x': 435,
-            'y': 45
-          }
-        },
-        'dockers': [
-
-        ]
-      },
-      {
-        'resourceId': 'sid-2B855895-02F2-4FC0-94BE-3634AA7FEFAD',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'conditionsequenceflow': '',
-          'executionlisteners': '',
-          'defaultflow': 'false',
-          'skipexpression': ''
-        },
-        'stencil': {
-          'id': 'SequenceFlow'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-4D07711C-5A69-4825-8FA1-B0866540D733'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 689.9496688685755,
-            'y': 172.76408571778015
-          },
-          'upperLeft': {
-            'x': 600.0307998814245,
-            'y': 139.25544553221985
-          }
-        },
-        'dockers': [
-          {
-            'x': 82.5,
-            'y': 63.5
-          },
-          {
-            'x': 14,
-            'y': 14
-          }
-        ],
-        'target': {
-          'resourceId': 'sid-4D07711C-5A69-4825-8FA1-B0866540D733'
-        }
-      },
-      {
-        'resourceId': 'sid-FC4FB9E4-4E20-4B93-9C95-EF2DE78CDA97',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'conditionsequenceflow': '',
-          'executionlisteners': '',
-          'defaultflow': 'false',
-          'skipexpression': ''
-        },
-        'stencil': {
-          'id': 'SequenceFlow'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-3B2BA28A-F373-4DAD-B916-FBD2C1ED714E'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 434.5725444459134,
-            'y': 255.70368848126364
-          },
-          'upperLeft': {
-            'x': 346.8005024290866,
-            'y': 187.30607714373636
-          }
-        },
-        'dockers': [
-          {
-            'x': 20.5,
-            'y': 20.5
-          },
-          {
-            'x': 50,
-            'y': 40
-          }
-        ],
-        'target': {
-          'resourceId': 'sid-3B2BA28A-F373-4DAD-B916-FBD2C1ED714E'
-        }
-      },
-      {
-        'resourceId': 'sid-B15F4736-8C5A-42FE-9E80-7AA659C64042',
-        'properties': {
-          'overrideid': '',
-          'name': '',
-          'documentation': '',
-          'conditionsequenceflow': '',
-          'executionlisteners': '',
-          'defaultflow': 'false',
-          'skipexpression': ''
-        },
-        'stencil': {
-          'id': 'SequenceFlow'
-        },
-        'childShapes': [
-
-        ],
-        'outgoing': [
-          {
-            'resourceId': 'sid-4F6722CA-9043-4310-8BDD-2B3B97392E34'
-          }
-        ],
-        'bounds': {
-          'lowerRight': {
-            'x': 434.03125,
-            'y': 157.8125
-          },
-          'upperLeft': {
-            'x': 335.5,
-            'y': 108.5
-          }
-        },
-        'dockers': [
-          {
-            'x': 20.5,
-            'y': 20.5
-          },
-          {
-            'x': 335.5,
-            'y': 108.5
-          },
-          {
-            'x': 82.5,
-            'y': 63.5
-          }
-        ],
-        'target': {
-          'resourceId': 'sid-4F6722CA-9043-4310-8BDD-2B3B97392E34'
-        }
-      },
-
-      {
-        "outgoing": [
-          {
-            "resourceId": "sid-95F9ED47-6C8D-4273-BD39-E70557D7634D"
-          }
-        ],
-        "resourceId": "sid-3FD63486-3A95-447A-AB17-887861BBFCDF",
-        "bounds": {
-          "upperLeft": {
-            "x": 1037,
-            "y": 509
-          },
-          "lowerRight": {
-            "x": 1077,
-            "y": 549
-          }
+        "resourceId": "sid-6C7811C1-4B06-41A9-90A2-81162A526ED3",
+        "properties": {
+          "nmb": ""
         },
         "stencil": {
-          "id": "ExclusiveGateway"
-        },
-        "dockers": [
-
-        ],
-        "properties": {
-          "name": ""
+          "id": "StartNoneEvent"
         },
         "childShapes": [
 
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-E6B4A4EC-66EE-4A5E-B233-D6E34D08891A"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 201,
+            "y": 117
+          },
+          "upperLeft": {
+            "x": 165,
+            "y": 81
+          }
+        },
+        "dockers": [
+
         ]
       },
       {
-        "outgoing": [
-          {
-            "resourceId": "sid-D463BFD1-268B-448E-818B-AB37034AA3D0"
-          }
-        ],
-        "resourceId": "sid-95F9ED47-6C8D-4273-BD39-E70557D7634D",
-        "bounds": {
-          "upperLeft": {
-            "x": 1077.390625,
-            "y": 529
-          },
-          "lowerRight": {
-            "x": 1114.4629580690025,
-            "y": 665.7788641550494
-          }
+        "resourceId": "sid-E6B4A4EC-66EE-4A5E-B233-D6E34D08891A",
+        "properties": {
+          "name": "",
+          "defaultflow": "false"
         },
         "stencil": {
           "id": "SequenceFlow"
         },
-        "dockers": [
-          {
-            "x": 20,
-            "y": 20
-          },
-          {
-            "x": 1093.5,
-            "y": 529
-          },
-          {
-            "x": 1094.5596923828125,
-            "y": 664.6448974609375
-          },
-          {
-            "x": 56,
-            "y": 36
-          }
-        ],
-        "properties": {
-          "defaultflow": "false",
-          "name": "Y"
-        },
         "childShapes": [
 
         ],
+        "outgoing": [
+          {
+            "resourceId": "sid-81C3622C-8556-4D81-94E9-C0EE94EE7BB5"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 223.40225219726562,
+            "y": 99
+          },
+          "upperLeft": {
+            "x": 201.0866437639509,
+            "y": 99
+          }
+        },
+        "dockers": [
+          {
+            "x": 18,
+            "y": 18
+          },
+          {
+            "x": 127.23772321428574,
+            "y": 36
+          }
+        ],
         "target": {
-          "resourceId": "sid-D463BFD1-268B-448E-818B-AB37034AA3D0"
+          "resourceId": "sid-81C3622C-8556-4D81-94E9-C0EE94EE7BB5"
         }
       },
       {
-        "outgoing": [
-        ],
-        "resourceId": "sid-D463BFD1-268B-448E-818B-AB37034AA3D0",
-        "bounds": {
-          "upperLeft": {
-            "x": 1115,
-            "y": 633
-          },
-          "lowerRight": {
-            "x": 1227,
-            "y": 705
-          }
+        "resourceId": "sid-81C3622C-8556-4D81-94E9-C0EE94EE7BB5",
+        "properties": {
         },
         "stencil": {
           "id": "UserTask"
         },
-        "dockers": [
+        "childShapes": [
 
         ],
-        "properties": {
-          "activityAttributeVo": {
-            "createdByLable": "索晓菲",
-            "creationDate": 1568168636000,
-            "frameId": "07267bd2ac584dba8243644ec2af1d66",
-            "frameL0Id": "07267bd2ac584dba8243644ec2af1d66",
-            "frameL0Lable": "集团总部",
-            "frameLable": "集团总部",
-            "id": "e3725a0b41d04de38be23a44fb42b4ca",
-            "jsonDesc": {
-              "kpiLable": [
-
-              ],
-              "organizationLable": "集团总部",
-              "roleLable": "董事长"
-            },
-            "lastUpdateDate": 1568170044000,
-            "lastUpdatedByLable": "索晓菲",
-            "type": "approval"
+        "outgoing": [
+          {
+            "resourceId": "sid-DEFF4C32-730B-4262-B763-B2F41776B94A"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 364,
+            "y": 135
           },
-          "activityEnvAttribute": {
-            "attachment": [
-
-            ],
-            "clause": [
-
-            ],
-            "dates": "1",
-            "description": "审核公司预算并报董事会审批",
-            "form": [
-
-            ],
-            "kpi": [
-
-            ],
-            "name": "审核",
-            "organization": "5369343dc7b84a05a74921f002c1f067",
-            "roleId": "0909ac69cb1a4978b679039fbc13eb1e",
-            "standard": [
-
-            ]
-          },
-          "name": "审核",
-          "nmb": "05-05",
-          "refId": "e3725a0b41d04de38be23a44fb42b4ca",
-          "type": "approval"
+          "upperLeft": {
+            "x": 224,
+            "y": 63
+          }
         },
-        "childShapes": [
+        "dockers": [
 
         ]
       },
+      {
+        "resourceId": "sid-9B0F83F9-29C4-4060-9476-EE9FA77B1ADD",
+        "properties": {
+          "name": ""
+        },
+        "stencil": {
+          "id": "IntermediateSignalEvent"
+        },
+        "childShapes": [
 
+        ],
+        "outgoing": [
+          {
+            "resourceId": "sid-EF24C37D-731C-4B1A-8906-47BECEBE3B01"
+          }
+        ],
+        "bounds": {
+          "lowerRight": {
+            "x": 314,
+            "y": 197
+          },
+          "upperLeft": {
+            "x": 274,
+            "y": 157
+          }
+        },
+        "dockers": [
+
+        ]
+      },
+      //
+      // {
+      //   "resourceId": "sid-EF24C37D-731C-4B1A-8906-47BECEBE3B01",
+      //   "properties": {
+      //     "name": "",
+      //     "defaultflow": "false"
+      //   },
+      //   "stencil": {
+      //     "id": "SequenceFlow"
+      //   },
+      //   "childShapes": [
+      //
+      //   ],
+      //   "outgoing": [
+      //     {
+      //       "resourceId": "sid-81C3622C-8556-4D81-94E9-C0EE94EE7BB5"
+      //     }
+      //   ],
+      //   "bounds": {
+      //     "lowerRight": {
+      //       "x": 294,
+      //       "y": 156.5
+      //     },
+      //     "upperLeft": {
+      //       "x": 294,
+      //       "y": 135.34375
+      //     }
+      //   },
+      //   "dockers": [
+      //     {
+      //       "x": 20,
+      //       "y": 20
+      //     },
+      //     {
+      //       "x": 70,
+      //       "y": 36
+      //     }
+      //   ],
+      //   "target": {
+      //     "resourceId": "sid-81C3622C-8556-4D81-94E9-C0EE94EE7BB5"
+      //   }
+      // },
+      // {
+      //   "resourceId": "sid-DEFF4C32-730B-4262-B763-B2F41776B94A",
+      //   "properties": {
+      //     "name": "",
+      //     "defaultflow": "false"
+      //   },
+      //   "stencil": {
+      //     "id": "SequenceFlow"
+      //   },
+      //   "childShapes": [
+      //
+      //   ],
+      //   "outgoing": [
+      //     {
+      //       "resourceId": "sid-8029A610-C569-4D64-BEC9-CA6AAB08E376"
+      //     }
+      //   ],
+      //   "bounds": {
+      //     "lowerRight": {
+      //       "x": 400.8388073979592,
+      //       "y": 272
+      //     },
+      //     "upperLeft": {
+      //       "x": 364.140625,
+      //       "y": 99
+      //     }
+      //   },
+      //   "dockers": [
+      //     {
+      //       "x": 70,
+      //       "y": 36
+      //     },
+      //     {
+      //       "x": 382.5,
+      //       "y": 99
+      //     },
+      //     {
+      //       "x": 382.5,
+      //       "y": 272
+      //     },
+      //     {
+      //       "x": 119.02040816326533,
+      //       "y": 36
+      //     }
+      //   ],
+      //   "target": {
+      //     "resourceId": "sid-8029A610-C569-4D64-BEC9-CA6AAB08E376"
+      //   }
+      // },
+      // {
+      //   "resourceId": "sid-8029A610-C569-4D64-BEC9-CA6AAB08E376",
+      //   "properties": {
+      //     "nmb": "",
+      //     "refId": "94ec574b914441998af4c0d2ed0a89c3",
+      //     "type": "approvalprocess",
+      //     "activityEnvAttribute": {
+      //       "attachment": [
+      //
+      //       ],
+      //       "dates": "3",
+      //       "kpi": [
+      //
+      //       ],
+      //       "name": "测试删除活动3",
+      //       "roleId": "a384eea75029451a97b1e40cf2252feb",
+      //       "standard": [
+      //
+      //       ]
+      //     }
+      //   },
+      //   "stencil": {
+      //     "id": "UserTask"
+      //   },
+      //   "childShapes": [
+      //
+      //   ],
+      //   "outgoing": [
+      //     {
+      //       "resourceId": "sid-DAE67219-7315-420B-BACC-FA4AD4AF83AD"
+      //     }
+      //   ],
+      //   "bounds": {
+      //     "lowerRight": {
+      //       "x": 545,
+      //       "y": 308
+      //     },
+      //     "upperLeft": {
+      //       "x": 401,
+      //       "y": 236
+      //     }
+      //   },
+      //   "dockers": [
+      //
+      //   ]
+      // },
+      // {
+      //   "resourceId": "sid-361F8C75-CC3B-4E42-A109-22CBD31DCE56",
+      //   "properties": {
+      //     "name": ""
+      //   },
+      //   "stencil": {
+      //     "id": "EndNoneEvent"
+      //   },
+      //   "childShapes": [
+      //
+      //   ],
+      //   "outgoing": [
+      //
+      //   ],
+      //   "bounds": {
+      //     "lowerRight": {
+      //       "x": 604,
+      //       "y": 290
+      //     },
+      //     "upperLeft": {
+      //       "x": 568,
+      //       "y": 254
+      //     }
+      //   },
+      //   "dockers": [
+      //
+      //   ]
+      // },
+      // {
+      //   "resourceId": "sid-DAE67219-7315-420B-BACC-FA4AD4AF83AD",
+      //   "properties": {
+      //     "name": "",
+      //     "defaultflow": "false"
+      //   },
+      //   "stencil": {
+      //     "id": "SequenceFlow"
+      //   },
+      //   "childShapes": [
+      //
+      //   ],
+      //   "outgoing": [
+      //     {
+      //       "resourceId": "sid-361F8C75-CC3B-4E42-A109-22CBD31DCE56"
+      //     }
+      //   ],
+      //   "bounds": {
+      //     "lowerRight": {
+      //       "x": 567.34375,
+      //       "y": 272
+      //     },
+      //     "upperLeft": {
+      //       "x": 545.5078125,
+      //       "y": 272
+      //     }
+      //   },
+      //   "dockers": [
+      //     {
+      //       "x": 72,
+      //       "y": 36
+      //     },
+      //     {
+      //       "x": 18,
+      //       "y": 18
+      //     }
+      //   ],
+      //   "target": {
+      //     "resourceId": "sid-361F8C75-CC3B-4E42-A109-22CBD31DCE56"
+      //   }
+      // }
     ],
     'stencil': {
       'id': 'BPMNDiagram'

@@ -249,8 +249,9 @@
         this.editorManager.clearAllEvents()
       },
       handleSaveBtn (editor) {
-        this.saveVisible = true
-        this.editorManager = editor
+        this.save()
+        // this.saveVisible = true
+        // this.editorManager = editor
       },
       save () {
         this.saveLoading = true

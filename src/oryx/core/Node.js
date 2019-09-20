@@ -446,8 +446,7 @@ export default class Node extends Shape {
           data = deserializeEvent.result
         }
       }
-    }
-    catch (e) {}
+    } catch (e) {}
 
     // Set the outgoing shapes
     let outgoing = data.findAll((ser) => (ser.prefix + '-' + ser.name) === 'raziel-outgoing')

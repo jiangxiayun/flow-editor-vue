@@ -388,6 +388,15 @@ export default class Canvas extends AbstractShape {
       return addedShapes
     }
 
+    // 排序Node在前，先渲染全部Node后再渲染Edge，防止初次加载docker的referencePoint就产生偏移
+    shapeObjects.sort((value1, value2) => {
+      let stencil = StencilSet.stencil(this.getStencil().namespace() + value1.stencil.id)
+      if (stencil.type() === 'node') {
+        return -1;
+      } else {
+        return 1;
+      }
+    })
     let shapes = addChildShapesRecursively({
       childShapes: shapeObjects,
       resourceId: this.resourceId
