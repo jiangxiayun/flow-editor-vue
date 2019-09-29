@@ -740,13 +740,14 @@ export default class Label {
           invalidTSpans.push(tspan)
         } else {
           // set vertical position
+          console.log(this._verticalAlign)
           let dy = 0
           switch (this._verticalAlign) {
             case 'bottom':
-              dy = -(length - index - 1) * (fontSize)
+              dy = -(length - index - 1) * (fontSize + 2)
               break
             case 'middle':
-              dy = -(length / 2.0 - index - 1) * (fontSize)
+              dy = -(length / 2.0 - index - 1) * (fontSize + 2)
               dy -= ORYX_CONFIG.LABEL_LINE_DISTANCE / 2
               break
             case 'top':

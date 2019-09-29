@@ -455,71 +455,96 @@ export default class Edge extends Shape {
 
             break
           case 'midtop':
-            numOfDockers = this.dockers.length
-            if (numOfDockers % 2 == 0) {
-              let angle = this._getAngle(this.dockers[numOfDockers / 2 - 1], this.dockers[numOfDockers / 2])
-              let pos1 = this.dockers[numOfDockers / 2 - 1].bounds.center()
-              let pos2 = this.dockers[numOfDockers / 2].bounds.center()
-              let pos = { x: (pos1.x + pos2.x) / 2.0, y: (pos1.y + pos2.y) / 2.0 }
-
-              if (angle === 0 || angle === 360) {
-                label.horizontalAlign('center')  // X水平，文字居中，底端对齐
-                label.verticalAlign('bottom')
-                label.x = pos.x
-              } else {
-                label.horizontalAlign('right')  // Y水平，文字居线左，右对齐
-                label.verticalAlign('middle')
-                label.x = pos.x - 5
-              }
-              label.y = pos.y - label.getOffsetTop()
-              // if (angle <= 90 || angle > 270) {
-              //   label.rotate(360 - angle, pos)
-              // } else {
-              //   label.rotate(180 - angle, pos)
-              // }
-            } else {
-              index = parseInt(numOfDockers / 2)
-              angle = this._getAngle(this.dockers[index], this.dockers[index + 1])
-              pos = this.dockers[index].bounds.center()
-              let pos2 = this.dockers[index + 1].bounds.center()
-              // let pos2 = this.dockers[index + 1].bounds.center()
-              // label.horizontalAlign('left')
-              // label.verticalAlign('bottom')
-              // label.x = pos.x + label.getOffsetTop()
-              // label.y = (pos.y + pos2.y) / 2 - label.getOffsetTop()
-
-              // console.log(index, this.dockers[index])
-              if (angle === 0 || angle === 360) {
-                label.horizontalAlign('center')  // X水平，文字居中，底端对齐
-                label.verticalAlign('bottom')
-                label.x = (pos.x + pos2.x) / 2  - label.getOffsetTop()
-                label.y = pos.y - label.getOffsetTop()
-              } else {
-                label.horizontalAlign('right')  // Y水平，文字居线左，右对齐
-                label.verticalAlign('middle')
-                label.x = pos.x - label.getOffsetTop()
-                let pos2 = this.dockers[index + 1].bounds.center()
-                label.y = (pos.y + pos2.y) / 2 - label.getOffsetTop()
-              }
-
-              // console.log(567, label, angle)
-              // label.rotate(180 - angle, pos)
-              // if (angle <= 90 || angle > 270) {
-              //   label.horizontalAlign('left')
-              //   label.verticalAlign('bottom')
-              //   label.x = pos.x + label.getOffsetTop()
-              //   label.y = pos.y - label.getOffsetTop()
-              //   label.rotate(360 - angle, pos)
-              // } else {
-              //   label.horizontalAlign('right')
-              //   label.verticalAlign('bottom')
-              //   label.x = pos.x - label.getOffsetTop()
-              //   let pos2 = this.dockers[index + 1].bounds.center()
-              //   console.log(567, pos, pos2)
-              //   label.y = pos.y - label.getOffsetTop()
-              //   label.rotate(180 - angle, pos)
-              // }
+            let index = 0
+            if (this.dockers.length > 2) {
+              let firstDistance = ORYX_Math.getDistancePointToPoint(
+                this.dockers[0].bounds.center(), this.dockers[1].bounds.center())
+              let sencodDistance = ORYX_Math.getDistancePointToPoint(
+                this.dockers[1].bounds.center(), this.dockers[2].bounds.center())
+              index = firstDistance > sencodDistance ? 0 : 1
             }
+
+            let angle = this._getAngle(this.dockers[index], this.dockers[index + 1])
+            let pos1 = this.dockers[index].bounds.center()
+            let pos2 = this.dockers[index + 1].bounds.center()
+            let pos = { x: (pos1.x + pos2.x) / 2.0, y: (pos1.y + pos2.y) / 2.0 }
+
+            if (angle === 0 || angle === 360) {
+              label.horizontalAlign('center')  // X水平，文字居中，底端对齐
+              label.verticalAlign('bottom')
+              label.x = pos.x
+            } else {
+              label.horizontalAlign('right')  // Y水平，文字居线左，右对齐
+              label.verticalAlign('middle')
+              label.x = pos.x - 5
+            }
+            label.y = pos.y - label.getOffsetTop()
+
+            // numOfDockers = this.dockers.length
+            // if (numOfDockers % 2 == 0) {
+            //   let angle = this._getAngle(this.dockers[numOfDockers / 2 - 1], this.dockers[numOfDockers / 2])
+            //   let pos1 = this.dockers[numOfDockers / 2 - 1].bounds.center()
+            //   let pos2 = this.dockers[numOfDockers / 2].bounds.center()
+            //   let pos = { x: (pos1.x + pos2.x) / 2.0, y: (pos1.y + pos2.y) / 2.0 }
+            //
+            //   if (angle === 0 || angle === 360) {
+            //     label.horizontalAlign('center')  // X水平，文字居中，底端对齐
+            //     label.verticalAlign('bottom')
+            //     label.x = pos.x
+            //   } else {
+            //     label.horizontalAlign('right')  // Y水平，文字居线左，右对齐
+            //     label.verticalAlign('middle')
+            //     label.x = pos.x - 5
+            //   }
+            //   label.y = pos.y - label.getOffsetTop()
+            //   // if (angle <= 90 || angle > 270) {
+            //   //   label.rotate(360 - angle, pos)
+            //   // } else {
+            //   //   label.rotate(180 - angle, pos)
+            //   // }
+            // } else {
+            //   index = parseInt(numOfDockers / 2)
+            //   angle = this._getAngle(this.dockers[index], this.dockers[index + 1])
+            //   pos = this.dockers[index].bounds.center()
+            //   let pos2 = this.dockers[index + 1].bounds.center()
+            //   // let pos2 = this.dockers[index + 1].bounds.center()
+            //   // label.horizontalAlign('left')
+            //   // label.verticalAlign('bottom')
+            //   // label.x = pos.x + label.getOffsetTop()
+            //   // label.y = (pos.y + pos2.y) / 2 - label.getOffsetTop()
+            //
+            //   // console.log(index, this.dockers[index])
+            //   if (angle === 0 || angle === 360) {
+            //     label.horizontalAlign('center')  // X水平，文字居中，底端对齐
+            //     label.verticalAlign('bottom')
+            //     label.x = (pos.x + pos2.x) / 2  - label.getOffsetTop()
+            //     label.y = pos.y - label.getOffsetTop()
+            //   } else {
+            //     label.horizontalAlign('right')  // Y水平，文字居线左，右对齐
+            //     label.verticalAlign('middle')
+            //     label.x = pos.x - label.getOffsetTop()
+            //     let pos2 = this.dockers[index + 1].bounds.center()
+            //     label.y = (pos.y + pos2.y) / 2 - label.getOffsetTop()
+            //   }
+            //
+            //   // console.log(567, label, angle)
+            //   // label.rotate(180 - angle, pos)
+            //   // if (angle <= 90 || angle > 270) {
+            //   //   label.horizontalAlign('left')
+            //   //   label.verticalAlign('bottom')
+            //   //   label.x = pos.x + label.getOffsetTop()
+            //   //   label.y = pos.y - label.getOffsetTop()
+            //   //   label.rotate(360 - angle, pos)
+            //   // } else {
+            //   //   label.horizontalAlign('right')
+            //   //   label.verticalAlign('bottom')
+            //   //   label.x = pos.x - label.getOffsetTop()
+            //   //   let pos2 = this.dockers[index + 1].bounds.center()
+            //   //   console.log(567, pos, pos2)
+            //   //   label.y = pos.y - label.getOffsetTop()
+            //   //   label.rotate(180 - angle, pos)
+            //   // }
+            // }
 
             break
           case 'midbottom':
