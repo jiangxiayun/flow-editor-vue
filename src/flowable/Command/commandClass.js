@@ -19,6 +19,10 @@ export default class CommandClass extends ORYX.Core.Command {
     if (!this.shape) {
       this.shape = this.facade.createShape(this.option)
       this.parent = this.shape.parent
+      this.facade.handleEvents({
+        type: 'newshape_addin_canvas',
+        shape: this.shape
+      })
     } else if (this.parent) {
       this.parent.add(this.shape)
     }

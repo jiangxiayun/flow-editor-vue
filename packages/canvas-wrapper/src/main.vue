@@ -417,7 +417,8 @@
             // Update canvas
             // let command = new commandClass(option, this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())
             // this.editorManager.executeCommands([command])
-            this.editorManager.assignCommand('CommandClass', option, this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())
+            this.editorManager.assignCommand('CommandClass', option,
+              this.editorManager.dragCurrentParent, canAttach, pos, this.editorManager.getEditor())
 
             // Fire event to all who want to know about this
             let dropEvent = {

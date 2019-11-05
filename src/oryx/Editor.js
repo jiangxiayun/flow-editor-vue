@@ -1093,7 +1093,7 @@ export default class Editor {
       }
     }
 
-    this.handleEvents({ type: 'newshape_addin_canvas', shape: newShapeObject })
+    // this.handleEvents({ type: 'newshape_addin_canvas', shape: newShapeObject })
 
     // Update the shape
     if (newShapeObject instanceof ORYX_Edge) {
