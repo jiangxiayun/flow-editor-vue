@@ -28,7 +28,7 @@
                 :disabled="item.type == 'separator'"
                 @click="toolbarSecondaryButtonClicked(index)">
           <i v-if="item.type == 'button'" :class="item.cssClass" class="toolbar-button"
-             data-toggle="tooltip" :title="t(item.title)"></i>
+             data-toggle="tooltip" :title="t(item.title) || item.title"></i>
           <div v-if="item.type == 'separator'" :class="item.cssClass"></div>
         </button>
       </div>
