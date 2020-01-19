@@ -23,7 +23,7 @@
         <button v-for="(item, index) in secondaryItems"
                 :key="item.id"
                 :id="item.id"
-                :title="t(item.title)"
+                :title="t(item.title) || item.title"
                 class="btn btn-inverse" :class="{'separator': item.type == 'separator'}"
                 :disabled="item.type == 'separator'"
                 @click="toolbarSecondaryButtonClicked(index)">
