@@ -1153,7 +1153,8 @@ export const AA = {
         'baseMorphs': [
           'UserTask'
         ],
-        'preserveBounds': true
+        'preserveBounds': true,
+        'hideMorphButton': true
       },
       {
         'role': 'GatewaysMorph',

@@ -133,7 +133,6 @@ export default class EditorManager {
 
     // this is an object.
     let editorConfig = this.editor.getJSON()
-    console.log(222, this.modelId)
     let model = {
       modelId: this.modelId,
       bounds: editorConfig.bounds,
@@ -189,8 +188,12 @@ export default class EditorManager {
     let quickMenuItems = []
     let morphRoles = []
     for (let i = 0; i < data.rules.morphingRules.length; i++) {
-      let role = data.rules.morphingRules[i].role
-      let roleItem = { 'role': role, 'morphOptions': [] }
+      if (!data.rules.morphingRules[i].hideMorphButton) {
+
+      }
+      // let role = data.rules.morphingRules[i].role
+      const { role, hideMorphButton } = data.rules.morphingRules[i]
+      let roleItem = { 'role': role, 'hideMorphButton': hideMorphButton, 'morphOptions': [] }
       morphRoles.push(roleItem)
     }
 
@@ -894,7 +897,9 @@ export default class EditorManager {
       if (stencilItem && stencilItem.morphRole) {
         for (let i = 0; i < this.morphRoles.length; i++) {
           if (this.morphRoles[i].role === stencilItem.morphRole) {
-            morphShapes = this.morphRoles[i].morphOptions
+            if (!this.morphRoles[i].hideMorphButton) {
+              morphShapes = this.morphRoles[i].morphOptions
+            }
           }
         }
       }

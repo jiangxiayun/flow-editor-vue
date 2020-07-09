@@ -425,7 +425,7 @@
           }
         }
         let item = morphShapes[0]
-        console.log('item', morphShapes)
+        console.log('morphShapes', morphShapes)
 
         let stencil = undefined
         const stencilSets = this.editorManager.getStencilSets().values()
