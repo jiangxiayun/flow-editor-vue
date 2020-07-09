@@ -912,7 +912,7 @@ export default class EditorManager {
       if (ORYX.CONFIG.CustomConfigs.UI_CONFIG.Oryx_button_left_bottom) {
         let flow_op_btns = document.getElementById('flow_op_btns')
         flow_op_btns.style.left = x + 'px'
-        flow_op_btns.style.top = (shapeXY.y + bounds.height() + 2) + 'px'
+        flow_op_btns.style.top = (shapeXY.y + bounds.height() + 4) + 'px'
       }
 
       let editable = selectedShape._stencil._jsonStencil.id.endsWith('CollapsedSubProcess')

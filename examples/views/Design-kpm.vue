@@ -404,6 +404,7 @@
       },
       // 切换元素类型
       handleCommand () {
+        console.log('切换元素类型')
         let morphShapes = []
         const morphRoles = this.editorManager.morphRoles
         console.log('morphRoles', morphRoles)

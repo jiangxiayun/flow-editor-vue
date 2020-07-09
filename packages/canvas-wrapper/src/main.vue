@@ -22,11 +22,11 @@
       <template v-if="UI_CONFIG.Oryx_button_left_bottom">
         <div id="flow_op_btns" v-show="!btn_visibile.hide_shape_buttons">
           <!--删除按钮-->
-          <div class="Oryx_button" id="delete-button"
-               :title="t('BUTTON.ACTION.DELETE.TOOLTIP')"
-               @click="deleteShape">
-            <img src="@/assets/images/delete.png"/>
-          </div>
+<!--          <div class="Oryx_button" id="delete-button"-->
+<!--               :title="t('BUTTON.ACTION.DELETE.TOOLTIP')"-->
+<!--               @click="deleteShape">-->
+<!--            <img src="@/assets/images/delete.png"/>-->
+<!--          </div>-->
           <!--设置修改形状-->
           <div v-if="!btn_visibile.hide_morph_buttons"
                class="Oryx_button" id="morph-button"
@@ -154,7 +154,6 @@
     },
     methods: {
       oryxBtnStatus (btns) {
-        // console.log('oryxBtnStatus', btns)
         btns.map(btn => {
           this.btn_visibile[btn.type] = btn.status
         })

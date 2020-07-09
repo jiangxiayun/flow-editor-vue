@@ -397,6 +397,9 @@ export const AA = {
         'Startevents_all',
         'StartEventsMorph',
         'all'
+      ],
+      'stencilItem': [
+          'ExclusiveGateway'
       ]
     },
     {
@@ -1155,7 +1158,8 @@ export const AA = {
       {
         'role': 'GatewaysMorph',
         'baseMorphs': [
-          'ExclusiveGateway'
+          'ExclusiveGateway',
+            'ParallelGateway'
         ]
       },
       {

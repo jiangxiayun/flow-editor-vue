@@ -2,7 +2,7 @@ const DEFAULT_CONFIG = {
   UI_CONFIG: {
     showRemovedProperties: false,
     CUSTOM_CONTEXTMENU: false, // 是否自定义上下文
-    Oryx_button_left_bottom: false,  // 节点选中时左下角悬浮快捷键是否展示
+    Oryx_button_left_bottom: true,  // 节点选中时左下角悬浮快捷键是否展示
     Oryx_button_right_top: true,  // 节点选中时右上角悬浮快捷键是否展示
     CANVAS_WIDTH: 1200,
     CANVAS_HEIGHT: 1050,
