@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@antv/g6": "^2.2.6",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "deepmerge": "^3.2.0",
     "element-ui": "^2.4.5",
     "mousetrap": "^1.6.3",
